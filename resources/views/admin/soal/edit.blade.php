@@ -152,7 +152,7 @@
                                list.appendChild(li);
                            });
                        "
-                       accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.zip">
+                       accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.zip,.pkt">
                 @error('files') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
                 @error('files.*') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
             </div>
@@ -269,6 +269,10 @@
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" name="allowed_extensions[]" value="archive" class="accent-pink-500 bg-gray-800 border-gray-600 w-4 h-4 rounded" {{ in_array('archive', $exts) ? 'checked' : '' }}>
                                     <span class="text-xs text-gray-300">Arsip (.zip, .rar)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="allowed_extensions[]" value="pkt" class="accent-pink-500 bg-gray-800 border-gray-600 w-4 h-4 rounded" {{ in_array('pkt', $exts) ? 'checked' : '' }}>
+                                    <span class="text-xs text-gray-300">Packet Tracer (.pkt)</span>
                                 </label>
                             </div>
                             @error('allowed_extensions') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror

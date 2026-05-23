@@ -270,7 +270,7 @@ class SoalAccessController extends Controller
         $allowedMimes = [];
         if (empty($allowed)) {
             // Semua format diizinkan (whitelist aman)
-            $allowedMimes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'zip', 'rar'];
+            $allowedMimes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'zip', 'rar', 'pkt'];
         } else {
             if (in_array('pdf', $allowed))     $allowedMimes = array_merge($allowedMimes, ['pdf']);
             if (in_array('word', $allowed))    $allowedMimes = array_merge($allowedMimes, ['doc', 'docx']);
@@ -278,14 +278,15 @@ class SoalAccessController extends Controller
             if (in_array('ppt', $allowed))     $allowedMimes = array_merge($allowedMimes, ['ppt', 'pptx']);
             if (in_array('image', $allowed))   $allowedMimes = array_merge($allowedMimes, ['jpg', 'jpeg', 'png']);
             if (in_array('archive', $allowed)) $allowedMimes = array_merge($allowedMimes, ['zip', 'rar']);
+            if (in_array('pkt', $allowed))     $allowedMimes = array_merge($allowedMimes, ['pkt']);
         }
 
-        $mimesRule = 'mimes:' . implode(',', $allowedMimes);
+        $extRule = 'extensions:' . implode(',', $allowedMimes);
 
         $request->validate([
             'nim'  => 'required|string|max:50|regex:/^[a-zA-Z0-9\-]+$/',
             'nama' => 'required|string|max:255',
-            'file' => ['required', 'file', 'max:10240', $mimesRule],
+            'file' => ['required', 'file', 'max:10240', $extRule],
         ]);
 
         $file = $request->file('file');
@@ -307,7 +308,7 @@ class SoalAccessController extends Controller
             'application/x-rar-compressed', 'application/vnd.rar',
         ];
 
-        if (!in_array($realMime, $safeMimes)) {
+        if (!in_array($realMime, $safeMimes) && $file->getClientOriginalExtension() !== 'pkt') {
             return response()->json(['message' => 'Tipe file tidak diizinkan.'], 422);
         }
 

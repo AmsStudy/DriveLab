@@ -67,7 +67,7 @@ class SoalController extends Controller
             'deadline_at' => 'nullable|required_if:is_submission_enabled,1|date',
             'submission_instructions' => 'nullable|string',
             'allowed_extensions' => 'nullable|required_if:is_submission_enabled,1|array',
-            'allowed_extensions.*' => 'string|in:pdf,word,excel,ppt,image,archive',
+            'allowed_extensions.*' => 'string|in:pdf,word,excel,ppt,image,archive,pkt',
         ]);
 
         do {
@@ -142,7 +142,7 @@ class SoalController extends Controller
             'deadline_at' => 'nullable|required_if:is_submission_enabled,1|date',
             'submission_instructions' => 'nullable|string',
             'allowed_extensions' => 'nullable|required_if:is_submission_enabled,1|array',
-            'allowed_extensions.*' => 'string|in:pdf,word,excel,ppt,image,archive',
+            'allowed_extensions.*' => 'string|in:pdf,word,excel,ppt,image,archive,pkt',
             'files'        => 'nullable|array|max:5',
             'files.*'      => 'file|max:5120',
         ]);

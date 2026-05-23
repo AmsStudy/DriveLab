@@ -628,6 +628,7 @@ footer{
                 if (in_array('ppt', $allowed))     { $accepts[] = '.ppt,.pptx';     $extLabels[] = 'PowerPoint'; }
                 if (in_array('image', $allowed))   { $accepts[] = '.jpg,.jpeg,.png'; $extLabels[] = 'Gambar'; }
                 if (in_array('archive', $allowed)) { $accepts[] = '.zip,.rar';       $extLabels[] = 'Arsip'; }
+                if (in_array('pkt', $allowed))     { $accepts[] = '.pkt';            $extLabels[] = 'Packet Tracer'; }
 
                 $extText    = 'Format: ' . implode(', ', $extLabels);
                 $acceptAttr = implode(',', $accepts);
@@ -900,15 +901,18 @@ document.getElementById('submission-form').addEventListener('submit', async func
     try {
         const response = await fetch('{{ route('soal.submitTask', ['token' => $soal->unique_token]) }}', {
             method: 'POST',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            headers: { 
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
             body: formData,
         });
 
         let result;
+        const text = await response.text();
         try {
-            result = await response.json();
+            result = JSON.parse(text);
         } catch {
-            const text = await response.text();
             showAlert('error', 'Server error: ' + text.substring(0, 120));
             setLoading(false);
             return;
@@ -924,7 +928,12 @@ document.getElementById('submission-form').addEventListener('submit', async func
                 btnLabel.textContent = 'Perbarui Tugas';
             }
         } else {
-            showAlert('error', result.message || result.error || 'Terjadi kesalahan saat mengunggah.');
+            let errorMsg = result.message || result.error || 'Terjadi kesalahan saat mengunggah.';
+            if (result.errors) {
+                const firstKey = Object.keys(result.errors)[0];
+                errorMsg = result.errors[firstKey][0];
+            }
+            showAlert('error', errorMsg);
         }
     } catch (err) {
         showAlert('error', 'Kesalahan koneksi: ' + err.message);

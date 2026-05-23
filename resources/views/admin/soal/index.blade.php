@@ -304,7 +304,7 @@
                             <ul id="file-list" class="text-[11px] text-green-400 font-medium space-y-0.5 text-left pl-2 list-disc list-inside"></ul>
                         </div>
                     </div>
-                    <input type="file" id="files" name="files[]" multiple class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.zip">
+                    <input type="file" id="files" name="files[]" multiple class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.zip,.pkt">
                     @error('files') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
                 </div>
 
@@ -383,6 +383,10 @@
                                 <label class="flex items-center gap-1.5 cursor-pointer">
                                     <input type="checkbox" name="allowed_extensions[]" value="archive" class="accent-pink-500 bg-gray-800 border-gray-600 w-3.5 h-3.5 rounded">
                                     <span class="text-xs text-gray-300">Arsip (.zip, .rar)</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="allowed_extensions[]" value="pkt" class="accent-pink-500 bg-gray-800 border-gray-600 w-3.5 h-3.5 rounded">
+                                    <span class="text-xs text-gray-300">Packet Tracer (.pkt)</span>
                                 </label>
                             </div>
                             @error('allowed_extensions') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
