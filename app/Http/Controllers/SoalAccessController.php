@@ -46,10 +46,10 @@ class SoalAccessController extends Controller
 
         $soal = Soal::with('category', 'admin')->where('unique_token', $token)->firstOrFail();
 
-        $ip        = $request->ip();
+        $sessionId = $request->session()->getId();
         $userAgent = $request->userAgent();
         
-        $throttleKey = 'soal_access_' . $soal->id . '_' . $ip;
+        $throttleKey = 'soal_access_' . $soal->id . '_' . $sessionId;
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
@@ -258,11 +258,11 @@ class SoalAccessController extends Controller
     }
     public function submitTask(Request $request, string $token)
     {
-        // Rate limiting: maks 30 pengiriman per IP per menit
-        $rateLimitKey = 'submit_task_' . $request->ip();
-        if (RateLimiter::tooManyAttempts($rateLimitKey, 30)) {
+        // Rate limiting: maks 15 pengiriman per sesi per menit
+        $rateLimitKey = 'submit_task_' . $request->session()->getId();
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 15)) {
             $seconds = RateLimiter::availableIn($rateLimitKey);
-            return response()->json(['message' => 'Terlalu banyak permintaan. Coba lagi dalam ' . ceil($seconds) . ' detik.'], 429);
+            return response()->json(['message' => 'Terlalu banyak permintaan pengumpulan. Coba lagi dalam ' . ceil($seconds) . ' detik.'], 429);
         }
         RateLimiter::hit($rateLimitKey, 60);
 
@@ -383,11 +383,11 @@ class SoalAccessController extends Controller
 
     public function trackTask(Request $request)
     {
-        // Rate limiting: maks 30 permintaan per IP per menit
-        $rateLimitKey = 'track_task_' . $request->ip();
+        // Rate limiting: maks 30 permintaan per sesi per menit
+        $rateLimitKey = 'track_task_' . $request->session()->getId();
         if (RateLimiter::tooManyAttempts($rateLimitKey, 30)) {
             $seconds = RateLimiter::availableIn($rateLimitKey);
-            return response()->json(['message' => 'Terlalu banyak permintaan. Coba lagi dalam ' . ceil($seconds) . ' detik.'], 429);
+            return response()->json(['message' => 'Terlalu banyak permintaan pelacakan. Coba lagi dalam ' . ceil($seconds) . ' detik.'], 429);
         }
         RateLimiter::hit($rateLimitKey, 60);
 

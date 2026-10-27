@@ -346,6 +346,13 @@ class SoalController extends Controller
     {
         $this->authorizeAccess($soal);
 
+        // Hindari timeout dan kehabisan memori untuk arsip tugas berukuran besar
+        @set_time_limit(0);
+        $currentMemory = (int) ini_get('memory_limit');
+        if ($currentMemory > 0 && $currentMemory < 512) {
+            @ini_set('memory_limit', '512M');
+        }
+
         $submissions = Submission::where('soal_id', $soal->id)->orderBy('nim')->get();
 
         if ($submissions->isEmpty()) {
@@ -361,40 +368,51 @@ class SoalController extends Controller
 
         if (!is_dir($tempDir)) {
             mkdir($tempDir, 0755, true);
+        } else {
+            // Bersihkan file arsip sementara yang sudah berusia lebih dari 1 jam
+            foreach (glob($tempDir . '/*.zip') as $oldZip) {
+                if (is_file($oldZip) && (time() - filemtime($oldZip)) > 3600) {
+                    @unlink($oldZip);
+                }
+            }
         }
 
         $tempPath = $tempDir . '/' . Str::uuid() . '.zip';
         $zip      = new ZipArchive();
 
         if ($zip->open($tempPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-            abort(500, 'Gagal membuat arsip ZIP.');
+            return back()->with('error', 'Gagal membuat arsip ZIP pada server.');
         }
 
-        $usedNames = [];
-        $added     = 0;
+        try {
+            $usedNames = [];
+            $added     = 0;
 
-        foreach ($submissions as $submission) {
-            $realFile = $this->resolvePrivateFile($submission->file_path, $realBase);
+            foreach ($submissions as $submission) {
+                $realFile = $this->resolvePrivateFile($submission->file_path, $realBase);
 
-            if ($realFile === null) {
-                continue;
+                if ($realFile === null) {
+                    continue;
+                }
+
+                $zip->addFile($realFile, $this->submissionZipEntryName($submission, $usedNames));
+                $added++;
             }
 
-            $zip->addFile($realFile, $this->submissionZipEntryName($submission, $usedNames));
-            $added++;
-        }
+            $zip->close();
 
-        $zip->close();
+            if ($added === 0) {
+                @unlink($tempPath);
+                return back()->with('error', 'Tidak ada file fisik tugas yang dapat diunduh.');
+            }
 
-        if ($added === 0) {
+            $zipFileName = 'tugas_' . Str::slug($soal->title) . '_' . now()->format('Ymd_His') . '.zip';
+
+            return response()->download($tempPath, $zipFileName)->deleteFileAfterSend(true);
+        } catch (\Throwable $e) {
             @unlink($tempPath);
-
-            return back()->with('error', 'Tidak ada file tugas yang dapat diunduh.');
+            return back()->with('error', 'Terjadi kesalahan saat memproses file ZIP: ' . $e->getMessage());
         }
-
-        $zipFileName = 'tugas_' . Str::slug($soal->title) . '_' . now()->format('Ymd_His') . '.zip';
-
-        return response()->download($tempPath, $zipFileName)->deleteFileAfterSend(true);
     }
 
     public function downloadSubmission($id)
