@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -12,7 +12,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', sans-serif;
-            background: #0D0D14;
+            background: #090D0B;
             color: #E5E7EB;
             min-height: 100vh;
             display: flex;
@@ -24,18 +24,18 @@
             overflow-x: hidden;
         }
         .blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
-        .blob-1 { width: 500px; height: 500px; background: rgba(247,37,133,.07); top: -10%; left: -15%; }
-        .blob-2 { width: 500px; height: 500px; background: rgba(168,85,247,.05); bottom: -15%; right: -15%; }
+        .blob-1 { width: 500px; height: 500px; background: rgba(16,185,129,.08); top: -10%; left: -15%; }
+        .blob-2 { width: 500px; height: 500px; background: rgba(13,148,136,.06); bottom: -15%; right: -15%; }
 
         .auth-container { position: relative; z-index: 10; width: 100%; max-width: 420px; }
 
         .logo-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 36px; text-decoration: none; }
-        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #F72585, #7209B7); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 24px rgba(247,37,133,.3); }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #10B981, #0D9488); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 24px rgba(16,185,129,.35); }
         .logo-text { font-weight: 800; font-size: 22px; color: #fff; letter-spacing: -.5px; }
 
         .auth-card {
-            background: #13131F;
-            border: 1px solid #1E1E2E;
+            background: #0F1713;
+            border: 1px solid #1A2820;
             border-radius: 20px;
             padding: 36px 32px;
             box-shadow: 0 25px 60px rgba(0,0,0,.5);
@@ -46,8 +46,8 @@
         label { display: block; font-size: 13px; font-weight: 600; color: #9CA3AF; margin-bottom: 6px; }
         input[type="text"], input[type="email"], input[type="password"] {
             width: 100%;
-            background: #0D0D14;
-            border: 1px solid #1E1E2E;
+            background: #080C0A;
+            border: 1px solid #1A2820;
             color: #fff;
             font-size: 14px;
             font-family: 'Inter', sans-serif;
@@ -57,8 +57,8 @@
             transition: border-color .2s, box-shadow .2s;
         }
         input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
-            border-color: #F72585;
-            box-shadow: 0 0 0 3px rgba(247,37,133,.15);
+            border-color: #10B981;
+            box-shadow: 0 0 0 3px rgba(16,185,129,.15);
         }
         input::placeholder { color: #374151; }
 
@@ -66,7 +66,7 @@
 
         .btn-primary {
             width: 100%;
-            background: linear-gradient(135deg, #F72585, #7209B7);
+            background: linear-gradient(135deg, #10B981, #0D9488);
             color: #fff;
             font-size: 14px;
             font-weight: 700;
@@ -76,11 +76,11 @@
             border-radius: 12px;
             cursor: pointer;
             transition: opacity .2s, box-shadow .2s;
-            box-shadow: 0 0 20px rgba(247,37,133,.25);
+            box-shadow: 0 0 20px rgba(16,185,129,.25);
         }
-        .btn-primary:hover { opacity: .9; box-shadow: 0 0 30px rgba(247,37,133,.4); }
+        .btn-primary:hover { opacity: .9; box-shadow: 0 0 30px rgba(16,185,129,.4); }
 
-        .link-pink { color: #F72585; text-decoration: none; font-weight: 600; font-size: 13px; transition: opacity .2s; }
+        .link-pink { color: #10B981; text-decoration: none; font-weight: 600; font-size: 13px; transition: opacity .2s; }
         .link-pink:hover { opacity: .75; }
 
         .link-muted { color: #6B7280; text-decoration: none; font-size: 13px; transition: color .2s; }
@@ -91,7 +91,7 @@
         .error-msg { font-size: 12px; color: #FB7185; margin-top: 5px; }
 
         .checkbox-row { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
-        .checkbox-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: #F72585; border-radius: 4px; flex-shrink: 0; }
+        .checkbox-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: #10B981; border-radius: 4px; flex-shrink: 0; }
         .checkbox-row span { font-size: 13px; color: #6B7280; }
 
         .footer-note { margin-top: 24px; text-align: center; font-size: 12px; color: #374151; }

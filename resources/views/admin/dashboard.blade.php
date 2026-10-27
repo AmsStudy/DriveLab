@@ -10,11 +10,11 @@
 <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
 
     {{-- Total Dokumen --}}
-    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-pink-500/30 group" style="background:#11111B;border:1px solid #1E1E2E;">
+    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-emerald-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Dokumen</span>
-            <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(247,37,133,.12);">
-                <svg class="w-4 h-4" style="color:#F72585;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(16,185,129,.12);">
+                <svg class="w-4 h-4" style="color:#10B981;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
             </div>
@@ -24,7 +24,7 @@
     </div>
 
     {{-- Dokumen Aktif --}}
-    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-emerald-500/30 group" style="background:#11111B;border:1px solid #1E1E2E;">
+    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-emerald-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-semibold text-emerald-400/80 uppercase tracking-wider">Aktif</span>
             <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(16,185,129,.12);">
@@ -38,7 +38,7 @@
     </div>
 
     {{-- Total Kunjungan / Views --}}
-    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-blue-500/30 group" style="background:#11111B;border:1px solid #1E1E2E;">
+    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-blue-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-semibold text-blue-400/80 uppercase tracking-wider">Kunjungan</span>
             <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(59,130,246,.12);">
@@ -53,35 +53,35 @@
     </div>
 
     {{-- Total Tugas Masuk --}}
-    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-purple-500/30 group" style="background:#11111B;border:1px solid rgba(168,85,247,.2);">
+    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-teal-500/30 group" style="background:#0F1713;border:1px solid rgba(13,148,136,.2);">
         <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-semibold text-purple-400/80 uppercase tracking-wider">Tugas</span>
-            <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(168,85,247,.12);">
-                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span class="text-xs font-semibold text-teal-400/80 uppercase tracking-wider">Tugas</span>
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(13,148,136,.12);">
+                <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                 </svg>
             </div>
         </div>
-        <p class="text-3xl font-extrabold text-purple-400 tracking-tight">{{ number_format($stats['tugas_masuk']) }}</p>
+        <p class="text-3xl font-extrabold text-teal-400 tracking-tight">{{ number_format($stats['tugas_masuk']) }}</p>
         <p class="text-xs text-gray-400 mt-1">Pengumpulan</p>
     </div>
 
     {{-- Tugas Hari Ini --}}
-    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-purple-500/30 group" style="background:#11111B;border:1px solid rgba(168,85,247,.2);">
+    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-teal-500/30 group" style="background:#0F1713;border:1px solid rgba(13,148,136,.2);">
         <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-semibold text-purple-400/80 uppercase tracking-wider">Hari Ini</span>
-            <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(168,85,247,.12);">
-                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span class="text-xs font-semibold text-teal-400/80 uppercase tracking-wider">Hari Ini</span>
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(13,148,136,.12);">
+                <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
         </div>
-        <p class="text-3xl font-extrabold text-purple-300 tracking-tight">{{ number_format($stats['tugas_hari_ini']) }}</p>
+        <p class="text-3xl font-extrabold text-teal-300 tracking-tight">{{ number_format($stats['tugas_hari_ini']) }}</p>
         <p class="text-xs text-gray-400 mt-1">Tugas Hari Ini</p>
     </div>
 
     {{-- Total Lampiran & Link --}}
-    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-amber-500/30 group" style="background:#11111B;border:1px solid #1E1E2E;">
+    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-amber-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-semibold text-amber-400/80 uppercase tracking-wider">Lampiran</span>
             <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(245,158,11,.12);">
@@ -99,10 +99,10 @@
 {{-- ─── SUPER ADMIN EXTRA BANNER / STATS ─── --}}
 @if(auth()->user()->isSuperAdmin())
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-    <div class="rounded-2xl p-4 flex items-center justify-between" style="background:#11111B;border:1px solid #1E1E2E;">
+    <div class="rounded-2xl p-4 flex items-center justify-between" style="background:#0F1713;border:1px solid #1A2820;">
         <div class="flex items-center gap-3.5">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(247,37,133,.12);">
-                <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(16,185,129,.12);">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
             </div>
@@ -111,10 +111,10 @@
                 <p class="text-lg font-bold text-white">{{ $stats['total_admin'] }} Pengguna</p>
             </div>
         </div>
-        <a href="{{ route('admin.users.index') }}" class="text-xs text-pink-400 hover:text-pink-300 font-medium">Kelola →</a>
+        <a href="{{ route('admin.users.index') }}" class="text-xs text-emerald-400 hover:text-emerald-300 font-medium">Kelola →</a>
     </div>
 
-    <div class="rounded-2xl p-4 flex items-center justify-between" style="background:#11111B;border:1px solid {{ $stats['admin_pending'] > 0 ? 'rgba(234,179,8,.3)' : '#1E1E2E' }};">
+    <div class="rounded-2xl p-4 flex items-center justify-between" style="background:#0F1713;border:1px solid {{ $stats['admin_pending'] > 0 ? 'rgba(234,179,8,.3)' : '#1A2820' }};">
         <div class="flex items-center gap-3.5">
             <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(234,179,8,.12);">
                 <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +133,7 @@
         @endif
     </div>
 
-    <div class="rounded-2xl p-4 flex items-center justify-between" style="background:#11111B;border:1px solid #1E1E2E;">
+    <div class="rounded-2xl p-4 flex items-center justify-between" style="background:#0F1713;border:1px solid #1A2820;">
         <div class="flex items-center gap-3.5">
             <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(249,115,22,.12);">
                 <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,18 +155,18 @@
 
     {{-- Left: Pengumpulan Tugas Terbaru (2 Cols) --}}
     <div class="lg:col-span-2 space-y-6">
-        <div class="rounded-2xl overflow-hidden shadow-xl" style="background:#11111B;border:1px solid #1E1E2E;">
-            <div class="px-6 py-4 flex items-center justify-between" style="border-bottom:1px solid #1E1E2E;">
+        <div class="rounded-2xl overflow-hidden shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
+            <div class="px-6 py-4 flex items-center justify-between" style="border-bottom:1px solid #1A2820;">
                 <div>
                     <h3 class="font-bold text-white text-base flex items-center gap-2">
-                        <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                         </svg>
                         Pengumpulan Tugas Terbaru
                     </h3>
                     <p class="text-xs text-gray-400 mt-0.5">Aktivitas mahasiswa mengumpulkan tugas secara real-time</p>
                 </div>
-                <a href="{{ route('admin.soal.index') }}" class="text-xs text-pink-400 hover:text-pink-300 font-semibold flex items-center gap-1 transition-colors">
+                <a href="{{ route('admin.soal.index') }}" class="text-xs text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 transition-colors">
                     Semua Dokumen
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
@@ -183,7 +183,7 @@
             @else
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="text-xs text-gray-500 uppercase tracking-wider" style="border-bottom:1px solid #1E1E2E;background:rgba(255,255,255,.01);">
+                        <thead class="text-xs text-gray-500 uppercase tracking-wider" style="border-bottom:1px solid #1A2820;background:rgba(255,255,255,.01);">
                             <tr>
                                 <th class="px-6 py-3 text-left">Mahasiswa</th>
                                 <th class="px-4 py-3 text-left">Dokumen Soal</th>
@@ -197,7 +197,7 @@
                             <tr class="hover:bg-gray-800/30 transition-colors">
                                 <td class="px-6 py-3">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-400 flex items-center justify-center font-bold text-xs uppercase flex-shrink-0">
+                                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs uppercase flex-shrink-0">
                                             {{ substr($sub->nama, 0, 1) }}
                                         </div>
                                         <div class="min-w-0">
@@ -208,7 +208,7 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     @if($sub->soal)
-                                        <a href="{{ route('admin.soal.show', $sub->soal) }}" class="text-xs text-gray-300 hover:text-pink-400 font-medium truncate block max-w-xs transition-colors">
+                                        <a href="{{ route('admin.soal.show', $sub->soal) }}" class="text-xs text-gray-300 hover:text-emerald-400 font-medium truncate block max-w-xs transition-colors">
                                             {{ $sub->soal->title }}
                                         </a>
                                         @if($sub->soal->category)
@@ -220,7 +220,7 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     @if($sub->isLink())
-                                        <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-500/15 text-purple-400 border border-purple-500/30">Link</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-teal-500/15 text-teal-400 border border-teal-500/30">Link</span>
                                     @elseif($sub->isText())
                                         <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">Teks</span>
                                     @else
@@ -232,7 +232,7 @@
                                 </td>
                                 <td class="px-4 py-3 text-right">
                                     @if($sub->soal)
-                                        <a href="{{ route('admin.soal.show', $sub->soal) }}" class="text-xs text-pink-400 hover:text-pink-300 p-1.5 hover:bg-pink-500/10 rounded-lg transition-colors inline-block" title="Lihat di Soal">
+                                        <a href="{{ route('admin.soal.show', $sub->soal) }}" class="text-xs text-emerald-400 hover:text-emerald-300 p-1.5 hover:bg-emerald-500/10 rounded-lg transition-colors inline-block" title="Lihat di Soal">
                                             Buka →
                                         </a>
                                     @endif
@@ -250,10 +250,10 @@
     <div class="space-y-6">
 
         {{-- Quick Actions --}}
-        <div class="rounded-2xl p-5 shadow-xl" style="background:#11111B;border:1px solid #1E1E2E;">
+        <div class="rounded-2xl p-5 shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
             <h3 class="font-bold text-white text-sm mb-3">Aksi Cepat</h3>
             <div class="grid grid-cols-2 gap-2.5">
-                <a href="{{ route('admin.soal.create') }}" class="p-3 rounded-xl bg-pink-600 hover:bg-pink-700 text-white text-xs font-semibold flex flex-col items-center justify-center gap-1.5 text-center transition-colors shadow-lg shadow-pink-600/20">
+                <a href="{{ route('admin.soal.create') }}" class="p-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex flex-col items-center justify-center gap-1.5 text-center transition-colors shadow-lg shadow-emerald-600/20">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     Buat Soal Baru
                 </a>
@@ -263,13 +263,13 @@
                 </a>
             </div>
             <a href="{{ route('home') }}" target="_blank" rel="noopener noreferrer" class="mt-2.5 w-full p-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-400 hover:text-white text-xs font-medium flex items-center justify-center gap-2 transition-colors border border-gray-800">
-                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                 Buka Portal Mahasiswa
             </a>
         </div>
 
         {{-- Top Dokumen Paling Banyak Diakses --}}
-        <div class="rounded-2xl overflow-hidden shadow-xl" style="background:#11111B;border:1px solid #1E1E2E;">
+        <div class="rounded-2xl overflow-hidden shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
             <div class="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
                 <h3 class="font-bold text-white text-sm flex items-center gap-2">
                     <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -287,7 +287,7 @@
                     @foreach($top_soals as $topSoal)
                     <div class="p-4 hover:bg-gray-800/30 transition-colors">
                         <div class="flex items-start justify-between gap-3 mb-1">
-                            <a href="{{ route('admin.soal.show', $topSoal) }}" class="text-xs font-semibold text-gray-200 hover:text-pink-400 transition-colors line-clamp-1">
+                            <a href="{{ route('admin.soal.show', $topSoal) }}" class="text-xs font-semibold text-gray-200 hover:text-emerald-400 transition-colors line-clamp-1">
                                 {{ $topSoal->title }}
                             </a>
                             <span class="text-xs font-bold text-blue-400 flex-shrink-0 bg-blue-500/10 px-2 py-0.5 rounded-md border border-blue-500/20">
@@ -296,7 +296,7 @@
                         </div>
                         <div class="flex items-center justify-between text-[11px] text-gray-500 mt-2">
                             <span>{{ $topSoal->category->name ?? 'Tanpa Kategori' }}</span>
-                            <span class="text-purple-400 font-medium">{{ $topSoal->submissions_count }} tugas terkumpul</span>
+                            <span class="text-teal-400 font-medium">{{ $topSoal->submissions_count }} tugas terkumpul</span>
                         </div>
                     </div>
                     @endforeach
@@ -306,7 +306,7 @@
 
         @if(auth()->user()->isSuperAdmin() && isset($recent_activities) && !$recent_activities->isEmpty())
         {{-- Activity Log (Super Admin Audit) --}}
-        <div class="rounded-2xl overflow-hidden shadow-xl" style="background:#11111B;border:1px solid #1E1E2E;">
+        <div class="rounded-2xl overflow-hidden shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
             <div class="px-5 py-4 border-b border-gray-800">
                 <h3 class="font-bold text-white text-sm flex items-center gap-2">
                     <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

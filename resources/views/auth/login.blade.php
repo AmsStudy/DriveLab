@@ -10,7 +10,7 @@
         <div class="form-group">
             <label for="email">Email</label>
             <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
-                   style="{{ $errors->has('email') ? 'border-color:#F72585;' : '' }}">
+                   style="{{ $errors->has('email') ? 'border-color:#EF4444;' : '' }}">
             @error('email')<p class="error-msg">{{ $message }}</p>@enderror
         </div>
 
@@ -22,7 +22,7 @@
                 @endif
             </div>
             <input id="password" type="password" name="password" required autocomplete="current-password"
-                   style="{{ $errors->has('password') ? 'border-color:#F72585;margin-top:6px;' : 'margin-top:6px;' }}">
+                   style="{{ $errors->has('password') ? 'border-color:#EF4444;margin-top:6px;' : 'margin-top:6px;' }}">
             @error('password')<p class="error-msg">{{ $message }}</p>@enderror
         </div>
 

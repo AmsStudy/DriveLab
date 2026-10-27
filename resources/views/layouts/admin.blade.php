@@ -10,19 +10,19 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { font-family: 'Inter', sans-serif; }
-        :root { --pink: #F72585; --pink2: #7209B7; }
-        .sidebar-active { background: rgba(247,37,133,.12) !important; color: #F72585 !important; border-right: 2px solid #F72585; }
-        .sidebar-active svg { color: #F72585 !important; }
+        :root { --emerald: #10B981; --mint: #34D399; --teal: #0D9488; }
+        .sidebar-active { background: rgba(16,185,129,.12) !important; color: #10B981 !important; border-right: 2px solid #10B981; }
+        .sidebar-active svg { color: #10B981 !important; }
     </style>
 </head>
-<body class="text-gray-100 min-h-screen" style="background:#0D0D14; font-family:'Inter',sans-serif;">
+<body class="text-gray-100 min-h-screen" style="background:#090D0B; font-family:'Inter',sans-serif;">
 
     {{-- Sidebar --}}
     <div class="flex min-h-screen">
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 flex flex-col" style="background:#13131F; border-right:1px solid #1E1E2E;">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 flex flex-col" style="background:#0F1713; border-right:1px solid #1A2820;">
             {{-- Logo --}}
-            <div class="flex items-center gap-3 px-6 py-5" style="border-bottom:1px solid #1E1E2E;">
-                <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#F72585,#7209B7);box-shadow:0 0 16px rgba(247,37,133,.3);">
+            <div class="flex items-center gap-3 px-6 py-5" style="border-bottom:1px solid #1A2820;">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#10B981,#0D9488);box-shadow:0 0 16px rgba(16,185,129,.35);">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                     </svg>
@@ -34,14 +34,14 @@
             </div>
 
             {{-- User Info --}}
-            <div class="px-4 py-3" style="border-bottom:1px solid #1E1E2E;">
-                <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 rounded-xl p-3 transition-colors group cursor-pointer" style="background:rgba(247,37,133,.05);" onmouseover="this.style.background='rgba(247,37,133,.1)'" onmouseout="this.style.background='rgba(247,37,133,.05)'">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform" style="background:linear-gradient(135deg,#F72585,#7209B7);">
+            <div class="px-4 py-3" style="border-bottom:1px solid #1A2820;">
+                <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 rounded-xl p-3 transition-colors group cursor-pointer" style="background:rgba(16,185,129,.05);" onmouseover="this.style.background='rgba(16,185,129,.1)'" onmouseout="this.style.background='rgba(16,185,129,.05)'">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform" style="background:linear-gradient(135deg,#10B981,#0D9488);">
                         <span class="text-white text-xs font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</span>
                     </div>
                     <div class="min-w-0">
                         <p class="text-sm font-medium text-white truncate">{{ auth()->user()->name }}</p>
-                        <span class="text-xs px-1.5 py-0.5 rounded-full" style="background:rgba(247,37,133,.15);color:#F472B6;">
+                        <span class="text-xs px-1.5 py-0.5 rounded-full" style="background:rgba(16,185,129,.15);color:#34D399;">
                             {{ auth()->user()->isSuperAdmin() ? 'Super Admin' : 'Admin' }}
                         </span>
                     </div>
@@ -77,10 +77,10 @@
             </nav>
 
             {{-- Logout --}}
-            <div class="p-3" style="border-top:1px solid #1E1E2E;">
+            <div class="p-3" style="border-top:1px solid #1A2820;">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-200 text-sm" style="color:#6B7280;" onmouseover="this.style.background='rgba(247,37,133,.08)';this.style.color='#F72585'" onmouseout="this.style.background='transparent';this.style.color='#6B7280'">
+                    <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-200 text-sm" style="color:#6B7280;" onmouseover="this.style.background='rgba(16,185,129,.08)';this.style.color='#10B981'" onmouseout="this.style.background='transparent';this.style.color='#6B7280'">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                         </svg>
@@ -93,7 +93,7 @@
         {{-- Main Content --}}
         <main class="flex-1 ml-64">
             {{-- Top Header --}}
-            <header class="px-6 py-4 sticky top-0 z-40" style="background:rgba(13,13,20,.9);backdrop-filter:blur(12px);border-bottom:1px solid #1E1E2E;">
+            <header class="px-6 py-4 sticky top-0 z-40" style="background:rgba(9,13,11,.92);backdrop-filter:blur(12px);border-bottom:1px solid #1A2820;">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-white">@yield('page-title', 'Dashboard')</h2>
@@ -144,7 +144,7 @@
                 text: message,
                 icon: isDanger ? 'warning' : 'question',
                 showCancelButton: true,
-                confirmButtonColor: isDanger ? '#ef4444' : '#F72585',
+                confirmButtonColor: isDanger ? '#ef4444' : '#10B981',
                 cancelButtonColor: '#374151', // Gray-700
                 confirmButtonText: confirmText,
                 cancelButtonText: 'Batal',

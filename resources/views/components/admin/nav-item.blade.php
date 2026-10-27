@@ -16,15 +16,15 @@
    id="nav-{{ str_replace(['.', '_'], '-', $route) }}"
    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group"
    style="{{ $isActive
-       ? 'background:rgba(247,37,133,.12); color:#F72585; border:1px solid rgba(247,37,133,.25);'
+       ? 'background:rgba(16,185,129,.12); color:#10B981; border:1px solid rgba(16,185,129,.25);'
        : 'color:#6B7280; border:1px solid transparent;' }}"
    @if(!$isActive)
-   onmouseover="this.style.background='rgba(247,37,133,.06)'; this.style.color='#E5E7EB';"
+   onmouseover="this.style.background='rgba(16,185,129,.06)'; this.style.color='#E5E7EB';"
    onmouseout="this.style.background='transparent'; this.style.color='#6B7280';"
    @endif>
 
     <svg class="w-5 h-5 flex-shrink-0"
-         style="{{ $isActive ? 'color:#F72585;' : 'color:#6B7280;' }}"
+         style="{{ $isActive ? 'color:#10B981;' : 'color:#6B7280;' }}"
          fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $icons[$icon] ?? $icons['document'] }}"/>
     </svg>
