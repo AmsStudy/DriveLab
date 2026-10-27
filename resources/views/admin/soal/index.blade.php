@@ -218,9 +218,12 @@
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
         <div class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeCreateModal()"></div>
         
-        <div class="relative inline-block w-full max-w-md bg-gray-900 border border-gray-800 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8">
+        <div class="relative inline-block w-full max-w-2xl bg-gray-900 border border-gray-800 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8">
             <div class="px-5 py-3.5 border-b border-gray-800 flex justify-between items-center bg-gray-900">
-                <h3 class="text-lg leading-6 font-semibold text-white" id="modal-title">Tambah Dokumen Baru</h3>
+                <div class="flex items-center gap-3">
+                    <h3 class="text-base font-semibold text-white" id="modal-title">Tambah Dokumen Baru</h3>
+                    <a href="{{ route('admin.soal.create') }}" class="text-xs text-pink-400 hover:text-pink-300 underline font-medium">Buka Form Halaman Penuh →</a>
+                </div>
                 <button type="button" onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
@@ -233,33 +236,20 @@
                 <div>
                     <label for="title" class="block text-xs font-medium text-gray-300 mb-1">Judul Dokumen <span class="text-red-400">*</span></label>
                     <input type="text" id="title" name="title" value="{{ old('title') }}" required
-                           placeholder="Contoh: Asistensi"
+                           placeholder="Contoh: Modul 3 Praktikum"
                            class="w-full bg-gray-800 border {{ $errors->has('title') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-3.5 py-2 text-sm placeholder-gray-500 focus:outline-none focus:border-pink-500">
                     @error('title') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
                 </div>
 
-                {{-- Kode Unik --}}
-                <div>
-                    <label for="kode_unik" class="block text-xs font-medium text-gray-300 mb-1">Kode Unik Akses <span class="text-red-400">*</span></label>
-                    <div class="relative">
+                {{-- Kode Unik & Kategori --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label for="kode_unik" class="block text-xs font-medium text-gray-300 mb-1">Kode Unik Akses <span class="text-red-400">*</span></label>
                         <input type="text" id="kode_unik" name="kode_unik" 
                                value="{{ old('kode_unik', 'AMSSOAL-' . Str::upper(Str::random(5))) }}" required
                                class="w-full bg-gray-800 border {{ $errors->has('kode_unik') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-3.5 py-2 text-sm placeholder-gray-500 focus:outline-none focus:border-pink-500">
+                        @error('kode_unik') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
                     </div>
-                    <p class="mt-1 text-[11px] text-gray-500">Digunakan mahasiswa di halaman depan untuk mengakses dokumen. Boleh diedit sesuka hati.</p>
-                    @error('kode_unik') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
-                </div>
-
-                {{-- Deskripsi --}}
-                <div>
-                    <label for="description" class="block text-xs font-medium text-gray-300 mb-1">Deskripsi <span class="text-gray-500">(opsional)</span></label>
-                    <textarea id="description" name="description" rows="2"
-                              placeholder="Keterangan singkat..."
-                              class="w-full bg-gray-800 border {{ $errors->has('description') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-3.5 py-2 text-sm placeholder-gray-500 focus:outline-none focus:border-pink-500 resize-none">{{ old('description') }}</textarea>
-                </div>
-
-                {{-- Kategori & Password --}}
-                <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label for="category_id" class="block text-xs font-medium text-gray-300 mb-1">Kategori</label>
                         <select id="category_id" name="category_id"
@@ -270,6 +260,10 @@
                             @endforeach
                         </select>
                     </div>
+                </div>
+
+                {{-- Password & Deskripsi --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label for="password" class="block text-xs font-medium text-gray-300 mb-1">Password <span class="text-red-400">*</span></label>
                         <div class="relative">
@@ -282,34 +276,65 @@
                         </div>
                         @error('password') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
                     </div>
+                    <div>
+                        <label for="description" class="block text-xs font-medium text-gray-300 mb-1">Deskripsi Singkat</label>
+                        <input type="text" id="description" name="description" value="{{ old('description') }}"
+                               placeholder="Keterangan singkat..."
+                               class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-xl px-3.5 py-2 text-sm placeholder-gray-500 focus:outline-none focus:border-pink-500">
+                    </div>
                 </div>
 
-                {{-- Upload File --}}
-                <div>
+                {{-- Teks Soal Langsung --}}
+                <div class="border-t border-gray-800 pt-3">
+                    <label for="content_text" class="block text-xs font-medium text-blue-400 mb-1">Soal / Materi Berupa Teks Langsung <span class="text-gray-500 font-normal">(opsional)</span></label>
+                    <textarea id="content_text" name="content_text" rows="3"
+                              placeholder="Ketik isi soal langsung jika ingin ditampilkan di layar mahasiswa..."
+                              class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-xl px-3.5 py-2 text-xs font-mono focus:outline-none focus:border-pink-500 resize-none">{{ old('content_text') }}</textarea>
+                </div>
+
+                {{-- Tautan / Link Materi --}}
+                <div class="border-t border-gray-800 pt-3">
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-xs font-medium text-gray-300">File Dokumen <span class="text-gray-500 font-normal">(Maks 5 file)</span></label>
+                        <label class="block text-xs font-medium text-purple-400">Tautan / Link Materi <span class="text-gray-500 font-normal">(opsional)</span></label>
+                        <button type="button" onclick="addModalLinkRow()" class="text-[11px] text-purple-400 hover:text-purple-300 font-medium">+ Tambah Link</button>
+                    </div>
+                    <div id="modal-links-container" class="space-y-1.5">
+                        <div class="grid grid-cols-12 gap-2 modal-link-row">
+                            <input type="text" name="links[0][title]" placeholder="Label Link (misal: Drive)"
+                                   class="col-span-5 bg-gray-800 border border-gray-700 text-gray-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-pink-500">
+                            <input type="url" name="links[0][url]" placeholder="https://..."
+                                   class="col-span-7 bg-gray-800 border border-gray-700 text-gray-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-pink-500">
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Upload File Lampiran (Maks 15 File) --}}
+                <div class="border-t border-gray-800 pt-3">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-medium text-green-400">File Dokumen <span class="text-gray-500 font-normal">(Maks 15 file, 5MB/file)</span></label>
                         <label class="flex items-center gap-1.5 cursor-pointer">
                             <input type="hidden" name="is_downloadable" value="0">
-                            <input type="checkbox" name="is_downloadable" value="1" {{ old('is_downloadable') ? 'checked' : '' }}
-                                   class="text-pink-600 bg-gray-800 border-gray-600 rounded w-3 h-3 focus:ring-offset-gray-900 focus:ring-pink-500">
-                            <span class="text-[11px] text-gray-400 hover:text-gray-300 transition-colors">Izinkan File Diunduh Mahasiswa</span>
+                            <input type="checkbox" id="modal_master_downloadable" name="is_downloadable" value="1" checked
+                                   onchange="toggleModalFilesDl(this.checked)"
+                                   class="accent-pink-500 bg-gray-800 border-gray-600 rounded w-3.5 h-3.5">
+                            <span class="text-[11px] text-gray-300">Izinkan Semua Diunduh</span>
                         </label>
                     </div>
                     <div id="drop-zone" class="border-2 border-dashed border-gray-700 hover:border-pink-500 rounded-xl p-3 text-center cursor-pointer transition-colors group" onclick="document.getElementById('files').click()">
                         <div id="drop-placeholder">
                             <svg class="w-6 h-6 mx-auto text-gray-600 group-hover:text-pink-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                            <p class="text-[11px] text-gray-400">Klik atau drop file di sini</p>
-                        </div>
-                        <div id="file-info" class="hidden">
-                            <ul id="file-list" class="text-[11px] text-green-400 font-medium space-y-0.5 text-left pl-2 list-disc list-inside"></ul>
+                            <p class="text-[11px] text-gray-400">Klik atau drop hingga 15 file di sini</p>
                         </div>
                     </div>
                     <input type="file" id="files" name="files[]" multiple class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.zip,.pkt">
                     @error('files') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
+
+                    {{-- Dynamic File List with per-file download checkbox --}}
+                    <div id="modal-files-list" class="mt-2 space-y-1.5 hidden"></div>
                 </div>
 
                 {{-- Masa Aktif --}}
-                <div>
+                <div class="border-t border-gray-800 pt-3">
                     <label class="block text-xs font-medium text-gray-300 mb-1">Masa Aktif Dokumen <span class="text-red-400">*</span></label>
                     <div class="flex gap-4 mb-2">
                         <label class="flex items-center gap-1.5 cursor-pointer">
@@ -357,9 +382,33 @@
                             <label class="block text-[11px] text-gray-400 mb-0.5">Instruksi Tambahan (Opsional)</label>
                             <textarea name="submission_instructions" rows="2" class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-pink-500" placeholder="Contoh: Format laporan dalam PDF, ukuran max 5MB.">{{ old('submission_instructions') }}</textarea>
                         </div>
+
+                        {{-- Metode Pengumpulan --}}
                         <div>
-                            <label class="block text-[11px] text-gray-400 mb-1.5">Format File yang Diizinkan <span class="text-red-400">*</span></label>
+                            <label class="block text-[11px] text-gray-300 font-semibold mb-1">Metode yang Diizinkan:</label>
+                            <div class="flex flex-wrap gap-3">
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="submission_types[]" value="file" checked class="accent-pink-500 w-3.5 h-3.5 rounded">
+                                    <span class="text-xs text-gray-300">📁 File</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="submission_types[]" value="link" checked class="accent-pink-500 w-3.5 h-3.5 rounded">
+                                    <span class="text-xs text-gray-300">🔗 Link URL</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="submission_types[]" value="text" checked class="accent-pink-500 w-3.5 h-3.5 rounded">
+                                    <span class="text-xs text-gray-300">📝 Teks</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] text-gray-400 mb-1.5">Format File yang Diizinkan (Jika File):</label>
                             <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center gap-1.5 cursor-pointer col-span-2">
+                                    <input type="checkbox" name="allowed_extensions[]" value="all" class="accent-pink-500 bg-gray-800 border-gray-600 w-3.5 h-3.5 rounded">
+                                    <span class="text-xs text-pink-400 font-bold">Semua Format (Security Checked)</span>
+                                </label>
                                 <label class="flex items-center gap-1.5 cursor-pointer">
                                     <input type="checkbox" name="allowed_extensions[]" value="pdf" class="accent-pink-500 bg-gray-800 border-gray-600 w-3.5 h-3.5 rounded" checked>
                                     <span class="text-xs text-gray-300">PDF (.pdf)</span>
@@ -397,7 +446,7 @@
                 {{-- Submit --}}
                 <div class="pt-3 border-t border-gray-800 flex justify-end gap-2 sticky bottom-0 bg-gray-900 pb-1">
                     <button type="button" onclick="closeCreateModal()" class="text-gray-400 hover:bg-gray-800 px-3 py-1.5 rounded-lg text-xs transition-colors border border-transparent">Batal</button>
-                    <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium transition-colors">Simpan</button>
+                    <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium transition-colors">Simpan Dokumen</button>
                 </div>
             </form>
         </div>
@@ -423,7 +472,6 @@ const modal = document.getElementById('create-modal');
 function openCreateModal() { modal.classList.remove('hidden'); }
 function closeCreateModal() { modal.classList.add('hidden'); }
 
-// Buka otomatis jika ada error validasi
 @if($errors->any())
     openCreateModal();
 @endif
@@ -450,23 +498,39 @@ function toggleSubmissionFields(checked) {
     }
 }
 
-// File drag & drop
+let modalLinkIndex = 1;
+function addModalLinkRow() {
+    if (modalLinkIndex >= 15) { alert('Maksimal 15 tautan.'); return; }
+    const container = document.getElementById('modal-links-container');
+    const div = document.createElement('div');
+    div.className = 'grid grid-cols-12 gap-2 modal-link-row';
+    div.innerHTML = `
+        <input type="text" name="links[${modalLinkIndex}][title]" placeholder="Label Link"
+               class="col-span-5 bg-gray-800 border border-gray-700 text-gray-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-pink-500">
+        <input type="url" name="links[${modalLinkIndex}][url]" placeholder="https://..."
+               class="col-span-7 bg-gray-800 border border-gray-700 text-gray-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-pink-500">
+    `;
+    container.appendChild(div);
+    modalLinkIndex++;
+}
+
+function toggleModalFilesDl(checked) {
+    document.querySelectorAll('.modal-file-dl').forEach(cb => cb.checked = checked);
+}
+
+// File drag & drop (Maks 15 File)
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('files');
-const placeholder = document.getElementById('drop-placeholder');
-const fileInfo = document.getElementById('file-info');
-const fileList = document.getElementById('file-list');
+const filesList = document.getElementById('modal-files-list');
 
 function updateFileDisplay(files) {
     if (files && files.length > 0) {
-        placeholder.classList.add('hidden');
-        fileInfo.classList.remove('hidden');
-        fileList.innerHTML = '';
+        filesList.innerHTML = '';
         
-        if(files.length > 5) {
-            alert('Maksimal hanya 5 file yang diperbolehkan');
+        if (files.length > 15) {
+            alert('Maksimal hanya 15 file yang diperbolehkan');
             fileInput.value = '';
-            placeholder.classList.remove('hidden'); fileInfo.classList.add('hidden');
+            filesList.classList.add('hidden');
             return;
         }
 
@@ -476,16 +540,32 @@ function updateFileDisplay(files) {
         if (hasLargeFile) {
             alert('Satu atau lebih file melebihi batas 5MB!');
             fileInput.value = '';
-            placeholder.classList.remove('hidden'); fileInfo.classList.add('hidden');
+            filesList.classList.add('hidden');
             return;
         }
 
-        Array.from(files).forEach(file => {
+        filesList.classList.remove('hidden');
+        const masterChecked = document.getElementById('modal_master_downloadable').checked;
+
+        Array.from(files).forEach((file, idx) => {
             const kb = file.size / 1024;
             const sizeStr = kb < 1024 ? `${kb.toFixed(1)} KB` : `${(kb/1024).toFixed(2)} MB`;
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${file.name}</span> <span class="text-gray-500 text-xs ml-2">(${sizeStr})</span>`;
-            fileList.appendChild(li);
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-between bg-gray-800/80 p-2 rounded-lg border border-gray-700 text-xs';
+            div.innerHTML = `
+                <div class="flex items-center gap-2 min-w-0">
+                    <span class="text-pink-400 font-bold">#${idx + 1}</span>
+                    <span class="text-gray-200 truncate max-w-[200px]">${file.name}</span>
+                    <span class="text-gray-500 text-[10px]">(${sizeStr})</span>
+                </div>
+                <label class="flex items-center gap-1.5 cursor-pointer ml-2 flex-shrink-0">
+                    <input type="hidden" name="file_downloadable[${idx}]" value="0">
+                    <input type="checkbox" name="file_downloadable[${idx}]" value="1" ${masterChecked ? 'checked' : ''}
+                           class="modal-file-dl accent-pink-500 w-3 h-3 rounded">
+                    <span class="text-[10px] text-gray-300">Unduh</span>
+                </label>
+            `;
+            filesList.appendChild(div);
         });
     }
 }

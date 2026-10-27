@@ -222,6 +222,10 @@ class SoalAccessController extends Controller
         $soal = Soal::where('unique_token', $token)->firstOrFail();
         $attachment = $soal->attachments()->findOrFail($attachmentId);
 
+        if (!$attachment->isFile() || empty($attachment->file_path)) {
+            abort(404, 'Lampiran ini bukan file yang dapat diunduh.');
+        }
+
         $isAdminPreview = $this->isAuthorizedAdminPreview($request, $soal);
 
         if (!$isAdminPreview) {
@@ -233,9 +237,7 @@ class SoalAccessController extends Controller
                 abort(403, 'Waktu akses soal ini sudah berakhir.');
             }
 
-            $ext = strtolower($attachment->file_type ?? '');
-            $isPreviewable = in_array($ext, ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp']);
-            if ($isPreviewable && !$soal->is_downloadable) {
+            if (!$attachment->canDownload()) {
                 abort(403, 'File soal ini tidak diizinkan untuk diunduh.');
             }
         }
@@ -256,6 +258,7 @@ class SoalAccessController extends Controller
             'is_downloadable' => $soal->is_downloadable,
         ]);
     }
+
     public function submitTask(Request $request, string $token)
     {
         // Rate limiting: maks 15 pengiriman per sesi per menit
@@ -291,51 +294,106 @@ class SoalAccessController extends Controller
             return response()->json(['message' => 'Sesi akses tidak valid. Silakan masukkan password soal terlebih dahulu.'], 403);
         }
 
-        // Tentukan MIME type yang diizinkan berdasarkan allowed_extensions
-        $allowed = $soal->allowed_extensions ?? [];
-        $allowedMimes = [];
-        if (empty($allowed)) {
-            // Semua format diizinkan (whitelist aman)
-            $allowedMimes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'zip', 'rar', 'pkt'];
-        } else {
-            if (in_array('pdf', $allowed))     $allowedMimes = array_merge($allowedMimes, ['pdf']);
-            if (in_array('word', $allowed))    $allowedMimes = array_merge($allowedMimes, ['doc', 'docx']);
-            if (in_array('excel', $allowed))   $allowedMimes = array_merge($allowedMimes, ['xls', 'xlsx']);
-            if (in_array('ppt', $allowed))     $allowedMimes = array_merge($allowedMimes, ['ppt', 'pptx']);
-            if (in_array('image', $allowed))   $allowedMimes = array_merge($allowedMimes, ['jpg', 'jpeg', 'png']);
-            if (in_array('archive', $allowed)) $allowedMimes = array_merge($allowedMimes, ['zip', 'rar']);
-            if (in_array('pkt', $allowed))     $allowedMimes = array_merge($allowedMimes, ['pkt']);
+        $submissionType = $request->input('submission_type', 'file');
+        $allowedTypes   = $soal->submission_types ?: ['file'];
+
+        if (!in_array($submissionType, $allowedTypes, true)) {
+            return response()->json(['message' => 'Tipe pengumpulan (' . $submissionType . ') tidak diizinkan untuk tugas ini.'], 422);
         }
 
-        $extRule = 'extensions:' . implode(',', $allowedMimes);
+        // ─── Tipe 1: Link URL ─────────────────────────────────────────────
+        if ($submissionType === 'link') {
+            $request->validate([
+                'nim'      => 'required|string|max:50|regex:/^[a-zA-Z0-9\-]+$/',
+                'nama'     => 'required|string|max:255',
+                'link_url' => 'required|url|max:2000',
+            ]);
 
+            $existing = Submission::where('soal_id', $soal->id)->where('nim', $request->nim)->first();
+            $isUpdate = $existing !== null;
+
+            if ($existing && $existing->file_path) {
+                Storage::disk('private')->delete($existing->file_path);
+            }
+
+            $subData = [
+                'soal_id'            => $soal->id,
+                'nim'                => $request->nim,
+                'nama'               => $request->nama,
+                'submission_type'    => 'link',
+                'link_url'           => $request->link_url,
+                'text_content'       => null,
+                'file_path'          => null,
+                'file_original_name' => null,
+                'file_extension'     => null,
+                'file_size'          => null,
+            ];
+
+            if ($existing) {
+                $existing->update($subData);
+            } else {
+                Submission::create($subData);
+            }
+
+            return response()->json([
+                'message'   => $isUpdate ? 'Tautan tugas berhasil diperbarui.' : 'Tautan tugas berhasil dikumpulkan.',
+                'is_update' => $isUpdate,
+            ]);
+        }
+
+        // ─── Tipe 2: Teks Langsung ─────────────────────────────────────────
+        if ($submissionType === 'text') {
+            $request->validate([
+                'nim'          => 'required|string|max:50|regex:/^[a-zA-Z0-9\-]+$/',
+                'nama'         => 'required|string|max:255',
+                'text_content' => 'required|string|min:3|max:50000',
+            ]);
+
+            $existing = Submission::where('soal_id', $soal->id)->where('nim', $request->nim)->first();
+            $isUpdate = $existing !== null;
+
+            if ($existing && $existing->file_path) {
+                Storage::disk('private')->delete($existing->file_path);
+            }
+
+            $subData = [
+                'soal_id'            => $soal->id,
+                'nim'                => $request->nim,
+                'nama'               => $request->nama,
+                'submission_type'    => 'text',
+                'link_url'           => null,
+                'text_content'       => $request->text_content,
+                'file_path'          => null,
+                'file_original_name' => null,
+                'file_extension'     => null,
+                'file_size'          => null,
+            ];
+
+            if ($existing) {
+                $existing->update($subData);
+            } else {
+                Submission::create($subData);
+            }
+
+            return response()->json([
+                'message'   => $isUpdate ? 'Jawaban teks berhasil diperbarui.' : 'Jawaban teks berhasil dikumpulkan.',
+                'is_update' => $isUpdate,
+            ]);
+        }
+
+        // ─── Tipe 3: Upload File dengan Security Inspection ─────────────────
         $request->validate([
             'nim'  => 'required|string|max:50|regex:/^[a-zA-Z0-9\-]+$/',
             'nama' => 'required|string|max:255',
-            'file' => ['required', 'file', 'max:10240', $extRule],
+            'file' => ['required', 'file', 'max:10240'],
         ]);
 
         $file = $request->file('file');
 
-        // Verifikasi MIME type asli dari konten file (anti-spoof ekstensi)
-        $finfo    = finfo_open(FILEINFO_MIME_TYPE);
-        $realMime = finfo_file($finfo, $file->getRealPath());
-        finfo_close($finfo);
-
-        $safeMimes = [
-            'application/pdf', 'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.ms-excel',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'application/vnd.ms-powerpoint',
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            'image/jpeg', 'image/png',
-            'application/zip', 'application/x-zip-compressed',
-            'application/x-rar-compressed', 'application/vnd.rar',
-        ];
-
-        if (!in_array($realMime, $safeMimes) && $file->getClientOriginalExtension() !== 'pkt') {
-            return response()->json(['message' => 'Tipe file tidak diizinkan.'], 422);
+        // Validasi keamanan komprehensif (anti-shell, anti-executable, sniffing, double-extension)
+        [$isSafe, $errorMsg] = \App\Services\FileSecurityService::validate($file, $soal->allowed_extensions ?? []);
+        if (!$isSafe) {
+            return response()->json(['message' => $errorMsg], 422);
         }
 
         // Nama file bersih — hapus karakter berbahaya dari NIM/Nama
@@ -350,28 +408,27 @@ class SoalAccessController extends Controller
 
         $isUpdate = $existing !== null;
 
-        if ($existing) {
-            if ($existing->file_path && $existing->file_path !== $path) {
-                Storage::disk('private')->delete($existing->file_path);
-            }
+        if ($existing && $existing->file_path && $existing->file_path !== $path) {
+            Storage::disk('private')->delete($existing->file_path);
+        }
 
-            $existing->update([
-                'nama'               => $request->nama,
-                'file_path'          => $path,
-                'file_original_name' => $file->getClientOriginalName(),
-                'file_extension'     => $file->getClientOriginalExtension(),
-                'file_size'          => $file->getSize(),
-            ]);
+        $subData = [
+            'soal_id'            => $soal->id,
+            'nim'                => $request->nim,
+            'nama'               => $request->nama,
+            'submission_type'    => 'file',
+            'link_url'           => null,
+            'text_content'       => null,
+            'file_path'          => $path,
+            'file_original_name' => $file->getClientOriginalName(),
+            'file_extension'     => $file->getClientOriginalExtension(),
+            'file_size'          => $file->getSize(),
+        ];
+
+        if ($existing) {
+            $existing->update($subData);
         } else {
-            Submission::create([
-                'soal_id'            => $soal->id,
-                'nim'                => $request->nim,
-                'nama'               => $request->nama,
-                'file_path'          => $path,
-                'file_original_name' => $file->getClientOriginalName(),
-                'file_extension'     => $file->getClientOriginalExtension(),
-                'file_size'          => $file->getSize(),
-            ]);
+            Submission::create($subData);
         }
 
         $message = $isUpdate
@@ -401,12 +458,20 @@ class SoalAccessController extends Controller
             ->get();
 
         $formatted = $submissions->map(function ($sub) {
+            $identifier = match ($sub->submission_type) {
+                'link' => $sub->link_url,
+                'text' => \Illuminate\Support\Str::limit($sub->text_content, 40),
+                default => $sub->file_original_name,
+            };
+
             return [
-                'id'         => $sub->id,
-                'soal_title' => $sub->soal->title,
-                'nama'       => $sub->nama,
-                'file_name'  => $sub->file_original_name,
-                'created_at' => $sub->created_at->format('Y-m-d H:i:s')
+                'id'              => $sub->id,
+                'soal_title'      => $sub->soal->title ?? 'Dokumen Dihapus',
+                'nama'            => $sub->nama,
+                'submission_type' => $sub->submission_type ?? 'file',
+                'file_name'       => $identifier,
+                'link_url'        => $sub->link_url,
+                'created_at'      => $sub->created_at->format('Y-m-d H:i:s'),
             ];
         });
 

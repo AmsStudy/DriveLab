@@ -232,6 +232,105 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
 }
 .btn-dl-only:hover{background:var(--surface2);color:var(--text1);border-color:rgba(255,255,255,0.12)}
 
+.btn-disabled{
+  flex:1;
+  background:rgba(255,255,255,0.03);color:var(--text3);
+  border:1px solid var(--border);
+  cursor:not-allowed;font-size:12px;opacity:0.65;
+}
+
+.badge-preview-only{
+  font-size:10px;font-weight:600;color:var(--amber);
+  background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);
+  padding:2px 7px;border-radius:6px;
+}
+
+/* ─── CONTENT TEXT CARD ─── */
+.content-text-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px 24px;
+  margin-bottom:24px;
+  animation:fadeUp 0.4s 0.05s ease both;
+  position:relative;
+}
+.content-text-header{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:14px;padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+}
+.content-text-title{
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+  color:var(--pink);text-transform:uppercase;letter-spacing:0.06em;
+  display:flex;align-items:center;gap:8px;
+}
+.content-text-title svg{width:16px;height:16px}
+.btn-copy-text{
+  background:var(--surface3);color:var(--text2);
+  border:1px solid var(--border);border-radius:8px;
+  padding:6px 12px;font-size:12px;font-weight:500;
+  cursor:pointer;display:flex;align-items:center;gap:6px;
+  transition:all 0.2s;
+}
+.btn-copy-text:hover{background:var(--surface2);color:var(--text1);border-color:rgba(255,255,255,0.15)}
+.content-text-body{
+  font-size:13.5px;line-height:1.7;color:var(--text1);
+  white-space:pre-wrap;word-break:break-word;
+  background:#05050A;padding:18px;border-radius:12px;
+  border:1px solid rgba(255,255,255,0.05);
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+  max-height:450px;overflow-y:auto;
+}
+
+/* ─── LINK GRID ─── */
+.link-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:14px;margin-bottom:24px;
+  animation:fadeUp 0.4s 0.1s ease both;
+}
+.link-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:16px;
+  display:flex;align-items:center;gap:14px;
+  transition:all 0.25s ease;
+}
+.link-card:hover{
+  border-color:rgba(114,9,183,0.4);
+  transform:translateY(-2px);
+  box-shadow:0 8px 30px rgba(0,0,0,0.4);
+}
+.link-icon-wrap{
+  width:42px;height:42px;border-radius:12px;
+  background:rgba(114,9,183,0.15);border:1px solid rgba(114,9,183,0.3);
+  color:#C77DFF;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.link-info{flex:1;min-width:0}
+.link-title{font-size:13px;font-weight:600;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.link-url{font-size:11px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ─── SUBMISSION TYPE TABS ─── */
+.sub-type-tabs{
+  display:flex;gap:8px;margin-bottom:20px;
+  background:var(--surface2);padding:6px;border-radius:12px;
+  border:1px solid var(--border);
+}
+.tab-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px 14px;background:transparent;border:none;border-radius:8px;
+  color:var(--text2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;transition:all 0.2s ease;
+}
+.tab-btn:hover{color:var(--text1)}
+.tab-btn.active{
+  background:linear-gradient(135deg,rgba(247,37,133,0.25),rgba(114,9,183,0.25));
+  color:#fff;border:1px solid rgba(247,37,133,0.4);
+  box-shadow:0 2px 10px rgba(247,37,133,0.15);
+}
+.sub-pane{display:none}
+.sub-pane.active{display:block}
+
 .btn-icon{
   width:38px;height:38px;padding:0;flex-shrink:0;
   background:var(--surface3);color:var(--text2);
@@ -517,18 +616,73 @@ footer{
         </div>
     </div>
 
+    {{-- Soal Text Content --}}
+    @if($soal->content_text)
+        <div class="content-text-card">
+            <div class="content-text-header">
+                <div class="content-text-title">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Instruksi / Soal Teks
+                </div>
+                <button type="button" class="btn-copy-text" onclick="navigator.clipboard.writeText(document.getElementById('soal-raw-text').innerText).then(()=>alert('Teks soal berhasil disalin!'))">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    Salin Teks
+                </button>
+            </div>
+            <div class="content-text-body" id="soal-raw-text">{!! nl2br(e($soal->content_text)) !!}</div>
+        </div>
+    @endif
+
+    @php
+        $linkAttachments = $soal->attachments->where('type', 'link');
+        $fileAttachments = $soal->attachments->where('type', 'file');
+    @endphp
+
+    {{-- Link Attachments --}}
+    @if($linkAttachments->count() > 0)
+        <div class="section-header">
+            <div class="section-title">Tautan / Link Terkait</div>
+        </div>
+        <div class="link-grid">
+            @foreach($linkAttachments as $linkAtt)
+                <div class="link-card">
+                    <div class="link-icon-wrap">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                        </svg>
+                    </div>
+                    <div class="link-info">
+                        <div class="link-title">{{ $linkAtt->file_original_name ?: 'Tautan Eksternal' }}</div>
+                        <div class="link-url">{{ Str::limit($linkAtt->link_url, 45) }}</div>
+                    </div>
+                    <a href="{{ $linkAtt->link_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="flex:none;padding:9px 18px">
+                        Buka Link
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </a>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
     {{-- File Section --}}
-    @if($soal->attachments->count() > 0)
+    @if($fileAttachments->count() > 0)
 
         <div class="section-header">
-            <div class="section-title">File Terlampir</div>
+            <div class="section-title">File Lampiran (Maks. 15 File)</div>
         </div>
 
         <div class="file-grid">
-            @foreach($soal->attachments as $attachment)
+            @foreach($fileAttachments as $attachment)
                 @php
-                    $ext         = strtolower($attachment->file_type ?? '');
+                    $ext           = strtolower($attachment->file_type ?? '');
                     $isPreviewable = in_array($ext, ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp']);
+                    $canDownload   = $attachment->canDownload();
 
                     $previewUrl = route('soal.preview_wrapper', [
                         'token'      => $soal->unique_token,
@@ -554,7 +708,12 @@ footer{
                             <p class="file-name" title="{{ $attachment->file_original_name }}">
                                 {{ $attachment->file_original_name }}
                             </p>
-                            <p class="file-size">{{ $attachment->file_size_formatted }}</p>
+                            <div style="display:flex;align-items:center;gap:8px;margin-top:5px;">
+                                <span class="file-size">{{ $attachment->file_size_formatted }}</span>
+                                @if(!$canDownload)
+                                    <span class="badge-preview-only">Hanya Pratinjau</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
@@ -571,7 +730,7 @@ footer{
                             </a>
                         @endif
 
-                        @if(!$isPreviewable || $soal->is_downloadable)
+                        @if($canDownload)
                             @if($isPreviewable)
                                 {{-- Icon-only download button alongside preview --}}
                                 <a href="{{ $downloadUrl }}" class="btn btn-icon" title="Unduh File">
@@ -588,20 +747,27 @@ footer{
                                     Unduh File
                                 </a>
                             @endif
+                        @elseif(!$isPreviewable)
+                            <div class="btn btn-disabled" title="Unduhan file dinonaktifkan oleh asisten">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                                Hanya Pratinjau
+                            </div>
                         @endif
                     </div>
                 </div>
             @endforeach
         </div>
 
-    @else
+    @elseif($linkAttachments->isEmpty() && empty($soal->content_text))
 
         {{-- Empty State --}}
         <div class="empty-state">
             <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
-            <p>Dokumen ini belum memiliki file yang diunggah.</p>
+            <p>Dokumen ini belum memiliki file atau materi yang diunggah.</p>
             @if($soal->description)
                 <p class="empty-desc">{{ $soal->description }}</p>
             @endif
@@ -618,8 +784,8 @@ footer{
             $extLabels  = [];
             $allowed    = $soal->allowed_extensions ?? [];
 
-            if (empty($allowed)) {
-                $extText    = 'Mendukung semua format file';
+            if (empty($allowed) || in_array('all', $allowed)) {
+                $extText    = 'Semua format file (Lolos Scan Keamanan)';
                 $acceptAttr = '';
             } else {
                 if (in_array('pdf', $allowed))     { $accepts[] = '.pdf';           $extLabels[] = 'PDF'; }
@@ -633,6 +799,9 @@ footer{
                 $extText    = 'Format: ' . implode(', ', $extLabels);
                 $acceptAttr = implode(',', $accepts);
             }
+
+            $allowedSubTypes = $soal->submission_types ?: ['file'];
+            $defaultSubType  = in_array('file', $allowedSubTypes) ? 'file' : (in_array('link', $allowedSubTypes) ? 'link' : 'text');
         @endphp
 
         <div class="submission-wrap">
@@ -690,7 +859,7 @@ footer{
                         </svg>
                         <div>
                             <strong>Pengumpulan ulang</strong>
-                            Satu NIM hanya menyimpan satu file. Upload lagi dengan NIM yang sama akan menggantikan tugas sebelumnya hingga batas waktu berakhir.
+                            Satu NIM hanya menyimpan satu data tugas. Upload lagi dengan NIM yang sama akan menggantikan pengumpulan sebelumnya.
                         </div>
                     </div>
 
@@ -728,42 +897,112 @@ footer{
                             </div>
                         </div>
 
-                        <label class="field-label" style="margin-bottom:7px">
-                            File Tugas <span class="req">*</span>
-                            <span class="note">Maks. 10 MB</span>
-                        </label>
+                        <input type="hidden" name="submission_type" id="sub_type" value="{{ $defaultSubType }}">
 
-                        <div class="dropzone" id="dropzone"
-                             onclick="document.getElementById('sub_file').click()">
-                            <div id="dz-empty">
-                                <div class="dz-icon-wrap">
-                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                    </svg>
-                                </div>
-                                <div class="dz-text">Klik atau seret file ke sini</div>
-                                <div class="dz-sub">{{ $extText }} · Maks. 10 MB</div>
+                        @if(count($allowedSubTypes) > 1)
+                            <div class="sub-type-tabs">
+                                @if(in_array('file', $allowedSubTypes))
+                                    <button type="button" class="tab-btn {{ $defaultSubType === 'file' ? 'active' : '' }}" data-type="file" onclick="switchSubmissionType('file')">
+                                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                        </svg>
+                                        Upload File
+                                    </button>
+                                @endif
+                                @if(in_array('link', $allowedSubTypes))
+                                    <button type="button" class="tab-btn {{ $defaultSubType === 'link' ? 'active' : '' }}" data-type="link" onclick="switchSubmissionType('link')">
+                                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                        </svg>
+                                        Tautan / Link
+                                    </button>
+                                @endif
+                                @if(in_array('text', $allowedSubTypes))
+                                    <button type="button" class="tab-btn {{ $defaultSubType === 'text' ? 'active' : '' }}" data-type="text" onclick="switchSubmissionType('text')">
+                                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        Jawaban Teks
+                                    </button>
+                                @endif
                             </div>
-                            <div class="dz-success" id="dz-success">
-                                <div class="dz-success-icon">
-                                    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                </div>
-                                <div class="dz-filename" id="dz-filename"></div>
-                                <span class="dz-change"
-                                      onclick="event.stopPropagation();document.getElementById('sub_file').click()">
-                                    Ganti File
-                                </span>
-                            </div>
-                        </div>
+                        @endif
 
-                        <input type="file"
-                               id="sub_file"
-                               name="file"
-                               style="display:none"
-                               {{ $acceptAttr ? 'accept=' . $acceptAttr : '' }}
-                               required>
+                        {{-- Pane: File --}}
+                        @if(in_array('file', $allowedSubTypes))
+                            <div class="sub-pane {{ $defaultSubType === 'file' ? 'active' : '' }}" id="pane-file">
+                                <label class="field-label" style="margin-bottom:7px">
+                                    File Tugas <span class="req">*</span>
+                                    <span class="note">Maks. 10 MB (Check Keamanan Otomatis)</span>
+                                </label>
+
+                                <div class="dropzone" id="dropzone"
+                                     onclick="document.getElementById('sub_file').click()">
+                                    <div id="dz-empty">
+                                        <div class="dz-icon-wrap">
+                                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                            </svg>
+                                        </div>
+                                        <div class="dz-text">Klik atau seret file ke sini</div>
+                                        <div class="dz-sub">{{ $extText }} · Maks. 10 MB</div>
+                                    </div>
+                                    <div class="dz-success" id="dz-success">
+                                        <div class="dz-success-icon">
+                                            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="dz-filename" id="dz-filename"></div>
+                                        <span class="dz-change"
+                                              onclick="event.stopPropagation();document.getElementById('sub_file').click()">
+                                            Ganti File
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <input type="file"
+                                       id="sub_file"
+                                       name="file"
+                                       style="display:none"
+                                       {{ $acceptAttr ? 'accept=' . $acceptAttr : '' }}>
+                            </div>
+                        @endif
+
+                        {{-- Pane: Link --}}
+                        @if(in_array('link', $allowedSubTypes))
+                            <div class="sub-pane {{ $defaultSubType === 'link' ? 'active' : '' }}" id="pane-link" style="margin-bottom:16px;">
+                                <div class="field-group">
+                                    <label class="field-label">
+                                        URL / Tautan Tugas <span class="req">*</span>
+                                        <span class="note">GitHub, Google Drive, Figma, dll.</span>
+                                    </label>
+                                    <div class="field-wrap">
+                                        <input type="url" id="sub_link" name="link_url"
+                                               placeholder="https://github.com/... atau https://drive.google.com/..."
+                                               class="field-input">
+                                        <svg class="field-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Pane: Text --}}
+                        @if(in_array('text', $allowedSubTypes))
+                            <div class="sub-pane {{ $defaultSubType === 'text' ? 'active' : '' }}" id="pane-text" style="margin-bottom:16px;">
+                                <div class="field-group">
+                                    <label class="field-label">
+                                        Jawaban / Kode Teks <span class="req">*</span>
+                                        <span class="note">Maks. 50.000 karakter</span>
+                                    </label>
+                                    <textarea id="sub_text" name="text_content" rows="6"
+                                              placeholder="Tuliskan atau tempel jawaban tugas Anda di sini..."
+                                              class="field-input" style="height:auto;padding-left:14px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.6;"></textarea>
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="alert" id="sub-alert"></div>
 
@@ -822,14 +1061,25 @@ setInterval(() => {
 // ─── Submission form logic ───
 @if($soal->is_submission_enabled && (!isset($isDeadlinePassed) || !$isDeadlinePassed) && (!isset($isAdminPreview) || !$isAdminPreview))
 
-const dropzone   = document.getElementById('dropzone');
-const fileInput  = document.getElementById('sub_file');
-const dzEmpty    = document.getElementById('dz-empty');
-const dzSuccess  = document.getElementById('dz-success');
-const dzFilename = document.getElementById('dz-filename');
-const subAlert   = document.getElementById('sub-alert');
-const subBtn     = document.getElementById('sub-btn');
-const btnLabel   = document.getElementById('btn-label');
+const dropzone     = document.getElementById('dropzone');
+const fileInput    = document.getElementById('sub_file');
+const dzEmpty      = document.getElementById('dz-empty');
+const dzSuccess    = document.getElementById('dz-success');
+const dzFilename   = document.getElementById('dz-filename');
+const subAlert     = document.getElementById('sub-alert');
+const subBtn       = document.getElementById('sub-btn');
+const btnLabel     = document.getElementById('btn-label');
+const subTypeInput = document.getElementById('sub_type');
+
+function switchSubmissionType(type) {
+    if (subTypeInput) subTypeInput.value = type;
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-type') === type);
+    });
+    document.querySelectorAll('.sub-pane').forEach(pane => {
+        pane.classList.toggle('active', pane.id === 'pane-' + type);
+    });
+}
 
 function showAlert(type, msg) {
     subAlert.className = 'alert alert-' + type;
@@ -841,56 +1091,84 @@ function showAlert(type, msg) {
 function setFileSelected(file) {
     if (file.size > 10 * 1024 * 1024) {
         showAlert('error', 'Ukuran file melebihi batas maksimal 10 MB!');
-        fileInput.value = '';
+        if (fileInput) fileInput.value = '';
         return;
     }
-    dzEmpty.style.display  = 'none';
-    dzSuccess.style.display = 'flex';
-    dzFilename.textContent  = file.name;
-    dropzone.classList.add('has-file');
-    dropzone.classList.remove('dragover');
+    if (dzEmpty) dzEmpty.style.display   = 'none';
+    if (dzSuccess) dzSuccess.style.display = 'flex';
+    if (dzFilename) dzFilename.textContent  = file.name;
+    if (dropzone) {
+        dropzone.classList.add('has-file');
+        dropzone.classList.remove('dragover');
+    }
 }
 
 function setLoading(loading) {
     subBtn.disabled = loading;
     if (loading) {
-        btnLabel.textContent = 'Mengunggah...';
-        document.getElementById('btn-arrow').outerHTML =
-            '<div class="spinner" id="btn-arrow"></div>';
+        btnLabel.textContent = 'Mengirim Tugas...';
+        const arrow = document.getElementById('btn-arrow');
+        if (arrow) arrow.outerHTML = '<div class="spinner" id="btn-arrow"></div>';
     } else {
         btnLabel.textContent = 'Kirim Tugas Sekarang';
-        document.getElementById('btn-arrow').outerHTML =
-            '<svg id="btn-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>';
+        const spinner = document.getElementById('btn-arrow');
+        if (spinner) spinner.outerHTML = '<svg id="btn-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>';
     }
 }
 
-fileInput.addEventListener('change', function() {
-    if (this.files[0]) setFileSelected(this.files[0]);
-});
+if (fileInput) {
+    fileInput.addEventListener('change', function() {
+        if (this.files[0]) setFileSelected(this.files[0]);
+    });
+}
 
-['dragenter','dragover'].forEach(evt => {
-    dropzone.addEventListener(evt, e => {
-        e.preventDefault(); e.stopPropagation();
-        dropzone.classList.add('dragover');
+if (dropzone) {
+    ['dragenter','dragover'].forEach(evt => {
+        dropzone.addEventListener(evt, e => {
+            e.preventDefault(); e.stopPropagation();
+            dropzone.classList.add('dragover');
+        });
     });
-});
-['dragleave','drop'].forEach(evt => {
-    dropzone.addEventListener(evt, e => {
-        e.preventDefault(); e.stopPropagation();
-        dropzone.classList.remove('dragover');
+    ['dragleave','drop'].forEach(evt => {
+        dropzone.addEventListener(evt, e => {
+            e.preventDefault(); e.stopPropagation();
+            dropzone.classList.remove('dragover');
+        });
     });
-});
-dropzone.addEventListener('drop', e => {
-    const f = e.dataTransfer.files[0];
-    if (f) { fileInput.files = e.dataTransfer.files; setFileSelected(f); }
-});
+    dropzone.addEventListener('drop', e => {
+        const f = e.dataTransfer.files[0];
+        if (f && fileInput) { fileInput.files = e.dataTransfer.files; setFileSelected(f); }
+    });
+}
 
 document.getElementById('submission-form').addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    if (!fileInput.files.length) {
-        showAlert('error', 'Silakan pilih file tugas terlebih dahulu.');
-        return;
+    const currentType = subTypeInput ? subTypeInput.value : 'file';
+
+    if (currentType === 'file') {
+        if (!fileInput || !fileInput.files.length) {
+            showAlert('error', 'Silakan pilih file tugas terlebih dahulu.');
+            return;
+        }
+    } else if (currentType === 'link') {
+        const linkEl = document.getElementById('sub_link');
+        const linkVal = linkEl ? linkEl.value.trim() : '';
+        if (!linkVal) {
+            showAlert('error', 'Silakan masukkan URL / tautan tugas.');
+            return;
+        }
+        if (!/^https?:\/\//i.test(linkVal)) {
+            showAlert('error', 'URL harus diawali dengan http:// atau https://');
+            return;
+        }
+    } else if (currentType === 'text') {
+        const textEl = document.getElementById('sub_text');
+        const textVal = textEl ? textEl.value.trim() : '';
+        if (!textVal) {
+            showAlert('error', 'Silakan ketikkan jawaban teks terlebih dahulu.');
+            return;
+        }
     }
 
     const formData = new FormData(this);
@@ -920,9 +1198,9 @@ document.getElementById('submission-form').addEventListener('submit', async func
 
         if (response.ok) {
             this.reset();
-            dzEmpty.style.display   = 'block';
-            dzSuccess.style.display = 'none';
-            dropzone.classList.remove('has-file');
+            if (dzEmpty) dzEmpty.style.display   = 'block';
+            if (dzSuccess) dzSuccess.style.display = 'none';
+            if (dropzone) dropzone.classList.remove('has-file');
             showAlert('success', result.message || 'Tugas berhasil dikirim!');
             if (result.is_update) {
                 btnLabel.textContent = 'Perbarui Tugas';

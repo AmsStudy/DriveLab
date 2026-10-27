@@ -17,6 +17,7 @@ class Soal extends Model
     protected $fillable = [
         'title',
         'description',
+        'content_text',
         'unique_token',
         'kode_unik',
         'password',
@@ -33,6 +34,7 @@ class Soal extends Model
         'is_downloadable',
         'access_count',
         'is_submission_enabled',
+        'submission_types',
         'deadline_at',
         'submission_instructions',
         'allowed_extensions',
@@ -44,9 +46,16 @@ class Soal extends Model
         'is_active'    => 'boolean',
         'is_downloadable' => 'boolean',
         'is_submission_enabled' => 'boolean',
+        'submission_types' => 'array',
         'deadline_at'  => 'datetime',
         'allowed_extensions' => 'array',
     ];
+
+    public function isSubmissionTypeAllowed(string $type): bool
+    {
+        $types = $this->submission_types ?: ['file'];
+        return in_array($type, $types);
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

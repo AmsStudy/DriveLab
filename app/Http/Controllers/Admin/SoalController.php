@@ -54,29 +54,42 @@ class SoalController extends Controller
         $validated = $request->validate([
             'title'        => 'required|string|max:255',
             'description'  => 'nullable|string',
+            'content_text' => 'nullable|string',
             'password'     => 'required|string|min:4',
             'category_id'  => 'nullable|exists:categories,id',
             'access_type'  => 'required|in:lifetime,scheduled',
             'active_from'  => 'nullable|required_if:access_type,scheduled|date',
             'active_until' => 'nullable|required_if:access_type,scheduled|date|after:active_from',
-            'files'        => 'nullable|array|max:5',
+            'files'        => 'nullable|array|max:15',
             'files.*'      => 'file|max:5120', // 5MB per file
+            'file_downloadable' => 'nullable|array',
             'is_downloadable' => 'boolean',
             'kode_unik'    => 'required|string|max:20|unique:soals,kode_unik',
             'is_submission_enabled' => 'boolean',
+            'submission_types' => 'nullable|array',
+            'submission_types.*' => 'string|in:file,link,text',
             'deadline_at' => 'nullable|required_if:is_submission_enabled,1|date',
             'submission_instructions' => 'nullable|string',
             'allowed_extensions' => 'nullable|required_if:is_submission_enabled,1|array',
-            'allowed_extensions.*' => 'string|in:pdf,word,excel,ppt,image,archive,pkt',
+            'allowed_extensions.*' => 'string|in:all,pdf,word,excel,ppt,image,archive,pkt',
+            'links'        => 'nullable|array|max:15',
+            'links.*.title'=> 'nullable|string|max:255',
+            'links.*.url'  => 'nullable|url|max:2000',
         ]);
 
         do {
             $token = Str::random(6);
         } while (Soal::where('unique_token', $token)->exists());
 
+        $submissionTypes = $request->input('submission_types');
+        if ($request->boolean('is_submission_enabled') && empty($submissionTypes)) {
+            $submissionTypes = ['file'];
+        }
+
         $soal = Soal::create([
             'title'               => $validated['title'],
             'description'         => $validated['description'] ?? null,
+            'content_text'        => $validated['content_text'] ?? null,
             'kode_unik'           => $validated['kode_unik'],
             'unique_token'        => $token,
             'password'            => Hash::make($validated['password']),
@@ -88,24 +101,48 @@ class SoalController extends Controller
             'is_active'           => true,
             'is_downloadable'     => $request->boolean('is_downloadable'),
             'is_submission_enabled' => $request->boolean('is_submission_enabled'),
+            'submission_types'    => $submissionTypes,
             'deadline_at'         => $validated['deadline_at'] ?? null,
             'submission_instructions' => $validated['submission_instructions'] ?? null,
             'allowed_extensions'  => $validated['allowed_extensions'] ?? [],
         ]);
 
+        // 1. Simpan lampiran file fisik (maksimal 15 file)
         if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
+            $fileDl = $request->input('file_downloadable', []);
+            $masterDl = $request->boolean('is_downloadable');
+
+            foreach ($request->file('files') as $idx => $file) {
+                $canDownload = isset($fileDl[$idx]) ? (bool)$fileDl[$idx] : $masterDl;
+
                 $soal->attachments()->create([
+                    'type'               => 'file',
                     'file_original_name' => $file->getClientOriginalName(),
                     'file_type'          => $file->getClientOriginalExtension(),
                     'file_size'          => $file->getSize(),
                     'file_path'          => $file->store('soals', 'private'),
+                    'is_downloadable'    => $canDownload,
                 ]);
             }
         }
 
+        // 2. Simpan lampiran link eksternal (jika ada)
+        if ($request->filled('links') && is_array($request->links)) {
+            foreach ($request->links as $link) {
+                if (!empty($link['url'])) {
+                    $soal->attachments()->create([
+                        'type'               => 'link',
+                        'file_original_name' => !empty($link['title']) ? $link['title'] : $link['url'],
+                        'file_type'          => 'link',
+                        'link_url'           => $link['url'],
+                        'is_downloadable'    => false,
+                    ]);
+                }
+            }
+        }
+
         return redirect()->route('admin.soal.index')
-            ->with('success', 'Soal berhasil ditambahkan!');
+            ->with('success', 'Dokumen soal berhasil ditambahkan!');
     }
 
     public function show(Soal $soal)
@@ -130,6 +167,7 @@ class SoalController extends Controller
         $validated = $request->validate([
             'title'        => 'required|string|max:255',
             'description'  => 'nullable|string',
+            'content_text' => 'nullable|string',
             'password'     => 'nullable|string|min:4',
             'category_id'  => 'nullable|exists:categories,id',
             'access_type'  => 'required|in:lifetime,scheduled',
@@ -139,17 +177,30 @@ class SoalController extends Controller
             'is_downloadable' => 'boolean',
             'kode_unik'    => 'required|string|max:20|unique:soals,kode_unik,' . $soal->id,
             'is_submission_enabled' => 'boolean',
+            'submission_types' => 'nullable|array',
+            'submission_types.*' => 'string|in:file,link,text',
             'deadline_at' => 'nullable|required_if:is_submission_enabled,1|date',
             'submission_instructions' => 'nullable|string',
             'allowed_extensions' => 'nullable|required_if:is_submission_enabled,1|array',
-            'allowed_extensions.*' => 'string|in:pdf,word,excel,ppt,image,archive,pkt',
-            'files'        => 'nullable|array|max:5',
+            'allowed_extensions.*' => 'string|in:all,pdf,word,excel,ppt,image,archive,pkt',
+            'files'        => 'nullable|array|max:15',
             'files.*'      => 'file|max:5120',
+            'file_downloadable' => 'nullable|array',
+            'attachment_downloadable' => 'nullable|array',
+            'links'        => 'nullable|array|max:15',
+            'links.*.title'=> 'nullable|string|max:255',
+            'links.*.url'  => 'nullable|url|max:2000',
         ]);
+
+        $submissionTypes = $request->input('submission_types');
+        if ($request->boolean('is_submission_enabled') && empty($submissionTypes)) {
+            $submissionTypes = ['file'];
+        }
 
         $data = [
             'title'        => $validated['title'],
             'description'  => $validated['description'] ?? null,
+            'content_text' => $validated['content_text'] ?? null,
             'kode_unik'    => $validated['kode_unik'],
             'category_id'  => $validated['category_id'] ?? null,
             'access_type'  => $validated['access_type'],
@@ -158,6 +209,7 @@ class SoalController extends Controller
             'is_active'    => $request->boolean('is_active'),
             'is_downloadable' => $request->boolean('is_downloadable'),
             'is_submission_enabled' => $request->boolean('is_submission_enabled'),
+            'submission_types'    => $submissionTypes,
             'deadline_at'         => $validated['deadline_at'] ?? null,
             'submission_instructions' => $validated['submission_instructions'] ?? null,
             'allowed_extensions'  => $validated['allowed_extensions'] ?? [],
@@ -170,36 +222,71 @@ class SoalController extends Controller
 
         $soal->update($data);
 
-        // Hapus file spesifik jika diminta
+        // Hapus file/lampiran spesifik jika diminta
         if ($request->has('delete_attachments') && is_array($request->delete_attachments)) {
             $attachmentsToDelete = $soal->attachments()->whereIn('id', $request->delete_attachments)->get();
             foreach ($attachmentsToDelete as $att) {
-                Storage::disk('private')->delete($att->file_path);
+                if ($att->isFile() && $att->file_path) {
+                    Storage::disk('private')->delete($att->file_path);
+                }
                 $att->delete();
             }
         }
 
-        // Tambahkan file baru
+        // Update hak download lampiran file yang sudah ada
+        if ($request->has('attachment_downloadable') && is_array($request->attachment_downloadable)) {
+            foreach ($soal->attachments()->where('type', 'file')->get() as $existingAtt) {
+                $canDl = !empty($request->attachment_downloadable[$existingAtt->id]);
+                $existingAtt->update(['is_downloadable' => $canDl]);
+            }
+        } elseif ($request->has('is_downloadable_bulk')) {
+            // Jika admin melakukan mass toggle
+            $soal->attachments()->where('type', 'file')->update(['is_downloadable' => $request->boolean('is_downloadable')]);
+        }
+
+        // Tambahkan file baru (maks total 15 file)
         if ($request->hasFile('files')) {
-            $remainingCount = $soal->attachments()->count();
+            $remainingCount = $soal->attachments()->where('type', 'file')->count();
             $newFilesCount = count($request->file('files'));
             
-            if ($remainingCount + $newFilesCount > 5) {
-                return redirect()->back()->withErrors(['files' => 'Total file tidak boleh melebihi 5.'])->withInput();
+            if ($remainingCount + $newFilesCount > 15) {
+                return redirect()->back()->withErrors(['files' => 'Total file tidak boleh melebihi 15.'])->withInput();
             }
 
-            foreach ($request->file('files') as $file) {
+            $fileDl = $request->input('file_downloadable', []);
+            $masterDl = $request->boolean('is_downloadable');
+
+            foreach ($request->file('files') as $idx => $file) {
+                $canDownload = isset($fileDl[$idx]) ? (bool)$fileDl[$idx] : $masterDl;
+
                 $soal->attachments()->create([
+                    'type'               => 'file',
                     'file_original_name' => $file->getClientOriginalName(),
                     'file_type'          => $file->getClientOriginalExtension(),
                     'file_size'          => $file->getSize(),
                     'file_path'          => $file->store('soals', 'private'),
+                    'is_downloadable'    => $canDownload,
                 ]);
             }
         }
 
+        // Tambahkan link baru (jika ada)
+        if ($request->filled('links') && is_array($request->links)) {
+            foreach ($request->links as $link) {
+                if (!empty($link['url'])) {
+                    $soal->attachments()->create([
+                        'type'               => 'link',
+                        'file_original_name' => !empty($link['title']) ? $link['title'] : $link['url'],
+                        'file_type'          => 'link',
+                        'link_url'           => $link['url'],
+                        'is_downloadable'    => false,
+                    ]);
+                }
+            }
+        }
+
         return redirect()->route('admin.soal.index')
-            ->with('success', 'Soal berhasil diperbarui!');
+            ->with('success', 'Dokumen soal berhasil diperbarui!');
     }
 
     public function destroy(Soal $soal)
@@ -235,6 +322,10 @@ class SoalController extends Controller
     {
         $soal = $attachment->soal;
         $this->authorizeAccess($soal);
+
+        if (!$attachment->isFile() || empty($attachment->file_path)) {
+            abort(404, 'Lampiran ini bukan file yang dapat diunduh.');
+        }
 
         $realBase = realpath(Storage::disk('private')->path(''));
         $realFile = $this->resolvePrivateFile($attachment->file_path, $realBase);
@@ -301,7 +392,9 @@ class SoalController extends Controller
     private function purgeSoalStorage(Soal $soal): void
     {
         foreach ($soal->attachments as $attachment) {
-            Storage::disk('private')->delete($attachment->file_path);
+            if ($attachment->isFile() && $attachment->file_path) {
+                Storage::disk('private')->delete($attachment->file_path);
+            }
             $attachment->delete();
         }
 
@@ -316,7 +409,7 @@ class SoalController extends Controller
 
         $csvFileName = 'rekap_tugas_' . Str::slug($soal->title) . '.csv';
         $headers = [
-            "Content-type"        => "text/csv",
+            "Content-type"        => "text/csv; charset=UTF-8",
             "Content-Disposition" => "attachment; filename=$csvFileName",
             "Pragma"              => "no-cache",
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
@@ -325,14 +418,22 @@ class SoalController extends Controller
 
         $callback = function() use($submissions) {
             $file = fopen('php://output', 'w');
-            fputcsv($file, ['No', 'NIM', 'Nama', 'File Asli', 'Waktu Pengumpulan']);
+            fputs($file, "\xEF\xBB\xBF"); // UTF-8 BOM untuk Excel
+            fputcsv($file, ['No', 'NIM', 'Nama Mahasiswa', 'Tipe Pengumpulan', 'File / Tautan / Teks', 'Waktu Pengumpulan']);
 
             foreach ($submissions as $index => $sub) {
+                $konten = match ($sub->submission_type) {
+                    'link'  => $sub->link_url,
+                    'text'  => $sub->text_content,
+                    default => $sub->file_original_name,
+                };
+
                 fputcsv($file, [
                     $index + 1,
                     $sub->nim,
                     $sub->nama,
-                    $sub->file_original_name,
+                    strtoupper($sub->submission_type ?? 'FILE'),
+                    $konten,
                     $sub->created_at->format('Y-m-d H:i:s')
                 ]);
             }
@@ -389,21 +490,45 @@ class SoalController extends Controller
             $added     = 0;
 
             foreach ($submissions as $submission) {
-                $realFile = $this->resolvePrivateFile($submission->file_path, $realBase);
-
-                if ($realFile === null) {
+                if ($submission->isLink()) {
+                    $entryName = $this->submissionZipEntryName($submission, $usedNames, 'txt');
+                    $content   = "PENGUMPULAN TUGAS BERUPA TAUTAN / LINK\n"
+                               . "NIM        : " . $submission->nim . "\n"
+                               . "Nama       : " . $submission->nama . "\n"
+                               . "Tautan     : " . $submission->link_url . "\n"
+                               . "Waktu      : " . $submission->created_at->format('Y-m-d H:i:s') . "\n";
+                    $zip->addFromString($entryName, $content);
+                    $added++;
                     continue;
                 }
 
-                $zip->addFile($realFile, $this->submissionZipEntryName($submission, $usedNames));
-                $added++;
+                if ($submission->isText()) {
+                    $entryName = $this->submissionZipEntryName($submission, $usedNames, 'txt');
+                    $content   = "PENGUMPULAN TUGAS BERUPA TEKS\n"
+                               . "NIM        : " . $submission->nim . "\n"
+                               . "Nama       : " . $submission->nama . "\n"
+                               . "Waktu      : " . $submission->created_at->format('Y-m-d H:i:s') . "\n"
+                               . "--------------------------------------------------------\n\n"
+                               . $submission->text_content . "\n";
+                    $zip->addFromString($entryName, $content);
+                    $added++;
+                    continue;
+                }
+
+                if ($submission->file_path) {
+                    $realFile = $this->resolvePrivateFile($submission->file_path, $realBase);
+                    if ($realFile !== null) {
+                        $zip->addFile($realFile, $this->submissionZipEntryName($submission, $usedNames));
+                        $added++;
+                    }
+                }
             }
 
             $zip->close();
 
             if ($added === 0) {
                 @unlink($tempPath);
-                return back()->with('error', 'Tidak ada file fisik tugas yang dapat diunduh.');
+                return back()->with('error', 'Tidak ada file atau data tugas yang dapat dimasukkan ke dalam arsip ZIP.');
             }
 
             $zipFileName = 'tugas_' . Str::slug($soal->title) . '_' . now()->format('Ymd_His') . '.zip';
@@ -419,6 +544,10 @@ class SoalController extends Controller
     {
         $submission = Submission::findOrFail($id);
         $this->authorizeAccess($submission->soal);
+
+        if (!$submission->isFile() || empty($submission->file_path)) {
+            abort(404, 'Pengumpulan ini bukan file yang dapat diunduh.');
+        }
 
         $realBase = realpath(Storage::disk('private')->path(''));
         $realFile = $this->resolvePrivateFile($submission->file_path, $realBase);
@@ -442,12 +571,17 @@ class SoalController extends Controller
         return $realFile;
     }
 
-    private function submissionZipEntryName(Submission $submission, array &$usedNames): string
+    private function submissionZipEntryName(Submission $submission, array &$usedNames, ?string $customExt = null): string
     {
         $nim      = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $submission->nim);
         $nama     = preg_replace('/[^a-zA-Z0-9\-_\s]/', '_', str_replace(' ', '_', $submission->nama));
-        $original = $submission->file_original_name ?: basename($submission->file_path);
-        $original = preg_replace('/[^a-zA-Z0-9.\-_]/', '_', $original);
+
+        if ($customExt !== null) {
+            $original = "jawaban.{$customExt}";
+        } else {
+            $original = $submission->file_original_name ?: basename($submission->file_path ?? 'tugas');
+            $original = preg_replace('/[^a-zA-Z0-9.\-_]/', '_', $original);
+        }
 
         $name = "{$nim}_{$nama}_{$original}";
         $base = $name;

@@ -24,6 +24,9 @@ class Submission extends Model
         'soal_id',
         'nim',
         'nama',
+        'submission_type',
+        'link_url',
+        'text_content',
         'file_path',
         'file_original_name',
         'file_extension',
@@ -33,5 +36,20 @@ class Submission extends Model
     public function soal(): BelongsTo
     {
         return $this->belongsTo(Soal::class);
+    }
+
+    public function isFile(): bool
+    {
+        return ($this->submission_type ?? 'file') === 'file';
+    }
+
+    public function isLink(): bool
+    {
+        return $this->submission_type === 'link';
+    }
+
+    public function isText(): bool
+    {
+        return $this->submission_type === 'text';
     }
 }

@@ -184,9 +184,19 @@
                             <div class="p-3 rounded-lg" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
                                 <div class="flex justify-between items-start mb-1">
                                     <p class="text-sm font-medium text-pink-400" x-text="item.soal_title"></p>
-                                    <span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full border border-green-500/30">Diterima</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded border"
+                                              :class="item.submission_type === 'link' ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : (item.submission_type === 'text' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-blue-500/20 text-blue-300 border-blue-500/30')"
+                                              x-text="item.submission_type || 'file'"></span>
+                                        <span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full border border-green-500/30">Diterima</span>
+                                    </div>
                                 </div>
-                                <p class="text-xs text-gray-300 truncate mb-1" x-text="item.file_name"></p>
+                                <template x-if="item.submission_type === 'link'">
+                                    <a :href="item.link_url" target="_blank" rel="noopener noreferrer" class="text-xs text-purple-400 hover:underline truncate block mb-1" x-text="item.file_name"></a>
+                                </template>
+                                <template x-if="item.submission_type !== 'link'">
+                                    <p class="text-xs text-gray-300 truncate mb-1" x-text="item.file_name"></p>
+                                </template>
                                 <p class="text-[11px] text-gray-500" x-text="'Dikumpulkan: ' + item.created_at"></p>
                             </div>
                         </template>

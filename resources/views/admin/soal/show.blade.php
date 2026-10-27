@@ -56,23 +56,76 @@
                 </div>
             </div>
 
+            {{-- Soal Text Content --}}
+            @if($soal->content_text)
+            <div class="pt-4 border-t border-gray-800 space-y-2">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Teks / Konten Soal
+                    </p>
+                    <button type="button" onclick="navigator.clipboard.writeText({{ json_encode($soal->content_text) }}).then(()=>alert('Teks soal disalin!'))" class="text-xs text-pink-400 hover:text-pink-300">Salin</button>
+                </div>
+                <div class="p-3 bg-gray-950/70 rounded-xl border border-gray-800 text-xs text-gray-300 font-mono max-h-48 overflow-y-auto whitespace-pre-wrap leading-relaxed">
+{{ $soal->content_text }}
+                </div>
+            </div>
+            @endif
+
             {{-- File List --}}
             @if($soal->attachments->count() > 0)
             <div class="pt-4 border-t border-gray-800 space-y-3">
-                <p class="text-xs text-gray-500 font-medium">File Lampiran (Bisa Diunduh)</p>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Lampiran & Tautan ({{ $soal->attachments->count() }})</p>
+                    <span class="text-[11px] text-gray-500">Maks. 15 Item</span>
+                </div>
                 @foreach($soal->attachments as $attachment)
-                    <div class="flex items-center justify-between bg-gray-800/50 p-3 rounded-xl border border-gray-700">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <span class="text-xs font-bold text-pink-400 bg-pink-500/10 px-2 py-1 rounded-md">{{ strtoupper($attachment->file_type) ?: 'FILE' }}</span>
-                            <div class="min-w-0">
-                                <p class="text-sm text-gray-200 truncate">{{ $attachment->file_original_name }}</p>
-                                <p class="text-xs text-gray-500">{{ $attachment->file_size_formatted }}</p>
+                    @if($attachment->isLink())
+                        <div class="flex items-center justify-between bg-gray-800/50 p-3 rounded-xl border border-purple-500/20">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <span class="text-xs font-bold text-purple-400 bg-purple-500/10 px-2 py-1 rounded-md">LINK</span>
+                                <div class="min-w-0">
+                                    <p class="text-sm text-gray-200 truncate">{{ $attachment->file_original_name ?: 'Tautan Eksternal' }}</p>
+                                    <a href="{{ $attachment->link_url }}" target="_blank" rel="noopener noreferrer" class="text-xs text-purple-400 hover:underline truncate block">{{ $attachment->link_url }}</a>
+                                </div>
                             </div>
+                            <a href="{{ $attachment->link_url }}" target="_blank" rel="noopener noreferrer" class="p-2 text-purple-400 hover:bg-purple-500/20 rounded-lg transition-colors flex-shrink-0" title="Buka Tautan">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                            </a>
                         </div>
-                        <a href="{{ route('admin.soal.download', $attachment->id) }}" class="p-2 text-pink-400 hover:bg-pink-500/20 rounded-lg transition-colors" title="Download File">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        </a>
-                    </div>
+                    @elseif($attachment->isText())
+                        <div class="bg-gray-800/50 p-3 rounded-xl border border-amber-500/20 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded-md">TEKS</span>
+                                    <span class="text-sm text-gray-200 truncate">{{ $attachment->file_original_name ?: 'Lampiran Teks' }}</span>
+                                </div>
+                                <button type="button" onclick="navigator.clipboard.writeText({{ json_encode($attachment->content_text) }}).then(()=>alert('Teks disalin!'))" class="text-xs text-amber-400 hover:text-amber-300">Salin</button>
+                            </div>
+                            <p class="text-xs text-gray-400 font-mono whitespace-pre-wrap max-h-24 overflow-y-auto bg-gray-900/60 p-2 rounded-lg border border-gray-800">{{ Str::limit($attachment->content_text, 250) }}</p>
+                        </div>
+                    @else
+                        {{-- File --}}
+                        <div class="flex items-center justify-between bg-gray-800/50 p-3 rounded-xl border border-gray-700">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <span class="text-xs font-bold text-pink-400 bg-pink-500/10 px-2 py-1 rounded-md">{{ strtoupper($attachment->file_type) ?: 'FILE' }}</span>
+                                <div class="min-w-0">
+                                    <p class="text-sm text-gray-200 truncate">{{ $attachment->file_original_name }}</p>
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <span class="text-xs text-gray-500">{{ $attachment->file_size_formatted }}</span>
+                                        @if($attachment->is_downloadable)
+                                            <span class="text-[10px] bg-green-500/15 text-green-400 px-1.5 py-0.5 rounded font-medium">Bisa Diunduh</span>
+                                        @else
+                                            <span class="text-[10px] bg-yellow-500/15 text-yellow-400 px-1.5 py-0.5 rounded font-medium">Hanya Preview</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="{{ route('admin.soal.download', $attachment->id) }}" class="p-2 text-pink-400 hover:bg-pink-500/20 rounded-lg transition-colors flex-shrink-0" title="Download File (Admin)">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            </a>
+                        </div>
+                    @endif
                 @endforeach
             </div>
             @endif
@@ -178,7 +231,8 @@
                             <tr>
                                 <th class="px-6 py-3 text-left">NIM</th>
                                 <th class="px-4 py-3 text-left">Nama</th>
-                                <th class="px-4 py-3 text-left">File</th>
+                                <th class="px-4 py-3 text-left">Tipe</th>
+                                <th class="px-4 py-3 text-left">Jawaban / Berkas</th>
                                 <th class="px-4 py-3 text-left">Waktu Pengumpulan</th>
                                 <th class="px-4 py-3 text-center">Aksi</th>
                             </tr>
@@ -187,13 +241,45 @@
                             @foreach($submissions as $sub)
                             <tr class="hover:bg-gray-800/30">
                                 <td class="px-6 py-3 text-gray-300 font-mono text-xs">{{ $sub->nim }}</td>
-                                <td class="px-4 py-3 text-gray-300 text-xs">{{ $sub->nama }}</td>
-                                <td class="px-4 py-3 text-gray-500 text-xs">{{ $sub->file_original_name }}</td>
+                                <td class="px-4 py-3 text-gray-300 text-xs font-medium">{{ $sub->nama }}</td>
+                                <td class="px-4 py-3 text-xs">
+                                    @if($sub->isLink())
+                                        <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-500/15 text-purple-400 border border-purple-500/20">Link</span>
+                                    @elseif($sub->isText())
+                                        <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/20">Teks</span>
+                                    @else
+                                        <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-500/15 text-blue-400 border border-blue-500/20">File</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-xs">
+                                    @if($sub->isLink())
+                                        <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 hover:underline max-w-xs truncate inline-flex items-center gap-1 font-mono">
+                                            {{ Str::limit($sub->link_url, 40) }}
+                                            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        </a>
+                                    @elseif($sub->isText())
+                                        <button type="button" onclick="showTextModal({{ json_encode($sub->nama) }}, {{ json_encode($sub->nim) }}, {{ json_encode($sub->text_content) }})" class="text-amber-400 hover:text-amber-300 font-mono text-xs max-w-xs truncate text-left block hover:underline">
+                                            {{ Str::limit($sub->text_content, 45) }}
+                                        </button>
+                                    @else
+                                        <span class="text-gray-300">{{ $sub->file_original_name }}</span>
+                                    @endif
+                                </td>
                                 <td class="px-4 py-3 text-gray-400 text-xs">{{ $sub->created_at->format('d M Y H:i:s') }}</td>
                                 <td class="px-4 py-3 text-center">
-                                    <a href="{{ route('admin.soal.download-submissions', $sub->id) }}" class="text-blue-400 hover:text-blue-300" title="Download">
-                                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                    </a>
+                                    @if($sub->isLink())
+                                        <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:text-purple-300 p-1.5 inline-block hover:bg-purple-500/10 rounded-lg transition-colors" title="Buka Link">
+                                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        </a>
+                                    @elseif($sub->isText())
+                                        <button type="button" onclick="showTextModal({{ json_encode($sub->nama) }}, {{ json_encode($sub->nim) }}, {{ json_encode($sub->text_content) }})" class="text-amber-400 hover:text-amber-300 p-1.5 inline-block hover:bg-amber-500/10 rounded-lg transition-colors" title="Lihat Teks Lengkap">
+                                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        </button>
+                                    @else
+                                        <a href="{{ route('admin.soal.download-submissions', $sub->id) }}" class="text-blue-400 hover:text-blue-300 p-1.5 inline-block hover:bg-blue-500/10 rounded-lg transition-colors" title="Download File">
+                                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach
@@ -204,5 +290,49 @@
         </div>
     </div>
 </div>
+
+{{-- Text Submission Preview Modal --}}
+<div id="textSubmissionModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
+        <div class="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
+            <div>
+                <h3 class="text-white font-semibold text-base" id="modalStudentName">Jawaban Mahasiswa</h3>
+                <p class="text-xs text-gray-500 font-mono mt-0.5" id="modalStudentNim"></p>
+            </div>
+            <button onclick="closeTextModal()" class="text-gray-400 hover:text-white p-1 rounded-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="p-6 overflow-y-auto flex-1">
+            <pre class="bg-gray-950 p-4 rounded-xl border border-gray-800 text-gray-200 font-mono text-xs whitespace-pre-wrap leading-relaxed select-text" id="modalTextContent"></pre>
+        </div>
+        <div class="px-6 py-3 border-t border-gray-800 flex justify-end gap-3 bg-gray-900/50">
+            <button type="button" onclick="copyModalText()" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                Salin Teks
+            </button>
+            <button type="button" onclick="closeTextModal()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl text-xs font-semibold transition-colors">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentModalText = '';
+function showTextModal(name, nim, content) {
+    document.getElementById('modalStudentName').textContent = name;
+    document.getElementById('modalStudentNim').textContent = 'NIM: ' + nim;
+    document.getElementById('modalTextContent').textContent = content;
+    currentModalText = content;
+    document.getElementById('textSubmissionModal').classList.remove('hidden');
+}
+function closeTextModal() {
+    document.getElementById('textSubmissionModal').classList.add('hidden');
+}
+function copyModalText() {
+    navigator.clipboard.writeText(currentModalText).then(() => {
+        alert('Teks jawaban berhasil disalin!');
+    });
+}
+</script>
 @endsection
 
