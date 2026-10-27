@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 @section('title', 'Kategori')
 @section('page-title', 'Kelola Kategori')
 @section('page-description', 'Atur pengelompokan soal berdasarkan kategori')
@@ -6,7 +6,7 @@
 @section('content')
 <div class="flex justify-end mb-5">
     <a href="{{ route('admin.categories.create') }}" id="add-category-btn"
-       class="bg-gradient-to-r from-pink-600 to-fuchsia-700 hover:from-pink-700 hover:to-fuchsia-800 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2">
+       class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
@@ -14,7 +14,7 @@
     </a>
 </div>
 
-<div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+<div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl overflow-hidden">
     @if($categories->isEmpty())
         <div class="py-16 text-center text-gray-500">
             <p>Belum ada kategori. Buat kategori pertama Anda!</p>

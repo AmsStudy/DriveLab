@@ -11,23 +11,23 @@
 *{margin:0;padding:0;box-sizing:border-box}
 
 :root{
-  --bg:#080810;
-  --surface:#0E0E1A;
-  --surface2:#14141F;
-  --surface3:#1A1A28;
-  --border:rgba(255,255,255,0.06);
-  --border-pink:rgba(247,37,133,0.35);
-  --pink:#F72585;
-  --pink-dim:rgba(247,37,133,0.12);
-  --pink-glow:rgba(247,37,133,0.25);
-  --violet:#7209B7;
+  --bg:#090D0B;
+  --surface:#0F1713;
+  --surface2:#142019;
+  --surface3:#1A2820;
+  --border:#1A2820;
+  --border-emerald:rgba(16,185,129,0.35);
+  --emerald:#10B981;
+  --emerald-dim:rgba(16,185,129,0.12);
+  --emerald-glow:rgba(16,185,129,0.25);
+  --violet:#0D9488;
   --text1:#F1EEF6;
   --text2:#9B96B0;
   --text3:#5A5573;
-  --green:#22C55E;
-  --green-dim:rgba(34,197,94,0.12);
-  --blue:#3B82F6;
-  --blue-dim:rgba(59,130,246,0.1);
+  --green:#10B981;
+  --green-dim:rgba(16,185,129,0.12);
+  --blue:#06B6D4;
+  --blue-dim:rgba(6,182,212,0.1);
   --amber:#F59E0B;
 }
 
@@ -52,7 +52,7 @@ body::before{
 /* ─── HEADER ─── */
 .topbar{
   position:sticky;top:0;z-index:100;
-  background:rgba(8,8,16,0.8);
+  background:rgba(9,13,11,0.85);
   backdrop-filter:blur(24px);
   border-bottom:1px solid var(--border);
   padding:0 24px;
@@ -64,15 +64,15 @@ body::before{
 
 .logo-icon{
   width:36px;height:36px;border-radius:10px;
-  background:linear-gradient(135deg,var(--pink),var(--violet));
+  background:linear-gradient(135deg,var(--emerald),var(--violet));
   display:flex;align-items:center;justify-content:center;
   flex-shrink:0;
-  box-shadow:0 0 20px rgba(247,37,133,0.3);
+  box-shadow:0 0 20px rgba(16,185,129,0.3);
   position:relative;
 }
 .logo-icon::after{
   content:'';position:absolute;inset:-1px;border-radius:11px;
-  background:linear-gradient(135deg,var(--pink),var(--violet));
+  background:linear-gradient(135deg,var(--emerald),var(--violet));
   z-index:-1;opacity:0.4;filter:blur(8px);
 }
 
@@ -82,7 +82,7 @@ body::before{
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px;
 }
 .topbar-cat{
-  font-size:11px;color:var(--pink);font-weight:500;
+  font-size:11px;color:var(--emerald);font-weight:500;
   display:flex;align-items:center;gap:4px;margin-top:2px;
 }
 
@@ -142,7 +142,7 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
 }
 .section-title::before{
   content:'';width:3px;height:14px;border-radius:2px;
-  background:linear-gradient(180deg,var(--pink),var(--violet));
+  background:linear-gradient(180deg,var(--emerald),var(--violet));
 }
 
 /* ─── FILE GRID ─── */
@@ -166,13 +166,13 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
   content:'';
   position:absolute;
   top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(247,37,133,0.4),transparent);
+  background:linear-gradient(90deg,transparent,rgba(16,185,129,0.4),transparent);
   opacity:0;transition:opacity 0.3s;
 }
 .file-card:hover{
-  border-color:var(--border-pink);
+  border-color:var(--border-emerald);
   transform:translateY(-2px);
-  box-shadow:0 8px 32px rgba(0,0,0,0.4),0 0 0 1px rgba(247,37,133,0.08);
+  box-shadow:0 8px 32px rgba(0,0,0,0.4),0 0 0 1px rgba(16,185,129,0.12);
 }
 .file-card:hover::before{opacity:1}
 
@@ -192,7 +192,7 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
   font-size:10px;font-weight:800;font-family:'Syne',sans-serif;
   letter-spacing:0.04em;text-transform:uppercase;
 }
-.ext-preview{background:var(--pink-dim);color:var(--pink);border:1px solid rgba(247,37,133,0.2)}
+.ext-preview{background:var(--emerald-dim);color:var(--emerald);border:1px solid rgba(16,185,129,0.2)}
 .ext-other{background:var(--surface3);color:var(--text3);border:1px solid var(--border)}
 
 .file-info{flex:1;min-width:0}
@@ -214,12 +214,12 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
 }
 .btn-primary{
   flex:1;
-  background:linear-gradient(135deg,var(--pink),#D4006E);
+  background:linear-gradient(135deg,var(--emerald),#0D9488);
   color:#fff;
-  box-shadow:0 4px 16px rgba(247,37,133,0.2);
+  box-shadow:0 4px 16px rgba(16,185,129,0.2);
 }
 .btn-primary:hover{
-  box-shadow:0 6px 22px rgba(247,37,133,0.35);
+  box-shadow:0 6px 22px rgba(16,185,129,0.35);
   transform:translateY(-1px);
   filter:brightness(1.05);
 }
@@ -262,7 +262,7 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
 }
 .content-text-title{
   font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
-  color:var(--pink);text-transform:uppercase;letter-spacing:0.06em;
+  color:var(--emerald);text-transform:uppercase;letter-spacing:0.06em;
   display:flex;align-items:center;gap:8px;
 }
 .content-text-title svg{width:16px;height:16px}
@@ -324,9 +324,9 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
 }
 .tab-btn:hover{color:var(--text1)}
 .tab-btn.active{
-  background:linear-gradient(135deg,rgba(247,37,133,0.25),rgba(114,9,183,0.25));
-  color:#fff;border:1px solid rgba(247,37,133,0.4);
-  box-shadow:0 2px 10px rgba(247,37,133,0.15);
+  background:linear-gradient(135deg,rgba(16,185,129,0.25),rgba(13,148,136,0.25));
+  color:#fff;border:1px solid rgba(16,185,129,0.4);
+  box-shadow:0 2px 10px rgba(16,185,129,0.15);
 }
 .sub-pane{display:none}
 .sub-pane.active{display:block}
@@ -366,7 +366,7 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
   position:absolute;
   bottom:-60px;left:50%;transform:translateX(-50%);
   width:500px;height:200px;
-  background:radial-gradient(ellipse,rgba(247,37,133,0.07) 0%,transparent 70%);
+  background:radial-gradient(ellipse,rgba(16,185,129,0.08) 0%,transparent 70%);
   pointer-events:none;
 }
 .sub-header{
@@ -381,10 +381,10 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
 }
 .sub-title-icon{
   width:32px;height:32px;border-radius:8px;
-  background:var(--pink-dim);
+  background:var(--emerald-dim);
   display:flex;align-items:center;justify-content:center;
 }
-.sub-title-icon svg{width:16px;height:16px;color:var(--pink)}
+.sub-title-icon svg{width:16px;height:16px;color:var(--emerald)}
 
 .deadline-badge{
   display:flex;align-items:center;gap:5px;
@@ -432,7 +432,7 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
   text-transform:uppercase;letter-spacing:0.08em;
   display:flex;align-items:center;gap:4px;
 }
-.field-label .req{color:var(--pink)}
+.field-label .req{color:var(--emerald)}
 .field-label .note{color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;margin-left:auto;font-size:11px}
 .field-wrap{position:relative}
 .field-icon{
@@ -451,15 +451,15 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
 }
 .field-input::placeholder{color:var(--text3)}
 .field-input:focus{
-  border-color:var(--pink);
-  box-shadow:0 0 0 3px rgba(247,37,133,0.1);
-  background:#0A0A14;
+  border-color:var(--emerald);
+  box-shadow:0 0 0 3px rgba(16,185,129,0.12);
+  background:#070C09;
 }
 
 /* Dropzone */
 .dropzone{
   border:1.5px dashed rgba(255,255,255,0.1);
-  background:#07070F;
+  background:#070C09;
   border-radius:14px;
   padding:36px 24px;
   text-align:center;
@@ -469,12 +469,12 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
   margin-bottom:16px;
 }
 .dropzone:hover{
-  border-color:rgba(247,37,133,0.35);
-  background:rgba(247,37,133,0.03);
+  border-color:rgba(16,185,129,0.35);
+  background:rgba(16,185,129,0.03);
 }
 .dropzone.dragover{
-  border-color:var(--pink);
-  background:var(--pink-dim);
+  border-color:var(--emerald);
+  background:var(--emerald-dim);
 }
 .dropzone.has-file{
   border-color:rgba(34,197,94,0.35);
@@ -486,11 +486,11 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
   border-radius:50%;display:flex;align-items:center;justify-content:center;
   transition:all 0.25s;
 }
-.dropzone:hover .dz-icon-wrap{border-color:rgba(247,37,133,0.3);background:var(--pink-dim)}
+.dropzone:hover .dz-icon-wrap{border-color:rgba(16,185,129,0.3);background:var(--emerald-dim)}
 .dz-icon-wrap svg{width:22px;height:22px;color:var(--text3);transition:color 0.25s}
-.dropzone:hover .dz-icon-wrap svg{color:var(--pink)}
+.dropzone:hover .dz-icon-wrap svg{color:var(--emerald)}
 .dz-text{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:5px;transition:color 0.25s}
-.dropzone:hover .dz-text{color:var(--pink)}
+.dropzone:hover .dz-text{color:var(--emerald)}
 .dz-sub{font-size:11.5px;color:var(--text3)}
 .dz-success{display:none;flex-direction:column;align-items:center}
 .dz-success-icon{
@@ -520,12 +520,12 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
 /* Submit btn */
 .btn-submit{
   width:100%;padding:14px 24px;
-  background:linear-gradient(135deg,var(--pink),#C1005D);
+  background:linear-gradient(135deg,var(--emerald),#0D9488);
   color:#fff;border:none;border-radius:12px;cursor:pointer;
   font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
   display:flex;align-items:center;justify-content:center;gap:8px;
   transition:all 0.25s ease;
-  box-shadow:0 4px 20px rgba(247,37,133,0.2);
+  box-shadow:0 4px 20px rgba(16,185,129,0.25);
   position:relative;overflow:hidden;
 }
 .btn-submit::after{
@@ -533,7 +533,7 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
   background:linear-gradient(135deg,rgba(255,255,255,0.08),transparent);
   pointer-events:none;
 }
-.btn-submit:hover{box-shadow:0 8px 30px rgba(247,37,133,0.35);transform:translateY(-2px)}
+.btn-submit:hover{box-shadow:0 8px 30px rgba(16,185,129,0.4);transform:translateY(-2px)}
 .btn-submit:active{transform:translateY(0);filter:brightness(0.95)}
 .btn-submit:disabled{opacity:0.6;cursor:not-allowed;transform:none;box-shadow:none}
 .btn-submit svg{width:16px;height:16px}
@@ -811,7 +811,7 @@ footer{
             <div class="sub-header">
                 <div class="sub-title">
                     <div class="sub-title-icon">
-                        <svg fill="none" stroke="#F72585" stroke-width="2" viewBox="0 0 24 24">
+                        <svg fill="none" stroke="#10B981" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                         </svg>
                     </div>

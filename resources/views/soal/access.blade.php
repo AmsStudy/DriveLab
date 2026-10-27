@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -9,31 +9,31 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: #0D0D14; color: #E5E7EB; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background: #090D0B; color: #E5E7EB; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; overflow-x: hidden; }
         .blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
-        .blob-1 { width: 400px; height: 400px; background: rgba(247,37,133,.07); top: -10%; left: -15%; }
-        .blob-2 { width: 400px; height: 400px; background: rgba(168,85,247,.05); bottom: -15%; right: -15%; }
+        .blob-1 { width: 400px; height: 400px; background: rgba(16,185,129,.09); top: -10%; left: -15%; }
+        .blob-2 { width: 400px; height: 400px; background: rgba(52,211,153,.06); bottom: -15%; right: -15%; }
         .wrap { position: relative; z-index: 10; width: 100%; max-width: 420px; }
         .logo-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 32px; text-decoration: none; }
-        .logo-icon { width: 52px; height: 52px; background: linear-gradient(135deg, #F72585, #7209B7); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(247,37,133,.3); }
+        .logo-icon { width: 52px; height: 52px; background: linear-gradient(135deg, #10B981, #0D9488); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(16,185,129,.3); }
         .logo-text { font-weight: 800; font-size: 22px; color: #fff; letter-spacing: -.5px; }
-        .card { background: #13131F; border: 1px solid #1E1E2E; border-radius: 20px; padding: 24px; margin-bottom: 16px; }
-        .soal-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(247,37,133,.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .badge-lifetime { font-size: 11px; background: rgba(247,37,133,.12); color: #F472B6; padding: 3px 10px; border-radius: 50px; border: 1px solid rgba(247,37,133,.2); }
+        .card { background: #0F1713; border: 1px solid #1A2820; border-radius: 20px; padding: 24px; margin-bottom: 16px; }
+        .soal-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(16,185,129,.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .badge-lifetime { font-size: 11px; background: rgba(16,185,129,.12); color: #34D399; padding: 3px 10px; border-radius: 50px; border: 1px solid rgba(16,185,129,.25); }
         .badge-time { font-size: 11px; background: rgba(234,179,8,.1); color: #FCD34D; padding: 3px 10px; border-radius: 50px; }
         label { display: block; font-size: 13px; font-weight: 600; color: #9CA3AF; margin-bottom: 7px; }
         .pwd-wrap { position: relative; }
-        .pwd-input { width: 100%; background: #0D0D14; border: 1px solid #1E1E2E; color: #fff; font-size: 14px; font-family: 'Inter', sans-serif; padding: 13px 48px 13px 16px; border-radius: 12px; outline: none; transition: border-color .2s, box-shadow .2s; }
-        .pwd-input:focus { border-color: #F72585; box-shadow: 0 0 0 3px rgba(247,37,133,.15); }
-        .pwd-input.error { border-color: #F72585; }
+        .pwd-input { width: 100%; background: #090E0B; border: 1px solid #1A2820; color: #fff; font-size: 14px; font-family: 'Inter', sans-serif; padding: 13px 48px 13px 16px; border-radius: 12px; outline: none; transition: border-color .2s, box-shadow .2s; }
+        .pwd-input:focus { border-color: #10B981; box-shadow: 0 0 0 3px rgba(16,185,129,.15); }
+        .pwd-input.error { border-color: #EF4444; }
         .toggle-btn { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #6B7280; padding: 0; display: flex; transition: color .2s; }
         .toggle-btn:hover { color: #D1D5DB; }
         .error-msg { font-size: 12px; color: #FB7185; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
-        .submit-btn { width: 100%; margin-top: 20px; background: linear-gradient(135deg, #F72585, #7209B7); color: #fff; font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif; border: none; padding: 14px 24px; border-radius: 12px; cursor: pointer; transition: opacity .2s, box-shadow .2s; box-shadow: 0 0 20px rgba(247,37,133,.25); }
-        .submit-btn:hover { opacity: .9; box-shadow: 0 0 30px rgba(247,37,133,.4); }
+        .submit-btn { width: 100%; margin-top: 20px; background: linear-gradient(135deg, #10B981, #0D9488); color: #fff; font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif; border: none; padding: 14px 24px; border-radius: 12px; cursor: pointer; transition: opacity .2s, box-shadow .2s; box-shadow: 0 0 20px rgba(16,185,129,.25); }
+        .submit-btn:hover { opacity: .9; box-shadow: 0 0 30px rgba(16,185,129,.4); }
         .inactive-card { background: rgba(239,68,68,.06); border: 1px solid rgba(239,68,68,.2); border-radius: 20px; padding: 28px; text-align: center; }
         .footer-note { margin-top: 20px; text-align: center; font-size: 12px; color: #374151; }
-        .footer-note span { color: #F72585; }
+        .footer-note span { color: #10B981; }
     </style>
 </head>
 <body>
@@ -54,7 +54,7 @@
         <div class="card">
             <div style="display:flex;align-items:flex-start;gap:14px;">
                 <div class="soal-icon">
-                    <svg width="20" height="20" fill="none" stroke="#F72585" viewBox="0 0 24 24" stroke-width="2">
+                    <svg width="20" height="20" fill="none" stroke="#10B981" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                 </div>

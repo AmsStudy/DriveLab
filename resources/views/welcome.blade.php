@@ -10,52 +10,54 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-            --bg:    #0D0D14;
-            --card:  #13131F;
-            --border:#1E1E2E;
-            --pink:  #F72585;
-            --pink2: #C1005D;
-            --muted: #6B7280;
-            --text:  #E5E7EB;
+            --bg:      #090D0B;
+            --card:    #0F1713;
+            --border:  #1A2820;
+            --emerald: #10B981;
+            --emerald2:#059669;
+            --mint:    #34D399;
+            --teal:    #0D9488;
+            --muted:   #6B7280;
+            --text:    #E5E7EB;
         }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
         /* Glow blobs */
         .blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
-        .blob-1 { width: 500px; height: 500px; background: rgba(247,37,133,.08); top: -10%; left: -10%; }
-        .blob-2 { width: 600px; height: 600px; background: rgba(247,37,133,.05); bottom: -20%; right: -15%; }
+        .blob-1 { width: 500px; height: 500px; background: rgba(16,185,129,.09); top: -10%; left: -10%; }
+        .blob-2 { width: 600px; height: 600px; background: rgba(52,211,153,.06); bottom: -20%; right: -15%; }
 
         /* Nav */
-        nav { position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--border); background: rgba(13,13,20,.85); backdrop-filter: blur(16px); }
+        nav { position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--border); background: rgba(9,13,11,.85); backdrop-filter: blur(16px); }
         .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; }
         .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--pink), #7209B7); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--emerald), var(--teal)); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 10px rgba(16,185,129,.25); }
         .logo-text { font-weight: 800; font-size: 20px; color: #fff; letter-spacing: -.5px; }
         .nav-links { display: flex; align-items: center; gap: 12px; }
         .btn-ghost { color: var(--muted); font-size: 14px; font-weight: 500; text-decoration: none; padding: 8px 16px; border-radius: 8px; transition: color .2s; }
         .btn-ghost:hover { color: #fff; }
-        .btn-pink { background: var(--pink); color: #fff; font-size: 14px; font-weight: 600; text-decoration: none; padding: 9px 20px; border-radius: 10px; transition: background .2s, box-shadow .2s; }
-        .btn-pink:hover { background: #e01070; box-shadow: 0 0 20px rgba(247,37,133,.4); }
+        .btn-emerald { background: linear-gradient(135deg, var(--emerald), var(--teal)); color: #fff; font-size: 14px; font-weight: 600; text-decoration: none; padding: 9px 20px; border-radius: 10px; transition: all .2s; box-shadow: 0 2px 10px rgba(16,185,129,.2); }
+        .btn-emerald:hover { opacity: .92; box-shadow: 0 0 20px rgba(16,185,129,.4); }
 
         /* Hero */
         .hero { position: relative; z-index: 10; padding: 80px 24px 64px; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(247,37,133,.1); border: 1px solid rgba(247,37,133,.25); color: #f472b6; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 50px; margin-bottom: 28px; }
-        .badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pink); animation: pulse 2s infinite; }
+        .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.25); color: #34D399; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 50px; margin-bottom: 28px; }
+        .badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--emerald); animation: pulse 2s infinite; }
         @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.95)} }
         h1 { font-size: clamp(2.6rem, 5vw, 4.5rem); font-weight: 800; color: #fff; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 20px; }
-        h1 span { background: linear-gradient(135deg, var(--pink), #A855F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        h1 span { background: linear-gradient(135deg, var(--emerald), #38BDF8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .subtitle { font-size: 17px; color: var(--muted); max-width: 520px; line-height: 1.75; margin-bottom: 40px; }
 
         /* Search bar */
         .search-wrap { max-width: 520px; margin-bottom: 20px; }
-        .search-label { font-size: 11px; font-weight: 600; color: var(--pink); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
+        .search-label { font-size: 11px; font-weight: 600; color: var(--emerald); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
         .search-box { display: flex; background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color .2s, box-shadow .2s; }
-        .search-box:focus-within { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(247,37,133,.15); }
+        .search-box:focus-within { border-color: var(--emerald); box-shadow: 0 0 0 3px rgba(16,185,129,.15); }
         .search-icon { display: flex; align-items: center; padding: 0 16px; color: var(--muted); flex-shrink: 0; }
         .search-input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 14px; font-family: 'Inter', sans-serif; padding: 14px 0; }
         .search-input::placeholder { color: #4B5563; }
-        .search-btn { background: var(--pink); color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; padding: 14px 24px; font-family: 'Inter', sans-serif; transition: background .2s; flex-shrink: 0; }
-        .search-btn:hover { background: var(--pink2); }
+        .search-btn { background: var(--emerald); color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; padding: 14px 24px; font-family: 'Inter', sans-serif; transition: background .2s; flex-shrink: 0; }
+        .search-btn:hover { background: var(--emerald2); }
         .err-text { font-size: 12px; color: #FB7185; margin-top: 8px; padding-left: 4px; }
         .succ-text { font-size: 12px; color: #34D399; margin-top: 8px; padding-left: 4px; }
         .divider { display: flex; align-items: center; gap: 12px; max-width: 520px; margin: 16px 0; }
@@ -67,15 +69,15 @@
         /* Features */
         .section { position: relative; z-index: 10; padding: 72px 24px; }
         .section-inner { max-width: 1200px; margin: 0 auto; }
-        .section-label { font-size: 11px; font-weight: 700; color: var(--pink); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 12px; }
+        .section-label { font-size: 11px; font-weight: 700; color: var(--emerald); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 12px; }
         .section-title { font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 800; color: #fff; letter-spacing: -.5px; margin-bottom: 48px; }
         .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 28px; transition: border-color .25s, transform .25s; }
-        .card:hover { border-color: rgba(247,37,133,.3); transform: translateY(-3px); }
+        .card:hover { border-color: rgba(16,185,129,.35); transform: translateY(-3px); }
         .card-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
-        .card-icon.pink { background: rgba(247,37,133,.12); }
-        .card-icon.purple { background: rgba(168,85,247,.12); }
-        .card-icon.teal { background: rgba(20,184,166,.12); }
+        .card-icon.emerald { background: rgba(16,185,129,.12); }
+        .card-icon.mint { background: rgba(52,211,153,.12); }
+        .card-icon.teal { background: rgba(13,148,136,.12); }
         .card-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 10px; }
         .card-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
 
@@ -83,12 +85,12 @@
         .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0; }
         .step { padding: 32px; border-right: 1px solid var(--border); }
         .step:last-child { border-right: none; }
-        .step-num { font-size: 48px; font-weight: 800; background: linear-gradient(135deg, var(--pink), #A855F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 16px; }
+        .step-num { font-size: 48px; font-weight: 800; background: linear-gradient(135deg, var(--emerald), #38BDF8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 16px; }
         .step-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 8px; }
         .step-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
 
         /* CTA */
-        .cta { background: linear-gradient(135deg, rgba(247,37,133,.08), rgba(168,85,247,.08)); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .cta { background: linear-gradient(135deg, rgba(16,185,129,.08), rgba(13,148,136,.08)); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
         .cta-inner { max-width: 1200px; margin: 0 auto; padding: 80px 24px; text-align: center; }
         .cta h2 { font-size: clamp(1.8rem, 3vw, 2.8rem); font-weight: 800; color: #fff; margin-bottom: 14px; letter-spacing: -.5px; }
         .cta p { font-size: 15px; color: var(--muted); max-width: 400px; margin: 0 auto 32px; line-height: 1.7; }
@@ -116,9 +118,9 @@
             </a>
             <div class="nav-links">
                 @auth
-                    <a href="{{ route('admin.dashboard') }}" class="btn-pink">Dashboard →</a>
+                    <a href="{{ route('admin.dashboard') }}" class="btn-emerald">Dashboard →</a>
                 @else
-                    <a href="{{ route('login') }}" class="btn-pink">Masuk Portal</a>
+                    <a href="{{ route('login') }}" class="btn-emerald">Masuk Portal</a>
                 @endauth
             </div>
         </div>
@@ -135,10 +137,10 @@
 
         <div class="search-wrap" x-data="{ tab: 'akses' }">
             <div style="display: flex; gap: 16px; margin-bottom: 16px;">
-                <button @click="tab = 'akses'" :style="tab === 'akses' ? 'color: var(--pink); border-bottom: 2px solid var(--pink);' : 'color: var(--muted); border-bottom: 2px solid transparent;'" style="background: none; border: none; font-size: 13px; font-weight: 700; padding-bottom: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.2s;">
+                <button @click="tab = 'akses'" :style="tab === 'akses' ? 'color: var(--emerald); border-bottom: 2px solid var(--emerald);' : 'color: var(--muted); border-bottom: 2px solid transparent;'" style="background: none; border: none; font-size: 13px; font-weight: 700; padding-bottom: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.2s;">
                     Akses Dokumen
                 </button>
-                <button @click="tab = 'lacak'" :style="tab === 'lacak' ? 'color: #A855F7; border-bottom: 2px solid #A855F7;' : 'color: var(--muted); border-bottom: 2px solid transparent;'" style="background: none; border: none; font-size: 13px; font-weight: 700; padding-bottom: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.2s;">
+                <button @click="tab = 'lacak'" :style="tab === 'lacak' ? 'color: var(--mint); border-bottom: 2px solid var(--mint);' : 'color: var(--muted); border-bottom: 2px solid transparent;'" style="background: none; border: none; font-size: 13px; font-weight: 700; padding-bottom: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.2s;">
                     Lacak Tugas
                 </button>
             </div>
@@ -164,12 +166,12 @@
             <!-- Tab: Lacak Tugas -->
             <div x-show="tab === 'lacak'" x-transition style="display: none;" x-data="lacakTugas()">
                 <form @submit.prevent="submitLacak">
-                    <div class="search-box" style="border-color: rgba(168,85,247,0.3);">
-                        <div class="search-icon" style="color: #A855F7;">
+                    <div class="search-box" style="border-color: rgba(52,211,153,0.35);">
+                        <div class="search-icon" style="color: var(--mint);">
                             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </div>
                         <input type="text" x-model="nim" class="search-input" placeholder="Masukkan NIM Anda" required autocomplete="off">
-                        <button type="submit" class="search-btn" style="background: #A855F7;" :disabled="loading">
+                        <button type="submit" class="search-btn" style="background: linear-gradient(135deg, var(--emerald), var(--teal));" :disabled="loading">
                             <span x-show="!loading">CARI →</span>
                             <span x-show="loading">Mencari...</span>
                         </button>
@@ -183,16 +185,16 @@
                         <template x-for="item in tasks" :key="item.id">
                             <div class="p-3 rounded-lg" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
                                 <div class="flex justify-between items-start mb-1">
-                                    <p class="text-sm font-medium text-pink-400" x-text="item.soal_title"></p>
+                                    <p class="text-sm font-medium text-emerald-400" x-text="item.soal_title"></p>
                                     <div class="flex items-center gap-1.5">
                                         <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded border"
-                                              :class="item.submission_type === 'link' ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : (item.submission_type === 'text' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-blue-500/20 text-blue-300 border-blue-500/30')"
+                                              :class="item.submission_type === 'link' ? 'bg-teal-500/20 text-teal-300 border-teal-500/30' : (item.submission_type === 'text' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30')"
                                               x-text="item.submission_type || 'file'"></span>
-                                        <span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full border border-green-500/30">Diterima</span>
+                                        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">Diterima</span>
                                     </div>
                                 </div>
                                 <template x-if="item.submission_type === 'link'">
-                                    <a :href="item.link_url" target="_blank" rel="noopener noreferrer" class="text-xs text-purple-400 hover:underline truncate block mb-1" x-text="item.file_name"></a>
+                                    <a :href="item.link_url" target="_blank" rel="noopener noreferrer" class="text-xs text-teal-400 hover:underline truncate block mb-1" x-text="item.file_name"></a>
                                 </template>
                                 <template x-if="item.submission_type !== 'link'">
                                     <p class="text-xs text-gray-300 truncate mb-1" x-text="item.file_name"></p>
@@ -259,22 +261,22 @@
             <h2 class="section-title">Kenapa pilih LabDrive?</h2>
             <div class="cards">
                 <div class="card">
-                    <div class="card-icon pink">
-                        <svg width="22" height="22" fill="none" stroke="#F72585" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <div class="card-icon emerald">
+                        <svg width="22" height="22" fill="none" stroke="#10B981" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                     </div>
                     <p class="card-title">Enkripsi Akses</p>
                     <p class="card-desc">Setiap dokumen dilindungi kode unik dan password khusus. File tidak bisa diakses langsung tanpa otentikasi.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon purple">
-                        <svg width="22" height="22" fill="none" stroke="#A855F7" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    <div class="card-icon mint">
+                        <svg width="22" height="22" fill="none" stroke="#34D399" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                     </div>
                     <p class="card-title">Kontrol Hak Unduh</p>
                     <p class="card-desc">Admin bisa mengizinkan atau memblokir fitur unduh kapan saja. Perubahan langsung terasa tanpa refresh manual.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon teal">
-                        <svg width="22" height="22" fill="none" stroke="#14B8A6" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <svg width="22" height="22" fill="none" stroke="#0D9488" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <p class="card-title">Jadwal & Auto-Refresh</p>
                     <p class="card-desc">Atur waktu aktif dan kedaluwarsa. Jika waktu habis, halaman mahasiswa otomatis ter-refresh dan akses ditutup.</p>
@@ -321,7 +323,7 @@
             <p class="section-label" style="margin-bottom:16px;">Sistem Tertutup</p>
             <h2>Portal Khusus<br>Internal Laboratorium.</h2>
             <p>Akses ke dashboard pengelola dokumen dibatasi hanya untuk Asisten dan Laboran yang terdaftar.</p>
-            <a href="{{ route('login') }}" class="btn-pink" style="font-size:15px; padding:12px 32px; border-radius:12px;">Masuk Sekarang →</a>
+            <a href="{{ route('login') }}" class="btn-emerald" style="font-size:15px; padding:12px 32px; border-radius:12px;">Masuk Sekarang →</a>
         </div>
     </section>
 

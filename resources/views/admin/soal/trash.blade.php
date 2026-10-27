@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Recycle Bin')
 @section('page-title', 'Recycle Bin')
@@ -11,19 +11,19 @@
     <div class="flex-1 min-w-60">
         <input id="search-input" type="text" name="search" value="{{ request('search') }}"
                placeholder="Cari judul dokumen di Recycle Bin..."
-               class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-xl px-4 py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500">
+               class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
     </div>
-    <button type="submit" id="search-btn" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors">
+    <button type="submit" id="search-btn" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-emerald-500/20">
         Cari
     </button>
     <a href="{{ route('admin.soal.index') }}" id="back-btn"
-       class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors">
+       class="bg-[#0F1713] hover:bg-gray-800 border border-[#1A2820] text-gray-300 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors">
         Kembali ke Arsip Dokumen
     </a>
 </form>
 
 {{-- Table --}}
-<div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+<div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl overflow-hidden">
     @if($soals->isEmpty())
         <div class="py-16 text-center text-gray-500">
             <svg class="w-16 h-16 mx-auto mb-4 opacity-30 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

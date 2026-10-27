@@ -80,8 +80,8 @@
         }
         .btn-primary:hover { opacity: .9; box-shadow: 0 0 30px rgba(16,185,129,.4); }
 
-        .link-pink { color: #10B981; text-decoration: none; font-weight: 600; font-size: 13px; transition: opacity .2s; }
-        .link-pink:hover { opacity: .75; }
+        .link-emerald, .link-pink { color: #10B981; text-decoration: none; font-weight: 600; font-size: 13px; transition: opacity .2s; }
+        .link-emerald:hover, .link-pink:hover { opacity: .75; }
 
         .link-muted { color: #6B7280; text-decoration: none; font-size: 13px; transition: color .2s; }
         .link-muted:hover { color: #fff; }

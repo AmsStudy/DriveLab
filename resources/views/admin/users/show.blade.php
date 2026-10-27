@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 @section('title', 'Detail Admin')
 @section('page-title', 'Detail Profil Admin')
 @section('page-description', 'Informasi lengkap dan Arsip Dokumen milik ' . $user->name)
@@ -8,8 +8,8 @@
 
     {{-- Profil Info --}}
     <div class="lg:col-span-1 space-y-6">
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 text-center">
-            <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-pink-500 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-pink-500/20 mb-4">
+        <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-6 text-center">
+            <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-4">
                 <span class="text-3xl font-bold text-white">{{ strtoupper(substr($user->name, 0, 2)) }}</span>
             </div>
             <h2 class="text-xl font-bold text-white">{{ $user->name }}</h2>
@@ -25,18 +25,18 @@
             </div>
         </div>
 
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+        <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-6">
             <h3 class="text-sm font-semibold text-gray-300 mb-4">Informasi Tambahan</h3>
             <div class="space-y-3 text-sm">
-                <div class="flex justify-between border-b border-gray-800 pb-2">
+                <div class="flex justify-between border-b border-[#1A2820] pb-2">
                     <span class="text-gray-500">Institusi/Lab</span>
                     <span class="text-gray-200 text-right">{{ $user->institution ?? '—' }}</span>
                 </div>
-                <div class="flex justify-between border-b border-gray-800 pb-2">
+                <div class="flex justify-between border-b border-[#1A2820] pb-2">
                     <span class="text-gray-500">Total Dokumen</span>
-                    <span class="text-pink-400 font-bold">{{ $user->soals_count }}</span>
+                    <span class="text-emerald-400 font-bold">{{ $user->soals_count }}</span>
                 </div>
-                <div class="flex justify-between border-b border-gray-800 pb-2">
+                <div class="flex justify-between border-b border-[#1A2820] pb-2">
                     <span class="text-gray-500">Terdaftar Sejak</span>
                     <span class="text-gray-200">{{ $user->created_at->format('d M Y') }}</span>
                 </div>
@@ -55,7 +55,7 @@
                 @if($user->status === 'pending')
                     <form method="POST" action="{{ route('admin.users.approve', $user) }}">
                         @csrf @method('PATCH')
-                        <button class="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-xl text-sm font-medium transition-colors">Approve Admin Ini</button>
+                        <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-xl text-sm font-medium transition-colors">Approve Admin Ini</button>
                     </form>
                 @elseif($user->status === 'active')
                     <form method="POST" action="{{ route('admin.users.reject', $user) }}">
@@ -65,7 +65,7 @@
                 @elseif($user->status === 'inactive')
                     <form method="POST" action="{{ route('admin.users.approve', $user) }}">
                         @csrf @method('PATCH')
-                        <button class="w-full bg-green-500/20 hover:bg-green-500/30 text-green-400 py-2 rounded-xl text-sm font-medium transition-colors">Aktifkan Kembali</button>
+                        <button class="w-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 py-2 rounded-xl text-sm font-medium transition-colors">Aktifkan Kembali</button>
                     </form>
                 @endif
             </div>
@@ -74,8 +74,8 @@
 
     {{-- Arsip Dokumen --}}
     <div class="lg:col-span-2">
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-800 flex justify-between items-center">
+        <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-[#1A2820] flex justify-between items-center">
                 <h3 class="font-semibold text-white">Dokumen yang Diunggah</h3>
                 <span class="text-xs text-gray-500">{{ $user->soals_count }} dokumen</span>
             </div>
@@ -87,7 +87,7 @@
             @else
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider">
+                        <thead class="border-b border-[#1A2820] text-xs text-gray-500 uppercase tracking-wider">
                             <tr>
                                 <th class="px-6 py-3 text-left">Dokumen</th>
                                 <th class="px-4 py-3 text-left">Status</th>
@@ -95,7 +95,7 @@
                                 <th class="px-6 py-3 text-right">Lihat</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-800/60">
+                        <tbody class="divide-y divide-[#1A2820]/60">
                             @foreach($soals as $soal)
                             <tr class="hover:bg-gray-800/30">
                                 <td class="px-6 py-4">
@@ -118,7 +118,7 @@
                                     {{ number_format($soal->access_count) }}&times;
                                 </td>
                                 <td class="px-6 py-4 text-right">
-                                    <a href="{{ route('admin.soal.show', $soal) }}" class="text-pink-400 hover:text-pink-300 text-xs font-medium">Detail &rarr;</a>
+                                    <a href="{{ route('admin.soal.show', $soal) }}" class="text-emerald-400 hover:text-emerald-300 text-xs font-semibold">Detail &rarr;</a>
                                 </td>
                             </tr>
                             @endforeach
@@ -126,7 +126,7 @@
                     </table>
                 </div>
                 @if($soals->hasPages())
-                    <div class="px-6 py-4 border-t border-gray-800">{{ $soals->links() }}</div>
+                    <div class="px-6 py-4 border-t border-[#1A2820]">{{ $soals->links() }}</div>
                 @endif
             @endif
         </div>

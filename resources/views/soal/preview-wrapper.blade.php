@@ -9,13 +9,14 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-            --bg: #080810;
-            --surface: #0E0E1A;
-            --surface2: #161626;
-            --border: rgba(255, 255, 255, 0.08);
-            --pink: #F72585;
-            --pink-dim: rgba(247, 37, 133, 0.15);
-            --violet: #7209B7;
+            --bg: #090D0B;
+            --surface: #0F1713;
+            --surface2: #142019;
+            --border: #1A2820;
+            --emerald: #10B981;
+            --emerald-dim: rgba(16, 185, 129, 0.15);
+            --mint: #34D399;
+            --teal: #0D9488;
             --text: #F1EEF6;
             --muted: #8E8A9F;
         }
@@ -38,7 +39,7 @@
             left: 0;
             right: 0;
             height: 56px;
-            background: rgba(14, 14, 26, 0.92);
+            background: rgba(15, 23, 19, 0.92);
             backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -72,7 +73,7 @@
             white-space: nowrap;
         }
         .btn-back:hover {
-            border-color: var(--pink);
+            border-color: var(--emerald);
             color: #fff;
         }
 
@@ -103,9 +104,9 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: var(--pink-dim);
-            border: 1px solid rgba(247, 37, 133, 0.35);
-            color: #f472b6;
+            background: var(--emerald-dim);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #34D399;
             font-size: 11px;
             font-weight: 600;
             padding: 4px 10px;
@@ -200,8 +201,8 @@
         .spinner {
             width: 36px;
             height: 36px;
-            border: 3px solid rgba(247, 37, 133, 0.2);
-            border-top-color: var(--pink);
+            border: 3px solid rgba(16, 185, 129, 0.2);
+            border-top-color: var(--emerald);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
@@ -341,7 +342,7 @@
 
                     // Baris 1: Kode Unik & Brand
                     ctx.font = 'bold ' + Math.max(13, Math.floor(canvas.width / 42)) + 'px Inter, sans-serif';
-                    ctx.fillStyle = 'rgba(247, 37, 133, 0.16)';
+                    ctx.fillStyle = 'rgba(16, 185, 129, 0.16)';
                     ctx.textAlign = 'center';
                     ctx.fillText('LABDRIVE · {{ $soal->kode_unik }}', 0, 0);
 

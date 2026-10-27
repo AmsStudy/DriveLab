@@ -18,7 +18,7 @@
             <div class="divider-row">
                 <label for="password" style="margin-bottom:0;">Password</label>
                 @if (Route::has('password.request'))
-                    <a class="link-pink" href="{{ route('password.request') }}" style="font-size:12px;">Lupa password?</a>
+                    <a class="link-emerald" href="{{ route('password.request') }}" style="font-size:12px;">Lupa password?</a>
                 @endif
             </div>
             <input id="password" type="password" name="password" required autocomplete="current-password"

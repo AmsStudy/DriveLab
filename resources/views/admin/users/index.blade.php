@@ -9,22 +9,22 @@
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5">
     <form method="GET" class="flex flex-wrap gap-3">
         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email..."
-               class="flex-1 min-w-60 bg-gray-800 border border-gray-700 text-gray-100 rounded-xl px-4 py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-pink-500">
-        <select name="status" class="bg-gray-800 border border-gray-700 text-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
+               class="flex-1 min-w-60 bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+        <select name="status" class="bg-[#090E0B] border border-[#1A2820] text-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
             <option value="">Semua Status</option>
             <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
             <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
         </select>
-        <button type="submit" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors">Filter</button>
+        <button type="submit" class="bg-[#1A2820] hover:bg-[#25382D] text-gray-200 border border-[#1A2820] px-4 py-2.5 rounded-xl text-sm font-medium transition-colors">Filter</button>
     </form>
     
-    <button type="button" onclick="document.getElementById('create-modal').classList.remove('hidden')" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2">
+    <button type="button" onclick="document.getElementById('create-modal').classList.remove('hidden')" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         Tambah Asisten
     </button>
 </div>
 
-<div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+<div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl overflow-hidden">
     @if($admins->isEmpty())
         <div class="py-16 text-center text-gray-500 text-sm">Tidak ada admin yang ditemukan.</div>
     @else
@@ -44,11 +44,11 @@
                 <tr class="hover:bg-gray-800/30 transition-colors">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-fuchsia-600 flex items-center justify-center flex-shrink-0">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0">
                                 <span class="text-white text-xs font-bold">{{ strtoupper(substr($admin->name, 0, 2)) }}</span>
                             </div>
                             <div>
-                                <a href="{{ route('admin.users.show', $admin) }}" class="font-medium text-gray-100 hover:text-pink-400 transition-colors">{{ $admin->name }}</a>
+                                <a href="{{ route('admin.users.show', $admin) }}" class="font-medium text-gray-100 hover:text-emerald-400 transition-colors">{{ $admin->name }}</a>
                                 <p class="text-xs text-gray-500">{{ $admin->email }}</p>
                             </div>
                         </div>
@@ -112,11 +112,11 @@
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="document.getElementById('create-modal').classList.add('hidden')"></div>
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-gray-900 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full border border-gray-800">
+        <div class="inline-block align-bottom bg-[#0F1713] rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full border border-[#1A2820]">
             <form action="{{ route('admin.users.store') }}" method="POST">
                 @csrf
-                <div class="px-6 py-5 border-b border-gray-800 flex justify-between items-center">
-                    <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">Tambah Asisten Baru</h3>
+                <div class="px-6 py-5 border-b border-[#1A2820] flex justify-between items-center">
+                    <h3 class="text-lg leading-6 font-semibold text-white" id="modal-title">Tambah Asisten Baru</h3>
                     <button type="button" onclick="document.getElementById('create-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
@@ -124,21 +124,21 @@
                 <div class="px-6 py-5 space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1.5">Nama Lengkap</label>
-                        <input type="text" name="name" required class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-pink-500">
+                        <input type="text" name="name" required class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1.5">Email / Username</label>
-                        <input type="email" name="email" required class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-pink-500">
+                        <input type="email" name="email" required class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1.5">Password Default</label>
-                        <input type="text" name="password" required value="{{ config('app.admin_default_password') }}" class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-pink-500">
+                        <input type="text" name="password" required value="{{ config('app.admin_default_password') }}" class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
                         <p class="text-xs text-gray-500 mt-1">Asisten bisa mengganti passwordnya sendiri nanti di menu Profil.</p>
                     </div>
                 </div>
-                <div class="px-6 py-4 border-t border-gray-800 flex justify-end gap-3 bg-gray-900/50">
-                    <button type="button" onclick="document.getElementById('create-modal').classList.add('hidden')" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-xl text-sm font-medium transition-colors">Batal</button>
-                    <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">Simpan Asisten</button>
+                <div class="px-6 py-4 border-t border-[#1A2820] flex justify-end gap-3 bg-[#0A100D]/50">
+                    <button type="button" onclick="document.getElementById('create-modal').classList.add('hidden')" class="bg-[#1A2820] hover:bg-[#25382D] text-gray-300 px-4 py-2 rounded-xl text-sm font-medium transition-colors">Batal</button>
+                    <button type="submit" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-5 py-2 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-emerald-500/20">Simpan Asisten</button>
                 </div>
             </form>
         </div>
