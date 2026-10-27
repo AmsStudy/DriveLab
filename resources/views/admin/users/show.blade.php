@@ -4,6 +4,21 @@
 @section('page-description', 'Informasi lengkap dan Arsip Dokumen milik ' . $user->name)
 
 @section('content')
+
+{{-- Back nav --}}
+<div class="mb-5">
+    <a href="{{ route('admin.users.index') }}"
+       class="inline-flex items-center gap-2 text-sm font-medium transition-colors"
+       style="color:#4B8C6A;"
+       onmouseover="this.style.color='#10B981'"
+       onmouseout="this.style.color='#4B8C6A'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Kembali ke Kelola Admin
+    </a>
+</div>
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     {{-- Profil Info --}}
@@ -42,11 +57,17 @@
                 </div>
             </div>
 
-            <div class="mt-6 flex flex-col gap-2">
+            <div class="mt-5 space-y-2">
+                <p class="text-[11px] text-gray-600 uppercase tracking-wider font-bold mb-2">Tindakan Akun</p>
+
                 <form method="POST" action="{{ route('admin.users.reset-password', $user) }}"
                       onsubmit="confirmAction(event, 'Reset password admin ini ke default ({{ config('app.admin_default_password') }})? Asisten harus segera mengganti password setelah login.', 'Ya, Reset Password', true)">
                     @csrf @method('PATCH')
-                    <button type="submit" class="w-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 py-2 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                    <button type="submit"
+                            class="w-full py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2"
+                            style="background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.2);"
+                            onmouseover="this.style.background='rgba(59,130,246,.2)'"
+                            onmouseout="this.style.background='rgba(59,130,246,.12)'">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                         Reset Password ke Default
                     </button>
@@ -55,17 +76,32 @@
                 @if($user->status === 'pending')
                     <form method="POST" action="{{ route('admin.users.approve', $user) }}">
                         @csrf @method('PATCH')
-                        <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-xl text-sm font-medium transition-colors">Approve Admin Ini</button>
+                        <button class="w-full py-2.5 rounded-xl text-sm font-semibold transition-all"
+                                style="background:linear-gradient(135deg,#10B981,#0D9488);color:#fff;"
+                                onmouseover="this.style.opacity='.9'"
+                                onmouseout="this.style.opacity='1'">
+                            ✓ Approve Admin Ini
+                        </button>
                     </form>
                 @elseif($user->status === 'active')
                     <form method="POST" action="{{ route('admin.users.reject', $user) }}">
                         @csrf @method('PATCH')
-                        <button class="w-full bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 py-2 rounded-xl text-sm font-medium transition-colors">Nonaktifkan Akun</button>
+                        <button class="w-full py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2"
+                                style="background:rgba(249,115,22,.12);color:#fb923c;border:1px solid rgba(249,115,22,.2);"
+                                onmouseover="this.style.background='rgba(249,115,22,.22)'"
+                                onmouseout="this.style.background='rgba(249,115,22,.12)'">
+                            Nonaktifkan Akun
+                        </button>
                     </form>
                 @elseif($user->status === 'inactive')
                     <form method="POST" action="{{ route('admin.users.approve', $user) }}">
                         @csrf @method('PATCH')
-                        <button class="w-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 py-2 rounded-xl text-sm font-medium transition-colors">Aktifkan Kembali</button>
+                        <button class="w-full py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2"
+                                style="background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.2);"
+                                onmouseover="this.style.background='rgba(16,185,129,.22)'"
+                                onmouseout="this.style.background='rgba(16,185,129,.12)'">
+                            ✓ Aktifkan Kembali
+                        </button>
                     </form>
                 @endif
             </div>

@@ -251,21 +251,44 @@
 
         {{-- Quick Actions --}}
         <div class="rounded-2xl p-5 shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
-            <h3 class="font-bold text-white text-sm mb-3">Aksi Cepat</h3>
-            <div class="grid grid-cols-2 gap-2.5">
-                <a href="{{ route('admin.soal.create') }}" class="p-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex flex-col items-center justify-center gap-1.5 text-center transition-colors shadow-lg shadow-emerald-600/20">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    Buat Soal Baru
+            <div class="flex items-center gap-2 mb-4">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <h3 class="font-bold text-white text-sm">Aksi Cepat</h3>
+            </div>
+            <div class="space-y-2">
+                <a href="{{ route('admin.soal.create') }}"
+                   class="w-full flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-white transition-all group"
+                   style="background:linear-gradient(135deg,#10B981,#0D9488);box-shadow:0 4px 12px rgba(16,185,129,.2);"
+                   onmouseover="this.style.boxShadow='0 6px 18px rgba(16,185,129,.35)'"
+                   onmouseout="this.style.boxShadow='0 4px 12px rgba(16,185,129,.2)'">
+                    <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    </div>
+                    <span>Buat Soal Baru</span>
+                    <svg class="w-4 h-4 ml-auto opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
-                <a href="{{ route('admin.categories.index') }}" class="p-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold flex flex-col items-center justify-center gap-1.5 text-center transition-colors border border-gray-700">
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                    Kelola Kategori
+                <a href="{{ route('admin.categories.index') }}"
+                   class="w-full flex items-center gap-3 p-3 rounded-xl text-sm font-semibold transition-all"
+                   style="background:rgba(16,185,129,.07);border:1px solid #1A2820;color:#d1fae5;"
+                   onmouseover="this.style.background='rgba(16,185,129,.13)';this.style.borderColor='rgba(16,185,129,.3)'"
+                   onmouseout="this.style.background='rgba(16,185,129,.07)';this.style.borderColor='#1A2820'">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(16,185,129,.15);">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                    </div>
+                    <span class="text-gray-300">Kelola Kategori</span>
+                    <svg class="w-4 h-4 ml-auto text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+                <a href="{{ route('home') }}" target="_blank" rel="noopener noreferrer"
+                   class="w-full flex items-center gap-3 p-3 rounded-xl text-sm font-medium transition-all"
+                   style="background:rgba(255,255,255,.03);border:1px solid #1A2820;color:#9CA3AF;"
+                   onmouseover="this.style.background='rgba(255,255,255,.06)';this.style.color='#d1d5db'"
+                   onmouseout="this.style.background='rgba(255,255,255,.03)';this.style.color='#9CA3AF'">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(255,255,255,.05);">
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </div>
+                    Portal Mahasiswa
                 </a>
             </div>
-            <a href="{{ route('home') }}" target="_blank" rel="noopener noreferrer" class="mt-2.5 w-full p-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-400 hover:text-white text-xs font-medium flex items-center justify-center gap-2 transition-colors border border-gray-800">
-                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                Buka Portal Mahasiswa
-            </a>
         </div>
 
         {{-- Top Dokumen Paling Banyak Diakses --}}

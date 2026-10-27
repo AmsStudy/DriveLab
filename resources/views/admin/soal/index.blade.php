@@ -7,36 +7,60 @@
 @section('content')
 
 {{-- Filter & Search --}}
-<form method="GET" id="filter-form" class="flex flex-wrap gap-3 mb-6">
-    <div class="flex-1 min-w-60">
+<form method="GET" id="filter-form" class="flex flex-wrap gap-2.5 mb-6">
+    <div class="flex-1 min-w-60 relative">
+        <svg class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
         <input id="search-input" type="text" name="search" value="{{ request('search') }}"
                placeholder="Cari judul dokumen..."
-               class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-xl px-4 py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+               class="w-full border text-gray-100 rounded-xl pl-9 pr-4 py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+               style="background:#090D0B;border-color:#1A2820;">
     </div>
-    <select id="category-filter" name="category" class="bg-gray-800 border border-gray-700 text-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
+    <select id="category-filter" name="category"
+            class="border text-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+            style="background:#090D0B;border-color:#1A2820;">
         <option value="">Semua Kategori</option>
         @foreach($categories as $cat)
             <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
         @endforeach
     </select>
-    <select id="status-filter" name="status" class="bg-gray-800 border border-gray-700 text-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
+    <select id="status-filter" name="status"
+            class="border text-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+            style="background:#090D0B;border-color:#1A2820;">
         <option value="">Semua Status</option>
         <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
         <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
         <option value="expired" {{ request('status') === 'expired' ? 'selected' : '' }}>Expired</option>
     </select>
-    <button type="submit" id="search-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors shadow-lg shadow-emerald-600/20">
+    <button type="submit" id="search-btn"
+            class="px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-colors"
+            style="background:linear-gradient(135deg,#10B981,#0D9488);">
         Cari
     </button>
+    @if(request()->hasAny(['search','category','status']))
+        <a href="{{ route('admin.soal.index') }}"
+           class="px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+           style="background:#1A2820;color:#9CA3AF;"
+           onmouseover="this.style.background='#25382D';this.style.color='#d1d5db'"
+           onmouseout="this.style.background='#1A2820';this.style.color='#9CA3AF'">Reset</a>
+    @endif
     <a href="{{ route('admin.soal.trash') }}" id="trash-btn"
-       class="bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2" title="Recycle Bin">
+       class="border px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2"
+       style="background:#090D0B;border-color:#1A2820;color:#9CA3AF;"
+       onmouseover="this.style.borderColor='rgba(239,68,68,.4)';this.style.color='#F87171'"
+       onmouseout="this.style.borderColor='#1A2820';this.style.color='#9CA3AF'"
+       title="Recycle Bin">
         <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
         </svg>
         <span class="hidden sm:inline">Recycle Bin</span>
     </a>
     <button type="button" onclick="openCreateModal()" id="add-soal-btn"
-       class="bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/25">
+            class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all"
+            style="background:linear-gradient(135deg,#10B981,#0D9488);box-shadow:0 4px 12px rgba(16,185,129,.2);"
+            onmouseover="this.style.boxShadow='0 6px 18px rgba(16,185,129,.35)'"
+            onmouseout="this.style.boxShadow='0 4px 12px rgba(16,185,129,.2)'">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>

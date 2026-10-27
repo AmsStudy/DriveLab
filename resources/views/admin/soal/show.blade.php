@@ -5,6 +5,20 @@
 
 @section('content')
 
+{{-- Back nav --}}
+<div class="mb-5">
+    <a href="{{ route('admin.soal.index') }}"
+       class="inline-flex items-center gap-2 text-sm font-medium transition-colors"
+       style="color:#4B8C6A;"
+       onmouseover="this.style.color='#10B981'"
+       onmouseout="this.style.color='#4B8C6A'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Kembali ke Arsip Dokumen
+    </a>
+</div>
+
 {{-- ─── TOP DOCUMENT SUMMARY BANNER ─── --}}
 <div class="rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden" style="background:#0F1713;border:1px solid #1A2820;">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-gray-800">
