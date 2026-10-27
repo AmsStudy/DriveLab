@@ -66,7 +66,8 @@
                         <th class="px-4 py-3 text-left">Kategori</th>
                         <th class="px-4 py-3 text-left">Status</th>
                         <th class="px-4 py-3 text-left">Masa Aktif</th>
-                        <th class="px-4 py-3 text-right">Akses</th>
+                        <th class="px-4 py-3 text-center">Tugas</th>
+                        <th class="px-4 py-3 text-right">Dilihat</th>
                         <th class="px-6 py-3 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -76,9 +77,11 @@
                         <td class="px-6 py-4">
                             <div class="flex items-start gap-3">
                                 {{-- File Type Icon --}}
-                                <div class="w-9 h-9 rounded-lg bg-gray-800 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <div class="w-9 h-9 rounded-lg bg-gray-800 flex items-center justify-center flex-shrink-0 mt-0.5 border border-gray-700/50">
                                     @if($soal->attachments->count() > 0)
-                                        <span class="text-blue-400 text-xs font-bold">{{ $soal->attachments->count() }} FILE</span>
+                                        <span class="text-pink-400 text-[10px] font-bold font-mono">{{ $soal->attachments->count() }} ITEM</span>
+                                    @elseif($soal->content_text)
+                                        <span class="text-amber-400 text-[10px] font-bold font-mono">TEKS</span>
                                     @else
                                         <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -86,10 +89,10 @@
                                     @endif
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="font-medium text-gray-100 truncate max-w-xs">{{ $soal->title }}</p>
+                                    <a href="{{ route('admin.soal.show', $soal) }}" class="font-medium text-gray-100 hover:text-pink-400 transition-colors truncate block max-w-xs">{{ $soal->title }}</a>
                                     <div class="flex items-center gap-2 mt-1">
                                         @if(auth()->user()->isSuperAdmin())
-                                            <span class="text-xs text-gray-600">· {{ $soal->admin->name }}</span>
+                                            <span class="text-xs text-gray-500">{{ $soal->admin->name }}</span>
                                         @endif
                                     </div>
                                 </div>
@@ -122,7 +125,7 @@
                         </td>
                         <td class="px-4 py-4 text-xs text-gray-500">
                             @if($soal->access_type === 'lifetime')
-                                <span class="text-purple-400">∞ Selamanya</span>
+                                <span class="text-purple-400 font-medium">∞ Selamanya</span>
                             @else
                                 <div>
                                     <p>{{ optional($soal->active_from)->format('d M Y H:i') ?? '—' }}</p>
@@ -130,8 +133,17 @@
                                 </div>
                             @endif
                         </td>
+                        <td class="px-4 py-4 text-center">
+                            @if($soal->is_submission_enabled)
+                                <a href="{{ route('admin.soal.show', $soal) }}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-purple-500/15 text-purple-400 border border-purple-500/25 hover:bg-purple-500/25 transition-colors" title="Lihat Pengumpulan Tugas">
+                                    {{ $soal->submissions_count }} Tugas
+                                </a>
+                            @else
+                                <span class="text-gray-600 text-xs">—</span>
+                            @endif
+                        </td>
                         <td class="px-4 py-4 text-right">
-                            <span class="text-gray-300 font-medium">{{ number_format($soal->access_count) }}×</span>
+                            <span class="text-gray-300 font-medium font-mono text-xs">{{ number_format($soal->access_count) }}×</span>
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center justify-end gap-1">
@@ -154,10 +166,10 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                 </a>
-                                {{-- Detail & Logs --}}
+                                {{-- Detail & Pengumpulan --}}
                                 <a href="{{ route('admin.soal.show', $soal) }}"
                                    id="show-soal-{{ $soal->id }}"
-                                   title="Detail & Riwayat Akses"
+                                   title="Detail & Pengumpulan Tugas"
                                    class="p-2 rounded-lg text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>

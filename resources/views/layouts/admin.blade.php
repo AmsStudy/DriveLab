@@ -62,8 +62,6 @@
                     Arsip Dokumen
                 </x-admin.nav-item>
 
-
-
                 <x-admin.nav-item route="admin.categories.index" icon="tag">
                     Kategori
                 </x-admin.nav-item>

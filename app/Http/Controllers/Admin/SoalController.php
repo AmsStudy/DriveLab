@@ -36,7 +36,7 @@ class SoalController extends Controller
             }
         }
 
-        $soals      = $query->with(['category', 'admin'])->latest()->paginate(15);
+        $soals      = $query->with(['category', 'admin', 'attachments'])->withCount('submissions')->latest()->paginate(15);
         $categories = Category::all();
 
         return view('admin.soal.index', compact('soals', 'categories'));
