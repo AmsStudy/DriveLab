@@ -37,13 +37,18 @@
 
                         <div>
                             <label for="category_id" class="block text-sm font-medium text-gray-300 mb-2">Kategori</label>
-                            <select id="category_id" name="category_id"
-                                    class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500">
-                                <option value="">— Pilih Kategori —</option>
-                                @foreach($categories as $cat)
-                                    <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                                @endforeach
-                            </select>
+                            <div class="relative">
+                                <select id="category_id" name="category_id"
+                                        class="w-full appearance-none bg-[#090E0B] border border-[#1A2820] text-gray-300 rounded-xl pl-4 pr-10 py-3 text-sm focus:outline-none focus:border-emerald-500">
+                                    <option value="">— Pilih Kategori —</option>
+                                    @foreach($categories as $cat)
+                                        <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

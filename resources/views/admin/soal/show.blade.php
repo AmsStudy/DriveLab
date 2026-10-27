@@ -3,6 +3,25 @@
 @section('page-title', 'Detail Dokumen')
 @section('page-description', 'Manajemen berkas, kode akses, dan pengumpulan tugas mahasiswa')
 
+@section('header-actions')
+<div class="flex items-center gap-2">
+    <a href="{{ route('soal.access', $soal->unique_token) }}" target="_blank" rel="noopener noreferrer"
+       class="px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-300 hover:text-white transition-all flex items-center gap-1.5 border"
+       style="background:#0F1713;border-color:#1A2820;"
+       onmouseover="this.style.borderColor='rgba(16,185,129,.4)'"
+       onmouseout="this.style.borderColor='#1A2820'">
+        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        Pratinjau Mahasiswa
+    </a>
+    <a href="{{ route('admin.soal.edit', $soal) }}"
+       class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white transition-all flex items-center gap-1.5 shadow-md shadow-emerald-500/20"
+       style="background:linear-gradient(135deg,#10B981,#0D9488);">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        Edit Dokumen
+    </a>
+</div>
+@endsection
+
 @section('content')
 
 {{-- Back nav --}}
@@ -20,10 +39,11 @@
 </div>
 
 {{-- ─── TOP DOCUMENT SUMMARY BANNER ─── --}}
-<div class="rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden" style="background:#0F1713;border:1px solid #1A2820;">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-gray-800">
-        <div>
-            <div class="flex items-center gap-2.5 mb-2 flex-wrap">
+<div class="rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden"
+     style="background:radial-gradient(circle at top right, rgba(16,185,129,0.06), transparent 55%), #0F1713; border:1px solid #1A2820;">
+    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6" style="border-bottom:1px solid #1A2820;">
+        <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2 mb-3 flex-wrap">
                 @if($soal->category)
                     <span class="text-xs px-2.5 py-1 rounded-lg font-semibold" style="background:{{ $soal->category->color }}20;color:{{ $soal->category->color }};border:1px solid {{ $soal->category->color }}40;">
                         {{ $soal->category->name }}
@@ -31,77 +51,128 @@
                 @endif
 
                 @php $st = $soal->access_status; @endphp
-                <span class="text-xs px-2.5 py-1 rounded-lg font-semibold
+                <span class="text-xs px-2.5 py-1 rounded-lg font-semibold inline-flex items-center gap-1.5
                     {{ $st === 'active' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : '' }}
                     {{ $st === 'inactive' ? 'bg-gray-500/15 text-gray-400 border border-gray-500/30' : '' }}
                     {{ $st === 'expired' ? 'bg-red-500/15 text-red-400 border border-red-500/30' : '' }}
                     {{ $st === 'scheduled' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : '' }}">
-                    ● {{ ['active'=>'Akses Aktif','inactive'=>'Nonaktif','expired'=>'Expired','scheduled'=>'Terjadwal'][$st] }}
+                    <span class="w-1.5 h-1.5 rounded-full {{ $st === 'active' ? 'bg-emerald-400 animate-pulse' : ($st === 'scheduled' ? 'bg-amber-400' : ($st === 'expired' ? 'bg-red-400' : 'bg-gray-400')) }}"></span>
+                    {{ ['active'=>'Akses Aktif','inactive'=>'Nonaktif','expired'=>'Expired','scheduled'=>'Terjadwal'][$st] }}
                 </span>
 
                 @if($soal->is_downloadable)
-                    <span class="text-xs px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
-                        Unduhan Dokumen Diizinkan
+                    <span class="text-xs px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium inline-flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Unduhan Diizinkan
                     </span>
                 @else
-                    <span class="text-xs px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
-                        Pratinjau Only (Unduhan Global Mati)
+                    <span class="text-xs px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium inline-flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        Hanya Pratinjau (Unduhan Mati)
+                    </span>
+                @endif
+
+                @if($soal->is_submission_enabled)
+                    <span class="text-xs px-2.5 py-1 rounded-lg bg-teal-500/10 text-teal-400 border border-teal-500/20 font-medium">
+                        Pengumpulan Tugas Aktif
+                    </span>
+                @else
+                    <span class="text-xs px-2.5 py-1 rounded-lg bg-gray-500/10 text-gray-400 border border-gray-500/20 font-medium">
+                        Pengumpulan Nonaktif
                     </span>
                 @endif
             </div>
 
-            <h1 class="text-xl md:text-2xl font-extrabold text-white tracking-tight">{{ $soal->title }}</h1>
+            <h1 class="text-xl md:text-2xl font-extrabold text-white tracking-tight break-words">{{ $soal->title }}</h1>
             @if($soal->description)
-                <p class="text-sm text-gray-400 mt-1 max-w-3xl leading-relaxed">{{ $soal->description }}</p>
+                <p class="text-sm text-gray-400 mt-2 max-w-3xl leading-relaxed">{{ $soal->description }}</p>
             @endif
         </div>
 
         <div class="flex items-center gap-2 flex-shrink-0">
             <a href="{{ route('soal.access', $soal->unique_token) }}" target="_blank" rel="noopener noreferrer"
-               class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 transition-colors flex items-center gap-1.5">
+               class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-200 border transition-all flex items-center gap-1.5"
+               style="background:#090D0B;border-color:#1A2820;"
+               onmouseover="this.style.borderColor='rgba(16,185,129,.4)';this.style.color='#10B981'"
+               onmouseout="this.style.borderColor='#1A2820';this.style.color='#E5E7EB'">
                 <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 Preview Mahasiswa
             </a>
             <a href="{{ route('admin.soal.edit', $soal) }}"
-               class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors flex items-center gap-1.5 shadow-lg shadow-emerald-600/20">
+               class="px-4 py-2 rounded-xl text-xs font-semibold text-white transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/20"
+               style="background:linear-gradient(135deg,#10B981,#0D9488);">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 Edit Dokumen
             </a>
         </div>
     </div>
 
-    {{-- KPI Highlights --}}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-5">
-        <div>
-            <p class="text-xs text-gray-400">Total Kunjungan / Dilihat</p>
-            <p class="text-xl font-bold text-white mt-0.5">{{ number_format($soal->access_count) }}<span class="text-xs font-normal text-gray-400 ml-1">kali</span></p>
-        </div>
-        <div>
-            <p class="text-xs text-gray-400">Tugas Mahasiswa Terkumpul</p>
-            <p class="text-xl font-bold text-teal-400 mt-0.5">{{ $submissions->count() }}<span class="text-xs font-normal text-gray-400 ml-1">NIM</span></p>
-        </div>
-        <div>
-            <p class="text-xs text-gray-400">Masa Berlaku Akses</p>
-            <p class="text-xs font-semibold text-gray-200 mt-1">
-                @if($soal->access_type === 'lifetime')
-                    ∞ Selamanya (Lifetime)
-                @else
-                    {{ optional($soal->active_from)->format('d M Y') }} &mdash; {{ optional($soal->active_until)->format('d M Y') }}
-                @endif
-            </p>
-        </div>
-        <div>
-            <p class="text-xs text-gray-400">Batas Waktu Pengumpulan</p>
-            @if($soal->is_submission_enabled && $soal->deadline_at)
-                @php $isExpired = now()->greaterThan($soal->deadline_at); @endphp
-                <p class="text-xs font-semibold {{ $isExpired ? 'text-red-400' : 'text-emerald-400' }} mt-1">
-                    {{ $soal->deadline_at->format('d M Y, H:i') }} ({{ $isExpired ? 'Berakhir' : $soal->deadline_at->diffForHumans() }})
+    {{-- KPI Highlights (Clean Metric Cards) --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 pt-5">
+        {{-- Stat 1: Total Kunjungan --}}
+        <div class="p-3.5 rounded-xl border flex items-start gap-3" style="background:#090D0B;border-color:#1A2820;">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(16,185,129,.12);color:#10B981;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <div class="min-w-0">
+                <p class="text-[11px] font-medium text-gray-400">Total Kunjungan</p>
+                <p class="text-lg font-bold text-white leading-tight mt-0.5">
+                    {{ number_format($soal->access_count) }}
+                    <span class="text-xs font-normal text-gray-500">kali</span>
                 </p>
-            @elseif(!$soal->is_submission_enabled)
-                <p class="text-xs font-medium text-gray-500 mt-1">Pengumpulan Dinonaktifkan</p>
-            @else
-                <p class="text-xs font-medium text-emerald-400 mt-1">Tidak Ada Batas Waktu</p>
-            @endif
+            </div>
+        </div>
+
+        {{-- Stat 2: Tugas Mahasiswa --}}
+        <div class="p-3.5 rounded-xl border flex items-start gap-3" style="background:#090D0B;border-color:#1A2820;">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(13,148,136,.15);color:#2DD4BF;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            </div>
+            <div class="min-w-0">
+                <p class="text-[11px] font-medium text-gray-400">Tugas Terkumpul</p>
+                <p class="text-lg font-bold text-teal-300 leading-tight mt-0.5">
+                    {{ $submissions->count() }}
+                    <span class="text-xs font-normal text-gray-500">NIM</span>
+                </p>
+            </div>
+        </div>
+
+        {{-- Stat 3: Masa Berlaku --}}
+        <div class="p-3.5 rounded-xl border flex items-start gap-3" style="background:#090D0B;border-color:#1A2820;">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(52,211,153,.12);color:#34D399;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="min-w-0">
+                <p class="text-[11px] font-medium text-gray-400">Masa Berlaku Akses</p>
+                <p class="text-xs font-semibold text-gray-200 leading-tight mt-1 truncate">
+                    @if($soal->access_type === 'lifetime')
+                        ∞ Selamanya (Lifetime)
+                    @else
+                        {{ optional($soal->active_from)->format('d M Y') }} &mdash; {{ optional($soal->active_until)->format('d M Y') }}
+                    @endif
+                </p>
+            </div>
+        </div>
+
+        {{-- Stat 4: Batas Pengumpulan --}}
+        <div class="p-3.5 rounded-xl border flex items-start gap-3" style="background:#090D0B;border-color:#1A2820;">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(245,158,11,.12);color:#FBBF24;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div class="min-w-0">
+                <p class="text-[11px] font-medium text-gray-400">Batas Pengumpulan</p>
+                @if($soal->is_submission_enabled && $soal->deadline_at)
+                    @php $isExpired = now()->greaterThan($soal->deadline_at); @endphp
+                    <p class="text-xs font-semibold {{ $isExpired ? 'text-red-400' : 'text-emerald-400' }} leading-tight mt-1 truncate">
+                        {{ $soal->deadline_at->format('d M, H:i') }}
+                        <span class="text-[10px] text-gray-500 font-normal">({{ $isExpired ? 'Selesai' : $soal->deadline_at->diffForHumans() }})</span>
+                    </p>
+                @elseif(!$soal->is_submission_enabled)
+                    <p class="text-xs font-medium text-gray-500 leading-tight mt-1">Nonaktif</p>
+                @else
+                    <p class="text-xs font-medium text-emerald-400 leading-tight mt-1">Tanpa Batas Waktu</p>
+                @endif
+            </div>
         </div>
     </div>
 </div>
@@ -115,52 +186,70 @@
         {{-- Card: Kode Akses & Kredensial --}}
         <div class="rounded-2xl p-5 shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
             <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2">
-                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(16,185,129,.12);color:#10B981;">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                </div>
                 Kode Akses & Keamanan
             </h3>
 
             <div class="space-y-3.5 text-xs">
                 {{-- Kode Akses --}}
-                <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800">
-                    <div class="flex items-center justify-between text-gray-400 mb-1">
-                        <span>Kode Unik Dokumen</span>
-                        <button type="button" onclick="copyText('{{ $soal->kode_unik }}', 'Kode unik disalin!')" class="text-emerald-400 hover:text-emerald-300">Salin</button>
+                <div class="p-3.5 rounded-xl border" style="background:#090D0B;border-color:#1A2820;">
+                    <div class="flex items-center justify-between text-gray-400 mb-1.5">
+                        <span class="text-[11px] font-medium text-gray-400">Kode Unik Dokumen</span>
+                        <button type="button" onclick="copyText('{{ $soal->kode_unik }}', 'Kode unik berhasil disalin!')"
+                                class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            Salin
+                        </button>
                     </div>
-                    <p class="font-mono text-base font-bold text-white tracking-widest">{{ $soal->kode_unik }}</p>
+                    <p class="font-mono text-base font-bold text-emerald-400 tracking-wider">{{ $soal->kode_unik }}</p>
                 </div>
 
                 {{-- Link Akses Cepat --}}
-                <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800">
-                    <div class="flex items-center justify-between text-gray-400 mb-1">
-                        <span>Link Akses Mahasiswa</span>
-                        <button type="button" onclick="copyText('{{ route('soal.access', $soal->unique_token) }}', 'Link akses disalin!')" class="text-emerald-400 hover:text-emerald-300">Salin</button>
+                <div class="p-3.5 rounded-xl border" style="background:#090D0B;border-color:#1A2820;">
+                    <div class="flex items-center justify-between text-gray-400 mb-1.5">
+                        <span class="text-[11px] font-medium text-gray-400">Tautan Akses Mahasiswa</span>
+                        <button type="button" onclick="copyText('{{ route('soal.access', $soal->unique_token) }}', 'Tautan akses berhasil disalin!')"
+                                class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            Salin
+                        </button>
                     </div>
-                    <input type="text" readonly value="{{ route('soal.access', $soal->unique_token) }}" class="w-full bg-transparent text-[11px] text-emerald-400 focus:outline-none font-mono truncate">
+                    <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-gray-300 font-mono text-[11px]" style="background:#0F1713;border-color:#1A2820;">
+                        <span class="truncate flex-1 select-all text-gray-300">{{ route('soal.access', $soal->unique_token) }}</span>
+                    </div>
                 </div>
 
                 {{-- Metadata Tambahan --}}
-                <div class="pt-2 border-t border-gray-800 space-y-2 text-gray-400">
-                    <div class="flex justify-between">
-                        <span>Admin Pembuat</span>
+                <div class="pt-3 space-y-2.5 text-gray-400" style="border-top:1px solid #1A2820;">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Admin Pembuat</span>
                         <span class="text-gray-200 font-medium">{{ $soal->admin->name }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span>Kategori</span>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Kategori</span>
                         <span class="text-gray-200 font-medium">{{ $soal->category->name ?? '—' }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span>Dibuat Pada</span>
-                        <span class="text-gray-200">{{ $soal->created_at->format('d M Y, H:i') }}</span>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Dibuat Pada</span>
+                        <span class="text-gray-300 font-mono text-[11px]">{{ $soal->created_at->format('d M Y, H:i') }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400">Terakhir Update</span>
+                        <span class="text-gray-300 font-mono text-[11px]">{{ $soal->updated_at->diffForHumans() }}</span>
                     </div>
                 </div>
 
                 {{-- Toggle Status --}}
-                <div class="pt-3 border-t border-gray-800 flex gap-2">
+                <div class="pt-3" style="border-top:1px solid #1A2820;">
                     <form method="POST" action="{{ route('admin.soal.toggle', $soal) }}" class="w-full">
                         @csrf @method('PATCH')
                         <button type="submit"
-                                class="w-full py-2.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2
-                                {{ $soal->is_active ? 'bg-orange-500/15 hover:bg-orange-500/25 text-orange-400 border border-orange-500/30' : 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30' }}">
+                                class="w-full py-2.5 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 border
+                                {{ $soal->is_active
+                                    ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
+                                    : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
                             {{ $soal->is_active ? 'Nonaktifkan Akses Dokumen' : 'Aktifkan Akses Dokumen' }}
                         </button>
@@ -174,12 +263,19 @@
         <div class="rounded-2xl p-5 shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="font-bold text-white text-sm flex items-center gap-2">
-                    <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(13,148,136,.15);color:#2DD4BF;">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
                     Teks / Soal Langsung
                 </h3>
-                <button type="button" onclick="copyText({{ json_encode($soal->content_text) }}, 'Teks soal disalin!')" class="text-xs text-emerald-400 hover:text-emerald-300 font-medium">Salin</button>
+                <button type="button" onclick="copyText({{ json_encode($soal->content_text) }}, 'Teks soal berhasil disalin!')"
+                        class="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    Salin
+                </button>
             </div>
-            <div class="p-3.5 bg-gray-950/80 rounded-xl border border-gray-800 text-xs text-gray-300 font-mono max-h-56 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text">
+            <div class="p-3.5 rounded-xl border text-xs text-gray-300 font-mono max-h-56 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text"
+                 style="background:#090D0B;border-color:#1A2820;">
 {{ $soal->content_text }}
             </div>
         </div>
@@ -189,21 +285,32 @@
         <div class="rounded-2xl p-5 shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="font-bold text-white text-sm flex items-center gap-2">
-                    <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                    Lampiran & Tautan ({{ $soal->attachments->count() }})
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(16,185,129,.12);color:#10B981;">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                    </div>
+                    Lampiran & Tautan
+                    <span class="text-xs px-2 py-0.5 rounded-full font-semibold" style="background:rgba(16,185,129,.12);color:#34D399;">
+                        {{ $soal->attachments->count() }}
+                    </span>
                 </h3>
-                <span class="text-[11px] text-gray-500">Maks. 15 File/Link</span>
+                <span class="text-[11px] text-gray-500 font-mono">Maks. 15 Item</span>
             </div>
 
             @if($soal->attachments->isEmpty())
-                <div class="py-8 text-center text-gray-500 text-xs">Belum ada file atau tautan terlampir.</div>
+                <div class="py-8 text-center text-gray-500 text-xs">
+                    <svg class="w-8 h-8 mx-auto mb-2 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Belum ada file atau tautan terlampir.
+                </div>
             @else
                 <div class="space-y-2.5">
                     @foreach($soal->attachments as $attachment)
                         @if($attachment->isLink())
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-gray-900/60 border border-teal-500/20 hover:border-teal-500/40 transition-colors">
+                            <div class="flex items-center justify-between p-3 rounded-xl border transition-colors group"
+                                 style="background:#090D0B;border-color:#1A2820;"
+                                 onmouseover="this.style.borderColor='rgba(13,148,136,.4)'"
+                                 onmouseout="this.style.borderColor='#1A2820'">
                                 <div class="flex items-center gap-2.5 min-w-0">
-                                    <span class="text-[10px] font-bold text-teal-400 bg-teal-500/10 px-2 py-1 rounded-md flex-shrink-0">LINK</span>
+                                    <span class="text-[10px] font-bold text-teal-400 bg-teal-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-teal-500/20 font-mono">LINK</span>
                                     <div class="min-w-0">
                                         <p class="text-xs font-semibold text-gray-200 truncate">{{ $attachment->file_original_name ?: 'Tautan Eksternal' }}</p>
                                         <a href="{{ $attachment->link_url }}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-teal-400 hover:underline truncate block font-mono">
@@ -211,15 +318,19 @@
                                         </a>
                                     </div>
                                 </div>
-                                <a href="{{ $attachment->link_url }}" target="_blank" rel="noopener noreferrer" class="p-1.5 text-teal-400 hover:bg-teal-500/20 rounded-lg transition-colors flex-shrink-0 ml-2" title="Buka Link">
+                                <a href="{{ $attachment->link_url }}" target="_blank" rel="noopener noreferrer"
+                                   class="p-1.5 text-teal-400 hover:bg-teal-500/20 rounded-lg transition-colors flex-shrink-0 ml-2" title="Buka Link">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                 </a>
                             </div>
                         @else
                             {{-- File Lampiran --}}
-                            <div class="flex items-center justify-between p-3 rounded-xl bg-gray-900/60 border border-gray-800 hover:border-gray-700 transition-colors">
+                            <div class="flex items-center justify-between p-3 rounded-xl border transition-colors group"
+                                 style="background:#090D0B;border-color:#1A2820;"
+                                 onmouseover="this.style.borderColor='rgba(16,185,129,.4)'"
+                                 onmouseout="this.style.borderColor='#1A2820'">
                                 <div class="flex items-center gap-2.5 min-w-0">
-                                    <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md flex-shrink-0 uppercase">
+                                    <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md flex-shrink-0 uppercase font-mono border border-emerald-500/20">
                                         {{ $attachment->file_type ?: 'FILE' }}
                                     </span>
                                     <div class="min-w-0">
@@ -227,14 +338,15 @@
                                         <div class="flex items-center gap-2 mt-0.5">
                                             <span class="text-[10px] text-gray-500 font-mono">{{ $attachment->file_size_formatted }}</span>
                                             @if($attachment->is_downloadable)
-                                                <span class="text-[9px] bg-emerald-500/15 text-emerald-400 px-1.5 py-0.2 rounded font-medium border border-emerald-500/20">Bisa Diunduh</span>
+                                                <span class="text-[9px] bg-emerald-500/15 text-emerald-400 px-1.5 py-0.5 rounded font-medium border border-emerald-500/20">Bisa Diunduh</span>
                                             @else
-                                                <span class="text-[9px] bg-amber-500/15 text-amber-400 px-1.5 py-0.2 rounded font-medium border border-amber-500/20">Hanya Preview</span>
+                                                <span class="text-[9px] bg-amber-500/15 text-amber-400 px-1.5 py-0.5 rounded font-medium border border-amber-500/20">Hanya Preview</span>
                                             @endif
                                         </div>
                                     </div>
                                 </div>
-                                <a href="{{ route('admin.soal.download', $attachment->id) }}" class="p-1.5 text-emerald-400 hover:bg-emerald-500/20 rounded-lg transition-colors flex-shrink-0 ml-2" title="Unduh File Ini (Admin)">
+                                <a href="{{ route('admin.soal.download', $attachment->id) }}"
+                                   class="p-1.5 text-emerald-400 hover:bg-emerald-500/20 rounded-lg transition-colors flex-shrink-0 ml-2" title="Unduh File Ini (Admin)">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                 </a>
                             </div>
@@ -249,29 +361,37 @@
     {{-- RIGHT COLUMN: RIWAYAT PENGUMPULAN TUGAS (2 Cols) --}}
     <div class="lg:col-span-2">
         <div class="rounded-2xl overflow-hidden shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
-            
+
             {{-- Header Pengumpulan Tugas --}}
-            <div class="p-6 border-b border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4" style="border-bottom:1px solid #1A2820;">
                 <div>
-                    <h2 class="text-base font-bold text-white flex items-center gap-2">
-                        <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <h2 class="text-base font-bold text-white flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(13,148,136,.15);color:#2DD4BF;">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        </div>
                         Riwayat Pengumpulan Tugas
                     </h2>
-                    <p class="text-xs text-gray-400 mt-0.5">Satu baris per mahasiswa (pengumpulan ulang otomatis menimpa versi sebelumnya)</p>
+                    <p class="text-xs text-gray-400 mt-1">Satu baris per mahasiswa (pengumpulan ulang otomatis menimpa versi sebelumnya)</p>
                 </div>
 
                 {{-- Action Buttons --}}
                 <div class="flex items-center gap-2 flex-wrap">
                     @if(!$submissions->isEmpty())
                         <a href="{{ route('admin.soal.download-submissions-zip', $soal) }}"
-                           class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                           class="px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-300 transition-colors flex items-center gap-1.5 border"
+                           style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);"
+                           onmouseover="this.style.background='rgba(16,185,129,.2)'"
+                           onmouseout="this.style.background='rgba(16,185,129,.12)'">
+                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                             Unduh Semua (ZIP)
                         </a>
                     @endif
                     <a href="{{ route('admin.soal.export-submissions', $soal) }}"
-                       class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                       class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-200 transition-colors flex items-center gap-1.5 border"
+                       style="background:#090D0B;border-color:#1A2820;"
+                       onmouseover="this.style.borderColor='rgba(16,185,129,.4)';this.style.color='#10B981'"
+                       onmouseout="this.style.borderColor='#1A2820';this.style.color='#E5E7EB'">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         Export Rekap (CSV)
                     </a>
                 </div>
@@ -279,20 +399,34 @@
 
             {{-- Filter & Search Bar --}}
             @if(!$submissions->isEmpty())
-            <div class="px-6 py-3 bg-gray-950/40 border-b border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="px-5 md:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3"
+                 style="background:rgba(9,13,11,.6);border-bottom:1px solid #1A2820;">
                 <div class="relative w-full sm:w-72">
                     <input type="text" id="submissionSearchInput" onkeyup="filterSubmissions()"
                            placeholder="Cari NIM atau Nama mahasiswa..."
-                           class="w-full bg-gray-900 border border-gray-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors">
-                    <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                           class="w-full border rounded-xl pl-9 pr-3.5 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                           style="background:#090D0B;border-color:#1A2820;">
+                    <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
 
                 {{-- Type Filter Pills --}}
-                <div class="flex items-center gap-1.5 self-start sm:self-auto text-xs" id="typeFilterPills">
-                    <button type="button" onclick="setSubFilter('all')" class="sub-filter-pill active px-3 py-1 rounded-lg font-medium transition-colors bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" data-type="all">Semua ({{ $submissions->count() }})</button>
-                    <button type="button" onclick="setSubFilter('file')" class="sub-filter-pill px-3 py-1 rounded-lg font-medium transition-colors bg-gray-900 text-gray-400 hover:text-white border border-gray-800" data-type="file">File ({{ $submissions->where('submission_type', 'file')->count() }})</button>
-                    <button type="button" onclick="setSubFilter('link')" class="sub-filter-pill px-3 py-1 rounded-lg font-medium transition-colors bg-gray-900 text-gray-400 hover:text-white border border-gray-800" data-type="link">Link ({{ $submissions->where('submission_type', 'link')->count() }})</button>
-                    <button type="button" onclick="setSubFilter('text')" class="sub-filter-pill px-3 py-1 rounded-lg font-medium transition-colors bg-gray-900 text-gray-400 hover:text-white border border-gray-800" data-type="text">Teks ({{ $submissions->where('submission_type', 'text')->count() }})</button>
+                <div class="flex items-center gap-1.5 self-start sm:self-auto text-xs flex-wrap" id="typeFilterPills">
+                    <button type="button" onclick="setSubFilter('all')"
+                            class="sub-filter-pill active px-3 py-1.5 rounded-lg font-medium transition-colors"
+                            style="background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3);"
+                            data-type="all">Semua ({{ $submissions->count() }})</button>
+                    <button type="button" onclick="setSubFilter('file')"
+                            class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-400 hover:text-white border"
+                            style="background:#090D0B;border-color:#1A2820;"
+                            data-type="file">File ({{ $submissions->where('submission_type', 'file')->count() }})</button>
+                    <button type="button" onclick="setSubFilter('link')"
+                            class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-400 hover:text-white border"
+                            style="background:#090D0B;border-color:#1A2820;"
+                            data-type="link">Link ({{ $submissions->where('submission_type', 'link')->count() }})</button>
+                    <button type="button" onclick="setSubFilter('text')"
+                            class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-400 hover:text-white border"
+                            style="background:#090D0B;border-color:#1A2820;"
+                            data-type="text">Teks ({{ $submissions->where('submission_type', 'text')->count() }})</button>
                 </div>
             </div>
             @endif
@@ -300,29 +434,32 @@
             {{-- Table Content --}}
             @if($submissions->isEmpty())
                 <div class="py-20 text-center text-gray-500">
-                    <svg class="w-16 h-16 mx-auto mb-3 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <p class="text-base font-semibold text-gray-300">Belum ada tugas yang dikumpulkan</p>
-                    <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Ketika mahasiswa mengirimkan file, link, atau teks jawaban, data mereka akan langsung ditampilkan di tabel ini.</p>
+                    <div class="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center" style="background:rgba(16,185,129,.08);color:#10B981;">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <p class="text-base font-semibold text-gray-200">Belum ada tugas yang dikumpulkan</p>
+                    <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Ketika mahasiswa mengirimkan file, link, atau teks jawaban, data mereka akan otomatis ditampilkan di sini.</p>
                 </div>
             @else
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm" id="submissionsTable">
-                        <thead class="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider" style="background:rgba(255,255,255,.01);">
+                        <thead class="text-xs text-gray-400 uppercase tracking-wider" style="background:#090D0B;border-bottom:1px solid #1A2820;">
                             <tr>
-                                <th class="px-6 py-3.5 text-left">Mahasiswa</th>
-                                <th class="px-4 py-3.5 text-left">Tipe</th>
-                                <th class="px-4 py-3.5 text-left">Berkas / Jawaban</th>
-                                <th class="px-4 py-3.5 text-left">Waktu Pengumpulan</th>
-                                <th class="px-4 py-3.5 text-center">Aksi</th>
+                                <th class="px-6 py-3.5 text-left font-semibold">Mahasiswa</th>
+                                <th class="px-4 py-3.5 text-left font-semibold">Tipe</th>
+                                <th class="px-4 py-3.5 text-left font-semibold">Berkas / Jawaban</th>
+                                <th class="px-4 py-3.5 text-left font-semibold">Waktu Pengumpulan</th>
+                                <th class="px-4 py-3.5 text-center font-semibold">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-800/60" id="submissionsTableBody">
+                        <tbody class="divide-y" style="border-color:#1A2820;" id="submissionsTableBody">
                             @foreach($submissions as $sub)
-                            <tr class="hover:bg-gray-800/30 transition-colors submission-row" data-type="{{ $sub->submission_type ?: 'file' }}">
+                            <tr class="hover:bg-emerald-950/10 transition-colors submission-row" style="border-color:#1A2820;" data-type="{{ $sub->submission_type ?: 'file' }}">
                                 {{-- Mahasiswa Identity --}}
                                 <td class="px-6 py-3.5">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs uppercase flex-shrink-0">
+                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs uppercase flex-shrink-0"
+                                             style="background:rgba(16,185,129,.12);color:#34D399;border:1px solid rgba(16,185,129,.25);">
                                             {{ substr($sub->nama, 0, 1) }}
                                         </div>
                                         <div class="min-w-0">
@@ -339,19 +476,21 @@
                                     @elseif($sub->isText())
                                         <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">Teks</span>
                                     @else
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-500/15 text-blue-400 border border-blue-500/30">File</span>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">File</span>
                                     @endif
                                 </td>
 
                                 {{-- Jawaban Content --}}
                                 <td class="px-4 py-3.5 text-xs">
                                     @if($sub->isLink())
-                                        <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 hover:underline max-w-xs truncate inline-flex items-center gap-1 font-mono">
+                                        <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer"
+                                           class="text-teal-400 hover:text-teal-300 hover:underline max-w-xs truncate inline-flex items-center gap-1 font-mono">
                                             {{ Str::limit($sub->link_url, 40) }}
                                             <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                         </a>
                                     @elseif($sub->isText())
-                                        <button type="button" onclick="showTextModal({{ json_encode($sub->nama) }}, {{ json_encode($sub->nim) }}, {{ json_encode($sub->text_content) }})" class="text-amber-400 hover:text-amber-300 font-mono text-xs max-w-xs truncate text-left block hover:underline">
+                                        <button type="button" onclick="showTextModal({{ json_encode($sub->nama) }}, {{ json_encode($sub->nim) }}, {{ json_encode($sub->text_content) }})"
+                                                class="text-amber-400 hover:text-amber-300 font-mono text-xs max-w-xs truncate text-left block hover:underline">
                                             {{ Str::limit($sub->text_content, 45) }}
                                         </button>
                                     @else
@@ -361,22 +500,25 @@
 
                                 {{-- Waktu --}}
                                 <td class="px-4 py-3.5 text-xs text-gray-400 whitespace-nowrap">
-                                    <p class="font-medium text-gray-300">{{ $sub->created_at->format('d M Y, H:i') }}</p>
-                                    <p class="text-[11px] text-gray-500 mt-0.5">{{ $sub->created_at->diffForHumans() }}</p>
+                                    <p class="font-medium text-gray-200">{{ $sub->created_at->format('d M Y, H:i') }}</p>
+                                    <p class="text-[11px] text-gray-500 mt-0.5 font-mono">{{ $sub->created_at->diffForHumans() }}</p>
                                 </td>
 
                                 {{-- Aksi --}}
                                 <td class="px-4 py-3.5 text-center">
                                     @if($sub->isLink())
-                                        <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer" class="p-2 text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block" title="Buka Link Tautan">
+                                        <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer"
+                                           class="p-2 text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block" title="Buka Link Tautan">
                                             <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                         </a>
                                     @elseif($sub->isText())
-                                        <button type="button" onclick="showTextModal({{ json_encode($sub->nama) }}, {{ json_encode($sub->nim) }}, {{ json_encode($sub->text_content) }})" class="p-2 text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors inline-block" title="Baca Teks Lengkap">
+                                        <button type="button" onclick="showTextModal({{ json_encode($sub->nama) }}, {{ json_encode($sub->nim) }}, {{ json_encode($sub->text_content) }})"
+                                                class="p-2 text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors inline-block" title="Baca Teks Lengkap">
                                             <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         </button>
                                     @else
-                                        <a href="{{ route('admin.soal.download-submissions', $sub->id) }}" class="p-2 text-blue-400 hover:bg-blue-500/10 rounded-xl transition-colors inline-block" title="Unduh File Mahasiswa">
+                                        <a href="{{ route('admin.soal.download-submissions', $sub->id) }}"
+                                           class="p-2 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors inline-block" title="Unduh File Mahasiswa">
                                             <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                         </a>
                                     @endif
@@ -394,26 +536,34 @@
 </div>
 
 {{-- ─── TEXT SUBMISSION PREVIEW MODAL ─── --}}
-<div id="textSubmissionModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="border border-gray-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]" style="background:#0F1713;border:1px solid #1A2820;">
-        <div class="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
+<div id="textSubmissionModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 items-center justify-center">
+    <div class="rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] border"
+         style="background:#0F1713;border-color:#1A2820;">
+        <div class="px-6 py-4 flex items-center justify-between" style="border-bottom:1px solid #1A2820;">
             <div>
                 <h3 class="text-white font-semibold text-base" id="modalStudentName">Jawaban Mahasiswa</h3>
                 <p class="text-xs text-gray-400 font-mono mt-0.5" id="modalStudentNim"></p>
             </div>
-            <button onclick="closeTextModal()" class="text-gray-400 hover:text-white p-1 rounded-lg">
+            <button onclick="closeTextModal()" class="text-gray-400 hover:text-white p-1 rounded-lg transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
         <div class="p-6 overflow-y-auto flex-1">
-            <pre class="bg-gray-950 p-4 rounded-xl border border-gray-800 text-gray-200 font-mono text-xs whitespace-pre-wrap leading-relaxed select-text" id="modalTextContent"></pre>
+            <pre class="p-4 rounded-xl border text-gray-200 font-mono text-xs whitespace-pre-wrap leading-relaxed select-text"
+                 style="background:#090D0B;border-color:#1A2820;" id="modalTextContent"></pre>
         </div>
-        <div class="px-6 py-3 border-t border-gray-800 flex justify-end gap-3 bg-gray-900/50">
-            <button type="button" onclick="copyModalText()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-lg shadow-emerald-600/20">
+        <div class="px-6 py-3 flex justify-end gap-3" style="border-top:1px solid #1A2820;background:#090D0B;">
+            <button type="button" onclick="copyModalText()"
+                    class="px-4 py-2 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md shadow-emerald-500/20"
+                    style="background:linear-gradient(135deg,#10B981,#0D9488);">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                 Salin Teks
             </button>
-            <button type="button" onclick="closeTextModal()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl text-xs font-semibold transition-colors">Tutup</button>
+            <button type="button" onclick="closeTextModal()"
+                    class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-300 transition-colors border"
+                    style="background:#1A2820;border-color:#25382D;"
+                    onmouseover="this.style.background='#25382D'"
+                    onmouseout="this.style.background='#1A2820'">Tutup</button>
         </div>
     </div>
 </div>
@@ -422,9 +572,30 @@
 let currentModalText = '';
 let currentFilterType = 'all';
 
+function showToast(msg) {
+    if (window.Swal) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            background: '#0F1713',
+            color: '#E5E7EB',
+            icon: 'success',
+            title: msg,
+            customClass: {
+                popup: 'border border-emerald-500/30'
+            }
+        });
+    } else {
+        alert(msg);
+    }
+}
+
 function copyText(str, msg) {
     navigator.clipboard.writeText(str).then(() => {
-        alert(msg || 'Berhasil disalin!');
+        showToast(msg || 'Berhasil disalin!');
     });
 }
 
@@ -433,16 +604,20 @@ function showTextModal(name, nim, content) {
     document.getElementById('modalStudentNim').textContent = 'NIM: ' + nim;
     document.getElementById('modalTextContent').textContent = content;
     currentModalText = content;
-    document.getElementById('textSubmissionModal').classList.remove('hidden');
+    const modal = document.getElementById('textSubmissionModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
 }
 
 function closeTextModal() {
-    document.getElementById('textSubmissionModal').classList.add('hidden');
+    const modal = document.getElementById('textSubmissionModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
 }
 
 function copyModalText() {
     navigator.clipboard.writeText(currentModalText).then(() => {
-        alert('Teks jawaban berhasil disalin!');
+        showToast('Teks jawaban berhasil disalin!');
     });
 }
 
@@ -451,9 +626,15 @@ function setSubFilter(type) {
     document.querySelectorAll('.sub-filter-pill').forEach(btn => {
         const isActive = btn.getAttribute('data-type') === type;
         if (isActive) {
-            btn.className = 'sub-filter-pill active px-3 py-1 rounded-lg font-medium transition-colors bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+            btn.className = 'sub-filter-pill active px-3 py-1.5 rounded-lg font-medium transition-colors';
+            btn.style.background = 'rgba(16,185,129,.15)';
+            btn.style.color = '#34D399';
+            btn.style.borderColor = 'rgba(16,185,129,.3)';
         } else {
-            btn.className = 'sub-filter-pill px-3 py-1 rounded-lg font-medium transition-colors bg-gray-900 text-gray-400 hover:text-white border border-gray-800';
+            btn.className = 'sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-400 hover:text-white border';
+            btn.style.background = '#090D0B';
+            btn.style.color = '#9CA3AF';
+            btn.style.borderColor = '#1A2820';
         }
     });
     filterSubmissions();

@@ -21,6 +21,13 @@
         .flash-msg { animation: fadeSlideDown .3s ease forwards; }
         @keyframes glow-pulse { 0%,100% { box-shadow:0 0 14px rgba(16,185,129,.3); } 50% { box-shadow:0 0 24px rgba(16,185,129,.55); } }
         .logo-icon { animation: glow-pulse 3s ease-in-out infinite; }
+        /* Prevent dropdown arrow overlap with text across all select elements */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding-right: 2.5rem !important;
+        }
     </style>
 </head>
 <body class="text-gray-100 min-h-screen" style="background:#090D0B; font-family:'Inter',sans-serif;">
@@ -75,6 +82,10 @@
 
                 <x-admin.nav-item route="admin.categories.index" icon="tag">
                     Kategori
+                </x-admin.nav-item>
+
+                <x-admin.nav-item route="admin.soal.trash" icon="trash">
+                    Recycle Bin
                 </x-admin.nav-item>
 
                 @if(auth()->user()->isSuperAdmin())

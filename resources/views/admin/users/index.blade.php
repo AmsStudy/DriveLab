@@ -16,13 +16,18 @@
                    class="pl-9 pr-4 min-w-60 border text-gray-100 rounded-xl py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
                    style="background:#090D0B;border-color:#1A2820;">
         </div>
-        <select name="status"
-                class="border text-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
-                style="background:#090D0B;border-color:#1A2820;">
-            <option value="">Semua Status</option>
-            <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>✓ Aktif</option>
-            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>✕ Nonaktif</option>
-        </select>
+        <div class="relative">
+            <select name="status"
+                    class="appearance-none border text-gray-300 rounded-xl pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                    style="background-color:#090D0B;border-color:#1A2820;">
+                <option value="">Semua Status</option>
+                <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>✓ Aktif</option>
+                <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>✕ Nonaktif</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+        </div>
         <button type="submit"
                 class="px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors text-white"
                 style="background:linear-gradient(135deg,#10B981,#0D9488);">

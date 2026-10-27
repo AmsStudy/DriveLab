@@ -17,22 +17,32 @@
                class="w-full border text-gray-100 rounded-xl pl-9 pr-4 py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
                style="background:#090D0B;border-color:#1A2820;">
     </div>
-    <select id="category-filter" name="category"
-            class="border text-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
-            style="background:#090D0B;border-color:#1A2820;">
-        <option value="">Semua Kategori</option>
-        @foreach($categories as $cat)
-            <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-        @endforeach
-    </select>
-    <select id="status-filter" name="status"
-            class="border text-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
-            style="background:#090D0B;border-color:#1A2820;">
-        <option value="">Semua Status</option>
-        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
-        <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
-        <option value="expired" {{ request('status') === 'expired' ? 'selected' : '' }}>Expired</option>
-    </select>
+    <div class="relative">
+        <select id="category-filter" name="category"
+                class="appearance-none border text-gray-300 rounded-xl pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                style="background-color:#090D0B;border-color:#1A2820;">
+            <option value="">Semua Kategori</option>
+            @foreach($categories as $cat)
+                <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+            @endforeach
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+    </div>
+    <div class="relative">
+        <select id="status-filter" name="status"
+                class="appearance-none border text-gray-300 rounded-xl pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                style="background-color:#090D0B;border-color:#1A2820;">
+            <option value="">Semua Status</option>
+            <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
+            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
+            <option value="expired" {{ request('status') === 'expired' ? 'selected' : '' }}>Expired</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+    </div>
     <button type="submit" id="search-btn"
             class="px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-colors"
             style="background:linear-gradient(135deg,#10B981,#0D9488);">
@@ -45,17 +55,6 @@
            onmouseover="this.style.background='#25382D';this.style.color='#d1d5db'"
            onmouseout="this.style.background='#1A2820';this.style.color='#9CA3AF'">Reset</a>
     @endif
-    <a href="{{ route('admin.soal.trash') }}" id="trash-btn"
-       class="border px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2"
-       style="background:#090D0B;border-color:#1A2820;color:#9CA3AF;"
-       onmouseover="this.style.borderColor='rgba(239,68,68,.4)';this.style.color='#F87171'"
-       onmouseout="this.style.borderColor='#1A2820';this.style.color='#9CA3AF'"
-       title="Recycle Bin">
-        <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-        </svg>
-        <span class="hidden sm:inline">Recycle Bin</span>
-    </a>
     <button type="button" onclick="openCreateModal()" id="add-soal-btn"
             class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all"
             style="background:linear-gradient(135deg,#10B981,#0D9488);box-shadow:0 4px 12px rgba(16,185,129,.2);"
@@ -288,13 +287,18 @@
                     </div>
                     <div>
                         <label for="category_id" class="block text-xs font-medium text-gray-300 mb-1">Kategori</label>
-                        <select id="category_id" name="category_id"
-                                class="w-full bg-gray-800 border border-gray-700 text-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-emerald-500">
-                            <option value="">— Pilih Kategori —</option>
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                            @endforeach
-                        </select>
+                        <div class="relative">
+                            <select id="category_id" name="category_id"
+                                    class="w-full appearance-none bg-gray-800 border border-gray-700 text-gray-300 rounded-xl pl-3.5 pr-10 py-2 text-sm focus:outline-none focus:border-emerald-500">
+                                <option value="">— Pilih Kategori —</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
