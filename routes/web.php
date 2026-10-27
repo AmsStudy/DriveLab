@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\AccessLogController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SoalController;
@@ -63,9 +62,6 @@ Route::prefix('admin')
 
         // Kategori CRUD
         Route::resource('categories', CategoryController::class)->except(['show']);
-
-        // Log Akses
-        Route::get('/logs', [AccessLogController::class, 'index'])->name('logs.index');
 
         // ── Super Admin Only ──────────────────────────────────────────────────
         Route::middleware('superadmin')->group(function () {

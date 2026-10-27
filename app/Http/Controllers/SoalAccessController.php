@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AccessLog;
 use App\Models\Soal;
 use App\Models\Submission;
 use Illuminate\Http\Request;
@@ -47,7 +46,6 @@ class SoalAccessController extends Controller
         $soal = Soal::with('category', 'admin')->where('unique_token', $token)->firstOrFail();
 
         $sessionId = $request->session()->getId();
-        $userAgent = $request->userAgent();
         
         $throttleKey = 'soal_access_' . $soal->id . '_' . $sessionId;
 
@@ -59,14 +57,6 @@ class SoalAccessController extends Controller
         // Cek apakah soal bisa diakses
         $status = $soal->access_status;
         if ($status !== 'active') {
-            AccessLog::create([
-                'soal_id'     => $soal->id,
-                'user_agent'  => $userAgent,
-                'status'      => 'failed',
-                'reason'      => $status,
-                'accessed_at' => now(),
-            ]);
-
             $msg = match ($status) {
                 'inactive'  => 'Soal ini sedang tidak aktif.',
                 'scheduled' => 'Waktu akses soal belum dimulai. Silakan tunggu.',
@@ -81,28 +71,12 @@ class SoalAccessController extends Controller
         if (!Hash::check($request->password, $soal->password)) {
             RateLimiter::hit($throttleKey, 300); // Blokir 5 menit jika gagal 5x
 
-            AccessLog::create([
-                'soal_id'     => $soal->id,
-                'user_agent'  => $userAgent,
-                'status'      => 'failed',
-                'reason'      => 'wrong_password',
-                'accessed_at' => now(),
-            ]);
-
             return back()->withErrors(['password' => 'Password salah. Silakan coba lagi.']);
         }
 
         // Akses berhasil
         RateLimiter::clear($throttleKey);
         $soal->increment('access_count');
-
-        AccessLog::create([
-            'soal_id'     => $soal->id,
-            'user_agent'  => $userAgent,
-            'status'      => 'success',
-            'reason'      => null,
-            'accessed_at' => now(),
-        ]);
 
         // Simpan token akses di session agar tidak perlu input password lagi
         session(["soal_access_{$soal->unique_token}" => true]);

@@ -75,11 +75,6 @@ class Soal extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function accessLogs(): HasMany
-    {
-        return $this->hasMany(AccessLog::class);
-    }
-
     public function attachments(): HasMany
     {
         return $this->hasMany(SoalAttachment::class);

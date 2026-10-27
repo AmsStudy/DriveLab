@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
@@ -66,14 +66,6 @@
 
                 <x-admin.nav-item route="admin.categories.index" icon="tag">
                     Kategori
-                </x-admin.nav-item>
-
-                <div class="pt-3 pb-1">
-                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3">Monitoring</p>
-                </div>
-
-                <x-admin.nav-item route="admin.logs.index" icon="log">
-                    Log Akses
                 </x-admin.nav-item>
 
                 @if(auth()->user()->isSuperAdmin())

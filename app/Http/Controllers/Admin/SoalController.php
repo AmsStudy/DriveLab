@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AccessLog;
 use App\Models\Category;
 use App\Models\Soal;
 use App\Models\Submission;
@@ -148,9 +147,8 @@ class SoalController extends Controller
     public function show(Soal $soal)
     {
         $this->authorizeAccess($soal);
-        $logs = AccessLog::where('soal_id', $soal->id)->latest('accessed_at')->paginate(20);
         $submissions = Submission::where('soal_id', $soal->id)->orderBy('created_at', 'desc')->get();
-        return view('admin.soal.show', compact('soal', 'logs', 'submissions'));
+        return view('admin.soal.show', compact('soal', 'submissions'));
     }
 
     public function edit(Soal $soal)
