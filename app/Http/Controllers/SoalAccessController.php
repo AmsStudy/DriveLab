@@ -61,7 +61,6 @@ class SoalAccessController extends Controller
         if ($status !== 'active') {
             AccessLog::create([
                 'soal_id'     => $soal->id,
-                'ip_address'  => $ip,
                 'user_agent'  => $userAgent,
                 'status'      => 'failed',
                 'reason'      => $status,
@@ -84,7 +83,6 @@ class SoalAccessController extends Controller
 
             AccessLog::create([
                 'soal_id'     => $soal->id,
-                'ip_address'  => $ip,
                 'user_agent'  => $userAgent,
                 'status'      => 'failed',
                 'reason'      => 'wrong_password',
@@ -100,7 +98,6 @@ class SoalAccessController extends Controller
 
         AccessLog::create([
             'soal_id'     => $soal->id,
-            'ip_address'  => $ip,
             'user_agent'  => $userAgent,
             'status'      => 'success',
             'reason'      => null,
@@ -156,7 +153,9 @@ class SoalAccessController extends Controller
             if ($soal->access_status !== 'active') abort(403, 'Waktu akses soal ini sudah berakhir.');
         }
 
-        return view('soal.preview-wrapper', compact('soal', 'attachment', 'isAdminPreview'));
+        $previewToken = hash_hmac('sha256', "preview-{$soal->unique_token}-{$attachment->id}", config('app.key'));
+
+        return view('soal.preview-wrapper', compact('soal', 'attachment', 'isAdminPreview', 'previewToken'));
     }
 
     /**
@@ -177,6 +176,31 @@ class SoalAccessController extends Controller
             if ($soal->access_status !== 'active') {
                 abort(403, 'Waktu akses soal ini sudah berakhir.');
             }
+
+            $ext = strtolower($attachment->file_type ?? pathinfo($attachment->file_original_name, PATHINFO_EXTENSION));
+            $isPreviewable = in_array($ext, ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp']);
+
+            // Jika file previewable dan unduhan dinonaktifkan:
+            if ($isPreviewable && !$soal->is_downloadable) {
+                $secFetchDest = strtolower($request->header('Sec-Fetch-Dest', ''));
+                $secFetchMode = strtolower($request->header('Sec-Fetch-Mode', ''));
+
+                // 1. Tangani jika dibuka langsung via address bar atau tab baru
+                if ($secFetchDest === 'document' || $secFetchMode === 'navigate') {
+                    return redirect()->route('soal.preview_wrapper', [
+                        'token'      => $token,
+                        'attachment' => $attachmentId,
+                    ]);
+                }
+
+                // 2. Wajibkan header autentikasi preview aman
+                $expectedToken = hash_hmac('sha256', "preview-{$soal->unique_token}-{$attachment->id}", config('app.key'));
+                $providedToken = $request->header('X-Lab-Preview');
+
+                if (!$providedToken || !hash_equals($expectedToken, $providedToken)) {
+                    abort(403, 'Akses langsung tidak diizinkan. Silakan buka file melalui preview resmi.');
+                }
+            }
         }
 
         $realFile = $this->resolveStorageFile($attachment->file_path);
@@ -184,10 +208,12 @@ class SoalAccessController extends Controller
         $mimeType = mime_content_type($realFile);
 
         return response()->file($realFile, [
-            'Content-Type'           => $mimeType,
-            'Content-Disposition'    => 'inline; filename="' . basename($attachment->file_original_name) . '"',
-            'X-Frame-Options'        => 'SAMEORIGIN',
-            'X-Content-Type-Options' => 'nosniff',
+            'Content-Type'              => $mimeType,
+            'Content-Disposition'       => 'inline; filename="' . basename($attachment->file_original_name) . '"',
+            'X-Frame-Options'           => 'SAMEORIGIN',
+            'X-Content-Type-Options'    => 'nosniff',
+            'Cache-Control'             => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma'                    => 'no-cache',
         ]);
     }
 

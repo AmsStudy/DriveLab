@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 @section('title', 'Log Akses')
 @section('page-title', 'Log Akses Dokumen')
 @section('page-description', 'Riwayat lengkap semua percobaan Akses Dokumen')
@@ -32,7 +32,6 @@
                     <tr>
                         <th class="px-6 py-3 text-left">Soal</th>
                         <th class="px-4 py-3 text-left">Waktu</th>
-                        <th class="px-4 py-3 text-left">IP Address</th>
                         <th class="px-4 py-3 text-left">Status</th>
                         <th class="px-4 py-3 text-left">Keterangan</th>
                     </tr>
@@ -50,7 +49,6 @@
                             {{ $log->accessed_at->format('d M Y H:i:s') }}
                             <p class="text-gray-600">{{ $log->accessed_at->diffForHumans() }}</p>
                         </td>
-                        <td class="px-4 py-3 text-gray-300 font-mono text-xs">{{ $log->ip_address }}</td>
                         <td class="px-4 py-3">
                             <span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full
                                 {{ $log->status === 'success' ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400' }}">

@@ -122,7 +122,6 @@
                         <thead class="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider">
                             <tr>
                                 <th class="px-6 py-3 text-left">Waktu</th>
-                                <th class="px-4 py-3 text-left">IP Address</th>
                                 <th class="px-4 py-3 text-left">Status</th>
                                 <th class="px-4 py-3 text-left">Keterangan</th>
                             </tr>
@@ -131,7 +130,6 @@
                             @foreach($logs as $log)
                             <tr class="hover:bg-gray-800/30">
                                 <td class="px-6 py-3 text-gray-400 text-xs">{{ $log->accessed_at->format('d M Y H:i:s') }}</td>
-                                <td class="px-4 py-3 text-gray-300 font-mono text-xs">{{ $log->ip_address }}</td>
                                 <td class="px-4 py-3">
                                     <span class="text-xs px-2 py-0.5 rounded-full {{ $log->status === 'success' ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400' }}">
                                         {{ $log->status === 'success' ? 'Berhasil' : 'Gagal' }}

@@ -140,7 +140,7 @@
                 <span class="w-2 h-2 rounded-full flex-shrink-0 {{ $log->status === 'success' ? 'bg-green-500' : 'bg-red-500' }}"></span>
                 <div class="flex-1 min-w-0">
                     <p class="text-sm text-gray-200 truncate">{{ $log->soal->title ?? 'Dokumen Dihapus' }}</p>
-                    <p class="text-xs text-gray-500">{{ $log->ip_address }} · {{ $log->accessed_at->diffForHumans() }}</p>
+                    <p class="text-xs text-gray-500">{{ $log->accessed_at->format('d M Y, H:i') }} ({{ $log->accessed_at->diffForHumans() }})</p>
                 </div>
                 <span class="text-xs px-2 py-1 rounded-full {{ $log->status === 'success' ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400' }}">
                     {{ $log->status === 'success' ? 'Berhasil' : 'Gagal' }}

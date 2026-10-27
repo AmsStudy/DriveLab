@@ -816,7 +816,7 @@ setInterval(() => {
             }
         })
         .catch(() => {});
-}, 5000);
+}, 15000);
 @endif
 
 // ─── Submission form logic ───

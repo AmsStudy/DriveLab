@@ -11,7 +11,6 @@ class AccessLog extends Model
 
     protected $fillable = [
         'soal_id',
-        'ip_address',
         'user_agent',
         'status',
         'reason',
