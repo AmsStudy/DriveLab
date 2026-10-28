@@ -6,23 +6,23 @@
 
 @section('content')
 
-{{-- Action Toolbar: Filter Bar on Left, Tambah Dokumen on Right --}}
-<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
-    <form method="GET" id="filter-form" class="flex flex-wrap items-center gap-3">
-        {{-- Search Input (Proportional width, generous padding so icon never touches text) --}}
-        <div class="relative w-full sm:w-64 md:w-72">
+{{-- Action Toolbar: Search, Filters, and Tambah Dokumen on the same line --}}
+<div class="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-6">
+    <form method="GET" id="filter-form" class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+        {{-- Search Input (Compact, not too long, so space beside it is filled) --}}
+        <div class="relative w-48 sm:w-56 md:w-60 flex-shrink-0">
             <svg class="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
             <input id="search-input" type="text" name="search" value="{{ request('search') }}"
                    placeholder="Cari judul dokumen..."
-                   class="w-full border text-gray-100 rounded-xl pl-10 pr-4 py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
-                   style="background-color:#090D0B;border-color:#1A2820;">
+                   class="w-full border text-gray-100 rounded-xl pr-3.5 py-2 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                   style="background-color:#090D0B;border-color:#1A2820;padding-left:2.5rem !important;">
         </div>
 
         {{-- Category Select (Single chevron via Tailwind Forms) --}}
         <select id="category-filter" name="category"
-                class="border text-gray-300 rounded-xl pl-3.5 pr-10 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                class="border text-gray-300 rounded-xl pl-3.5 pr-10 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
                 style="background-color:#090D0B;border-color:#1A2820;">
             <option value="">Semua Kategori</option>
             @foreach($categories as $cat)
@@ -32,7 +32,7 @@
 
         {{-- Status Select (Single chevron via Tailwind Forms) --}}
         <select id="status-filter" name="status"
-                class="border text-gray-300 rounded-xl pl-3.5 pr-10 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                class="border text-gray-300 rounded-xl pl-3.5 pr-10 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
                 style="background-color:#090D0B;border-color:#1A2820;">
             <option value="">Semua Status</option>
             <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
@@ -41,14 +41,14 @@
         </select>
 
         <button type="submit" id="search-btn"
-                class="px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-colors"
+                class="px-4 py-2 rounded-xl text-sm font-semibold text-white transition-colors flex-shrink-0"
                 style="background:linear-gradient(135deg,#10B981,#0D9488);">
             Cari
         </button>
 
         @if(request()->hasAny(['search','category','status']))
             <a href="{{ route('admin.soal.index') }}"
-               class="px-4 py-2.5 rounded-xl text-sm font-medium transition-colors border"
+               class="px-3 py-2 rounded-xl text-sm font-medium transition-colors border flex-shrink-0"
                style="background:#1A2820;border-color:#25382D;color:#9CA3AF;"
                onmouseover="this.style.background='#25382D';this.style.color='#d1d5db'"
                onmouseout="this.style.background='#1A2820';this.style.color='#9CA3AF'">
@@ -57,19 +57,17 @@
         @endif
     </form>
 
-    {{-- Tambah Dokumen (Direct link to create page, no popup) --}}
-    <div class="flex-shrink-0">
-        <a href="{{ route('admin.soal.create') }}" id="add-soal-btn"
-           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all shadow-md shadow-emerald-500/20"
-           style="background:linear-gradient(135deg,#10B981,#0D9488);"
-           onmouseover="this.style.boxShadow='0 6px 18px rgba(16,185,129,.35)'"
-           onmouseout="this.style.boxShadow='0 4px 12px rgba(16,185,129,.2)'">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Tambah Dokumen
-        </a>
-    </div>
+    {{-- Tambah Dokumen (Direct link, placed beside the filter items) --}}
+    <a href="{{ route('admin.soal.create') }}" id="add-soal-btn"
+       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md shadow-emerald-500/20 whitespace-nowrap flex-shrink-0"
+       style="background:linear-gradient(135deg,#10B981,#0D9488);"
+       onmouseover="this.style.boxShadow='0 6px 18px rgba(16,185,129,.35)'"
+       onmouseout="this.style.boxShadow='0 4px 12px rgba(16,185,129,.2)'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        <span>Tambah Dokumen</span>
+    </a>
 </div>
 
 {{-- Table --}}

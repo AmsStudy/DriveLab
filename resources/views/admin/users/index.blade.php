@@ -6,31 +6,31 @@
 @section('content')
 
 {{-- Filter & Action --}}
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5">
-    <form method="GET" class="flex flex-wrap items-center gap-3">
-        <div class="relative w-full sm:w-64 md:w-72">
+<div class="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-5">
+    <form method="GET" class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+        <div class="relative w-48 sm:w-56 md:w-60 flex-shrink-0">
             <svg class="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email..."
-                   class="w-full pl-10 pr-4 border text-gray-100 rounded-xl py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
-                   style="background-color:#090D0B;border-color:#1A2820;">
+                   class="w-full pr-3.5 border text-gray-100 rounded-xl py-2 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                   style="background-color:#090D0B;border-color:#1A2820;padding-left:2.5rem !important;">
         </div>
         <select name="status"
-                class="border text-gray-300 rounded-xl pl-3.5 pr-10 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                class="border text-gray-300 rounded-xl pl-3.5 pr-10 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
                 style="background-color:#090D0B;border-color:#1A2820;">
             <option value="">Semua Status</option>
             <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>✓ Aktif</option>
             <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>✕ Nonaktif</option>
         </select>
         <button type="submit"
-                class="px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors text-white"
+                class="px-4 py-2 rounded-xl text-sm font-semibold transition-colors text-white flex-shrink-0"
                 style="background:linear-gradient(135deg,#10B981,#0D9488);">
             Filter
         </button>
         @if(request()->hasAny(['search','status']))
             <a href="{{ route('admin.users.index') }}"
-               class="px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+               class="px-3 py-2 rounded-xl text-sm font-medium transition-colors flex-shrink-0"
                style="background:#1A2820;color:#9CA3AF;"
                onmouseover="this.style.background='#25382D';this.style.color='#d1d5db'"
                onmouseout="this.style.background='#1A2820';this.style.color='#9CA3AF'">Reset</a>
@@ -38,10 +38,10 @@
     </form>
 
     <button type="button" onclick="document.getElementById('create-modal').classList.remove('hidden')"
-            class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all shadow-lg"
-            style="background:linear-gradient(135deg,#10B981,#0D9488);box-shadow:0 4px 14px rgba(16,185,129,.25);"
-            onmouseover="this.style.boxShadow='0 6px 20px rgba(16,185,129,.4)'"
-            onmouseout="this.style.boxShadow='0 4px 14px rgba(16,185,129,.25)'">
+            class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md shadow-emerald-500/20 whitespace-nowrap flex-shrink-0"
+            style="background:linear-gradient(135deg,#10B981,#0D9488);"
+            onmouseover="this.style.boxShadow='0 6px 18px rgba(16,185,129,.35)'"
+            onmouseout="this.style.boxShadow='0 4px 12px rgba(16,185,129,.2)'">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         Tambah Asisten
     </button>

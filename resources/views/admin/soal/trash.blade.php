@@ -7,21 +7,22 @@
 @section('content')
 
 {{-- Filter & Search --}}
-<form method="GET" id="filter-form" class="flex flex-wrap items-center gap-3 mb-6">
-    <div class="relative w-full sm:w-72 md:w-80">
+<form method="GET" id="filter-form" class="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-6">
+    <div class="relative w-56 sm:w-64 md:w-72 flex-shrink-0">
         <svg class="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
         <input id="search-input" type="text" name="search" value="{{ request('search') }}"
                placeholder="Cari judul dokumen di Recycle Bin..."
-               class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl pl-10 pr-4 py-2.5 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors">
+               class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl pr-3.5 py-2 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+               style="padding-left:2.5rem !important;">
     </div>
-    <button type="submit" id="search-btn" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md shadow-emerald-500/20">
+    <button type="submit" id="search-btn" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-md shadow-emerald-500/20 flex-shrink-0">
         Cari
     </button>
     @if(request('search'))
         <a href="{{ route('admin.soal.trash') }}"
-           class="px-4 py-2.5 rounded-xl text-sm font-medium transition-colors border"
+           class="px-3 py-2 rounded-xl text-sm font-medium transition-colors border flex-shrink-0"
            style="background:#1A2820;border-color:#25382D;color:#9CA3AF;"
            onmouseover="this.style.background='#25382D';this.style.color='#d1d5db'"
            onmouseout="this.style.background='#1A2820';this.style.color='#9CA3AF'">
@@ -29,7 +30,7 @@
         </a>
     @endif
     <a href="{{ route('admin.soal.index') }}" id="back-btn"
-       class="bg-[#0F1713] hover:bg-gray-800 border border-[#1A2820] text-gray-300 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ml-auto">
+       class="bg-[#0F1713] hover:bg-gray-800 border border-[#1A2820] text-gray-300 px-4 py-2 rounded-xl text-sm font-medium transition-colors sm:ml-auto flex-shrink-0">
         Kembali ke Arsip Dokumen
     </a>
 </form>
