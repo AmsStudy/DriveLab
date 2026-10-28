@@ -203,46 +203,115 @@
 
         {{-- Review Answers & Explanations (if quiz allows show_review) --}}
         @if($quiz->show_review && $reviewAnswers)
-            <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8 space-y-4">
-                <div class="mb-4">
-                    <h2 class="text-lg font-bold text-white heading-font">💡 Pembahasan & Kunci Jawaban</h2>
-                    <p class="text-xs text-gray-400">Tinjau hasil jawaban Anda beserta kunci dan catatan pembahasan</p>
+            <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8 space-y-5">
+                <div class="flex items-center gap-3 pb-3 border-b border-[#1A2820]">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 text-lg">
+                        💡
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white heading-font">Pembahasan & Kunci Jawaban</h2>
+                        <p class="text-xs text-gray-400">Tinjau evaluasi butir soal, kunci jawaban yang tepat, dan catatan pembahasan instruktur</p>
+                    </div>
                 </div>
 
-                <div class="space-y-4">
+                <div class="space-y-5">
                     @foreach($reviewAnswers as $idx => $ans)
-                        <div class="p-5 rounded-2xl border {{ $ans->is_correct ? 'bg-emerald-500/5 border-emerald-500/30' : 'bg-rose-500/5 border-rose-500/30' }}">
-                            <div class="flex items-center justify-between gap-2 mb-2">
-                                <span class="text-xs font-bold font-mono text-gray-400">Soal #{{ $idx + 1 }}</span>
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold {{ $ans->is_correct ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400' }}">
-                                    {{ $ans->is_correct ? '✓ Benar (+' . $ans->points_earned . ' Poin)' : '✗ Salah (0 Poin)' }}
-                                </span>
+                        <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 shadow-sm transition-all {{ $ans->is_correct ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-rose-500' }}">
+                            {{-- Header Pertanyaan --}}
+                            <div class="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-[#16221B]">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono text-xs font-bold text-gray-300 bg-[#142019] border border-[#1E3327] px-2.5 py-1 rounded-lg">
+                                        Soal #{{ $idx + 1 }}
+                                    </span>
+                                    <span class="text-xs text-gray-400 font-medium">
+                                        {{ $ans->is_correct ? '+' . $ans->points_earned : '0' }} / {{ $ans->question->points ?? 0 }} Poin
+                                    </span>
+                                </div>
+
+                                <div>
+                                    @if($ans->is_correct)
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                            Jawaban Benar
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            Jawaban Salah
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
 
-                            <p class="text-sm font-semibold text-white mb-3">{{ $ans->question->question_text ?? 'Pertanyaan' }}</p>
+                            {{-- Question Text --}}
+                            <p class="text-sm sm:text-base font-bold text-white mb-4 leading-relaxed">{{ $ans->question->question_text ?? 'Pertanyaan' }}</p>
 
-                            {{-- Options List Review --}}
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs mb-3">
-                                @foreach($ans->question->options as $opt)
+                            {{-- Options Grid --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                                @php
+                                    $labels = ['A', 'B', 'C', 'D', 'E', 'F'];
+                                @endphp
+                                @foreach($ans->question->options as $optIdx => $opt)
                                     @php
                                         $isSelectedByStudent = ($ans->selected_option_id === $opt->id);
-                                        $isCorrectOption = $opt->is_correct;
+                                        $isCorrectOption = (bool)$opt->is_correct;
                                     @endphp
-                                    <div class="p-2.5 rounded-xl border flex items-center justify-between gap-2 {{ $isCorrectOption ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-200 font-bold' : ($isSelectedByStudent ? 'bg-rose-500/15 border-rose-500/50 text-rose-300 line-through' : 'bg-[#090D0B] border-[#1A2820] text-gray-400') }}">
-                                        <span>{{ $opt->option_text }}</span>
-                                        @if($isCorrectOption)
-                                            <span class="text-[10px] bg-emerald-500 text-white px-1.5 py-0.5 rounded font-bold">Kunci Benar</span>
-                                        @elseif($isSelectedByStudent)
-                                            <span class="text-[10px] bg-rose-500 text-white px-1.5 py-0.5 rounded font-bold">Jawaban Anda</span>
-                                        @endif
-                                    </div>
+
+                                    @if($isCorrectOption)
+                                        {{-- KUNCI BENAR --}}
+                                        <div class="p-3 rounded-xl border-2 border-emerald-500/60 bg-[#0E2018] text-white flex items-center justify-between gap-2 shadow-sm">
+                                            <div class="flex items-center gap-2.5">
+                                                <span class="w-6 h-6 rounded-lg bg-emerald-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
+                                                    {{ $labels[$optIdx] ?? ($optIdx + 1) }}
+                                                </span>
+                                                <span class="font-semibold text-emerald-100">{{ $opt->option_text }}</span>
+                                            </div>
+                                            @if($isSelectedByStudent)
+                                                <span class="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                    Pilihan Anda
+                                                </span>
+                                            @else
+                                                <span class="text-[10px] bg-emerald-600 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                    Kunci Benar
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @elseif($isSelectedByStudent)
+                                        {{-- JAWABAN SALAH MAHASISWA --}}
+                                        <div class="p-3 rounded-xl border-2 border-rose-500/60 bg-[#221013] text-white flex items-center justify-between gap-2 shadow-sm">
+                                            <div class="flex items-center gap-2.5">
+                                                <span class="w-6 h-6 rounded-lg bg-rose-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
+                                                    {{ $labels[$optIdx] ?? ($optIdx + 1) }}
+                                                </span>
+                                                <span class="font-semibold text-rose-200 line-through opacity-90">{{ $opt->option_text }}</span>
+                                            </div>
+                                            <span class="text-[10px] bg-rose-600 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                Pilihan Anda (Salah)
+                                            </span>
+                                        </div>
+                                    @else
+                                        {{-- OPSI LAIN (NETRAL) --}}
+                                        <div class="p-3 rounded-xl border border-[#1A2820] bg-[#0E1612] text-gray-400 flex items-center gap-2.5 opacity-75">
+                                            <span class="w-6 h-6 rounded-lg bg-gray-800 text-gray-400 font-bold text-xs flex items-center justify-center flex-shrink-0">
+                                                {{ $labels[$optIdx] ?? ($optIdx + 1) }}
+                                            </span>
+                                            <span class="font-normal">{{ $opt->option_text }}</span>
+                                        </div>
+                                    @endif
                                 @endforeach
                             </div>
 
-                            {{-- Explanation --}}
+                            {{-- Catatan Pembahasan (Amber Note) --}}
                             @if(!empty($ans->question->explanation))
-                                <div class="p-3 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-300 text-xs">
-                                    <strong>💡 Pembahasan:</strong> {{ $ans->question->explanation }}
+                                <div class="mt-4 p-3.5 rounded-xl bg-[#17140B] border border-amber-500/30 text-xs">
+                                    <div class="flex items-center gap-2 font-bold text-amber-400 mb-1">
+                                        <span class="text-sm">💡</span>
+                                        <span class="uppercase tracking-wider text-[11px]">Penjelasan & Pembahasan:</span>
+                                    </div>
+                                    <p class="text-gray-200 leading-relaxed pl-5 font-normal">{{ $ans->question->explanation }}</p>
                                 </div>
                             @endif
                         </div>

@@ -63,11 +63,12 @@
 
             {{-- Timer & Anti-Cheat Controls --}}
             <div class="flex items-center gap-2 sm:gap-3">
-                {{-- Countdown Timer --}}
+                {{-- Countdown Timer (Jam:Menit:Detik) --}}
                 <template x-if="remainingSeconds !== null">
-                    <div class="px-3 py-1.5 rounded-xl border flex items-center gap-2 font-mono text-xs font-bold transition-all"
-                         :class="remainingSeconds <= 30 ? 'bg-red-500/20 border-red-500/40 text-red-400 animate-pulse' : (remainingSeconds <= 90 ? 'bg-amber-500/20 border-amber-500/40 text-amber-300' : 'bg-[#142019] border-[#1E3327] text-emerald-400')">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <div class="px-3.5 py-1.5 rounded-xl border flex items-center gap-2 font-mono text-xs sm:text-sm font-bold transition-all shadow-sm"
+                         :class="remainingSeconds <= 30 ? 'bg-red-500/20 border-red-500/40 text-red-400 animate-pulse' : (remainingSeconds <= 90 ? 'bg-amber-500/20 border-amber-500/40 text-amber-300' : 'bg-[#142019] border-[#1E3327] text-emerald-400')"
+                         title="Sisa Waktu Pengerjaan">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span x-text="formatTime(remainingSeconds)"></span>
                     </div>
                 </template>
@@ -81,9 +82,16 @@
                 </div>
 
                 {{-- Fullscreen Toggle --}}
-                <button type="button" @click="toggleFullscreen()" title="Layar Penuh"
-                        class="p-2 rounded-xl bg-[#142019] border border-[#1E3327] text-gray-400 hover:text-white transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                <button type="button" @click="toggleFullscreen()"
+                        :title="isFullscreen ? 'Keluar dari Mode Layar Penuh' : 'Mode Layar Penuh (Menghilangkan gangguan browser agar fokus ujian)'"
+                        class="px-2.5 py-1.5 rounded-xl bg-[#142019] border border-[#1E3327] hover:border-emerald-500/40 text-gray-400 hover:text-white transition-all flex items-center gap-1.5 text-xs font-medium">
+                    <template x-if="!isFullscreen">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                    </template>
+                    <template x-if="isFullscreen">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </template>
+                    <span class="hidden md:inline text-[11px]" x-text="isFullscreen ? 'Keluar Fullscreen' : 'Layar Penuh'"></span>
                 </button>
             </div>
         </div>
@@ -252,21 +260,23 @@
         function quizArena() {
             return {
                 questions: @json($clientQuestions),
-                remainingSeconds: @json($timeRemaining),
+                remainingSeconds: {{ $timeRemaining !== null ? (int)$timeRemaining : 'null' }},
                 currentIndex: 0,
                 answers: {},
                 tabSwitchCount: {{ (int)$attempt->tab_switch_count }},
                 showDrawer: false,
                 isSubmitting: false,
                 timerInterval: null,
+                isFullscreen: !!document.fullscreenElement,
 
                 get currentQuestion() {
                     return this.questions[this.currentIndex] || null;
                 },
 
                 initArena() {
-                    // Start timer if applicable
+                    // Start timer if applicable (strictly integer countdown)
                     if (this.remainingSeconds !== null && this.remainingSeconds > 0) {
+                        this.remainingSeconds = Math.max(0, Math.floor(Number(this.remainingSeconds)));
                         this.timerInterval = setInterval(() => {
                             if (this.remainingSeconds > 0) {
                                 this.remainingSeconds--;
@@ -276,6 +286,11 @@
                             }
                         }, 1000);
                     }
+
+                    // Fullscreen change listener
+                    document.addEventListener('fullscreenchange', () => {
+                        this.isFullscreen = !!document.fullscreenElement;
+                    });
 
                     // Setup Anti-Cheat Listeners
                     this.setupAntiCheat();
@@ -475,10 +490,15 @@
                     }
                 },
 
-                formatTime(sec) {
-                    const m = Math.floor(sec / 60);
-                    const s = sec % 60;
-                    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+                formatTime(totalSec) {
+                    if (totalSec === null || totalSec === undefined || isNaN(totalSec)) return '00:00:00';
+                    const secInt = Math.max(0, Math.floor(Number(totalSec)));
+                    const hours = Math.floor(secInt / 3600);
+                    const minutes = Math.floor((secInt % 3600) / 60);
+                    const seconds = secInt % 60;
+
+                    const pad = (n) => String(n).padStart(2, '0');
+                    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
                 },
 
                 getOptionLabel(idx) {

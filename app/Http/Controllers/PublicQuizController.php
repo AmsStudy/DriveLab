@@ -126,9 +126,9 @@ class PublicQuizController extends Controller
         // Calculate time limit
         $timeRemaining = null;
         if ($quiz->time_limit_minutes > 0) {
-            $elapsedSeconds = now()->diffInSeconds($attempt->started_at);
-            $totalSeconds = $quiz->time_limit_minutes * 60;
-            $timeRemaining = max(0, $totalSeconds - $elapsedSeconds);
+            $elapsedSeconds = (int) now()->diffInSeconds($attempt->started_at);
+            $totalSeconds = (int) ($quiz->time_limit_minutes * 60);
+            $timeRemaining = (int) max(0, $totalSeconds - $elapsedSeconds);
 
             if ($timeRemaining <= 0) {
                 $this->finalizeAttempt($attempt, []);
