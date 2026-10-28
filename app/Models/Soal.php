@@ -85,6 +85,11 @@ class Soal extends Model
         return $this->hasMany(Submission::class);
     }
 
+    public function quizzes(): HasMany
+    {
+        return $this->hasMany(Quiz::class);
+    }
+
     /**
      * Cek apakah soal ini bisa diakses saat ini.
      */

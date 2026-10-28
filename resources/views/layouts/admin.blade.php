@@ -84,6 +84,10 @@
                     Kategori
                 </x-admin.nav-item>
 
+                <x-admin.nav-item route="admin.quizzes.index" icon="quiz">
+                    Kuis Interaktif
+                </x-admin.nav-item>
+
                 <x-admin.nav-item route="admin.soal.trash" icon="trash">
                     Recycle Bin
                 </x-admin.nav-item>

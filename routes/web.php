@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\QuizController;
 use App\Http\Controllers\Admin\SoalController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicQuizController;
 use App\Http\Controllers\SoalAccessController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +29,17 @@ Route::prefix('soal')->name('soal.')->group(function () {
     Route::get('/{token}/file/{attachment}', [SoalAccessController::class, 'previewFile'])->name('file');
     Route::get('/{token}/download/{attachment}', [SoalAccessController::class, 'downloadFile'])->name('download');
     Route::get('/{token}/status', [SoalAccessController::class, 'status'])->name('status');
+});
+
+// ─── Kuis Interaktif (Mahasiswa) ──────────────────────────────────────────────
+Route::post('/quiz/join', [PublicQuizController::class, 'joinByCode'])->name('quiz.join');
+Route::prefix('quiz')->name('quiz.')->group(function () {
+    Route::get('/{token}', [PublicQuizController::class, 'lobby'])->name('lobby');
+    Route::post('/{token}/start', [PublicQuizController::class, 'start'])->name('start');
+    Route::get('/{token}/play/{attempt}', [PublicQuizController::class, 'play'])->name('play');
+    Route::post('/{token}/attempt/{attempt}/tab-switch', [PublicQuizController::class, 'recordTabSwitch'])->name('tab-switch');
+    Route::post('/{token}/submit/{attempt}', [PublicQuizController::class, 'submit'])->name('submit');
+    Route::get('/{token}/results/{attempt}', [PublicQuizController::class, 'results'])->name('results');
 });
 
 // ─── Auth (Breeze) ────────────────────────────────────────────────────────────
@@ -62,6 +75,18 @@ Route::prefix('admin')
 
         // Kategori CRUD
         Route::resource('categories', CategoryController::class)->except(['show']);
+
+        // Kuis Interaktif (CMS Quizizz)
+        Route::resource('quizzes', QuizController::class);
+        Route::patch('quizzes/{quiz}/toggle', [QuizController::class, 'toggleActive'])->name('quizzes.toggle');
+        Route::get('quizzes/{quiz}/questions', [QuizController::class, 'questions'])->name('quizzes.questions');
+        Route::post('quizzes/{quiz}/questions', [QuizController::class, 'storeQuestion'])->name('quizzes.questions.store');
+        Route::put('quizzes/{quiz}/questions/{question}', [QuizController::class, 'updateQuestion'])->name('quizzes.questions.update');
+        Route::delete('quizzes/{quiz}/questions/{question}', [QuizController::class, 'destroyQuestion'])->name('quizzes.questions.destroy');
+        Route::get('quizzes/{quiz}/results', [QuizController::class, 'results'])->name('quizzes.results');
+        Route::get('quizzes/{quiz}/export-csv', [QuizController::class, 'exportResultsCsv'])->name('quizzes.export-csv');
+        Route::delete('quizzes/{quiz}/attempts/{attempt}', [QuizController::class, 'destroyAttempt'])->name('quizzes.attempts.destroy');
+        Route::delete('quizzes/{quiz}/reset-attempts', [QuizController::class, 'resetAttempts'])->name('quizzes.reset-attempts');
 
         // ── Super Admin Only ──────────────────────────────────────────────────
         Route::middleware('superadmin')->group(function () {

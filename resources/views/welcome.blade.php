@@ -136,9 +136,12 @@
         <p class="subtitle">Sistem terenkripsi untuk mendistribusikan soal ujian dan modul praktikum. Dilindungi kode unik, password, dan jadwal akses otomatis.</p>
 
         <div class="search-wrap" x-data="{ tab: 'akses' }">
-            <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+            <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
                 <button @click="tab = 'akses'" :style="tab === 'akses' ? 'color: var(--emerald); border-bottom: 2px solid var(--emerald);' : 'color: var(--muted); border-bottom: 2px solid transparent;'" style="background: none; border: none; font-size: 13px; font-weight: 700; padding-bottom: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.2s;">
                     Akses Dokumen
+                </button>
+                <button @click="tab = 'kuis'" :style="tab === 'kuis' ? 'color: #38BDF8; border-bottom: 2px solid #38BDF8;' : 'color: var(--muted); border-bottom: 2px solid transparent;'" style="background: none; border: none; font-size: 13px; font-weight: 700; padding-bottom: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.2s;">
+                    ⚡ Kuis Interaktif
                 </button>
                 <button @click="tab = 'lacak'" :style="tab === 'lacak' ? 'color: var(--mint); border-bottom: 2px solid var(--mint);' : 'color: var(--muted); border-bottom: 2px solid transparent;'" style="background: none; border: none; font-size: 13px; font-weight: 700; padding-bottom: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.2s;">
                     Lacak Tugas
@@ -160,6 +163,21 @@
                 @endif
                 @if(session('success'))
                     <p class="succ-text">✓ {{ session('success') }}</p>
+                @endif
+            </form>
+
+            <!-- Tab: Gabung Kuis -->
+            <form action="{{ route('quiz.join') }}" method="POST" x-show="tab === 'kuis'" x-transition style="display: none;">
+                @csrf
+                <div class="search-box" style="border-color: rgba(56, 189, 248, 0.4);">
+                    <div class="search-icon" style="color: #38BDF8;">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <input type="text" name="access_code" class="search-input" placeholder="Kode Kuis, cth: LAB-ABC12" required autocomplete="off" style="text-transform: uppercase;">
+                    <button type="submit" class="search-btn" style="background: linear-gradient(135deg, #0284c7, #06b6d4);">GABUNG →</button>
+                </div>
+                @if(session('quiz_error'))
+                    <p class="err-text">✗ {{ session('quiz_error') }}</p>
                 @endif
             </form>
 

@@ -73,4 +73,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Category::class, 'created_by');
     }
+
+    public function quizzes(): HasMany
+    {
+        return $this->hasMany(Quiz::class);
+    }
 }
