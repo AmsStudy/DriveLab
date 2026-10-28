@@ -73,8 +73,20 @@ class SoalController extends Controller
             'allowed_extensions.*' => 'string|in:all,pdf,word,excel,ppt,image,archive,pkt',
             'links'        => 'nullable|array|max:15',
             'links.*.title'=> 'nullable|string|max:255',
-            'links.*.url'  => 'nullable|url|max:2000',
+            'links.*.url'  => 'nullable|url:http,https|max:2000',
         ]);
+
+        // Validasi keamanan file lampiran (anti-malware, anti-shell, anti-executable)
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                [$isSafe, $errorMsg] = \App\Services\FileSecurityService::validate($file);
+                if (!$isSafe) {
+                    return back()->withInput()->withErrors([
+                        'files' => "File lampiran \"{$file->getClientOriginalName()}\" ditolak demi keamanan: {$errorMsg}"
+                    ]);
+                }
+            }
+        }
 
         do {
             $token = Str::random(6);
@@ -187,8 +199,20 @@ class SoalController extends Controller
             'attachment_downloadable' => 'nullable|array',
             'links'        => 'nullable|array|max:15',
             'links.*.title'=> 'nullable|string|max:255',
-            'links.*.url'  => 'nullable|url|max:2000',
+            'links.*.url'  => 'nullable|url:http,https|max:2000',
         ]);
+
+        // Validasi keamanan file lampiran baru (anti-malware, anti-shell, anti-executable)
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                [$isSafe, $errorMsg] = \App\Services\FileSecurityService::validate($file);
+                if (!$isSafe) {
+                    return back()->withInput()->withErrors([
+                        'files' => "File lampiran baru \"{$file->getClientOriginalName()}\" ditolak demi keamanan: {$errorMsg}"
+                    ]);
+                }
+            }
+        }
 
         $submissionTypes = $request->input('submission_types');
         if ($request->boolean('is_submission_enabled') && empty($submissionTypes)) {
@@ -426,12 +450,13 @@ class SoalController extends Controller
                     default => $sub->file_original_name,
                 };
 
+                // Sanitasi setiap kolom terhadap Formula Injection (CWE-1236)
                 fputcsv($file, [
                     $index + 1,
-                    $sub->nim,
-                    $sub->nama,
+                    $this->sanitizeCsvCell($sub->nim),
+                    $this->sanitizeCsvCell($sub->nama),
                     strtoupper($sub->submission_type ?? 'FILE'),
-                    $konten,
+                    $this->sanitizeCsvCell($konten),
                     $sub->created_at->format('Y-m-d H:i:s')
                 ]);
             }
@@ -439,6 +464,24 @@ class SoalController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Sanitasi sel CSV untuk mencegah Formula Injection (CWE-1236).
+     */
+    private function sanitizeCsvCell(?string $value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        // Karakter berbahaya pemicu eksekusi formula di Excel / Calc
+        $triggers = ['=', '+', '-', '@', "\t", "\r"];
+        if (in_array($value[0], $triggers, true)) {
+            return "'" . $value;
+        }
+
+        return $value;
     }
 
     public function downloadSubmissionsZip(Soal $soal)
@@ -456,6 +499,20 @@ class SoalController extends Controller
 
         if ($submissions->isEmpty()) {
             return back()->with('error', 'Belum ada tugas yang dikumpulkan.');
+        }
+
+        // Hitung total ukuran akumulasi file untuk mencegah memory exhaustion & zip bomb
+        $totalBytes = 0;
+        foreach ($submissions as $sub) {
+            if ($sub->isFile() && $sub->file_size) {
+                $totalBytes += (int) $sub->file_size;
+            }
+        }
+
+        // Batas maksimal arsip zip 1GB (1024 * 1024 * 1024 bytes)
+        $maxBytes = 1024 * 1024 * 1024;
+        if ($totalBytes > $maxBytes) {
+            return back()->with('error', 'Ukuran total file tugas (' . round($totalBytes / (1024 * 1024 * 1024), 2) . ' GB) melebihi batas maksimal arsip ZIP (1 GB). Silakan unduh file tugas secara individual.');
         }
 
         if (!class_exists(ZipArchive::class)) {

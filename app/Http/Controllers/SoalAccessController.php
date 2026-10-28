@@ -13,15 +13,25 @@ class SoalAccessController extends Controller
 {
     public function accessByCode(Request $request)
     {
+        // Rate limiting: maks 10 pencarian kode per menit per IP
+        $codeThrottleKey = 'access_code_' . $request->ip();
+        if (RateLimiter::tooManyAttempts($codeThrottleKey, 10)) {
+            $seconds = RateLimiter::availableIn($codeThrottleKey);
+            return back()->with('error', 'Terlalu banyak percobaan pencarian kode. Coba lagi dalam ' . ceil($seconds) . ' detik.');
+        }
+
         $request->validate([
-            'kode_unik' => 'required|string'
+            'kode_unik' => 'required|string|max:50'
         ]);
 
         $soal = Soal::where('kode_unik', $request->kode_unik)->first();
 
         if (!$soal) {
+            RateLimiter::hit($codeThrottleKey, 60);
             return back()->with('error', 'Kode unik dokumen tidak ditemukan.');
         }
+
+        RateLimiter::clear($codeThrottleKey);
 
         return redirect()->route('soal.access', ['token' => $soal->unique_token]);
     }
@@ -45,9 +55,8 @@ class SoalAccessController extends Controller
 
         $soal = Soal::with('category', 'admin')->where('unique_token', $token)->firstOrFail();
 
-        $sessionId = $request->session()->getId();
-        
-        $throttleKey = 'soal_access_' . $soal->id . '_' . $sessionId;
+        // Kunci rate limit berbasis kombinasi ID soal dan IP klien (anti brute-force bypass)
+        $throttleKey = 'soal_access_' . $soal->id . '_' . $request->ip();
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
@@ -280,7 +289,7 @@ class SoalAccessController extends Controller
             $request->validate([
                 'nim'      => 'required|string|max:50|regex:/^[a-zA-Z0-9\-]+$/',
                 'nama'     => 'required|string|max:255',
-                'link_url' => 'required|url|max:2000',
+                'link_url' => 'required|url:http,https|max:2000',
             ]);
 
             $existing = Submission::where('soal_id', $soal->id)->where('nim', $request->nim)->first();
@@ -414,9 +423,9 @@ class SoalAccessController extends Controller
 
     public function trackTask(Request $request)
     {
-        // Rate limiting: maks 30 permintaan per sesi per menit
-        $rateLimitKey = 'track_task_' . $request->session()->getId();
-        if (RateLimiter::tooManyAttempts($rateLimitKey, 30)) {
+        // Rate limiting: maks 15 permintaan pelacakan per menit per IP
+        $rateLimitKey = 'track_task_' . $request->ip();
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 15)) {
             $seconds = RateLimiter::availableIn($rateLimitKey);
             return response()->json(['message' => 'Terlalu banyak permintaan pelacakan. Coba lagi dalam ' . ceil($seconds) . ' detik.'], 429);
         }
