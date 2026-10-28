@@ -4,6 +4,21 @@
 @section('page-description', 'Perbarui informasi dokumen, teks soal, file lampiran, dan pengaturan tugas')
 
 @section('content')
+
+{{-- Back nav --}}
+<div class="mb-5">
+    <a href="{{ route('admin.soal.show', $soal) }}"
+       class="inline-flex items-center gap-2 text-sm font-medium transition-colors"
+       style="color:#4B8C6A;"
+       onmouseover="this.style.color='#10B981'"
+       onmouseout="this.style.color='#4B8C6A'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Kembali ke Detail Dokumen
+    </a>
+</div>
+
 <div class="max-w-4xl">
     <form method="POST" action="{{ route('admin.soal.update', $soal) }}" enctype="multipart/form-data" id="edit-soal-form">
         @csrf @method('PUT')
@@ -35,18 +50,14 @@
 
                         <div>
                             <label for="category_id" class="block text-sm font-medium text-gray-300 mb-2">Kategori</label>
-                            <div class="relative">
-                                <select id="category_id" name="category_id"
-                                        class="w-full appearance-none bg-[#090E0B] border border-[#1A2820] text-gray-300 rounded-xl pl-4 pr-10 py-3 text-sm focus:outline-none focus:border-emerald-500">
-                                    <option value="">— Tanpa Kategori —</option>
-                                    @foreach($categories as $cat)
-                                        <option value="{{ $cat->id }}" {{ old('category_id', $soal->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                                </div>
-                            </div>
+                            <select id="category_id" name="category_id"
+                                    class="w-full border text-gray-300 rounded-xl pl-4 pr-10 py-3 text-sm focus:outline-none focus:border-emerald-500"
+                                    style="background-color:#090E0B;border-color:#1A2820;">
+                                <option value="">— Tanpa Kategori —</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->id }}" {{ old('category_id', $soal->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
 
