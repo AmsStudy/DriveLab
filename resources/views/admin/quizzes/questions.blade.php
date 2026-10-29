@@ -69,7 +69,21 @@
             }
         @endphp
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+        <style>
+            .bank-soal-2col {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 1.25rem;
+                align-items: start;
+            }
+            @media (max-width: 860px) {
+                .bank-soal-2col {
+                    grid-template-columns: 1fr !important;
+                }
+            }
+        </style>
+
+        <div class="bank-soal-2col">
             {{-- Kolom Kiri: Soal Nomor Ganjil (#1, #3, #5, ...) --}}
             <div class="space-y-4">
                 <div class="flex items-center gap-2 px-1 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
