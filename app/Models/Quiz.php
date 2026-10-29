@@ -27,6 +27,8 @@ class Quiz extends Model
         'is_active',
         'show_leaderboard',
         'show_review',
+        'allow_open_book',
+        'admin_unlock_password',
         'max_attempts',
     ];
 
@@ -38,6 +40,7 @@ class Quiz extends Model
         'is_active'          => 'boolean',
         'show_leaderboard'   => 'boolean',
         'show_review'        => 'boolean',
+        'allow_open_book'    => 'boolean',
         'max_attempts'       => 'integer',
     ];
 

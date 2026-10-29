@@ -199,9 +199,121 @@ class QuizFeatureTest extends TestCase
 
         // Test anti-cheat tab switch tracking
         $tabRes = $this->post(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]));
-        $tabRes->assertJson(['success' => true, 'tab_switch_count' => 1]);
+        $tabRes->assertJson(['success' => true, 'tab_switch_count' => 1, 'strike' => 1, 'penalty_seconds' => 60]);
         $attempt->refresh();
         $this->assertEquals(1, $attempt->tab_switch_count);
+        $this->assertNotNull($attempt->penalty_end_time);
+    }
+
+    public function test_anti_cheat_three_strikes_and_unlock_mechanisms(): void
+    {
+        $quiz = Quiz::create([
+            'user_id'                => $this->admin->id,
+            'title'                  => 'Ujian Integritas Algoritma',
+            'is_active'              => true,
+            'allow_open_book'        => false,
+            'admin_unlock_password'  => 'LABRAHASIA2026',
+        ]);
+
+        $attempt = QuizAttempt::create([
+            'quiz_id'               => $quiz->id,
+            'nim'                   => '220101999',
+            'student_name'          => 'Peserta Ujian',
+            'total_points_possible' => 100,
+            'started_at'            => now(),
+            'tab_switch_count'      => 0,
+        ]);
+
+        // Strike 1: 1 menit (60s) penalty
+        $res1 = $this->post(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]));
+        $res1->assertJson([
+            'success'          => true,
+            'tab_switch_count' => 1,
+            'strike'           => 1,
+            'penalty_seconds'  => 60,
+            'is_locked'        => false,
+        ]);
+
+        // Strike 2: 1.5 menit (90s) penalty
+        $res2 = $this->post(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]));
+        $res2->assertJson([
+            'success'          => true,
+            'tab_switch_count' => 2,
+            'strike'           => 2,
+            'penalty_seconds'  => 90,
+            'is_locked'        => false,
+        ]);
+
+        // Strike 3: Total lockout
+        $res3 = $this->post(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]));
+        $res3->assertJson([
+            'success'          => true,
+            'tab_switch_count' => 3,
+            'strike'           => 3,
+            'is_locked'        => true,
+        ]);
+
+        $attempt->refresh();
+        $this->assertTrue($attempt->is_locked);
+
+        // Attempt unlock with wrong password
+        $failUnlock = $this->postJson(route('quiz.unlock-password', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]), [
+            'admin_password' => 'SALAH_PASSWORD',
+        ]);
+        $failUnlock->assertStatus(422);
+        $attempt->refresh();
+        $this->assertTrue($attempt->is_locked);
+
+        // Attempt unlock with correct custom password
+        $successUnlock = $this->postJson(route('quiz.unlock-password', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]), [
+            'admin_password' => 'LABRAHASIA2026',
+        ]);
+        $successUnlock->assertStatus(200);
+        $successUnlock->assertJson(['success' => true]);
+
+        $attempt->refresh();
+        $this->assertFalse($attempt->is_locked);
+        $this->assertNull($attempt->penalty_end_time);
+
+        // Now test locking again and admin remote unlock via dashboard
+        $this->post(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]));
+        $attempt->refresh();
+        $this->assertTrue($attempt->is_locked);
+
+        $remoteUnlock = $this->actingAs($this->admin)->post(route('admin.quizzes.attempts.unlock', ['quiz' => $quiz->id, 'attempt' => $attempt->id]));
+        $remoteUnlock->assertSessionHas('success');
+        $attempt->refresh();
+        $this->assertFalse($attempt->is_locked);
+    }
+
+    public function test_open_book_mode_does_not_penalize_tab_switch(): void
+    {
+        $quiz = Quiz::create([
+            'user_id'         => $this->admin->id,
+            'title'           => 'Praktikum Open Book Modul',
+            'is_active'       => true,
+            'allow_open_book' => true,
+        ]);
+
+        $attempt = QuizAttempt::create([
+            'quiz_id'               => $quiz->id,
+            'nim'                   => '220101888',
+            'student_name'          => 'Mahasiswa Santai',
+            'total_points_possible' => 100,
+            'started_at'            => now(),
+        ]);
+
+        $res = $this->post(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]));
+        $res->assertJson([
+            'success'         => true,
+            'allow_open_book' => true,
+            'penalty_seconds' => 0,
+            'is_locked'       => false,
+        ]);
+
+        $attempt->refresh();
+        $this->assertEquals(0, $attempt->tab_switch_count);
+        $this->assertFalse($attempt->is_locked);
     }
 
     public function test_student_can_submit_answers_and_auto_grading_is_exact(): void

@@ -7,8 +7,10 @@ use App\Models\QuizAttempt;
 use App\Models\QuizAttemptAnswer;
 use App\Models\QuizOption;
 use App\Models\QuizQuestion;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class PublicQuizController extends Controller
 {
@@ -168,7 +170,19 @@ class PublicQuizController extends Controller
             ];
         })->values();
 
-        return view('quiz.play', compact('quiz', 'attempt', 'clientQuestions', 'timeRemaining'));
+        // Calculate any active penalty cooldown (to prevent bypass via browser refresh/F5)
+        $penaltyRemainingSeconds = 0;
+        if (!$quiz->allow_open_book && $attempt->penalty_end_time && now()->lessThan($attempt->penalty_end_time)) {
+            $penaltyRemainingSeconds = (int) now()->diffInSeconds($attempt->penalty_end_time);
+        }
+
+        return view('quiz.play', compact(
+            'quiz',
+            'attempt',
+            'clientQuestions',
+            'timeRemaining',
+            'penaltyRemainingSeconds'
+        ));
     }
 
     public function recordTabSwitch(string $token, QuizAttempt $attempt)
@@ -179,11 +193,125 @@ class PublicQuizController extends Controller
             return response()->json(['success' => false]);
         }
 
+        // If open book mode is allowed by instructor, no punishment is applied!
+        if ($quiz->allow_open_book) {
+            return response()->json([
+                'success'         => true,
+                'allow_open_book' => true,
+                'penalty_seconds' => 0,
+                'is_locked'       => false,
+                'message'         => 'Mode modul aktif: Anda bebas membuka modul praktikum.',
+            ]);
+        }
+
         $attempt->increment('tab_switch_count');
+        $count = $attempt->tab_switch_count;
+
+        $strike = min(3, $count);
+        $penaltySeconds = 0;
+        $isLocked = false;
+        $message = '';
+
+        $logs = $attempt->violations_log ?? [];
+        $logs[] = [
+            'type'      => 'tab_switch',
+            'count'     => $count,
+            'timestamp' => now()->toIso8601String(),
+        ];
+
+        if ($count === 1) {
+            // Punishment 1: 1 menit (60 detik)
+            $penaltySeconds = 60;
+            $attempt->penalty_end_time = now()->addSeconds(60);
+            $message = 'Peringatan 1/3: Terdeteksi perpindahan tab/aplikasi. Layar kuis terkunci selama 1 menit.';
+        } elseif ($count === 2) {
+            // Punishment 2: 1.30 menit (90 detik)
+            $penaltySeconds = 90;
+            $attempt->penalty_end_time = now()->addSeconds(90);
+            $message = 'Peringatan 2/3: Pelanggaran kedua! Pinalti waktu berlipat 1.5 menit. Pelanggaran berikutnya akan mengunci kuis total.';
+        } else {
+            // Punishment 3: Kunci total sampai admin membuka dengan password
+            $isLocked = true;
+            $attempt->is_locked = true;
+            $attempt->lock_reason = 'Terdeteksi 3x perpindahan tab/aplikasi';
+            $attempt->penalty_end_time = null;
+            $message = 'Kuis Terkunci Total: Anda telah melanggar aturan pengawas kuis (3x switch). Panggil Asisten Lab / Dosen untuk membuka kunci kuis Anda.';
+        }
+
+        $attempt->violations_log = $logs;
+        $attempt->save();
 
         return response()->json([
             'success'          => true,
-            'tab_switch_count' => $attempt->tab_switch_count,
+            'tab_switch_count' => $count,
+            'strike'           => $strike,
+            'penalty_seconds'  => $penaltySeconds,
+            'is_locked'        => $isLocked,
+            'message'          => $message,
+        ]);
+    }
+
+    public function unlockWithPassword(Request $request, string $token, QuizAttempt $attempt)
+    {
+        $quiz = Quiz::where('unique_token', $token)->with('user')->firstOrFail();
+
+        if ($attempt->quiz_id !== $quiz->id) {
+            abort(404);
+        }
+
+        $request->validate([
+            'admin_password' => 'required|string',
+        ]);
+
+        $passwordInput = $request->admin_password;
+        $isValid = false;
+
+        // 1. Check custom quiz unlock password if configured
+        if (!empty($quiz->admin_unlock_password) && $passwordInput === $quiz->admin_unlock_password) {
+            $isValid = true;
+        }
+
+        // 2. Check quiz creator admin account password
+        if (!$isValid && $quiz->user && Hash::check($passwordInput, $quiz->user->password)) {
+            $isValid = true;
+        }
+
+        // 3. Check any active superadmin account password
+        if (!$isValid) {
+            $superAdmins = User::where('role', 'superadmin')->where('status', 'active')->get();
+            foreach ($superAdmins as $sa) {
+                if (Hash::check($passwordInput, $sa->password)) {
+                    $isValid = true;
+                    break;
+                }
+            }
+        }
+
+        if (!$isValid) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Password admin tidak valid! Pastikan Anda adalah Asisten / Admin Lab.',
+            ], 422);
+        }
+
+        // Unlock student attempt
+        $logs = $attempt->violations_log ?? [];
+        $logs[] = [
+            'type'      => 'unlocked_by_password_on_screen',
+            'timestamp' => now()->toIso8601String(),
+        ];
+
+        $attempt->update([
+            'is_locked'        => false,
+            'lock_reason'      => null,
+            'penalty_end_time' => null,
+            'tab_switch_count' => min(2, $attempt->tab_switch_count), // Give them a chance on 2 strikes
+            'violations_log'   => $logs,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kunci kuis berhasil dibuka! Mahasiswa dapat melanjutkan ujian.',
         ]);
     }
 

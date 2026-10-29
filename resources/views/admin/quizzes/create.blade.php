@@ -191,6 +191,83 @@
             </div>
         </div>
 
+        {{-- Section 4: Keamanan Ujian & Anti-Kecurangan (Anti-Cheat) --}}
+        <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-6" x-data="{ openBook: '{{ old('allow_open_book', '0') }}' }">
+            <div class="flex items-center gap-3 mb-5 pb-3 border-b border-[#1A2820]">
+                <div class="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white">Keamanan Ujian & Mode Pengawasan</h3>
+                    <p class="text-xs text-gray-400">Atur proteksi anti-kecurangan dan akses modul mahasiswa saat ujian berlangsung</p>
+                </div>
+            </div>
+
+            {{-- Radio Buttons: Mode Ujian --}}
+            <div class="space-y-3 mb-6">
+                <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider block">
+                    Mode Pengawasan Ujian:
+                </label>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    {{-- Mode 1: Ujian Ketat (Default) --}}
+                    <label class="relative flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all"
+                           :class="openBook === '0' ? 'bg-emerald-500/10 border-emerald-500/40 ring-1 ring-emerald-500/30' : 'bg-[#090D0B] border-[#1A2820] hover:border-gray-700'">
+                        <input type="radio" name="allow_open_book" value="0" x-model="openBook"
+                               class="mt-1 text-emerald-500 focus:ring-emerald-500 bg-gray-900 border-gray-700">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-white">Mode Ujian Ketat (Anti-Cheat Aktif)</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Default</span>
+                            </div>
+                            <p class="text-[11px] text-gray-400 mt-1">
+                                Mahasiswa <span class="text-rose-400 font-semibold">DILARANG</span> berpindah tab atau membuka aplikasi lain.
+                            </p>
+                            <div class="mt-2.5 pt-2 border-t border-gray-800/60 text-[10.5px] text-gray-400 space-y-1">
+                                <div class="flex items-center gap-1.5"><span class="text-amber-400 font-bold">1x Switch:</span> Layar beku / Freeze 1 Menit (60s)</div>
+                                <div class="flex items-center gap-1.5"><span class="text-amber-500 font-bold">2x Switch:</span> Layar beku / Freeze 1.5 Menit (90s)</div>
+                                <div class="flex items-center gap-1.5"><span class="text-rose-400 font-bold">3x Switch:</span> <strong class="text-rose-300">TERKUNCI TOTAL</strong> (Buka via Password Admin)</div>
+                            </div>
+                        </div>
+                    </label>
+
+                    {{-- Mode 2: Bisa Lihat Modul --}}
+                    <label class="relative flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all"
+                           :class="openBook === '1' ? 'bg-sky-500/10 border-sky-500/40 ring-1 ring-sky-500/30' : 'bg-[#090D0B] border-[#1A2820] hover:border-gray-700'">
+                        <input type="radio" name="allow_open_book" value="1" x-model="openBook"
+                               class="mt-1 text-sky-500 focus:ring-sky-500 bg-gray-900 border-gray-700">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-white">Bisa Lihat Modul (Open Book)</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">Bebas Akses</span>
+                            </div>
+                            <p class="text-[11px] text-gray-400 mt-1">
+                                Mahasiswa diizinkan membuka tab modul praktikum atau materi materi lainnya.
+                            </p>
+                            <div class="mt-2.5 pt-2 border-t border-gray-800/60 text-[10.5px] text-sky-300/80">
+                                ℹ️ Fitur pinalti freeze layar dan penguncian total <strong>dinonaktifkan</strong>.
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            {{-- Password Buka Kunci Darurat --}}
+            <div x-show="openBook === '0'" x-transition class="pt-4 border-t border-[#1A2820]">
+                <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                    Password Khusus Buka Kunci Ujian (Opsional)
+                </label>
+                <div class="relative max-w-md">
+                    <input type="text" name="admin_unlock_password" value="{{ old('admin_unlock_password') }}"
+                           placeholder="Contoh: PENG4W45#2026 (Kosongkan jika ingin pakai password akun)"
+                           class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-rose-500 focus:ring-1 focus:ring-rose-500 rounded-xl text-sm text-gray-100 placeholder-gray-600 font-mono">
+                </div>
+                <p class="text-[11px] text-gray-500 mt-1.5">
+                    Password yang digunakan pengawas untuk membuka kuis mahasiswa yang terkunci akibat Strike 3. Jika dikosongkan, Anda dapat menggunakan <strong>password login akun Anda</strong> atau <strong>Super Admin</strong>.
+                </p>
+            </div>
+        </div>
+
         {{-- Form Actions --}}
         <div class="flex items-center justify-end gap-3 pt-2">
             <a href="{{ route('admin.quizzes.index') }}"

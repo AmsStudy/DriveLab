@@ -176,9 +176,17 @@
                                     {{ $att->formattedDuration() }}
                                 </td>
 
-                                {{-- Anti-Cheat Tab Switch --}}
+                                {{-- Anti-Cheat Tab Switch / Lock Status --}}
                                 <td class="px-5 py-4 text-center">
-                                    @if($att->tab_switch_count === 0)
+                                    @if($att->is_locked)
+                                        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-rose-300 bg-rose-500/25 px-2.5 py-1 rounded-full border border-rose-500/50 animate-pulse">
+                                            🔒 TERKUNCI (Strike 3)
+                                        </span>
+                                    @elseif($quiz->allow_open_book)
+                                        <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-full border border-sky-500/20">
+                                            📖 Modul Aktif (Bebas)
+                                        </span>
+                                    @elseif($att->tab_switch_count === 0)
                                         <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
                                             🛡️ Bersih (0)
                                         </span>
@@ -201,6 +209,20 @@
                                 {{-- Actions --}}
                                 <td class="px-5 py-4 text-right">
                                     <div class="flex items-center justify-end gap-1.5">
+                                        {{-- Remote Unlock Button if attempt is locked --}}
+                                        @if($att->is_locked)
+                                            <form method="POST" action="{{ route('admin.quizzes.attempts.unlock', [$quiz, $att]) }}" class="inline"
+                                                  onsubmit="confirmAction(event, 'Buka kunci pengerjaan untuk mahasiswa {{ $att->student_name }} ({{ $att->nim }})? Mahasiswa akan dapat melanjutkan kuis kembali.', 'Ya, Buka Kunci', false)">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="px-2.5 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-400 text-xs font-semibold flex items-center gap-1 transition-colors"
+                                                        title="Buka Kunci Mahasiswa">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                                                    <span>Buka Kunci</span>
+                                                </button>
+                                            </form>
+                                        @endif
+
                                         {{-- Detail Modal Button --}}
                                         <button type="button"
                                                 @click="viewAttemptDetail({{ $att->toJson() }})"

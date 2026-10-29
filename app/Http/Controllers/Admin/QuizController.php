@@ -86,23 +86,27 @@ class QuizController extends Controller
             'shuffle_options'    => 'nullable|boolean',
             'show_leaderboard'   => 'nullable|boolean',
             'show_review'        => 'nullable|boolean',
+            'allow_open_book'    => 'nullable|boolean',
+            'admin_unlock_password' => 'nullable|string|max:50',
             'max_attempts'       => 'nullable|integer|min:1|max:20',
             'is_active'          => 'nullable|boolean',
         ]);
 
         $quiz = new Quiz();
-        $quiz->user_id            = auth()->id();
-        $quiz->title              = $validated['title'];
-        $quiz->description        = $validated['description'] ?? null;
-        $quiz->soal_id            = $validated['soal_id'] ?? null;
-        $quiz->time_limit_minutes = $validated['time_limit_minutes'] ?? 0;
-        $quiz->time_per_question  = $validated['time_per_question'] ?? 0;
-        $quiz->shuffle_questions  = $request->boolean('shuffle_questions', true);
-        $quiz->shuffle_options    = $request->boolean('shuffle_options', true);
-        $quiz->show_leaderboard   = $request->boolean('show_leaderboard', true);
-        $quiz->show_review        = $request->boolean('show_review', true);
-        $quiz->max_attempts       = $validated['max_attempts'] ?? 1;
-        $quiz->is_active          = $request->boolean('is_active', true);
+        $quiz->user_id               = auth()->id();
+        $quiz->title                 = $validated['title'];
+        $quiz->description           = $validated['description'] ?? null;
+        $quiz->soal_id               = $validated['soal_id'] ?? null;
+        $quiz->time_limit_minutes    = $validated['time_limit_minutes'] ?? 0;
+        $quiz->time_per_question     = $validated['time_per_question'] ?? 0;
+        $quiz->shuffle_questions     = $request->boolean('shuffle_questions', true);
+        $quiz->shuffle_options       = $request->boolean('shuffle_options', true);
+        $quiz->show_leaderboard      = $request->boolean('show_leaderboard', true);
+        $quiz->show_review           = $request->boolean('show_review', true);
+        $quiz->allow_open_book       = $request->boolean('allow_open_book', false);
+        $quiz->admin_unlock_password = $request->filled('admin_unlock_password') ? trim($request->admin_unlock_password) : null;
+        $quiz->max_attempts          = $validated['max_attempts'] ?? 1;
+        $quiz->is_active             = $request->boolean('is_active', true);
         $quiz->save();
 
         return redirect()->route('admin.quizzes.questions', $quiz)
@@ -131,21 +135,27 @@ class QuizController extends Controller
             'shuffle_options'    => 'nullable|boolean',
             'show_leaderboard'   => 'nullable|boolean',
             'show_review'        => 'nullable|boolean',
+            'allow_open_book'    => 'nullable|boolean',
+            'admin_unlock_password' => 'nullable|string|max:50',
             'max_attempts'       => 'nullable|integer|min:1|max:20',
             'is_active'          => 'nullable|boolean',
         ]);
 
-        $quiz->title              = $validated['title'];
-        $quiz->description        = $validated['description'] ?? null;
-        $quiz->soal_id            = $validated['soal_id'] ?? null;
-        $quiz->time_limit_minutes = $validated['time_limit_minutes'] ?? 0;
-        $quiz->time_per_question  = $validated['time_per_question'] ?? 0;
-        $quiz->shuffle_questions  = $request->boolean('shuffle_questions', false);
-        $quiz->shuffle_options    = $request->boolean('shuffle_options', false);
-        $quiz->show_leaderboard   = $request->boolean('show_leaderboard', false);
-        $quiz->show_review        = $request->boolean('show_review', false);
-        $quiz->max_attempts       = $validated['max_attempts'] ?? 1;
-        $quiz->is_active          = $request->boolean('is_active', false);
+        $quiz->title                 = $validated['title'];
+        $quiz->description           = $validated['description'] ?? null;
+        $quiz->soal_id               = $validated['soal_id'] ?? null;
+        $quiz->time_limit_minutes    = $validated['time_limit_minutes'] ?? 0;
+        $quiz->time_per_question     = $validated['time_per_question'] ?? 0;
+        $quiz->shuffle_questions     = $request->boolean('shuffle_questions', false);
+        $quiz->shuffle_options       = $request->boolean('shuffle_options', false);
+        $quiz->show_leaderboard      = $request->boolean('show_leaderboard', false);
+        $quiz->show_review           = $request->boolean('show_review', false);
+        $quiz->allow_open_book       = $request->boolean('allow_open_book', false);
+        if ($request->filled('admin_unlock_password')) {
+            $quiz->admin_unlock_password = trim($request->admin_unlock_password);
+        }
+        $quiz->max_attempts          = $validated['max_attempts'] ?? 1;
+        $quiz->is_active             = $request->boolean('is_active', false);
         $quiz->save();
 
         return redirect()->route('admin.quizzes.index')
@@ -274,7 +284,10 @@ class QuizController extends Controller
     {
         $this->authorizeQuiz($quiz);
 
-        $query = $quiz->attempts()->whereNotNull('completed_at');
+        $query = $quiz->attempts()->where(function ($q) {
+            $q->whereNotNull('completed_at')
+              ->orWhere('is_locked', true);
+        });
 
         if ($request->filled('search')) {
             $s = $request->search;
@@ -285,6 +298,7 @@ class QuizController extends Controller
         }
 
         $attempts = $query->with('answers.question')
+            ->orderByDesc('is_locked')
             ->orderByDesc('score')
             ->orderBy('duration_seconds')
             ->paginate(20)
@@ -388,6 +402,31 @@ class QuizController extends Controller
         $this->authorizeQuiz($quiz);
         $quiz->attempts()->delete();
         return back()->with('success', 'Semua riwayat pengerjaan kuis ini telah direset!');
+    }
+
+    public function remoteUnlockAttempt(Quiz $quiz, QuizAttempt $attempt)
+    {
+        $this->authorizeQuiz($quiz);
+        if ($attempt->quiz_id !== $quiz->id) {
+            abort(404);
+        }
+
+        $logs = $attempt->violations_log ?? [];
+        $logs[] = [
+            'type'        => 'remote_unlocked_by_admin',
+            'unlocked_by' => auth()->user()->name,
+            'timestamp'   => now()->toIso8601String(),
+        ];
+
+        $attempt->update([
+            'is_locked'        => false,
+            'lock_reason'      => null,
+            'penalty_end_time' => null,
+            'tab_switch_count' => min(2, $attempt->tab_switch_count),
+            'violations_log'   => $logs,
+        ]);
+
+        return back()->with('success', "Kunci pengerjaan mahasiswa {$attempt->student_name} ({$attempt->nim}) berhasil dibuka!");
     }
 
     private function authorizeQuiz(Quiz $quiz): void

@@ -38,6 +38,7 @@ Route::prefix('quiz')->name('quiz.')->group(function () {
     Route::post('/{token}/start', [PublicQuizController::class, 'start'])->name('start');
     Route::get('/{token}/play/{attempt}', [PublicQuizController::class, 'play'])->name('play');
     Route::post('/{token}/attempt/{attempt}/tab-switch', [PublicQuizController::class, 'recordTabSwitch'])->name('tab-switch');
+    Route::post('/{token}/attempt/{attempt}/unlock-password', [PublicQuizController::class, 'unlockWithPassword'])->name('unlock-password');
     Route::post('/{token}/submit/{attempt}', [PublicQuizController::class, 'submit'])->name('submit');
     Route::get('/{token}/results/{attempt}', [PublicQuizController::class, 'results'])->name('results');
 });
@@ -85,6 +86,7 @@ Route::prefix('admin')
         Route::delete('quizzes/{quiz}/questions/{question}', [QuizController::class, 'destroyQuestion'])->name('quizzes.questions.destroy');
         Route::get('quizzes/{quiz}/results', [QuizController::class, 'results'])->name('quizzes.results');
         Route::get('quizzes/{quiz}/export-csv', [QuizController::class, 'exportResultsCsv'])->name('quizzes.export-csv');
+        Route::post('quizzes/{quiz}/attempts/{attempt}/unlock', [QuizController::class, 'remoteUnlockAttempt'])->name('quizzes.attempts.unlock');
         Route::delete('quizzes/{quiz}/attempts/{attempt}', [QuizController::class, 'destroyAttempt'])->name('quizzes.attempts.destroy');
         Route::delete('quizzes/{quiz}/reset-attempts', [QuizController::class, 'resetAttempts'])->name('quizzes.reset-attempts');
 

@@ -24,6 +24,10 @@ class QuizAttempt extends Model
         'completed_at',
         'duration_seconds',
         'tab_switch_count',
+        'is_locked',
+        'lock_reason',
+        'penalty_end_time',
+        'violations_log',
     ];
 
     protected $casts = [
@@ -36,6 +40,9 @@ class QuizAttempt extends Model
         'completed_at'          => 'datetime',
         'duration_seconds'      => 'integer',
         'tab_switch_count'      => 'integer',
+        'is_locked'             => 'boolean',
+        'penalty_end_time'      => 'datetime',
+        'violations_log'        => 'array',
     ];
 
     public function quiz(): BelongsTo

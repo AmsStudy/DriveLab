@@ -73,13 +73,22 @@
                     </div>
                 </template>
 
-                {{-- Tab Switch Badge --}}
-                <div class="px-2.5 py-1.5 rounded-xl bg-[#142019] border border-[#1E3327] flex items-center gap-1.5 text-xs font-medium text-gray-300"
-                     :title="'Pelanggaran perpindahan tab: ' + tabSwitchCount">
-                    <span class="text-xs">🛡️</span>
-                    <span class="hidden sm:inline text-gray-400">Pengawas:</span>
-                    <span :class="tabSwitchCount > 0 ? 'text-amber-400 font-bold' : 'text-emerald-400 font-bold'" x-text="tabSwitchCount + ' Switch'"></span>
-                </div>
+                {{-- Anti-Cheat / Open Book Mode Status Badge --}}
+                @if($quiz->allow_open_book)
+                    <div class="px-2.5 py-1.5 rounded-xl bg-sky-500/10 border border-sky-500/25 flex items-center gap-1.5 text-xs font-semibold text-sky-400"
+                         title="Kuis ini mengizinkan mahasiswa membuka modul atau referensi materi eksternal">
+                        <span>📖</span>
+                        <span class="hidden sm:inline">Bisa Lihat Modul</span>
+                    </div>
+                @else
+                    <div class="px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-medium"
+                         :class="isLocked ? 'bg-rose-500/20 border-rose-500/40 text-rose-300 animate-pulse' : (tabSwitchCount > 0 ? 'bg-amber-500/15 border-amber-500/30 text-amber-300' : 'bg-[#142019] border-[#1E3327] text-emerald-400')"
+                         :title="'Status Pengawas CBT: ' + tabSwitchCount + ' kali terdeteksi switch tab/aplikasi'">
+                        <span x-text="isLocked ? '🔒' : (tabSwitchCount > 0 ? '⚠️' : '🛡️')"></span>
+                        <span class="hidden sm:inline text-gray-400">Pengawas:</span>
+                        <span class="font-bold" x-text="isLocked ? 'TERKUNCI' : tabSwitchCount + '/3 Pelanggaran'"></span>
+                    </div>
+                @endif
 
                 {{-- Fullscreen Toggle --}}
                 <button type="button" @click="toggleFullscreen()"
@@ -255,6 +264,135 @@
         </div>
     </div>
 
+    {{-- ========================================================================= --}}
+    {{-- OVERLAY 1: Freeze Cooldown Screen (Strike 1: 60s, Strike 2: 90s)        --}}
+    {{-- ========================================================================= --}}
+    <div x-show="!isLocked && penaltySeconds > 0"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        
+        <div class="bg-[#0F1713] border-2 border-amber-500/40 rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
+            {{-- Glowing Ambient --}}
+            <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce">
+                ⚠️
+            </div>
+
+            <template x-if="tabSwitchCount <= 1 || strike === 1">
+                <div>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 mb-2">
+                        Peringatan 1 dari 3: Sanksi 1 Menit
+                    </span>
+                    <h3 class="text-xl font-bold text-white heading-font">Terdeteksi Berpindah Tab / Layar!</h3>
+                    <p class="text-xs text-gray-400 mt-2">
+                        Anda terdeteksi meninggalkan halaman kuis. Sebagai sanksi, layar kuis dibekukan selama <strong class="text-amber-400">1 Menit (60 detik)</strong>.
+                    </p>
+                </div>
+            </template>
+
+            <template x-if="tabSwitchCount >= 2 && strike >= 2">
+                <div>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/30 mb-2">
+                        Peringatan 2 dari 3: Sanksi 1.5 Menit
+                    </span>
+                    <h3 class="text-xl font-bold text-white heading-font">Pelanggaran Berulang Terdeteksi!</h3>
+                    <p class="text-xs text-gray-400 mt-2">
+                        Sanksi bertambah kelipatan menjadi <strong class="text-rose-400">1 Menit 30 Detik (90s)</strong>.
+                        <br><span class="text-rose-300 font-semibold">PERINGATAN: 1x lagi terdeteksi, kuis Anda akan TERKUNCI TOTAL!</span>
+                    </p>
+                </div>
+            </template>
+
+            {{-- Big Timer Countdown --}}
+            <div class="my-6 p-4 rounded-2xl bg-[#090D0B] border border-amber-500/30">
+                <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Layar Terbuka Otomatis Dalam:</div>
+                <div class="text-4xl sm:text-5xl font-mono font-extrabold text-amber-400 tracking-wider animate-pulse"
+                     x-text="formatTime(penaltySeconds)"></div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-[#142019] border border-[#1E3327] text-[11px] text-gray-400 text-left">
+                💡 <strong>Catatan Integritas:</strong> Timer sanksi disimpan di server. Merefresh (F5) atau menutup browser tidak akan menghilangkan waktu tunggu ini.
+            </div>
+        </div>
+    </div>
+
+    {{-- ========================================================================= --}}
+    {{-- OVERLAY 2: Full Lockout Screen (Strike 3 - Butuh Password Admin)           --}}
+    {{-- ========================================================================= --}}
+    <div x-show="isLocked"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         class="fixed inset-0 z-50 bg-black/95 backdrop-blur-lg flex items-center justify-center p-4">
+        
+        <div class="bg-[#0F1713] border-2 border-rose-500/60 rounded-3xl max-w-lg w-full p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
+            {{-- Glowing Ambient --}}
+            <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-rose-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="w-16 h-16 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-3xl mx-auto mb-4 animate-pulse">
+                ⛔
+            </div>
+
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-500/25 text-rose-300 border border-rose-500/40 mb-2">
+                Strike 3: Kuis Terkunci Total
+            </span>
+            <h3 class="text-2xl font-extrabold text-white heading-font">Ujian Dibekukan Secara Permanen</h3>
+            
+            <p class="text-xs sm:text-sm text-gray-300 mt-2 max-w-sm mx-auto leading-relaxed">
+                Anda telah terdeteksi melakukan <strong class="text-rose-400">3 kali perpindahan layar/tab</strong>. Hak akses pengerjaan kuis Anda telah dikunci demi integritas ujian.
+            </p>
+
+            <div class="my-5 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-left text-xs text-rose-200">
+                <div class="font-bold flex items-center gap-1.5 mb-1 text-rose-300">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    Instruksi Pembukaan Kunci:
+                </div>
+                Silakan panggil <strong>Pengawas Ujian / Dosen / Asisten Lab</strong> yang bertugas. Pengawas akan memasukkan password otorisasi untuk membuka kembali sesi kuis Anda.
+            </div>
+
+            {{-- Admin Password Unlock Form --}}
+            <form @submit.prevent="submitUnlockPassword()" class="space-y-3 pt-2 text-left">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1">
+                        Password Otorisasi Pengawas:
+                    </label>
+                    <div class="relative">
+                        <input type="password" x-model="adminPassword" placeholder="Masukkan password pengawas..."
+                               class="w-full px-4 py-3 bg-[#090D0B] border border-rose-500/40 focus:border-rose-400 focus:ring-1 focus:ring-rose-400 rounded-xl text-sm text-white placeholder-gray-500 font-mono tracking-wider"
+                               required :disabled="isUnlocking">
+                    </div>
+                </div>
+
+                {{-- Error Message Alert --}}
+                <template x-if="unlockError">
+                    <div class="p-2.5 rounded-xl bg-red-950/50 border border-red-500/50 text-red-300 text-xs flex items-center gap-2">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        <span x-text="unlockError"></span>
+                    </div>
+                </template>
+
+                <button type="submit" :disabled="isUnlocking"
+                        class="w-full py-3 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 disabled:opacity-50 text-white font-bold text-sm shadow-lg shadow-rose-500/20 transition-all flex items-center justify-center gap-2">
+                    <span x-show="!isUnlocking">Buka Kunci Ujian Sekarang</span>
+                    <span x-show="isUnlocking" class="flex items-center gap-2">
+                        <svg class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                        <span>Memverifikasi Password...</span>
+                    </span>
+                </button>
+            </form>
+
+            <div class="mt-4 text-[11px] text-gray-500">
+                Sistem Pengawasan CBT Antigravity &bull; LabDrive Security Core
+            </div>
+        </div>
+    </div>
+
     {{-- Script Quiz Arena Logic --}}
     <script>
         function quizArena() {
@@ -264,9 +402,17 @@
                 currentIndex: 0,
                 answers: {},
                 tabSwitchCount: {{ (int)$attempt->tab_switch_count }},
+                allowOpenBook: {{ $quiz->allow_open_book ? 'true' : 'false' }},
+                isLocked: {{ $attempt->is_locked ? 'true' : 'false' }},
+                penaltySeconds: {{ (int)$penaltyRemainingSeconds }},
+                strike: {{ min(3, (int)$attempt->tab_switch_count) }},
+                adminPassword: '',
+                isUnlocking: false,
+                unlockError: '',
                 showDrawer: false,
                 isSubmitting: false,
                 timerInterval: null,
+                penaltyTimerInterval: null,
                 isFullscreen: !!document.fullscreenElement,
 
                 get currentQuestion() {
@@ -274,7 +420,7 @@
                 },
 
                 initArena() {
-                    // Start timer if applicable (strictly integer countdown)
+                    // Start main quiz timer if applicable
                     if (this.remainingSeconds !== null && this.remainingSeconds > 0) {
                         this.remainingSeconds = Math.max(0, Math.floor(Number(this.remainingSeconds)));
                         this.timerInterval = setInterval(() => {
@@ -285,6 +431,11 @@
                                 this.autoSubmitExpired();
                             }
                         }, 1000);
+                    }
+
+                    // Start penalty countdown if student refreshed with an active penalty
+                    if (this.penaltySeconds > 0 && !this.isLocked) {
+                        this.initPenaltyCountdown();
                     }
 
                     // Fullscreen change listener
@@ -299,38 +450,138 @@
                     this.setupKeyboardShortcuts();
                 },
 
+                initPenaltyCountdown() {
+                    if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
+                    this.penaltyTimerInterval = setInterval(() => {
+                        if (this.penaltySeconds > 0) {
+                            this.penaltySeconds--;
+                        } else {
+                            clearInterval(this.penaltyTimerInterval);
+                            this.penaltyTimerInterval = null;
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Waktu sanksi pembekuan berakhir. Silakan lanjutkan ujian.',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                background: '#0F1713',
+                                color: '#34D399',
+                                customClass: { popup: 'border border-emerald-500/40 rounded-xl' }
+                            });
+                        }
+                    }, 1000);
+                },
+
                 setupAntiCheat() {
-                    const notifyTabSwitch = () => {
-                        this.tabSwitchCount++;
+                    // If exam is open book ("Bisa lihat modul"), do not enforce tab switch penalty!
+                    if (this.allowOpenBook) {
+                        return;
+                    }
+
+                    let lastReportedTime = 0;
+                    const reportViolation = () => {
+                        if (this.isLocked || this.isSubmitting) return;
+
+                        // Throttle rapid triggers within 1 second
+                        const now = Date.now();
+                        if (now - lastReportedTime < 1000) return;
+                        lastReportedTime = now;
+
                         fetch('{{ route('quiz.tab-switch', [$quiz->unique_token, $attempt->id]) }}', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
                             }
-                        });
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (!data.success || data.allow_open_book) return;
 
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'warning',
-                            title: 'Peringatan: Perpindahan tab dicatat oleh pengawas kuis (' + this.tabSwitchCount + 'x)!',
-                            showConfirmButton: false,
-                            timer: 3500,
-                            background: '#0F1713',
-                            color: '#f87171',
-                            customClass: { popup: 'border border-red-500/40 rounded-xl' }
-                        });
+                            this.tabSwitchCount = data.tab_switch_count;
+                            this.strike = data.strike;
+
+                            if (data.is_locked) {
+                                this.isLocked = true;
+                                this.penaltySeconds = 0;
+                                if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
+                            } else if (data.penalty_seconds > 0) {
+                                this.penaltySeconds = data.penalty_seconds;
+                                this.initPenaltyCountdown();
+                            }
+                        })
+                        .catch(err => console.error('Violation record error:', err));
                     };
 
                     document.addEventListener('visibilitychange', () => {
                         if (document.hidden) {
-                            notifyTabSwitch();
+                            reportViolation();
                         }
                     });
 
                     window.addEventListener('blur', () => {
-                        // Notify blur
+                        if (!document.hidden && !this.isLocked && this.penaltySeconds === 0) {
+                            reportViolation();
+                        }
+                    });
+
+                    // Anti-Cheat: Disable right click, copy, and devtools shortcuts in strict exam mode
+                    document.addEventListener('contextmenu', (e) => {
+                        if (!this.allowOpenBook) e.preventDefault();
+                    });
+                    document.addEventListener('copy', (e) => {
+                        if (!this.allowOpenBook) e.preventDefault();
+                    });
+                    document.addEventListener('cut', (e) => {
+                        if (!this.allowOpenBook) e.preventDefault();
+                    });
+                },
+
+                submitUnlockPassword() {
+                    if (!this.adminPassword.trim()) {
+                        this.unlockError = 'Silakan masukkan password pengawas!';
+                        return;
+                    }
+                    this.isUnlocking = true;
+                    this.unlockError = '';
+
+                    fetch('{{ route('quiz.unlock-password', [$quiz->unique_token, $attempt->id]) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ admin_password: this.adminPassword })
+                    })
+                    .then(res => res.json().then(data => ({ status: res.status, body: data })))
+                    .then(({ status, body }) => {
+                        this.isUnlocking = false;
+                        if (status === 200 && body.success) {
+                            this.isLocked = false;
+                            this.penaltySeconds = 0;
+                            this.adminPassword = '';
+                            this.tabSwitchCount = body.tab_switch_count || 2;
+                            this.strike = 2;
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Kuis Berhasil Dibuka!',
+                                text: body.message || 'Sesi ujian Anda telah diizinkan kembali oleh pengawas.',
+                                background: '#0F1713',
+                                color: '#f3f4f6',
+                                confirmButtonColor: '#10B981',
+                                confirmButtonText: 'Lanjutkan Ujian',
+                                customClass: { popup: 'border border-emerald-500/40 rounded-2xl' }
+                            });
+                        } else {
+                            this.unlockError = body.message || 'Password pengawas salah! Silakan coba lagi.';
+                        }
+                    })
+                    .catch(() => {
+                        this.isUnlocking = false;
+                        this.unlockError = 'Terjadi gangguan jaringan saat memverifikasi password.';
                     });
                 },
 
