@@ -402,4 +402,70 @@ class QuizFeatureTest extends TestCase
         $resetRes->assertSessionHas('success');
         $this->assertEquals(0, $quiz->attempts()->count());
     }
+
+    public function test_autosave_answers_and_fullscreen_violation_reason(): void
+    {
+        $quiz = Quiz::create([
+            'user_id'   => $this->admin->id,
+            'title'     => 'Kuis Autosave Test',
+            'is_active' => true,
+        ]);
+
+        $q1 = $quiz->questions()->create(['question_text' => 'Q1', 'question_type' => 'multiple_choice', 'points' => 100]);
+        $opt1 = $q1->options()->create(['option_text' => 'A1', 'is_correct' => true, 'order_num' => 1]);
+
+        $attempt = QuizAttempt::create([
+            'quiz_id'               => $quiz->id,
+            'nim'                   => '220101555',
+            'student_name'          => 'Autosave Tester',
+            'total_points_possible' => 100,
+            'started_at'            => now(),
+        ]);
+
+        // 1. Test autosave endpoint
+        $autosaveRes = $this->postJson(route('quiz.autosave', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]), [
+            'answers' => [
+                $q1->id => $opt1->id,
+            ],
+        ]);
+        $autosaveRes->assertStatus(200);
+        $autosaveRes->assertJson(['success' => true]);
+
+        $attempt->refresh();
+        $this->assertEquals([$q1->id => $opt1->id], $attempt->draft_answers);
+
+        // 2. Test play arena loads saved answers
+        $playRes = $this->get(route('quiz.play', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]));
+        $playRes->assertStatus(200);
+        $playRes->assertViewHas('savedAnswers', [$q1->id => $opt1->id]);
+
+        // 3. Test submitting with empty answers uses draft_answers fallback
+        $submitRes = $this->postJson(route('quiz.submit', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]), []);
+        $submitRes->assertJson(['success' => true]);
+
+        $attempt->refresh();
+        $this->assertNotNull($attempt->completed_at);
+        $this->assertEquals(100.0, (float)$attempt->score);
+        $this->assertEquals(1, $attempt->correct_answers_count);
+
+        // 4. Test fullscreen_exit violation reason
+        $attempt2 = QuizAttempt::create([
+            'quiz_id'               => $quiz->id,
+            'nim'                   => '220101556',
+            'student_name'          => 'Kiosk Tester',
+            'total_points_possible' => 100,
+            'started_at'            => now(),
+        ]);
+
+        $exitRes = $this->postJson(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt2->id]), [
+            'reason' => 'fullscreen_exit',
+        ]);
+        $exitRes->assertJson([
+            'success'          => true,
+            'strike'           => 1,
+            'penalty_seconds'  => 60,
+        ]);
+        $attempt2->refresh();
+        $this->assertEquals('fullscreen_exit', $attempt2->violations_log[0]['type']);
+    }
 }

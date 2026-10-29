@@ -39,6 +39,7 @@ Route::prefix('quiz')->name('quiz.')->group(function () {
     Route::get('/{token}/play/{attempt}', [PublicQuizController::class, 'play'])->name('play');
     Route::post('/{token}/attempt/{attempt}/tab-switch', [PublicQuizController::class, 'recordTabSwitch'])->name('tab-switch');
     Route::post('/{token}/attempt/{attempt}/unlock-password', [PublicQuizController::class, 'unlockWithPassword'])->name('unlock-password');
+    Route::post('/{token}/attempt/{attempt}/autosave', [PublicQuizController::class, 'autosave'])->name('autosave');
     Route::post('/{token}/submit/{attempt}', [PublicQuizController::class, 'submit'])->name('submit');
     Route::get('/{token}/results/{attempt}', [PublicQuizController::class, 'results'])->name('results');
 });

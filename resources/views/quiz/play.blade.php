@@ -90,6 +90,29 @@
                     </div>
                 @endif
 
+                {{-- Autosave Sync Status Indicator --}}
+                <div class="px-2.5 py-1.5 rounded-xl bg-[#142019] border border-[#1E3327] flex items-center gap-1.5 text-xs font-medium"
+                     :title="syncStatus === 'saving' ? 'Menyimpan jawaban ke server...' : (syncStatus === 'synced' ? 'Semua jawaban tersimpan aman di server & memori lokal' : 'Jaringan terputus: jawaban tersimpan aman di perangkat')">
+                    <template x-if="syncStatus === 'saving'">
+                        <span class="text-sky-400 flex items-center gap-1">
+                            <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            <span class="hidden lg:inline text-[11px]">Menyimpan...</span>
+                        </span>
+                    </template>
+                    <template x-if="syncStatus === 'synced'">
+                        <span class="text-emerald-400 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span class="hidden lg:inline text-[11px]">Tersimpan</span>
+                        </span>
+                    </template>
+                    <template x-if="syncStatus === 'offline'">
+                        <span class="text-amber-400 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <span class="hidden lg:inline text-[11px]">Lokal (Offline)</span>
+                        </span>
+                    </template>
+                </div>
+
                 {{-- Fullscreen Toggle --}}
                 <button type="button" @click="toggleFullscreen()"
                         :title="isFullscreen ? 'Keluar dari Mode Layar Penuh' : 'Mode Layar Penuh (Menghilangkan gangguan browser agar fokus ujian)'"
@@ -393,6 +416,71 @@
         </div>
     </div>
 
+    {{-- ========================================================================= --}}
+    {{-- OVERLAY 3: Initial Fullscreen Enforced Prompt (CBT Kiosk Entrance)        --}}
+    {{-- ========================================================================= --}}
+    <div x-show="showInitialFullscreenPrompt && !allowOpenBook && !isLocked && penaltySeconds === 0"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-[#0F1713] border-2 border-emerald-500/40 rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-3xl mx-auto mb-4 animate-pulse">
+                🖥️
+            </div>
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mb-2">
+                CBT Kiosk Mode
+            </span>
+            <h3 class="text-xl font-bold text-white heading-font">Mode Layar Penuh Diwajibkan</h3>
+            <p class="text-xs text-gray-300 mt-2 leading-relaxed">
+                Untuk menjaga ketertiban dan integritas praktikum, ujian ini mewajibkan Anda mengerjakan dalam mode layar penuh (Kiosk Experience).
+            </p>
+            <div class="mt-6">
+                <button type="button" @click="enterFullscreen()"
+                        class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                    <span>Aktifkan Layar Penuh & Mulai Ujian</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- ========================================================================= --}}
+    {{-- OVERLAY 4: Fullscreen Exit 5-Second Warning Modal (Kiosk Enforcement)     --}}
+    {{-- ========================================================================= --}}
+    <div x-show="showFullscreenWarning && !isFullscreen && !isLocked && penaltySeconds === 0"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-[#0F1713] border-2 border-rose-500/60 rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-rose-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="w-16 h-16 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce">
+                ⚠️
+            </div>
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-500/25 text-rose-300 border border-rose-500/40 mb-2">
+                Peringatan Kiosk CBT
+            </span>
+            <h3 class="text-xl font-bold text-white heading-font">Anda Keluar Dari Layar Penuh!</h3>
+            <p class="text-xs text-gray-300 mt-2 leading-relaxed">
+                Ujian mewajibkan pengerjaan dalam mode layar penuh. Segera klik tombol di bawah sebelum waktu toleransi habis:
+            </p>
+            
+            <div class="my-5 p-4 rounded-2xl bg-[#090D0B] border border-rose-500/30">
+                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Toleransi Waktu Kembali:</div>
+                <div class="text-5xl font-mono font-extrabold text-rose-400 tracking-wider animate-pulse"
+                     x-text="fullscreenToleranceSeconds + 's'"></div>
+            </div>
+
+            <button type="button" @click="enterFullscreen()"
+                    class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                <span>Kembali ke Layar Penuh Sekarang</span>
+            </button>
+        </div>
+    </div>
+
     {{-- Script Quiz Arena Logic --}}
     <script>
         function quizArena() {
@@ -401,6 +489,8 @@
                 remainingSeconds: {{ $timeRemaining !== null ? (int)$timeRemaining : 'null' }},
                 currentIndex: 0,
                 answers: {},
+                syncStatus: 'synced', // 'synced', 'saving', 'offline'
+                syncDebounceTimer: null,
                 tabSwitchCount: {{ (int)$attempt->tab_switch_count }},
                 allowOpenBook: {{ $quiz->allow_open_book ? 'true' : 'false' }},
                 isLocked: {{ $attempt->is_locked ? 'true' : 'false' }},
@@ -414,12 +504,22 @@
                 timerInterval: null,
                 penaltyTimerInterval: null,
                 isFullscreen: !!document.fullscreenElement,
+                hasEnteredFullscreenOnce: false,
+                showInitialFullscreenPrompt: false,
+                showFullscreenWarning: false,
+                fullscreenToleranceSeconds: 5,
+                fullscreenToleranceInterval: null,
 
                 get currentQuestion() {
                     return this.questions[this.currentIndex] || null;
                 },
 
                 initArena() {
+                    // Initialize answers: merge server-saved draft answers with LocalStorage cache
+                    const serverDraft = @json($savedAnswers);
+                    const localDraft = this.loadLocalCache();
+                    this.answers = Object.assign({}, serverDraft, localDraft);
+
                     // Start main quiz timer if applicable
                     if (this.remainingSeconds !== null && this.remainingSeconds > 0) {
                         this.remainingSeconds = Math.max(0, Math.floor(Number(this.remainingSeconds)));
@@ -438,9 +538,27 @@
                         this.initPenaltyCountdown();
                     }
 
+                    // Check Fullscreen Kiosk Mode on startup
+                    if (!this.allowOpenBook && !this.isLocked && this.penaltySeconds === 0) {
+                        if (this.isFullscreen) {
+                            this.hasEnteredFullscreenOnce = true;
+                        } else {
+                            this.showInitialFullscreenPrompt = true;
+                        }
+                    }
+
                     // Fullscreen change listener
                     document.addEventListener('fullscreenchange', () => {
                         this.isFullscreen = !!document.fullscreenElement;
+                        if (this.isFullscreen) {
+                            this.hasEnteredFullscreenOnce = true;
+                            this.showInitialFullscreenPrompt = false;
+                            this.cancelFullscreenTolerance();
+                        } else {
+                            if (!this.allowOpenBook && this.hasEnteredFullscreenOnce && !this.isLocked && !this.isSubmitting && this.penaltySeconds === 0) {
+                                this.startFullscreenTolerance();
+                            }
+                        }
                     });
 
                     // Setup Anti-Cheat Listeners
@@ -448,6 +566,92 @@
 
                     // Setup Keyboard shortcuts
                     this.setupKeyboardShortcuts();
+                },
+
+                enterFullscreen() {
+                    const el = document.documentElement;
+                    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+                    if (req) {
+                        req.call(el).then(() => {
+                            this.isFullscreen = true;
+                            this.hasEnteredFullscreenOnce = true;
+                            this.showInitialFullscreenPrompt = false;
+                            this.cancelFullscreenTolerance();
+                        }).catch(() => {
+                            this.showInitialFullscreenPrompt = false;
+                        });
+                    } else {
+                        this.showInitialFullscreenPrompt = false;
+                    }
+                },
+
+                startFullscreenTolerance() {
+                    this.showFullscreenWarning = true;
+                    this.fullscreenToleranceSeconds = 5;
+                    if (this.fullscreenToleranceInterval) clearInterval(this.fullscreenToleranceInterval);
+
+                    this.fullscreenToleranceInterval = setInterval(() => {
+                        if (this.fullscreenToleranceSeconds > 1) {
+                            this.fullscreenToleranceSeconds--;
+                        } else {
+                            this.cancelFullscreenTolerance();
+                            this.reportViolation('fullscreen_exit');
+                        }
+                    }, 1000);
+                },
+
+                cancelFullscreenTolerance() {
+                    this.showFullscreenWarning = false;
+                    if (this.fullscreenToleranceInterval) {
+                        clearInterval(this.fullscreenToleranceInterval);
+                        this.fullscreenToleranceInterval = null;
+                    }
+                },
+
+                loadLocalCache() {
+                    try {
+                        const raw = localStorage.getItem('cbt_quiz_{{ $attempt->id }}_answers');
+                        return raw ? JSON.parse(raw) : {};
+                    } catch (e) {
+                        return {};
+                    }
+                },
+
+                saveLocalCache() {
+                    try {
+                        localStorage.setItem('cbt_quiz_{{ $attempt->id }}_answers', JSON.stringify(this.answers));
+                        localStorage.setItem('cbt_quiz_{{ $attempt->id }}_last_save', Date.now());
+                    } catch (e) {
+                        console.warn('LocalStorage save failed:', e);
+                    }
+                },
+
+                triggerBackgroundSync() {
+                    this.syncStatus = 'saving';
+                    if (this.syncDebounceTimer) clearTimeout(this.syncDebounceTimer);
+
+                    this.syncDebounceTimer = setTimeout(() => {
+                        fetch('{{ route('quiz.autosave', [$quiz->unique_token, $attempt->id]) }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ answers: this.answers })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                this.syncStatus = 'synced';
+                            } else {
+                                this.syncStatus = 'offline';
+                            }
+                        })
+                        .catch(() => {
+                            this.syncStatus = 'offline';
+                        });
+                    }, 400);
                 },
 
                 initPenaltyCountdown() {
@@ -480,7 +684,7 @@
                     }
 
                     let lastReportedTime = 0;
-                    const reportViolation = () => {
+                    this.reportViolation = (reason = 'tab_switch') => {
                         if (this.isLocked || this.isSubmitting) return;
 
                         // Throttle rapid triggers within 1 second
@@ -494,7 +698,8 @@
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                                 'Accept': 'application/json'
-                            }
+                            },
+                            body: JSON.stringify({ reason: reason })
                         })
                         .then(res => res.json())
                         .then(data => {
@@ -517,13 +722,13 @@
 
                     document.addEventListener('visibilitychange', () => {
                         if (document.hidden) {
-                            reportViolation();
+                            this.reportViolation('tab_switch');
                         }
                     });
 
                     window.addEventListener('blur', () => {
                         if (!document.hidden && !this.isLocked && this.penaltySeconds === 0) {
-                            reportViolation();
+                            this.reportViolation('tab_switch');
                         }
                     });
 
@@ -610,6 +815,8 @@
 
                 selectOption(questionId, optionId) {
                     this.answers[questionId] = optionId;
+                    this.saveLocalCache();
+                    this.triggerBackgroundSync();
                 },
 
                 isSelected(questionId, optionId) {
@@ -698,6 +905,11 @@
                     })
                     .then(res => res.json())
                     .then(data => {
+                        try {
+                            localStorage.removeItem('cbt_quiz_{{ $attempt->id }}_answers');
+                            localStorage.removeItem('cbt_quiz_{{ $attempt->id }}_last_save');
+                        } catch (e) {}
+
                         if (data.redirect) {
                             window.location.href = data.redirect;
                         } else {
@@ -733,10 +945,27 @@
 
                 toggleFullscreen() {
                     if (!document.fullscreenElement) {
-                        document.documentElement.requestFullscreen().catch(() => {});
+                        this.enterFullscreen();
                     } else {
-                        if (document.exitFullscreen) {
-                            document.exitFullscreen();
+                        if (!this.allowOpenBook) {
+                            Swal.fire({
+                                title: 'Keluar Layar Penuh?',
+                                text: 'Ujian ini mewajibkan mode layar penuh. Keluar dari layar penuh akan memicu peringatan toleransi 5 detik.',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Tetap di Layar Penuh',
+                                cancelButtonText: 'Keluar (Beresiko)',
+                                confirmButtonColor: '#10B981',
+                                cancelButtonColor: '#1A2820',
+                                background: '#0F1713',
+                                color: '#f3f4f6'
+                            }).then((res) => {
+                                if (res.dismiss === Swal.DismissReason.cancel) {
+                                    if (document.exitFullscreen) document.exitFullscreen();
+                                }
+                            });
+                        } else {
+                            if (document.exitFullscreen) document.exitFullscreen();
                         }
                     }
                 },

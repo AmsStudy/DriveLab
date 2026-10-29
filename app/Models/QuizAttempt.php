@@ -28,6 +28,7 @@ class QuizAttempt extends Model
         'lock_reason',
         'penalty_end_time',
         'violations_log',
+        'draft_answers',
     ];
 
     protected $casts = [
@@ -43,6 +44,7 @@ class QuizAttempt extends Model
         'is_locked'             => 'boolean',
         'penalty_end_time'      => 'datetime',
         'violations_log'        => 'array',
+        'draft_answers'         => 'array',
     ];
 
     public function quiz(): BelongsTo

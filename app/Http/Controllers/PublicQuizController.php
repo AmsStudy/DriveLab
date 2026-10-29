@@ -176,16 +176,19 @@ class PublicQuizController extends Controller
             $penaltyRemainingSeconds = (int) now()->diffInSeconds($attempt->penalty_end_time);
         }
 
+        $savedAnswers = $attempt->draft_answers ?? [];
+
         return view('quiz.play', compact(
             'quiz',
             'attempt',
             'clientQuestions',
             'timeRemaining',
-            'penaltyRemainingSeconds'
+            'penaltyRemainingSeconds',
+            'savedAnswers'
         ));
     }
 
-    public function recordTabSwitch(string $token, QuizAttempt $attempt)
+    public function recordTabSwitch(Request $request, string $token, QuizAttempt $attempt)
     {
         $quiz = Quiz::where('unique_token', $token)->firstOrFail();
 
@@ -204,6 +207,7 @@ class PublicQuizController extends Controller
             ]);
         }
 
+        $reason = $request->input('reason', 'tab_switch');
         $attempt->increment('tab_switch_count');
         $count = $attempt->tab_switch_count;
 
@@ -214,28 +218,30 @@ class PublicQuizController extends Controller
 
         $logs = $attempt->violations_log ?? [];
         $logs[] = [
-            'type'      => 'tab_switch',
+            'type'      => $reason,
             'count'     => $count,
             'timestamp' => now()->toIso8601String(),
         ];
+
+        $reasonLabel = ($reason === 'fullscreen_exit') ? 'keluar dari layar penuh (kiosk)' : 'perpindahan tab/aplikasi';
 
         if ($count === 1) {
             // Punishment 1: 1 menit (60 detik)
             $penaltySeconds = 60;
             $attempt->penalty_end_time = now()->addSeconds(60);
-            $message = 'Peringatan 1/3: Terdeteksi perpindahan tab/aplikasi. Layar kuis terkunci selama 1 menit.';
+            $message = "Peringatan 1/3: Terdeteksi {$reasonLabel}. Layar kuis terkunci selama 1 menit.";
         } elseif ($count === 2) {
             // Punishment 2: 1.30 menit (90 detik)
             $penaltySeconds = 90;
             $attempt->penalty_end_time = now()->addSeconds(90);
-            $message = 'Peringatan 2/3: Pelanggaran kedua! Pinalti waktu berlipat 1.5 menit. Pelanggaran berikutnya akan mengunci kuis total.';
+            $message = "Peringatan 2/3: Pelanggaran kedua ({$reasonLabel})! Pinalti waktu berlipat 1.5 menit. Pelanggaran berikutnya akan mengunci kuis total.";
         } else {
             // Punishment 3: Kunci total sampai admin membuka dengan password
             $isLocked = true;
             $attempt->is_locked = true;
-            $attempt->lock_reason = 'Terdeteksi 3x perpindahan tab/aplikasi';
+            $attempt->lock_reason = "Terdeteksi 3x pelanggaran CBT ({$reasonLabel})";
             $attempt->penalty_end_time = null;
-            $message = 'Kuis Terkunci Total: Anda telah melanggar aturan pengawas kuis (3x switch). Panggil Asisten Lab / Dosen untuk membuka kunci kuis Anda.';
+            $message = "Kuis Terkunci Total: Anda telah melanggar aturan pengawas kuis (3x switch). Panggil Asisten Lab / Dosen untuk membuka kunci kuis Anda.";
         }
 
         $attempt->violations_log = $logs;
@@ -315,6 +321,26 @@ class PublicQuizController extends Controller
         ]);
     }
 
+    public function autosave(Request $request, string $token, QuizAttempt $attempt)
+    {
+        $quiz = Quiz::where('unique_token', $token)->firstOrFail();
+
+        if ($attempt->quiz_id !== $quiz->id || $attempt->isCompleted()) {
+            return response()->json(['success' => false, 'message' => 'Sesi kuis tidak aktif.'], 403);
+        }
+
+        $answers = $request->input('answers', []);
+        if (is_array($answers)) {
+            $attempt->draft_answers = $answers;
+            $attempt->save();
+        }
+
+        return response()->json([
+            'success'  => true,
+            'saved_at' => now()->toIso8601String(),
+        ]);
+    }
+
     public function submit(Request $request, string $token, QuizAttempt $attempt)
     {
         $quiz = Quiz::where('unique_token', $token)->firstOrFail();
@@ -330,7 +356,7 @@ class PublicQuizController extends Controller
             return redirect()->route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
         }
 
-        $userAnswers = $request->input('answers', []);
+        $userAnswers = $request->input('answers', $attempt->draft_answers ?? []);
         $this->finalizeAttempt($attempt, is_array($userAnswers) ? $userAnswers : []);
 
         if ($request->wantsJson()) {
