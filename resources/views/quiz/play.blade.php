@@ -113,18 +113,27 @@
                     </template>
                 </div>
 
-                {{-- Fullscreen Toggle --}}
-                <button type="button" @click="toggleFullscreen()"
-                        :title="isFullscreen ? 'Keluar dari Mode Layar Penuh' : 'Mode Layar Penuh (Menghilangkan gangguan browser agar fokus ujian)'"
-                        class="px-2.5 py-1.5 rounded-xl bg-[#142019] border border-[#1E3327] hover:border-emerald-500/40 text-gray-400 hover:text-white transition-all flex items-center gap-1.5 text-xs font-medium">
-                    <template x-if="!isFullscreen">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
-                    </template>
-                    <template x-if="isFullscreen">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </template>
-                    <span class="hidden md:inline text-[11px]" x-text="isFullscreen ? 'Keluar Fullscreen' : 'Layar Penuh'"></span>
-                </button>
+                @if($quiz->allow_open_book)
+                    {{-- Fullscreen Toggle allowed in Open Book mode --}}
+                    <button type="button" @click="toggleFullscreen()"
+                            :title="isFullscreen ? 'Keluar dari Mode Layar Penuh' : 'Mode Layar Penuh (Menghilangkan gangguan browser agar fokus ujian)'"
+                            class="px-2.5 py-1.5 rounded-xl bg-[#142019] border border-[#1E3327] hover:border-emerald-500/40 text-gray-400 hover:text-white transition-all flex items-center gap-1.5 text-xs font-medium">
+                        <template x-if="!isFullscreen">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                        </template>
+                        <template x-if="isFullscreen">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </template>
+                        <span class="hidden md:inline text-[11px]" x-text="isFullscreen ? 'Keluar Fullscreen' : 'Layar Penuh'"></span>
+                    </button>
+                @else
+                    {{-- Kiosk Enforced Indicator (No manual exit button in strict mode) --}}
+                    <div class="px-2.5 py-1.5 rounded-xl bg-[#142019] border border-[#1E3327] flex items-center gap-1.5 text-xs font-medium text-emerald-400"
+                         title="Ujian berjalan dalam Mode Kiosk Layar Penuh Terkunci">
+                        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        <span class="hidden md:inline text-[11px] font-mono text-emerald-300">Kiosk Terkunci</span>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -135,8 +144,9 @@
         </div>
     </header>
 
-    {{-- Main Question Arena --}}
-    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6 sm:py-10 flex flex-col justify-between">
+    {{-- Main Question Arena (Zero-Visibility Curtain if not in Fullscreen during strict exam) --}}
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6 sm:py-10 flex flex-col justify-between transition-all duration-300"
+          :class="(!allowOpenBook && !isFullscreen && !isLocked && penaltySeconds === 0) ? 'filter blur-2xl pointer-events-none select-none opacity-5 scale-95' : ''">
 
         <template x-if="currentQuestion">
             <div class="space-y-6">
@@ -419,7 +429,7 @@
     {{-- ========================================================================= --}}
     {{-- OVERLAY 3: Initial Fullscreen Enforced Prompt (CBT Kiosk Entrance)        --}}
     {{-- ========================================================================= --}}
-    <div x-show="showInitialFullscreenPrompt && !allowOpenBook && !isLocked && penaltySeconds === 0"
+    <div x-show="!isFullscreen && !showFullscreenWarning && !allowOpenBook && !isLocked && penaltySeconds === 0"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
@@ -449,7 +459,7 @@
     {{-- ========================================================================= --}}
     {{-- OVERLAY 4: Fullscreen Exit 5-Second Warning Modal (Kiosk Enforcement)     --}}
     {{-- ========================================================================= --}}
-    <div x-show="showFullscreenWarning && !isFullscreen && !isLocked && penaltySeconds === 0"
+    <div x-show="showFullscreenWarning && !isFullscreen && !allowOpenBook && !isLocked && penaltySeconds === 0"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
@@ -503,15 +513,25 @@
                 isSubmitting: false,
                 timerInterval: null,
                 penaltyTimerInterval: null,
-                isFullscreen: !!document.fullscreenElement,
+                isFullscreen: false,
+                isEnteringFullscreen: false,
                 hasEnteredFullscreenOnce: false,
-                showInitialFullscreenPrompt: false,
                 showFullscreenWarning: false,
                 fullscreenToleranceSeconds: 5,
                 fullscreenToleranceInterval: null,
+                focusCheckInterval: null,
 
                 get currentQuestion() {
                     return this.questions[this.currentIndex] || null;
+                },
+
+                checkFullscreenState() {
+                    return Boolean(
+                        document.fullscreenElement ||
+                        document.webkitFullscreenElement ||
+                        document.mozFullScreenElement ||
+                        document.msFullscreenElement
+                    );
                 },
 
                 initArena() {
@@ -519,6 +539,12 @@
                     const serverDraft = @json($savedAnswers);
                     const localDraft = this.loadLocalCache();
                     this.answers = Object.assign({}, serverDraft, localDraft);
+
+                    // Check initial fullscreen state
+                    this.isFullscreen = this.checkFullscreenState();
+                    if (this.isFullscreen) {
+                        this.hasEnteredFullscreenOnce = true;
+                    }
 
                     // Start main quiz timer if applicable
                     if (this.remainingSeconds !== null && this.remainingSeconds > 0) {
@@ -538,27 +564,21 @@
                         this.initPenaltyCountdown();
                     }
 
-                    // Check Fullscreen Kiosk Mode on startup
-                    if (!this.allowOpenBook && !this.isLocked && this.penaltySeconds === 0) {
+                    // Comprehensive vendor-prefixed fullscreen listeners
+                    const onFsChange = () => {
+                        this.isFullscreen = this.checkFullscreenState();
                         if (this.isFullscreen) {
                             this.hasEnteredFullscreenOnce = true;
-                        } else {
-                            this.showInitialFullscreenPrompt = true;
-                        }
-                    }
-
-                    // Fullscreen change listener
-                    document.addEventListener('fullscreenchange', () => {
-                        this.isFullscreen = !!document.fullscreenElement;
-                        if (this.isFullscreen) {
-                            this.hasEnteredFullscreenOnce = true;
-                            this.showInitialFullscreenPrompt = false;
                             this.cancelFullscreenTolerance();
                         } else {
                             if (!this.allowOpenBook && this.hasEnteredFullscreenOnce && !this.isLocked && !this.isSubmitting && this.penaltySeconds === 0) {
                                 this.startFullscreenTolerance();
                             }
                         }
+                    };
+
+                    ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
+                        document.addEventListener(evt, onFsChange);
                     });
 
                     // Setup Anti-Cheat Listeners
@@ -569,19 +589,20 @@
                 },
 
                 enterFullscreen() {
+                    this.isEnteringFullscreen = true;
+                    setTimeout(() => { this.isEnteringFullscreen = false; }, 1200);
+
                     const el = document.documentElement;
-                    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+                    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
                     if (req) {
                         req.call(el).then(() => {
                             this.isFullscreen = true;
                             this.hasEnteredFullscreenOnce = true;
-                            this.showInitialFullscreenPrompt = false;
                             this.cancelFullscreenTolerance();
-                        }).catch(() => {
-                            this.showInitialFullscreenPrompt = false;
+                        }).catch((err) => {
+                            console.warn('Fullscreen request blocked or failed:', err);
+                            this.isFullscreen = this.checkFullscreenState();
                         });
-                    } else {
-                        this.showInitialFullscreenPrompt = false;
                     }
                 },
 
@@ -685,15 +706,16 @@
 
                     let lastReportedTime = 0;
                     this.reportViolation = (reason = 'tab_switch') => {
-                        if (this.isLocked || this.isSubmitting) return;
+                        if (this.isLocked || this.isSubmitting || this.isEnteringFullscreen) return;
 
-                        // Throttle rapid triggers within 1 second
+                        // Throttle rapid triggers within 1.5 seconds
                         const now = Date.now();
-                        if (now - lastReportedTime < 1000) return;
+                        if (now - lastReportedTime < 1500) return;
                         lastReportedTime = now;
 
                         fetch('{{ route('quiz.tab-switch', [$quiz->unique_token, $attempt->id]) }}', {
                             method: 'POST',
+                            keepalive: true,
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -712,6 +734,7 @@
                                 this.isLocked = true;
                                 this.penaltySeconds = 0;
                                 if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
+                                if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
                             } else if (data.penalty_seconds > 0) {
                                 this.penaltySeconds = data.penalty_seconds;
                                 this.initPenaltyCountdown();
@@ -720,17 +743,30 @@
                         .catch(err => console.error('Violation record error:', err));
                     };
 
+                    // 1. Tab switch or window minimize (Visibility API)
                     document.addEventListener('visibilitychange', () => {
                         if (document.hidden) {
                             this.reportViolation('tab_switch');
                         }
                     });
 
+                    // 2. Window loss of focus (Clicking outside, opening another app, alt-tab)
                     window.addEventListener('blur', () => {
-                        if (!document.hidden && !this.isLocked && this.penaltySeconds === 0) {
+                        if (!this.allowOpenBook && !this.isLocked && this.penaltySeconds === 0 && !this.isSubmitting && !this.isEnteringFullscreen) {
                             this.reportViolation('tab_switch');
                         }
                     });
+
+                    // 3. Heartbeat Focus Scanner:
+                    // Verifies document.hasFocus() so if student clicks into another app/window, it triggers
+                    if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
+                    this.focusCheckInterval = setInterval(() => {
+                        if (!this.allowOpenBook && !this.isLocked && this.penaltySeconds === 0 && !this.isSubmitting && !this.isEnteringFullscreen && this.hasEnteredFullscreenOnce) {
+                            if (document.hidden || !document.hasFocus()) {
+                                this.reportViolation('tab_switch');
+                            }
+                        }
+                    }, 750);
 
                     // Anti-Cheat: Disable right click, copy, and devtools shortcuts in strict exam mode
                     document.addEventListener('contextmenu', (e) => {
@@ -882,6 +918,8 @@
                 submitQuiz() {
                     if (this.isSubmitting) return;
                     this.isSubmitting = true;
+                    if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
+                    if (this.fullscreenToleranceInterval) clearInterval(this.fullscreenToleranceInterval);
 
                     Swal.fire({
                         title: 'Mengirim Jawaban...',
