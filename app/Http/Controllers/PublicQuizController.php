@@ -44,7 +44,21 @@ class PublicQuizController extends Controller
         $totalPoints = $quiz->questions()->sum('points');
         $participantsCount = $quiz->attempts()->whereNotNull('completed_at')->count();
 
-        return view('quiz.lobby', compact('quiz', 'questionsCount', 'totalPoints', 'participantsCount'));
+        $isUpcoming = $quiz->isScheduleUpcoming();
+        $isExpired = $quiz->isScheduleExpired();
+        $secondsUntilStart = $isUpcoming ? abs((int) now()->diffInSeconds($quiz->starts_at)) : 0;
+        $hasPassword = $quiz->hasAccessPassword();
+
+        return view('quiz.lobby', compact(
+            'quiz',
+            'questionsCount',
+            'totalPoints',
+            'participantsCount',
+            'isUpcoming',
+            'isExpired',
+            'secondsUntilStart',
+            'hasPassword'
+        ));
     }
 
     public function start(Request $request, string $token)
@@ -53,6 +67,24 @@ class PublicQuizController extends Controller
 
         if (!$quiz->is_active) {
             return back()->with('error', 'Kuis saat ini tidak aktif atau telah ditutup.');
+        }
+
+        // 1. Check schedule: Expired
+        if ($quiz->isScheduleExpired()) {
+            return back()->with('error', 'Batas waktu akses kuis telah berakhir. Soal tidak dapat diakses lagi.')->withInput();
+        }
+
+        // 2. Check schedule: Upcoming
+        if ($quiz->isScheduleUpcoming()) {
+            return back()->with('error', 'Kuis belum dimulai! Silakan tunggu hitungan mundur hingga waktu mulai tiba.')->withInput();
+        }
+
+        // 3. Check access password
+        if ($quiz->hasAccessPassword()) {
+            $inputPassword = (string) $request->input('access_password', '');
+            if (trim($inputPassword) !== $quiz->access_password) {
+                return back()->with('error', 'Password akses kuis salah! Pastikan Anda memasukkan password yang diberikan asisten/dosen.')->withInput();
+            }
         }
 
         $validated = $request->validate([
@@ -161,12 +193,14 @@ class PublicQuizController extends Controller
                 'id'            => $q->id,
                 'number'        => $index + 1,
                 'question_text' => $q->question_text,
-                'question_type' => $q->question_type,
+                'image_url'     => $q->image_url,
+                'question_type' => $q->isMultiSelect() ? 'multi_select' : $q->question_type,
                 'points'        => $q->points,
                 'options'       => $q->options->map(function ($opt) {
                     return [
-                        'id'   => $opt->id,
-                        'text' => $opt->option_text,
+                        'id'        => $opt->id,
+                        'text'      => $opt->option_text,
+                        'image_url' => $opt->image_url,
                     ];
                 })->values(),
             ];
@@ -467,33 +501,72 @@ class PublicQuizController extends Controller
 
         DB::transaction(function () use ($attempt, $questions, $userAnswers, &$totalPointsEarned, &$correctCount, &$wrongCount) {
             foreach ($questions as $q) {
-                $selectedOptionId = $userAnswers[$q->id] ?? null;
+                $rawAns = $userAnswers[$q->id] ?? null;
                 $isCorrect = false;
                 $points = 0;
+                $selectedOptionId = null;
+                $selectedOptionIds = null;
 
-                if ($selectedOptionId) {
-                    $selectedOption = $q->options->firstWhere('id', (int)$selectedOptionId);
-                    if ($selectedOption && $selectedOption->is_correct) {
-                        $isCorrect = true;
-                        $points = $q->points;
-                        $correctCount++;
+                if ($q->isMultiSelect()) {
+                    $correctOptionIds = $q->options->where('is_correct', true)->pluck('id')->values()->all();
+                    $userAnsIds = [];
+                    if (is_array($rawAns)) {
+                        $userAnsIds = array_values(array_map('intval', $rawAns));
+                    } elseif ($rawAns) {
+                        $userAnsIds = [(int)$rawAns];
+                    }
+
+                    $selectedOptionIds = $userAnsIds;
+                    $selectedOptionId = $userAnsIds[0] ?? null;
+
+                    if (!empty($userAnsIds)) {
+                        $correctSelected = array_intersect($userAnsIds, $correctOptionIds);
+                        $wrongSelected = array_diff($userAnsIds, $correctOptionIds);
+
+                        // If user selected exactly all correct options and no wrong options
+                        if (count($wrongSelected) === 0 && count($correctSelected) === count($correctOptionIds)) {
+                            $isCorrect = true;
+                            $points = $q->points;
+                            $correctCount++;
+                        } elseif (count($wrongSelected) === 0 && count($correctSelected) > 0) {
+                            // Partial credit: proportional to correctly selected items
+                            $ratio = count($correctSelected) / max(1, count($correctOptionIds));
+                            $points = (int) round($q->points * $ratio);
+                            $wrongCount++;
+                        } else {
+                            $wrongCount++;
+                        }
                     } else {
                         $wrongCount++;
                     }
                 } else {
-                    $wrongCount++;
+                    $selectedOptionId = $rawAns ? (int)(is_array($rawAns) ? ($rawAns[0] ?? 0) : $rawAns) : null;
+                    if ($selectedOptionId) {
+                        $selectedOptionIds = [$selectedOptionId];
+                        $selectedOption = $q->options->firstWhere('id', (int)$selectedOptionId);
+                        if ($selectedOption && $selectedOption->is_correct) {
+                            $isCorrect = true;
+                            $points = $q->points;
+                            $correctCount++;
+                        } else {
+                            $wrongCount++;
+                        }
+                    } else {
+                        $wrongCount++;
+                    }
                 }
 
-                if ($isCorrect) {
+                if ($points > 0) {
                     $totalPointsEarned += $points;
                 }
 
                 QuizAttemptAnswer::create([
-                    'quiz_attempt_id'    => $attempt->id,
-                    'quiz_question_id'   => $q->id,
-                    'selected_option_id' => $selectedOptionId ? (int)$selectedOptionId : null,
-                    'is_correct'         => $isCorrect,
-                    'points_earned'      => $points,
+                    'quiz_attempt_id'     => $attempt->id,
+                    'quiz_question_id'    => $q->id,
+                    'selected_option_id'  => $selectedOptionId,
+                    'selected_option_ids' => $selectedOptionIds,
+                    'is_correct'          => $isCorrect,
+                    'points_earned'       => $points,
                 ]);
             }
 

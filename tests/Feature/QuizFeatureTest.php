@@ -8,6 +8,8 @@ use App\Models\QuizOption;
 use App\Models\QuizQuestion;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class QuizFeatureTest extends TestCase
@@ -528,5 +530,170 @@ class QuizFeatureTest extends TestCase
         $this->assertNotNull($attempt1->completed_at);
         $this->assertEquals(100.0, (float)$attempt1->score);
         $this->assertEquals(1, $attempt1->correct_answers_count);
+    }
+
+    public function test_quiz_schedule_and_access_password_enforcement(): void
+    {
+        // 1. Test Upcoming Quiz (starts in 1 hour)
+        $upcomingQuiz = Quiz::create([
+            'user_id'          => $this->admin->id,
+            'title'            => 'Kuis Belum Mulai',
+            'starts_at'        => now()->addHour(),
+            'access_password'  => 'kunci123',
+        ]);
+
+        $lobbyRes = $this->get(route('quiz.lobby', $upcomingQuiz->unique_token));
+        $lobbyRes->assertStatus(200);
+        $lobbyRes->assertSee('Kuis Belum Dimulai');
+
+        $startUpcoming = $this->post(route('quiz.start', $upcomingQuiz->unique_token), [
+            'nim'             => '12345678',
+            'nama'            => 'Budi Test',
+            'access_password' => 'kunci123',
+        ]);
+        $startUpcoming->assertSessionHas('error');
+        $this->assertStringContainsString('belum dimulai', session('error'));
+
+        // 2. Test Expired Quiz (ended 1 hour ago)
+        $expiredQuiz = Quiz::create([
+            'user_id'         => $this->admin->id,
+            'title'           => 'Kuis Sudah Tutup',
+            'ends_at'         => now()->subHour(),
+        ]);
+
+        $lobbyExpired = $this->get(route('quiz.lobby', $expiredQuiz->unique_token));
+        $lobbyExpired->assertStatus(200);
+        $lobbyExpired->assertSee('Batas Waktu Akses Telah Berakhir');
+
+        $startExpired = $this->post(route('quiz.start', $expiredQuiz->unique_token), [
+            'nim'  => '12345678',
+            'nama' => 'Budi Test',
+        ]);
+        $startExpired->assertSessionHas('error');
+        $this->assertStringContainsString('telah berakhir', session('error'));
+
+        // 3. Test Access Password enforcement on active quiz
+        $pwQuiz = Quiz::create([
+            'user_id'         => $this->admin->id,
+            'title'           => 'Kuis Dengan Password',
+            'access_password' => 'secretPass99',
+        ]);
+
+        // Wrong password fails
+        $startWrongPw = $this->post(route('quiz.start', $pwQuiz->unique_token), [
+            'nim'             => '12345678',
+            'nama'            => 'Budi Test',
+            'access_password' => 'wrong',
+        ]);
+        $startWrongPw->assertSessionHas('error');
+        $this->assertStringContainsString('Password akses kuis salah', session('error'));
+
+        // Correct password succeeds
+        $startCorrectPw = $this->post(route('quiz.start', $pwQuiz->unique_token), [
+            'nim'             => '12345678',
+            'nama'            => 'Budi Test',
+            'access_password' => 'secretPass99',
+        ]);
+        $startCorrectPw->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('quiz_attempts', [
+            'quiz_id' => $pwQuiz->id,
+            'nim'     => '12345678',
+        ]);
+    }
+
+    public function test_multi_select_question_grading_and_image_upload(): void
+    {
+        Storage::fake('public');
+
+        $quiz = Quiz::create([
+            'user_id' => $this->admin->id,
+            'title'   => 'Kuis Pilihan Jamak & Gambar',
+        ]);
+
+        // 1. Admin creates multi-select question with question image & option images
+        $qImage = UploadedFile::fake()->image('soal_arsitektur.png', 800, 600);
+        $opt0Image = UploadedFile::fake()->image('opt_ram.jpg', 400, 300);
+
+        $createResponse = $this->actingAs($this->admin)->post(route('admin.quizzes.questions.store', $quiz), [
+            'question_text'   => 'Pilih komponen komputer yang merupakan memori volatil:',
+            'points'          => 100,
+            'options'         => ['RAM', 'Hard Disk', 'Cache L1', 'Flash Disk'],
+            'correct_indices' => [0, 2], // RAM and Cache L1
+            'question_image'  => $qImage,
+            'option_images'   => [
+                0 => $opt0Image,
+            ],
+        ]);
+
+        $createResponse->assertSessionHas('success');
+
+        $question = $quiz->questions()->first();
+        $this->assertNotNull($question);
+        $this->assertEquals('multi_select', $question->question_type);
+        $this->assertNotNull($question->image_path);
+        Storage::disk('public')->assertExists($question->image_path);
+
+        $options = $question->options()->orderBy('order_num')->get();
+        $this->assertCount(4, $options);
+        $this->assertTrue($options[0]->is_correct); // RAM
+        $this->assertFalse($options[1]->is_correct); // Hard Disk
+        $this->assertTrue($options[2]->is_correct); // Cache L1
+        $this->assertFalse($options[3]->is_correct); // Flash Disk
+        $this->assertNotNull($options[0]->image_path);
+        Storage::disk('public')->assertExists($options[0]->image_path);
+
+        // 2. Student Submits Perfect Answer (both RAM and Cache L1)
+        $start1 = $this->post(route('quiz.start', $quiz->unique_token), [
+            'nim'  => '99990001',
+            'nama' => 'Siswa Pintar',
+        ]);
+        $attempt1 = QuizAttempt::where('nim', '99990001')->first();
+
+        $submit1 = $this->withSession(['quiz_attempt_' . $quiz->id => $attempt1->id])
+            ->post(route('quiz.submit', ['token' => $quiz->unique_token, 'attempt' => $attempt1->id]), [
+                'answers' => [
+                    $question->id => [$options[0]->id, $options[2]->id],
+                ],
+            ]);
+        $submit1->assertRedirect();
+        $attempt1->refresh();
+        $this->assertEquals(100.0, (float)$attempt1->score);
+        $this->assertEquals(1, $attempt1->correct_answers_count);
+
+        // 3. Student Submits Partial Answer (only RAM, no wrong options)
+        $start2 = $this->post(route('quiz.start', $quiz->unique_token), [
+            'nim'  => '99990002',
+            'nama' => 'Siswa Parsial',
+        ]);
+        $attempt2 = QuizAttempt::where('nim', '99990002')->first();
+
+        $submit2 = $this->withSession(['quiz_attempt_' . $quiz->id => $attempt2->id])
+            ->post(route('quiz.submit', ['token' => $quiz->unique_token, 'attempt' => $attempt2->id]), [
+                'answers' => [
+                    $question->id => [$options[0]->id],
+                ],
+            ]);
+        $submit2->assertRedirect();
+        $attempt2->refresh();
+        $this->assertEquals(50.0, (float)$attempt2->score); // 1 out of 2 correct = 50%
+        $this->assertEquals(0, $attempt2->correct_answers_count);
+
+        // 4. Student Submits Mixed Answer (1 correct, 1 wrong: RAM and Hard Disk)
+        $start3 = $this->post(route('quiz.start', $quiz->unique_token), [
+            'nim'  => '99990003',
+            'nama' => 'Siswa Salah',
+        ]);
+        $attempt3 = QuizAttempt::where('nim', '99990003')->first();
+
+        $submit3 = $this->withSession(['quiz_attempt_' . $quiz->id => $attempt3->id])
+            ->post(route('quiz.submit', ['token' => $quiz->unique_token, 'attempt' => $attempt3->id]), [
+                'answers' => [
+                    $question->id => [$options[0]->id, $options[1]->id],
+                ],
+            ]);
+        $submit3->assertRedirect();
+        $attempt3->refresh();
+        $this->assertEquals(0.0, (float)$attempt3->score); // penalty: wrong answer selected = 0 points
+        $this->assertEquals(0, $attempt3->correct_answers_count);
     }
 }

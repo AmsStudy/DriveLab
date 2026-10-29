@@ -14,6 +14,7 @@ class QuizQuestion extends Model
     protected $fillable = [
         'quiz_id',
         'question_text',
+        'image_path',
         'question_type',
         'points',
         'explanation',
@@ -24,6 +25,21 @@ class QuizQuestion extends Model
         'points'    => 'integer',
         'order_num' => 'integer',
     ];
+
+    protected $appends = [
+        'image_url',
+    ];
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image_path ? asset('storage/' . $this->image_path) : null;
+    }
+
+    public function isMultiSelect(): bool
+    {
+        return $this->question_type === 'multi_select'
+            || ($this->relationLoaded('options') && $this->options->where('is_correct', true)->count() > 1);
+    }
 
     public function quiz(): BelongsTo
     {

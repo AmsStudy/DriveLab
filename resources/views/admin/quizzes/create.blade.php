@@ -78,18 +78,50 @@
                     </select>
                     <p class="text-[11px] text-gray-500 mt-1">Jika ditautkan, kuis ini akan terasosiasi dengan arsip dokumen praktikum terkait.</p>
                 </div>
+
+                {{-- Password Akses Mahasiswa (Opsional) --}}
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                        Password Akses Soal (Opsional)
+                    </label>
+                    <input type="text" name="access_password" value="{{ old('access_password') }}"
+                           placeholder="Kosongkan jika mahasiswa bebas akses tanpa password soal"
+                           class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-600 font-mono">
+                    <p class="text-[11px] text-gray-500 mt-1">Jika diisi, mahasiswa wajib memasukkan password ini setelah mengisi NIM & Nama agar soal terbuka.</p>
+                </div>
             </div>
         </div>
 
-        {{-- Section 2: Waktu & Percobaan --}}
+        {{-- Section 2: Jadwal & Waktu Akses --}}
         <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-5 pb-3 border-b border-[#1A2820]">
                 <div class="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <div>
-                    <h3 class="text-sm font-bold text-white">Durasi Waktu & Batas Percobaan</h3>
-                    <p class="text-xs text-gray-400">Atur batasan pengerjaan kuis untuk mahasiswa</p>
+                    <h3 class="text-sm font-bold text-white">Jadwal Akses & Batas Waktu</h3>
+                    <p class="text-xs text-gray-400">Atur rentang jadwal pengerjaan, hitungan mundur, dan batas waktu kuis</p>
+                </div>
+            </div>
+
+            {{-- Jadwal Mulai & Selesai --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 pb-4 border-b border-[#1A2820]/60">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                        Jadwal Mulai Akses Soal (Opsional)
+                    </label>
+                    <input type="datetime-local" name="starts_at" value="{{ old('starts_at') }}"
+                           class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                    <p class="text-[11px] text-gray-500 mt-1">Jika diisi dan waktu belum tiba, mahasiswa akan menunggu dengan hitungan mundur (countdown timer).</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                        Batas Akhir Akses Soal (Opsional)
+                    </label>
+                    <input type="datetime-local" name="ends_at" value="{{ old('ends_at') }}"
+                           class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                    <p class="text-[11px] text-gray-500 mt-1">Setelah batas waktu ini lewat, soal otomatis ditandai tutup dan tidak dapat diakses lagi.</p>
                 </div>
             </div>
 
@@ -97,11 +129,11 @@
                 {{-- Batas Waktu Total --}}
                 <div>
                     <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
-                        Batas Waktu Total (Menit)
+                        Durasi Pengerjaan (Menit)
                     </label>
                     <input type="number" name="time_limit_minutes" value="{{ old('time_limit_minutes', 15) }}" min="0" max="300"
                            class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
-                    <p class="text-[11px] text-gray-500 mt-1">Isi 0 jika tidak ada batas waktu kuis keseluruhan.</p>
+                    <p class="text-[11px] text-gray-500 mt-1">Isi 0 jika tanpa durasi pengerjaan.</p>
                 </div>
 
                 {{-- Batas Waktu Per Soal --}}
@@ -111,7 +143,7 @@
                     </label>
                     <input type="number" name="time_per_question" value="{{ old('time_per_question', 0) }}" min="0" max="300"
                            class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
-                    <p class="text-[11px] text-gray-500 mt-1">Gaya Quizizz per soal. Isi 0 untuk menonaktifkan.</p>
+                    <p class="text-[11px] text-gray-500 mt-1">Gaya Quizizz per soal. Isi 0 untuk nonaktif.</p>
                 </div>
 
                 {{-- Maksimal Percobaan --}}
@@ -121,7 +153,7 @@
                     </label>
                     <input type="number" name="max_attempts" value="{{ old('max_attempts', 1) }}" min="1" max="20" required
                            class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
-                    <p class="text-[11px] text-gray-500 mt-1">Berapa kali mahasiswa dengan NIM yang sama dapat mencoba.</p>
+                    <p class="text-[11px] text-gray-500 mt-1">Berapa kali mahasiswa dapat mencoba kuis.</p>
                 </div>
             </div>
         </div>

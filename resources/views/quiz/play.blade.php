@@ -154,44 +154,74 @@
                 {{-- Question Card --}}
                 <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8 shadow-xl relative">
                     <div class="flex items-center justify-between gap-3 mb-4">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono"
                                   x-text="'Soal #' + currentQuestion.number"></span>
-                            <span class="px-2.5 py-1 rounded-full text-xs bg-[#142019] text-gray-400 border border-[#1E3327]"
-                                  x-text="currentQuestion.question_type === 'true_false' ? 'Benar / Salah' : 'Pilihan Ganda'"></span>
+                            
+                            <template x-if="currentQuestion.question_type === 'multi_select'">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30 flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Pilihan Jamak (Centang Semua Jawaban Benar)
+                                </span>
+                            </template>
+                            <template x-if="currentQuestion.question_type === 'true_false'">
+                                <span class="px-2.5 py-1 rounded-full text-xs bg-[#142019] text-gray-400 border border-[#1E3327]">
+                                    Benar / Salah
+                                </span>
+                            </template>
+                            <template x-if="currentQuestion.question_type === 'multiple_choice'">
+                                <span class="px-2.5 py-1 rounded-full text-xs bg-[#142019] text-gray-400 border border-[#1E3327]">
+                                    Pilihan Tunggal
+                                </span>
+                            </template>
                         </div>
 
                         <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20"
                               x-text="'+' + currentQuestion.points + ' Poin'"></span>
                     </div>
 
+                    {{-- Question Image (if uploaded) --}}
+                    <template x-if="currentQuestion.image_url">
+                        <div class="my-4 rounded-2xl overflow-hidden border border-[#1A2820] bg-black/50 max-h-80 flex items-center justify-center p-2">
+                            <img :src="currentQuestion.image_url" alt="Gambar Soal"
+                                 class="max-h-72 w-auto object-contain rounded-xl hover:scale-[1.01] transition-transform">
+                        </div>
+                    </template>
+
                     <h1 class="text-lg sm:text-2xl font-bold text-white heading-font leading-relaxed whitespace-pre-wrap"
                         x-text="currentQuestion.question_text"></h1>
                 </div>
 
-                {{-- Options Grid (Quizizz Colorful Theme) --}}
+                {{-- Options Grid (Quizizz Colorful Theme with Image Support) --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
                     <template x-for="(opt, optIdx) in currentQuestion.options" :key="opt.id">
                         <button type="button"
                                 @click="selectOption(currentQuestion.id, opt.id)"
-                                class="option-card p-4 sm:p-5 rounded-2xl border text-left flex items-center gap-3.5 relative overflow-hidden group cursor-pointer"
+                                class="option-card p-4 sm:p-5 rounded-2xl border text-left flex items-start gap-3.5 relative overflow-hidden group cursor-pointer transition-all"
                                 :class="getOptionClasses(optIdx, isSelected(currentQuestion.id, opt.id))">
                             
-                            {{-- Option Badge (A, B, C, D) --}}
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0 transition-transform group-hover:scale-105"
+                            {{-- Option Badge (A, B, C, D) / Checkbox indicator --}}
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0 transition-transform group-hover:scale-105 mt-0.5"
                                  :class="getOptionBadgeClasses(optIdx, isSelected(currentQuestion.id, opt.id))">
                                 <span x-text="getOptionLabel(optIdx)"></span>
                             </div>
 
-                            {{-- Option Text --}}
-                            <div class="flex-1 text-sm sm:text-base font-semibold leading-snug"
-                                 :class="isSelected(currentQuestion.id, opt.id) ? 'text-white' : 'text-gray-200'"
-                                 x-text="opt.text">
+                            {{-- Option Content (Text + Image) --}}
+                            <div class="flex-1 min-w-0">
+                                <template x-if="opt.image_url">
+                                    <div class="mb-2 max-h-36 overflow-hidden rounded-xl border border-white/10 bg-black/40 p-1">
+                                        <img :src="opt.image_url" alt="Gambar Opsi" class="max-h-32 w-auto object-contain rounded-lg">
+                                    </div>
+                                </template>
+                                <div class="text-sm sm:text-base font-semibold leading-snug whitespace-pre-wrap"
+                                     :class="isSelected(currentQuestion.id, opt.id) ? 'text-white' : 'text-gray-200'"
+                                     x-text="opt.text">
+                                </div>
                             </div>
 
                             {{-- Active Selected Indicator --}}
                             <div x-show="isSelected(currentQuestion.id, opt.id)"
-                                 class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 shadow-md">
+                                 class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 shadow-md mt-0.5">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             </div>
                         </button>
@@ -277,9 +307,9 @@
                     <button type="button"
                             @click="jumpToQuestion(idx)"
                             class="h-11 rounded-xl text-xs font-bold font-mono flex flex-col items-center justify-center border transition-all"
-                            :class="idx === currentIndex ? 'border-emerald-400 bg-emerald-500/20 text-emerald-300 ring-2 ring-emerald-500/30' : (answers[q.id] ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400' : 'bg-[#090D0B] border-[#1A2820] text-gray-400 hover:border-gray-600')">
+                            :class="idx === currentIndex ? 'border-emerald-400 bg-emerald-500/20 text-emerald-300 ring-2 ring-emerald-500/30' : (isQuestionAnswered(q.id) ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400' : 'bg-[#090D0B] border-[#1A2820] text-gray-400 hover:border-gray-600')">
                         <span x-text="idx + 1"></span>
-                        <span class="text-[9px]" x-text="answers[q.id] ? '✓' : ''"></span>
+                        <span class="text-[9px]" x-text="isQuestionAnswered(q.id) ? '✓' : ''"></span>
                     </button>
                 </template>
             </div>
@@ -850,13 +880,39 @@
                 },
 
                 selectOption(questionId, optionId) {
-                    this.answers[questionId] = optionId;
+                    if (this.currentQuestion && this.currentQuestion.question_type === 'multi_select') {
+                        let current = this.answers[questionId];
+                        if (!Array.isArray(current)) {
+                            current = current ? [current] : [];
+                        }
+                        const idx = current.indexOf(optionId);
+                        if (idx > -1) {
+                            current.splice(idx, 1);
+                        } else {
+                            current.push(optionId);
+                        }
+                        this.answers[questionId] = current;
+                    } else {
+                        this.answers[questionId] = optionId;
+                    }
                     this.saveLocalCache();
                     this.triggerBackgroundSync();
                 },
 
                 isSelected(questionId, optionId) {
-                    return this.answers[questionId] === optionId;
+                    const val = this.answers[questionId];
+                    if (Array.isArray(val)) {
+                        return val.includes(optionId);
+                    }
+                    return val === optionId;
+                },
+
+                isQuestionAnswered(questionId) {
+                    const val = this.answers[questionId];
+                    if (Array.isArray(val)) {
+                        return val.length > 0;
+                    }
+                    return val !== undefined && val !== null && val !== '';
                 },
 
                 nextQuestion() {
@@ -877,7 +933,7 @@
                 },
 
                 answeredCount() {
-                    return Object.keys(this.answers).length;
+                    return Object.keys(this.answers).filter(qId => this.isQuestionAnswered(qId)).length;
                 },
 
                 confirmSubmit() {

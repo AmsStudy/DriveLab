@@ -13,6 +13,7 @@ class QuizOption extends Model
     protected $fillable = [
         'quiz_question_id',
         'option_text',
+        'image_path',
         'is_correct',
         'order_num',
     ];
@@ -21,6 +22,15 @@ class QuizOption extends Model
         'is_correct' => 'boolean',
         'order_num'  => 'integer',
     ];
+
+    protected $appends = [
+        'image_url',
+    ];
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image_path ? asset('storage/' . $this->image_path) : null;
+    }
 
     public function question(): BelongsTo
     {

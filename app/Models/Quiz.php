@@ -19,8 +19,11 @@ class Quiz extends Model
         'slug',
         'description',
         'access_code',
+        'access_password',
         'unique_token',
         'time_limit_minutes',
+        'starts_at',
+        'ends_at',
         'time_per_question',
         'shuffle_questions',
         'shuffle_options',
@@ -34,6 +37,8 @@ class Quiz extends Model
 
     protected $casts = [
         'time_limit_minutes' => 'integer',
+        'starts_at'          => 'datetime',
+        'ends_at'            => 'datetime',
         'time_per_question'  => 'integer',
         'shuffle_questions'  => 'boolean',
         'shuffle_options'    => 'boolean',
@@ -97,5 +102,31 @@ class Quiz extends Model
     public function totalPoints(): int
     {
         return (int) $this->questions()->sum('points');
+    }
+
+    public function isScheduleUpcoming(): bool
+    {
+        return $this->starts_at !== null && now()->lt($this->starts_at);
+    }
+
+    public function isScheduleExpired(): bool
+    {
+        return $this->ends_at !== null && now()->gt($this->ends_at);
+    }
+
+    public function isScheduleOpen(): bool
+    {
+        if ($this->isScheduleUpcoming()) {
+            return false;
+        }
+        if ($this->isScheduleExpired()) {
+            return false;
+        }
+        return true;
+    }
+
+    public function hasAccessPassword(): bool
+    {
+        return !empty($this->access_password);
     }
 }

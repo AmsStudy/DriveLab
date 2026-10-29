@@ -305,17 +305,75 @@
                             <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider">Daftar Jawaban Mahasiswa:</h4>
                             
                             <template x-for="(ans, aIdx) in selectedAttempt.answers" :key="ans.id">
-                                <div class="p-4 rounded-xl border"
+                                <div class="p-4 rounded-xl border space-y-3"
                                      :class="ans.is_correct ? 'bg-emerald-500/5 border-emerald-500/30' : 'bg-rose-500/5 border-rose-500/30'">
                                     
-                                    <div class="flex items-center justify-between gap-2 mb-2">
-                                        <span class="text-xs font-bold font-mono text-gray-400" x-text="'Soal #' + (aIdx + 1)"></span>
+                                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-bold font-mono text-gray-400" x-text="'Soal #' + (aIdx + 1)"></span>
+                                            <template x-if="ans.question && ans.question.question_type === 'multi_select'">
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                                    Pilihan Jamak
+                                                </span>
+                                            </template>
+                                        </div>
                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold"
                                               :class="ans.is_correct ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'"
                                               x-text="ans.is_correct ? '✓ Benar (+' + ans.points_earned + ' Poin)' : '✗ Salah (0 Poin)'"></span>
                                     </div>
 
-                                    <p class="text-xs font-semibold text-white mb-2" x-text="ans.question ? ans.question.question_text : 'Pertanyaan'"></p>
+                                    <p class="text-xs font-semibold text-white" x-text="ans.question ? ans.question.question_text : 'Pertanyaan'"></p>
+
+                                    {{-- Question Image if present --}}
+                                    <template x-if="ans.question && ans.question.image_url">
+                                        <div class="my-2">
+                                            <img :src="ans.question.image_url" alt="Gambar Soal"
+                                                 class="max-h-56 rounded-xl border border-[#1A2820] bg-[#090D0B] object-contain">
+                                        </div>
+                                    </template>
+
+                                    {{-- Options breakdown --}}
+                                    <template x-if="ans.question && ans.question.options && ans.question.options.length > 0">
+                                        <div class="space-y-1.5 pt-1">
+                                            <template x-for="(opt, optIdx) in ans.question.options" :key="opt.id">
+                                                <div class="flex items-start gap-2.5 p-2 rounded-lg text-xs transition-colors border"
+                                                     :class="opt.is_correct
+                                                        ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-200'
+                                                        : (isOptSelected(ans, opt.id)
+                                                            ? 'bg-rose-500/10 border-rose-500/40 text-rose-200'
+                                                            : 'bg-[#090D0B]/60 border-[#1A2820] text-gray-400')">
+                                                    
+                                                    <span class="w-5 h-5 rounded-md flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5"
+                                                          :class="opt.is_correct ? 'bg-emerald-500/20 text-emerald-300' : (isOptSelected(ans, opt.id) ? 'bg-rose-500/20 text-rose-300' : 'bg-[#142019] text-gray-400')"
+                                                          x-text="String.fromCharCode(65 + optIdx)"></span>
+
+                                                    <div class="flex-1 min-w-0">
+                                                        <div class="flex items-center gap-2 flex-wrap">
+                                                            <span class="font-medium" x-text="opt.option_text"></span>
+                                                            <template x-if="opt.is_correct">
+                                                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                                    ✓ Kunci
+                                                                </span>
+                                                            </template>
+                                                            <template x-if="isOptSelected(ans, opt.id)">
+                                                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold"
+                                                                      :class="opt.is_correct ? 'bg-emerald-500/30 text-emerald-200' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'">
+                                                                    Dipilih Mahasiswa
+                                                                </span>
+                                                            </template>
+                                                        </div>
+
+                                                        <template x-if="opt.image_url">
+                                                            <div class="mt-1.5">
+                                                                <img :src="opt.image_url" alt="Gambar Opsi"
+                                                                     class="max-h-36 rounded-lg border border-[#1A2820] bg-[#090D0B] object-contain">
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
 
                                     <template x-if="ans.question && ans.question.explanation">
                                         <p class="text-[11px] text-teal-300/80 mt-2 p-2 rounded-lg bg-teal-500/5 border border-teal-500/20">
@@ -348,6 +406,12 @@
             viewAttemptDetail(attempt) {
                 this.selectedAttempt = attempt;
                 this.showDetailModal = true;
+            },
+            isOptSelected(ans, optId) {
+                if (!ans) return false;
+                if (ans.selected_option_id === optId) return true;
+                if (Array.isArray(ans.selected_option_ids) && ans.selected_option_ids.includes(optId)) return true;
+                return false;
             }
         };
     }

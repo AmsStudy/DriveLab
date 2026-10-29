@@ -243,28 +243,47 @@
                                 </div>
                             </div>
 
+                            {{-- Question Image (if uploaded) --}}
+                            @if(!empty($ans->question->image_path))
+                                <div class="mb-3 rounded-2xl overflow-hidden border border-[#1A2820] bg-black/40 max-h-72 flex items-center justify-center p-2">
+                                    <a href="{{ $ans->question->image_url }}" target="_blank">
+                                        <img src="{{ $ans->question->image_url }}" alt="Gambar Soal" class="max-h-64 w-auto object-contain rounded-xl">
+                                    </a>
+                                </div>
+                            @endif
+
                             {{-- Question Text --}}
-                            <p class="text-sm sm:text-base font-bold text-white mb-4 leading-relaxed">{{ $ans->question->question_text ?? 'Pertanyaan' }}</p>
+                            <p class="text-sm sm:text-base font-bold text-white mb-4 leading-relaxed whitespace-pre-wrap">{{ $ans->question->question_text ?? 'Pertanyaan' }}</p>
 
                             {{-- Options Grid --}}
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
                                 @php
                                     $labels = ['A', 'B', 'C', 'D', 'E', 'F'];
+                                    $studentSelection = $ans->selected_option_ids ?: ($ans->selected_option_id ? [$ans->selected_option_id] : []);
                                 @endphp
                                 @foreach($ans->question->options as $optIdx => $opt)
                                     @php
-                                        $isSelectedByStudent = ($ans->selected_option_id === $opt->id);
+                                        $isSelectedByStudent = in_array((int)$opt->id, array_map('intval', $studentSelection), true);
                                         $isCorrectOption = (bool)$opt->is_correct;
                                     @endphp
 
                                     @if($isCorrectOption)
                                         {{-- KUNCI BENAR --}}
-                                        <div class="p-3 rounded-xl border-2 border-emerald-500/60 bg-[#0E2018] text-white flex items-center justify-between gap-2 shadow-sm">
-                                            <div class="flex items-center gap-2.5">
-                                                <span class="w-6 h-6 rounded-lg bg-emerald-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
+                                        <div class="p-3 rounded-xl border-2 border-emerald-500/60 bg-[#0E2018] text-white flex items-start justify-between gap-2 shadow-sm">
+                                            <div class="flex items-start gap-2.5 min-w-0">
+                                                <span class="w-6 h-6 rounded-lg bg-emerald-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                                                     {{ $labels[$optIdx] ?? ($optIdx + 1) }}
                                                 </span>
-                                                <span class="font-semibold text-emerald-100">{{ $opt->option_text }}</span>
+                                                <div class="min-w-0">
+                                                    @if($opt->image_path)
+                                                        <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
+                                                            <a href="{{ $opt->image_url }}" target="_blank">
+                                                                <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                    <span class="font-semibold text-emerald-100 block leading-snug">{{ $opt->option_text }}</span>
+                                                </div>
                                             </div>
                                             @if($isSelectedByStudent)
                                                 <span class="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1">
@@ -280,12 +299,21 @@
                                         </div>
                                     @elseif($isSelectedByStudent)
                                         {{-- JAWABAN SALAH MAHASISWA --}}
-                                        <div class="p-3 rounded-xl border-2 border-rose-500/60 bg-[#221013] text-white flex items-center justify-between gap-2 shadow-sm">
-                                            <div class="flex items-center gap-2.5">
-                                                <span class="w-6 h-6 rounded-lg bg-rose-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
+                                        <div class="p-3 rounded-xl border-2 border-rose-500/60 bg-[#221013] text-white flex items-start justify-between gap-2 shadow-sm">
+                                            <div class="flex items-start gap-2.5 min-w-0">
+                                                <span class="w-6 h-6 rounded-lg bg-rose-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                                                     {{ $labels[$optIdx] ?? ($optIdx + 1) }}
                                                 </span>
-                                                <span class="font-semibold text-rose-200 line-through opacity-90">{{ $opt->option_text }}</span>
+                                                <div class="min-w-0">
+                                                    @if($opt->image_path)
+                                                        <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
+                                                            <a href="{{ $opt->image_url }}" target="_blank">
+                                                                <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                    <span class="font-semibold text-rose-200 line-through opacity-90 block leading-snug">{{ $opt->option_text }}</span>
+                                                </div>
                                             </div>
                                             <span class="text-[10px] bg-rose-600 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -294,11 +322,20 @@
                                         </div>
                                     @else
                                         {{-- OPSI LAIN (NETRAL) --}}
-                                        <div class="p-3 rounded-xl border border-[#1A2820] bg-[#0E1612] text-gray-400 flex items-center gap-2.5 opacity-75">
-                                            <span class="w-6 h-6 rounded-lg bg-gray-800 text-gray-400 font-bold text-xs flex items-center justify-center flex-shrink-0">
+                                        <div class="p-3 rounded-xl border border-[#1A2820] bg-[#0E1612] text-gray-400 flex items-start gap-2.5 opacity-75">
+                                            <span class="w-6 h-6 rounded-lg bg-gray-800 text-gray-400 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                                                 {{ $labels[$optIdx] ?? ($optIdx + 1) }}
                                             </span>
-                                            <span class="font-normal">{{ $opt->option_text }}</span>
+                                            <div class="min-w-0">
+                                                @if($opt->image_path)
+                                                    <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
+                                                        <a href="{{ $opt->image_url }}" target="_blank">
+                                                            <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
+                                                        </a>
+                                                    </div>
+                                                @endif
+                                                <span class="font-normal block leading-snug">{{ $opt->option_text }}</span>
+                                            </div>
                                         </div>
                                     @endif
                                 @endforeach

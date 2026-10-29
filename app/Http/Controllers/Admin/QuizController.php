@@ -8,6 +8,7 @@ use App\Models\QuizAttempt;
 use App\Models\QuizOption;
 use App\Models\QuizQuestion;
 use App\Models\Soal;
+use App\Services\QuizImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -80,6 +81,9 @@ class QuizController extends Controller
             'title'              => 'required|string|max:255',
             'description'        => 'nullable|string|max:1000',
             'soal_id'            => 'nullable|exists:soals,id',
+            'access_password'    => 'nullable|string|max:50',
+            'starts_at'          => 'nullable|date',
+            'ends_at'            => 'nullable|date|after_or_equal:starts_at',
             'time_limit_minutes' => 'nullable|integer|min:0|max:300',
             'time_per_question'  => 'nullable|integer|min:0|max:300',
             'shuffle_questions'  => 'nullable|boolean',
@@ -97,6 +101,9 @@ class QuizController extends Controller
         $quiz->title                 = $validated['title'];
         $quiz->description           = $validated['description'] ?? null;
         $quiz->soal_id               = $validated['soal_id'] ?? null;
+        $quiz->access_password       = $request->filled('access_password') ? trim($request->access_password) : null;
+        $quiz->starts_at             = $request->filled('starts_at') ? $request->starts_at : null;
+        $quiz->ends_at               = $request->filled('ends_at') ? $request->ends_at : null;
         $quiz->time_limit_minutes    = $validated['time_limit_minutes'] ?? 0;
         $quiz->time_per_question     = $validated['time_per_question'] ?? 0;
         $quiz->shuffle_questions     = $request->boolean('shuffle_questions', true);
@@ -129,6 +136,9 @@ class QuizController extends Controller
             'title'              => 'required|string|max:255',
             'description'        => 'nullable|string|max:1000',
             'soal_id'            => 'nullable|exists:soals,id',
+            'access_password'    => 'nullable|string|max:50',
+            'starts_at'          => 'nullable|date',
+            'ends_at'            => 'nullable|date|after_or_equal:starts_at',
             'time_limit_minutes' => 'nullable|integer|min:0|max:300',
             'time_per_question'  => 'nullable|integer|min:0|max:300',
             'shuffle_questions'  => 'nullable|boolean',
@@ -144,6 +154,9 @@ class QuizController extends Controller
         $quiz->title                 = $validated['title'];
         $quiz->description           = $validated['description'] ?? null;
         $quiz->soal_id               = $validated['soal_id'] ?? null;
+        $quiz->access_password       = $request->filled('access_password') ? trim($request->access_password) : null;
+        $quiz->starts_at             = $request->filled('starts_at') ? $request->starts_at : null;
+        $quiz->ends_at               = $request->filled('ends_at') ? $request->ends_at : null;
         $quiz->time_limit_minutes    = $validated['time_limit_minutes'] ?? 0;
         $quiz->time_per_question     = $validated['time_per_question'] ?? 0;
         $quiz->shuffle_questions     = $request->boolean('shuffle_questions', false);
@@ -200,29 +213,57 @@ class QuizController extends Controller
         $this->authorizeQuiz($quiz);
 
         $validated = $request->validate([
-            'question_text' => 'required|string',
-            'question_type' => 'required|in:multiple_choice,true_false',
-            'points'        => 'required|integer|min:1|max:1000',
-            'explanation'   => 'nullable|string',
-            'options'       => 'required|array|min:2',
-            'options.*'     => 'required|string',
-            'correct_index' => 'required|integer|min:0',
+            'question_text'    => 'required|string',
+            'question_type'    => 'nullable|in:multiple_choice,multi_select,true_false',
+            'points'           => 'required|integer|min:1|max:1000',
+            'explanation'      => 'nullable|string',
+            'question_image'   => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'options'          => 'required|array|min:2',
+            'options.*'        => 'nullable|string',
+            'option_images.*'  => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'correct_indices'  => 'nullable|array|min:1',
+            'correct_indices.*'=> 'integer|min:0',
+            'correct_index'    => 'nullable|integer|min:0',
         ]);
 
-        DB::transaction(function () use ($quiz, $validated) {
+        $correctIndices = [];
+        if ($request->has('correct_indices') && is_array($request->correct_indices)) {
+            $correctIndices = array_map('intval', $request->correct_indices);
+        } elseif ($request->filled('correct_index')) {
+            $correctIndices = [(int)$request->correct_index];
+        } else {
+            $correctIndices = [0];
+        }
+
+        $isMulti = count($correctIndices) > 1;
+        $questionType = $isMulti ? 'multi_select' : ($request->input('question_type') ?: 'multiple_choice');
+
+        $questionImagePath = null;
+        if ($request->hasFile('question_image')) {
+            $questionImagePath = QuizImageService::optimizeAndStore($request->file('question_image'), 'questions', 1200);
+        }
+
+        DB::transaction(function () use ($quiz, $validated, $questionImagePath, $questionType, $correctIndices, $request) {
             $maxOrder = $quiz->questions()->max('order_num') ?? 0;
             $question = $quiz->questions()->create([
                 'question_text' => $validated['question_text'],
-                'question_type' => $validated['question_type'],
+                'image_path'    => $questionImagePath,
+                'question_type' => $questionType,
                 'points'        => $validated['points'],
                 'explanation'   => $validated['explanation'] ?? null,
                 'order_num'     => $maxOrder + 1,
             ]);
 
-            foreach ($validated['options'] as $idx => $optText) {
+            foreach ($request->input('options', []) as $idx => $optText) {
+                $optImagePath = null;
+                if ($request->hasFile("option_images.{$idx}")) {
+                    $optImagePath = QuizImageService::optimizeAndStore($request->file("option_images.{$idx}"), 'options', 650);
+                }
+
                 $question->options()->create([
-                    'option_text' => $optText,
-                    'is_correct'  => ((int)$validated['correct_index'] === (int)$idx),
+                    'option_text' => $optText ?? '',
+                    'image_path'  => $optImagePath,
+                    'is_correct'  => in_array((int)$idx, $correctIndices, true),
                     'order_num'   => $idx + 1,
                 ]);
             }
@@ -239,28 +280,70 @@ class QuizController extends Controller
         }
 
         $validated = $request->validate([
-            'question_text' => 'required|string',
-            'question_type' => 'required|in:multiple_choice,true_false',
-            'points'        => 'required|integer|min:1|max:1000',
-            'explanation'   => 'nullable|string',
-            'options'       => 'required|array|min:2',
-            'options.*'     => 'required|string',
-            'correct_index' => 'required|integer|min:0',
+            'question_text'            => 'required|string',
+            'question_type'            => 'nullable|in:multiple_choice,multi_select,true_false',
+            'points'                   => 'required|integer|min:1|max:1000',
+            'explanation'              => 'nullable|string',
+            'question_image'           => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'remove_question_image'    => 'nullable|boolean',
+            'options'                  => 'required|array|min:2',
+            'options.*'                => 'nullable|string',
+            'option_images.*'          => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+            'existing_option_images.*' => 'nullable|string',
+            'remove_option_images.*'   => 'nullable|boolean',
+            'correct_indices'          => 'nullable|array|min:1',
+            'correct_indices.*'        => 'integer|min:0',
+            'correct_index'            => 'nullable|integer|min:0',
         ]);
 
-        DB::transaction(function () use ($question, $validated) {
+        $correctIndices = [];
+        if ($request->has('correct_indices') && is_array($request->correct_indices)) {
+            $correctIndices = array_map('intval', $request->correct_indices);
+        } elseif ($request->filled('correct_index')) {
+            $correctIndices = [(int)$request->correct_index];
+        } else {
+            $correctIndices = [0];
+        }
+
+        $isMulti = count($correctIndices) > 1;
+        $questionType = $isMulti ? 'multi_select' : ($request->input('question_type') ?: 'multiple_choice');
+
+        $questionImagePath = $question->image_path;
+        if ($request->boolean('remove_question_image')) {
+            QuizImageService::deleteImage($questionImagePath);
+            $questionImagePath = null;
+        }
+        if ($request->hasFile('question_image')) {
+            QuizImageService::deleteImage($questionImagePath);
+            $questionImagePath = QuizImageService::optimizeAndStore($request->file('question_image'), 'questions', 1200);
+        }
+
+        DB::transaction(function () use ($question, $validated, $questionImagePath, $questionType, $correctIndices, $request) {
             $question->update([
                 'question_text' => $validated['question_text'],
-                'question_type' => $validated['question_type'],
+                'image_path'    => $questionImagePath,
+                'question_type' => $questionType,
                 'points'        => $validated['points'],
                 'explanation'   => $validated['explanation'] ?? null,
             ]);
 
+            // Recreate options, preserving or updating images
             $question->options()->delete();
-            foreach ($validated['options'] as $idx => $optText) {
+            foreach ($request->input('options', []) as $idx => $optText) {
+                $optImagePath = $request->input("existing_option_images.{$idx}");
+                if ($request->boolean("remove_option_images.{$idx}")) {
+                    QuizImageService::deleteImage($optImagePath);
+                    $optImagePath = null;
+                }
+                if ($request->hasFile("option_images.{$idx}")) {
+                    QuizImageService::deleteImage($optImagePath);
+                    $optImagePath = QuizImageService::optimizeAndStore($request->file("option_images.{$idx}"), 'options', 650);
+                }
+
                 $question->options()->create([
-                    'option_text' => $optText,
-                    'is_correct'  => ((int)$validated['correct_index'] === (int)$idx),
+                    'option_text' => $optText ?? '',
+                    'image_path'  => $optImagePath,
+                    'is_correct'  => in_array((int)$idx, $correctIndices, true),
                     'order_num'   => $idx + 1,
                 ]);
             }
@@ -274,6 +357,11 @@ class QuizController extends Controller
         $this->authorizeQuiz($quiz);
         if ($question->quiz_id !== $quiz->id) {
             abort(404);
+        }
+
+        QuizImageService::deleteImage($question->image_path);
+        foreach ($question->options as $opt) {
+            QuizImageService::deleteImage($opt->image_path);
         }
 
         $question->delete();
@@ -297,7 +385,7 @@ class QuizController extends Controller
             });
         }
 
-        $attempts = $query->with('answers.question')
+        $attempts = $query->with(['answers.question.options', 'answers.selectedOption'])
             ->orderByDesc('is_locked')
             ->orderByDesc('score')
             ->orderBy('duration_seconds')

@@ -82,30 +82,109 @@
                 </a>
             </div>
         @else
-            {{-- Active Quiz Lobby --}}
-            <div class="space-y-6">
+            {{-- Active Quiz Lobby with Schedule & Access Check --}}
+            <div class="space-y-6"
+                 x-data="{
+                     secondsLeft: {{ $secondsUntilStart ?? 0 }},
+                     isUpcoming: {{ $isUpcoming ? 'true' : 'false' }},
+                     isExpired: {{ $isExpired ? 'true' : 'false' }},
+                     showPassword: false,
+                     timerInterval: null,
+                     formatTime(s) {
+                         if (s <= 0) return '00:00:00';
+                         const h = Math.floor(s / 3600);
+                         const m = Math.floor((s % 3600) / 60);
+                         const sec = s % 60;
+                         if (h > 24) {
+                             const days = Math.floor(h / 24);
+                             const remH = h % 24;
+                             return `${days} Hari ${remH} Jam ${String(m).padStart(2, '0')}m`;
+                         }
+                         return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+                     },
+                     init() {
+                         if (this.isUpcoming && this.secondsLeft > 0) {
+                             this.timerInterval = setInterval(() => {
+                                 this.secondsLeft--;
+                                 if (this.secondsLeft <= 0) {
+                                     clearInterval(this.timerInterval);
+                                     this.isUpcoming = false;
+                                     window.location.reload();
+                                 }
+                             }, 1000);
+                         }
+                     }
+                 }">
 
                 {{-- Alert Messages --}}
                 @if(session('error'))
-                    <div class="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm flex items-center gap-3">
+                    <div class="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm flex items-center gap-3 animate-shake">
                         <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span>{{ session('error') }}</span>
+                        <span class="font-medium">{{ session('error') }}</span>
                     </div>
                 @endif
+
+                {{-- Countdown Timer Banner (if quiz is upcoming / not started yet) --}}
+                <template x-if="isUpcoming">
+                    <div class="p-6 md:p-8 rounded-3xl bg-amber-500/10 border border-amber-500/30 text-center glow-card relative overflow-hidden">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 animate-pulse">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <span class="text-xs font-bold text-amber-400 uppercase tracking-widest block mb-1">Kuis Belum Dimulai</span>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-white heading-font mb-2">Hitungan Mundur Akses Soal</h2>
+                        <p class="text-xs text-gray-400 mb-4">
+                            Soal dijadwalkan dapat diakses pada: <strong class="text-amber-300">{{ $quiz->starts_at ? $quiz->starts_at->translatedFormat('l, d F Y &bull; H:i') : '-' }} WITA</strong>
+                        </p>
+                        <div class="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#090D0B] border border-amber-500/40 shadow-inner">
+                            <span class="text-xs font-mono text-gray-400 uppercase tracking-wider">Mulai Dalam:</span>
+                            <span class="text-2xl md:text-3xl font-mono font-extrabold text-amber-400 tracking-wider" x-text="formatTime(secondsLeft)"></span>
+                        </div>
+                    </div>
+                </template>
+
+                {{-- Schedule Expired Banner (if quiz ends_at passed) --}}
+                <template x-if="isExpired">
+                    <div class="p-6 md:p-8 rounded-3xl bg-rose-500/10 border border-rose-500/30 text-center glow-card">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                        </div>
+                        <span class="text-xs font-bold text-rose-400 uppercase tracking-widest block mb-1">Akses Ditutup</span>
+                        <h2 class="text-2xl font-extrabold text-white heading-font mb-2">Batas Waktu Akses Telah Berakhir</h2>
+                        <p class="text-xs text-gray-300 max-w-lg mx-auto leading-relaxed">
+                            Batas waktu pengerjaan kuis ini telah melewati jadwal yang ditetapkan (<strong>{{ $quiz->ends_at ? $quiz->ends_at->translatedFormat('d M Y, H:i') : '' }} WITA</strong>). Mahasiswa tidak dapat lagi mengakses soal.
+                        </p>
+                    </div>
+                </template>
 
                 {{-- Hero Banner Card --}}
                 <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 md:p-8 glow-card relative overflow-hidden">
                     <div class="absolute -right-16 -top-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
                     <div class="flex flex-wrap items-center gap-2 mb-4">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                            Sesi Kuis Terbuka
-                        </span>
+                        @if($isExpired)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                                ⛔ Akses Kuis Ditutup
+                            </span>
+                        @elseif($isUpcoming)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                                ⏳ Menunggu Jadwal Mulai
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                                Sesi Kuis Terbuka
+                            </span>
+                        @endif
 
                         <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#142019] text-gray-300 border border-[#1E3327]">
                             Kode: {{ $quiz->access_code }}
                         </span>
+
+                        @if($hasPassword)
+                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20 flex items-center gap-1">
+                                🔒 Dilindungi Password Soal
+                            </span>
+                        @endif
 
                         @if($quiz->soal)
                             <span class="px-3 py-1 rounded-full text-xs font-medium bg-teal-500/10 text-teal-300 border border-teal-500/20">
@@ -156,7 +235,7 @@
                             </div>
                             <div>
                                 <h3 class="text-base font-bold text-white heading-font">Data Identitas Mahasiswa</h3>
-                                <p class="text-xs text-gray-400">Masukkan NIM dan Nama Lengkap Anda sebelum mulai</p>
+                                <p class="text-xs text-gray-400">Masukkan NIM, Nama Lengkap, dan Password Akses</p>
                             </div>
                         </div>
 
@@ -187,11 +266,53 @@
                                 @enderror
                             </div>
 
+                            {{-- Password Akses Soal (jika kuis dilindungi password) --}}
+                            @if($hasPassword)
+                                <div>
+                                    <label class="block text-xs font-semibold text-amber-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                        <span class="flex items-center gap-1.5">
+                                            <span>🔒 Password Akses Soal</span>
+                                            <span class="text-red-400">*</span>
+                                        </span>
+                                        <span class="text-[10px] text-gray-500 font-normal">Diberikan oleh Dosen / Asisten</span>
+                                    </label>
+                                    <div class="relative">
+                                        <input :type="showPassword ? 'text' : 'password'"
+                                               name="access_password"
+                                               value="{{ old('access_password') }}"
+                                               required
+                                               placeholder="Masukkan password akses soal..."
+                                               class="w-full pl-4 pr-11 py-3 bg-[#090D0B] border border-amber-500/40 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 rounded-xl text-sm text-gray-100 placeholder-gray-600 font-mono">
+                                        <button type="button"
+                                                @click="showPassword = !showPassword"
+                                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 p-1">
+                                            <svg x-show="!showPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <svg x-show="showPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                                        </button>
+                                    </div>
+                                    <p class="text-[11px] text-gray-500 mt-1">Pastikan password diisi dengan benar sebelum menekan tombol masuk.</p>
+                                </div>
+                            @endif
+
                             <div class="pt-3">
                                 <button type="submit"
-                                        class="w-full py-3.5 px-6 rounded-2xl text-white font-bold text-base glow-button flex items-center justify-center gap-2 transition-all">
-                                    <span>🚀 Masuk ke Arena Kuis</span>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                        :disabled="isUpcoming || isExpired"
+                                        :class="(isUpcoming || isExpired) ? 'opacity-50 cursor-not-allowed bg-gray-800 text-gray-500' : 'glow-button text-white'"
+                                        class="w-full py-3.5 px-6 rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all">
+                                    <template x-if="isUpcoming">
+                                        <span class="flex items-center gap-2">
+                                            <span>⏳ Menunggu Jadwal Kuis...</span>
+                                        </span>
+                                    </template>
+                                    <template x-if="isExpired">
+                                        <span>⛔ Akses Kuis Telah Berakhir</span>
+                                    </template>
+                                    <template x-if="!isUpcoming && !isExpired">
+                                        <span class="flex items-center gap-2">
+                                            <span>🚀 Masuk ke Arena Kuis</span>
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                        </span>
+                                    </template>
                                 </button>
                             </div>
                         </form>
@@ -212,11 +333,11 @@
                                 </li>
                                 <li class="flex items-start gap-2.5">
                                     <span class="text-emerald-400 mt-0.5">•</span>
-                                    <span><strong>Timer Otomatis:</strong> Jawaban akan otomatis terkumpul ketika waktu pengerjaan berakhir.</span>
+                                    <span><strong>Soal Gambar & Pilihan Jamak:</strong> Beberapa soal mungkin memiliki gambar diagram dan lebih dari satu jawaban benar (kotak centang).</span>
                                 </li>
                                 <li class="flex items-start gap-2.5">
                                     <span class="text-emerald-400 mt-0.5">•</span>
-                                    <span><strong>Shortcut Keyboard:</strong> Anda dapat menekan tombol 1, 2, 3, 4 atau A, B, C, D di keyboard untuk memilih jawaban dengan cepat.</span>
+                                    <span><strong>Timer Otomatis:</strong> Jawaban akan otomatis terkumpul ketika waktu pengerjaan berakhir.</span>
                                 </li>
                                 <li class="flex items-start gap-2.5">
                                     <span class="text-emerald-400 mt-0.5">•</span>

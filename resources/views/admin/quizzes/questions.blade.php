@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('title', 'Bank Soal: ' . $quiz->title)
 @section('page-title', 'CMS Bank Soal Kuis')
-@section('page-description', 'Kelola daftar pertanyaan, pilihan opsi, kunci jawaban, dan pembahasan')
+@section('page-description', 'Kelola daftar pertanyaan, gambar soal/jawaban, kunci jawaban jamak, dan pembahasan')
 
 @section('content')
 <div x-data="questionManager()" class="space-y-6">
@@ -42,14 +42,14 @@
         </div>
     </div>
 
-    {{-- Questions List --}}
+    {{-- Questions List: 2-Column Split (Ganjil di Kiri, Genap di Kanan) --}}
     @if($quiz->questions->isEmpty())
         <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-16 text-center">
             <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
             <h3 class="text-base font-bold text-white mb-1">Belum Ada Pertanyaan di Kuis Ini</h3>
-            <p class="text-xs text-gray-400 max-w-sm mx-auto mb-6">Mulai bangun pertanyaan pilihan ganda atau benar-salah untuk kuis interaktif ini.</p>
+            <p class="text-xs text-gray-400 max-w-sm mx-auto mb-6">Mulai bangun pertanyaan pilihan ganda, pilihan jamak, atau bergambar untuk kuis interaktif ini.</p>
             <button type="button" @click="openCreateModal()"
                     class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold hover:opacity-95 transition-all">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -57,78 +57,40 @@
             </button>
         </div>
     @else
-        <div class="space-y-4">
-            @foreach($quiz->questions as $index => $q)
-                <div class="bg-[#0F1713] border border-[#1A2820] hover:border-[#283d31] rounded-2xl p-5 transition-all">
-                    {{-- Header Pertanyaan --}}
-                    <div class="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-[#1A2820]">
-                        <div class="flex items-center gap-2.5 flex-wrap">
-                            <span class="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-xs flex items-center justify-center">
-                                {{ $index + 1 }}
-                            </span>
-                            <span class="px-2.5 py-1 rounded-md bg-[#131E17] border border-[#1A2820] text-gray-300 text-xs font-medium">
-                                {{ $q->question_type === 'true_false' ? 'Benar / Salah' : 'Pilihan Ganda' }}
-                            </span>
-                            <span class="px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold">
-                                +{{ $q->points }} Poin
-                            </span>
-                        </div>
+        @php
+            $oddItems = [];
+            $evenItems = [];
+            foreach ($quiz->questions as $i => $q) {
+                if ($i % 2 === 0) {
+                    $oddItems[] = ['q' => $q, 'num' => $i + 1];
+                } else {
+                    $evenItems[] = ['q' => $q, 'num' => $i + 1];
+                }
+            }
+        @endphp
 
-                        {{-- Action Buttons --}}
-                        <div class="flex items-center gap-1.5">
-                            <button type="button"
-                                    @click="openEditModal(@js($q))"
-                                    title="Edit Pertanyaan"
-                                    class="p-2 rounded-lg text-gray-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                            </button>
-
-                            <form method="POST" action="{{ route('admin.quizzes.questions.destroy', [$quiz, $q]) }}" class="inline"
-                                  onsubmit="confirmAction(event, 'Hapus pertanyaan No. {{ $index + 1 }} ini?', 'Ya, Hapus', true)">
-                                @csrf @method('DELETE')
-                                <button type="submit" title="Hapus Pertanyaan"
-                                        class="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    {{-- Question Text --}}
-                    <div class="text-sm font-semibold text-white mb-4 whitespace-pre-wrap leading-relaxed">
-                        {{ $q->question_text }}
-                    </div>
-
-                    {{-- Options List --}}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
-                        @php
-                            $labels = ['A', 'B', 'C', 'D', 'E', 'F'];
-                        @endphp
-                        @foreach($q->options as $optIndex => $opt)
-                            <div class="flex items-center gap-3 p-3 rounded-xl border transition-colors {{ $opt->is_correct ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-200' : 'bg-[#090D0B] border-[#1A2820] text-gray-300' }}">
-                                <span class="w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center flex-shrink-0 {{ $opt->is_correct ? 'bg-emerald-500 text-white' : 'bg-gray-800 text-gray-400' }}">
-                                    {{ $labels[$optIndex] ?? ($optIndex + 1) }}
-                                </span>
-                                <span class="text-xs font-medium flex-1">{{ $opt->option_text }}</span>
-                                @if($opt->is_correct)
-                                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full flex-shrink-0">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                        Kunci
-                                    </span>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-
-                    {{-- Explanation (if provided) --}}
-                    @if($q->explanation)
-                        <div class="mt-3 p-3 rounded-xl bg-teal-500/5 border border-teal-500/20 text-teal-300 text-xs flex items-start gap-2">
-                            <span class="font-bold flex-shrink-0">💡 Pembahasan:</span>
-                            <span class="text-gray-300">{{ $q->explanation }}</span>
-                        </div>
-                    @endif
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+            {{-- Kolom Kiri: Soal Nomor Ganjil (#1, #3, #5, ...) --}}
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 px-1 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span>Kolom Kiri &bull; Soal Ganjil</span>
                 </div>
-            @endforeach
+                @foreach($oddItems as $item)
+                    @include('admin.quizzes.partials.question-card', ['q' => $item['q'], 'qNum' => $item['num']])
+                @endforeach
+            </div>
+
+            {{-- Kolom Kanan: Soal Nomor Genap (#2, #4, #6, ...) --}}
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 px-1 text-xs font-semibold text-teal-400 uppercase tracking-wider">
+                    <span class="w-2 h-2 rounded-full bg-teal-400"></span>
+                    <span>Kolom Kanan &bull; Soal Genap</span>
+                </div>
+                @foreach($evenItems as $item)
+                    @include('admin.quizzes.partials.question-card', ['q' => $item['q'], 'qNum' => $item['num']])
+                @endforeach
+            </div>
         </div>
     @endif
 
@@ -144,13 +106,13 @@
          style="display: none;">
 
         <div @click.away="closeModal()"
-             class="bg-[#0F1713] border border-[#1A2820] rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+             class="bg-[#0F1713] border border-[#1A2820] rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             
             {{-- Modal Header --}}
             <div class="px-6 py-4 border-b border-[#1A2820] flex items-center justify-between">
                 <div>
                     <h3 class="text-base font-bold text-white" x-text="isEdit ? 'Edit Pertanyaan' : 'Tambah Pertanyaan Baru'"></h3>
-                    <p class="text-xs text-gray-400" x-text="isEdit ? 'Perbarui konten pertanyaan dan pilihan jawaban' : 'Buat soal pilihan ganda atau benar-salah'"></p>
+                    <p class="text-xs text-gray-400">Buat soal pilihan tunggal / jamak lengkap dengan gambar tajam & pembahasan</p>
                 </div>
                 <button type="button" @click="closeModal()" class="text-gray-400 hover:text-white transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -158,32 +120,23 @@
             </div>
 
             {{-- Modal Body Form --}}
-            <form :action="formAction" method="POST" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <form :action="formAction" method="POST" enctype="multipart/form-data" class="flex-1 overflow-y-auto p-6 space-y-5">
                 @csrf
                 <template x-if="isEdit">
                     <input type="hidden" name="_method" value="PUT">
                 </template>
-
-                {{-- Teks Pertanyaan --}}
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
-                        Teks Pertanyaan <span class="text-red-400">*</span>
-                    </label>
-                    <textarea name="question_text" x-model="formData.question_text" rows="3" required
-                              placeholder="Tuliskan butir soal di sini..."
-                              class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-500"></textarea>
-                </div>
 
                 {{-- Baris Pengaturan: Tipe & Poin --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {{-- Tipe Pertanyaan --}}
                     <div>
                         <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
-                            Tipe Pertanyaan <span class="text-red-400">*</span>
+                            Jenis Pertanyaan <span class="text-red-400">*</span>
                         </label>
                         <select name="question_type" x-model="formData.question_type" @change="handleTypeChange()"
-                                class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
-                            <option value="multiple_choice">Pilihan Ganda (A, B, C, D...)</option>
+                                class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 font-medium">
+                            <option value="multiple_choice">Pilihan Ganda (Tunggal - 1 Jawaban Benar)</option>
+                            <option value="multi_select">Pilihan Jamak (Checkbox - Lebih dari 1 Jawaban Benar)</option>
                             <option value="true_false">Benar / Salah (True / False)</option>
                         </select>
                     </div>
@@ -191,54 +144,132 @@
                     {{-- Bobot Poin --}}
                     <div>
                         <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
-                            Bobot Poin <span class="text-red-400">*</span>
+                            Bobot Nilai (Poin) <span class="text-red-400">*</span>
                         </label>
                         <input type="number" name="points" x-model="formData.points" min="1" max="1000" required
-                               class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                               class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 font-bold">
                     </div>
+                </div>
+
+                {{-- Teks Pertanyaan --}}
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                        Teks Pertanyaan <span class="text-red-400">*</span>
+                    </label>
+                    <textarea name="question_text" x-model="formData.question_text" rows="3" required
+                              placeholder="Tuliskan teks atau butir pertanyaan di sini..."
+                              class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-500 leading-relaxed"></textarea>
+                </div>
+
+                {{-- Upload Gambar Pertanyaan (Kompresi Tajam / Anti-Blur) --}}
+                <div class="p-3.5 rounded-xl bg-[#090D0B] border border-[#1A2820]">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-semibold text-teal-300 uppercase tracking-wider flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            Gambar Pendukung Soal (Opsional &bull; Otomatis Terkompresi Tajam)
+                        </label>
+                        <template x-if="formData.question_image_preview">
+                            <button type="button" @click="clearQuestionImage()"
+                                    class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 font-medium">
+                                ✕ Hapus Gambar
+                            </button>
+                        </template>
+                    </div>
+
+                    {{-- Image Preview if existing or selected --}}
+                    <template x-if="formData.question_image_preview">
+                        <div class="mb-3 max-h-48 overflow-hidden rounded-lg border border-teal-500/30 bg-black/40 flex items-center justify-center p-2">
+                            <img :src="formData.question_image_preview" alt="Preview Gambar Soal" class="max-h-44 object-contain rounded">
+                        </div>
+                    </template>
+
+                    <input type="file" name="question_image" accept="image/*" @change="previewQuestionImage($event)"
+                           class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-500/20 file:text-teal-300 hover:file:bg-teal-500/30 file:cursor-pointer cursor-pointer">
+                    
+                    <input type="hidden" name="remove_question_image" :value="formData.remove_question_image ? 1 : 0">
+                    <p class="text-[11px] text-gray-500 mt-1.5">Format: JPG, PNG, WebP. Gambar dikompresi otomatis tanpa pecah/blur agar cepat diakses mahasiswa.</p>
                 </div>
 
                 {{-- Opsi Jawaban --}}
                 <div>
                     <div class="flex items-center justify-between mb-2">
-                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                            Pilihan Jawaban (Centang tombol radio untuk Kunci Jawaban Benar) <span class="text-red-400">*</span>
-                        </label>
-                        <button type="button" x-show="formData.question_type === 'multiple_choice' && formData.options.length < 6"
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                                Pilihan Jawaban & Kunci
+                            </label>
+                            <p class="text-[11px] text-gray-400" x-text="formData.question_type === 'multi_select' ? 'Centang kotak (checkbox) untuk SEMUA jawaban yang benar.' : 'Centang tombol radio untuk satu kunci jawaban yang benar.'"></p>
+                        </div>
+
+                        <button type="button" x-show="formData.question_type !== 'true_false' && formData.options.length < 6"
                                 @click="addOption()"
-                                class="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold">
+                                class="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             Tambah Opsi
                         </button>
                     </div>
 
-                    <div class="space-y-2.5">
+                    <div class="space-y-3">
                         <template x-for="(opt, idx) in formData.options" :key="idx">
-                            <div class="flex items-center gap-2 p-2 rounded-xl bg-[#090D0B] border"
-                                 :class="parseInt(formData.correct_index) === idx ? 'border-emerald-500/60 bg-emerald-500/5' : 'border-[#1A2820]'">
+                            <div class="p-3 rounded-xl bg-[#090D0B] border transition-colors space-y-2"
+                                 :class="isCorrect(idx) ? 'border-emerald-500/60 bg-emerald-500/5' : 'border-[#1A2820]'">
                                 
-                                {{-- Radio for Correct Option --}}
-                                <label class="flex items-center gap-2 cursor-pointer px-2 py-1">
-                                    <input type="radio" name="correct_index" :value="idx"
-                                           :checked="parseInt(formData.correct_index) === idx"
-                                           @change="formData.correct_index = idx"
-                                           class="text-emerald-500 focus:ring-emerald-500 bg-gray-900 border-gray-700">
-                                    <span class="text-xs font-bold font-mono"
-                                          :class="parseInt(formData.correct_index) === idx ? 'text-emerald-400' : 'text-gray-400'"
-                                          x-text="getOptionLabel(idx)"></span>
-                                </label>
+                                <div class="flex items-center gap-2">
+                                    {{-- Multi-Select Checkbox OR Single Radio --}}
+                                    <template x-if="formData.question_type === 'multi_select'">
+                                        <label class="flex items-center gap-2 cursor-pointer px-1 py-1">
+                                            <input type="checkbox" name="correct_indices[]" :value="idx"
+                                                   :checked="isCorrect(idx)"
+                                                   @change="toggleCorrect(idx)"
+                                                   class="rounded text-purple-500 focus:ring-purple-500 bg-gray-900 border-gray-700 w-4 h-4">
+                                            <span class="text-xs font-bold font-mono"
+                                                  :class="isCorrect(idx) ? 'text-purple-300' : 'text-gray-400'"
+                                                  x-text="getOptionLabel(idx)"></span>
+                                        </label>
+                                    </template>
 
-                                {{-- Text input for option --}}
-                                <input type="text" :name="'options[' + idx + ']'" x-model="formData.options[idx]" required
-                                       :placeholder="'Tuliskan opsi jawaban ' + getOptionLabel(idx) + '...'"
-                                       class="flex-1 px-3 py-1.5 bg-transparent border-0 focus:ring-0 text-sm text-gray-100 placeholder-gray-600">
+                                    <template x-if="formData.question_type !== 'multi_select'">
+                                        <label class="flex items-center gap-2 cursor-pointer px-1 py-1">
+                                            <input type="radio" name="correct_index" :value="idx"
+                                                   :checked="parseInt(formData.correct_index) === idx"
+                                                   @change="formData.correct_index = idx"
+                                                   class="text-emerald-500 focus:ring-emerald-500 bg-gray-900 border-gray-700 w-4 h-4">
+                                            <span class="text-xs font-bold font-mono"
+                                                  :class="parseInt(formData.correct_index) === idx ? 'text-emerald-400' : 'text-gray-400'"
+                                                  x-text="getOptionLabel(idx)"></span>
+                                        </label>
+                                    </template>
 
-                                {{-- Remove Option (if MC and > 2) --}}
-                                <button type="button" x-show="formData.question_type === 'multiple_choice' && formData.options.length > 2"
-                                        @click="removeOption(idx)"
-                                        class="p-1.5 text-gray-500 hover:text-red-400 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
+                                    {{-- Text input for option --}}
+                                    <input type="text" :name="'options[' + idx + ']'" x-model="formData.options[idx]"
+                                           :placeholder="'Tuliskan teks opsi jawaban ' + getOptionLabel(idx) + ' (atau unggah gambar di bawah)...'"
+                                           class="flex-1 px-3 py-1.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 rounded-lg text-sm text-gray-100 placeholder-gray-600">
+
+                                    {{-- Remove Option (if MC and > 2) --}}
+                                    <button type="button" x-show="formData.question_type !== 'true_false' && formData.options.length > 2"
+                                            @click="removeOption(idx)"
+                                            title="Hapus opsi ini"
+                                            class="p-1.5 text-gray-500 hover:text-red-400 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+
+                                {{-- Option Image Upload & Preview --}}
+                                <div class="pl-8 flex items-center gap-3">
+                                    <template x-if="formData.option_image_previews[idx]">
+                                        <div class="relative group">
+                                            <img :src="formData.option_image_previews[idx]" alt="Preview Opsi" class="h-10 w-auto rounded border border-white/20 object-contain bg-black/50">
+                                            <button type="button" @click="clearOptionImage(idx)"
+                                                    class="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center">✕</button>
+                                        </div>
+                                    </template>
+
+                                    <input type="file" :name="'option_images[' + idx + ']'" accept="image/*"
+                                           @change="previewOptionImage($event, idx)"
+                                           class="text-[11px] text-gray-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[11px] file:font-medium file:bg-[#1A2820] file:text-gray-300 hover:file:bg-gray-800 file:cursor-pointer cursor-pointer">
+
+                                    <input type="hidden" :name="'existing_option_images[' + idx + ']'" :value="formData.existing_option_images[idx] || ''">
+                                    <input type="hidden" :name="'remove_option_images[' + idx + ']'" :value="formData.remove_option_images[idx] ? 1 : 0">
+                                </div>
                             </div>
                         </template>
                     </div>
@@ -247,7 +278,7 @@
                 {{-- Penjelasan / Pembahasan --}}
                 <div>
                     <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
-                        Pembahasan / Penjelasan Kunci Jawaban (Opsional)
+                        Pembahasan & Kunci Jawaban (Opsional)
                     </label>
                     <textarea name="explanation" x-model="formData.explanation" rows="2"
                               placeholder="Tuliskan catatan pembahasan mengapa jawaban tersebut benar untuk ditinjau mahasiswa..."
@@ -283,7 +314,13 @@
                 points: 10,
                 options: ['', '', '', ''],
                 correct_index: 0,
-                explanation: ''
+                correct_indices: [0],
+                explanation: '',
+                question_image_preview: null,
+                remove_question_image: false,
+                existing_option_images: {},
+                option_image_previews: {},
+                remove_option_images: {}
             },
             openCreateModal() {
                 this.isEdit = false;
@@ -294,7 +331,13 @@
                     points: 10,
                     options: ['', '', '', ''],
                     correct_index: 0,
-                    explanation: ''
+                    correct_indices: [0],
+                    explanation: '',
+                    question_image_preview: null,
+                    remove_question_image: false,
+                    existing_option_images: {},
+                    option_image_previews: {},
+                    remove_option_images: {}
                 };
                 this.showModal = true;
             },
@@ -304,24 +347,46 @@
                 
                 let optTexts = [];
                 let correctIdx = 0;
+                let correctIndices = [];
+                let existingOptImages = {};
+                let optImagePreviews = {};
+
                 if (question.options && question.options.length > 0) {
                     question.options.forEach((opt, idx) => {
-                        optTexts.push(opt.option_text);
+                        optTexts.push(opt.option_text || '');
                         if (opt.is_correct) {
                             correctIdx = idx;
+                            correctIndices.push(idx);
+                        }
+                        if (opt.image_url) {
+                            existingOptImages[idx] = opt.image_path;
+                            optImagePreviews[idx] = opt.image_url;
                         }
                     });
                 } else {
                     optTexts = ['', '', '', ''];
+                    correctIndices = [0];
                 }
+
+                if (correctIndices.length === 0) {
+                    correctIndices = [0];
+                }
+
+                const isMulti = question.question_type === 'multi_select' || correctIndices.length > 1;
 
                 this.formData = {
                     question_text: question.question_text,
-                    question_type: question.question_type,
+                    question_type: isMulti ? 'multi_select' : (question.question_type || 'multiple_choice'),
                     points: question.points,
                     options: optTexts,
                     correct_index: correctIdx,
-                    explanation: question.explanation || ''
+                    correct_indices: correctIndices,
+                    explanation: question.explanation || '',
+                    question_image_preview: question.image_url || null,
+                    remove_question_image: false,
+                    existing_option_images: existingOptImages,
+                    option_image_previews: optImagePreviews,
+                    remove_option_images: {}
                 };
                 this.showModal = true;
             },
@@ -332,8 +397,25 @@
                 if (this.formData.question_type === 'true_false') {
                     this.formData.options = ['Benar', 'Salah'];
                     this.formData.correct_index = 0;
+                    this.formData.correct_indices = [0];
                 } else if (this.formData.options.length < 2) {
                     this.formData.options = ['', '', '', ''];
+                }
+            },
+            isCorrect(idx) {
+                if (this.formData.question_type === 'multi_select') {
+                    return this.formData.correct_indices.includes(idx);
+                }
+                return parseInt(this.formData.correct_index) === idx;
+            },
+            toggleCorrect(idx) {
+                const i = this.formData.correct_indices.indexOf(idx);
+                if (i > -1) {
+                    if (this.formData.correct_indices.length > 1) {
+                        this.formData.correct_indices.splice(i, 1);
+                    }
+                } else {
+                    this.formData.correct_indices.push(idx);
                 }
             },
             addOption() {
@@ -344,6 +426,10 @@
             removeOption(index) {
                 if (this.formData.options.length > 2) {
                     this.formData.options.splice(index, 1);
+                    this.formData.correct_indices = this.formData.correct_indices.filter(i => i !== index).map(i => i > index ? i - 1 : i);
+                    if (this.formData.correct_indices.length === 0) {
+                        this.formData.correct_indices = [0];
+                    }
                     if (this.formData.correct_index >= this.formData.options.length) {
                         this.formData.correct_index = 0;
                     }
@@ -352,6 +438,29 @@
             getOptionLabel(index) {
                 const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
                 return labels[index] || (index + 1);
+            },
+            previewQuestionImage(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    this.formData.question_image_preview = URL.createObjectURL(file);
+                    this.formData.remove_question_image = false;
+                }
+            },
+            clearQuestionImage() {
+                this.formData.question_image_preview = null;
+                this.formData.remove_question_image = true;
+            },
+            previewOptionImage(event, idx) {
+                const file = event.target.files[0];
+                if (file) {
+                    this.formData.option_image_previews[idx] = URL.createObjectURL(file);
+                    this.formData.remove_option_images[idx] = false;
+                }
+            },
+            clearOptionImage(idx) {
+                this.formData.option_image_previews[idx] = null;
+                this.formData.remove_option_images[idx] = true;
+                delete this.formData.existing_option_images[idx];
             }
         };
     }
