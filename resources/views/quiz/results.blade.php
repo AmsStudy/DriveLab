@@ -140,8 +140,8 @@
                     </div>
                 </div>
 
-                {{-- Podium Top 3 (if at least 1 attempt) --}}
-                @if($leaderboard->count() >= 2)
+                {{-- Podium Top 3 (if at least 3 participants) --}}
+                @if($leaderboard->count() >= 3)
                     <div class="grid grid-cols-3 gap-2 sm:gap-4 items-end max-w-lg mx-auto mb-8 pt-4">
                         {{-- 2nd Place --}}
                         <div class="podium-2 rounded-2xl p-3 sm:p-4 text-center flex flex-col justify-end h-36 sm:h-44">

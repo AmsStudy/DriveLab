@@ -468,4 +468,65 @@ class QuizFeatureTest extends TestCase
         $attempt2->refresh();
         $this->assertEquals('fullscreen_exit', $attempt2->violations_log[0]['type']);
     }
+
+    public function test_idor_session_protection_and_expired_draft_fallback(): void
+    {
+        $quiz = Quiz::create([
+            'user_id'            => $this->admin->id,
+            'title'              => 'Kuis Uji IDOR & Keamanan',
+            'time_limit_minutes' => 5,
+            'is_active'          => true,
+            'max_attempts'       => 1,
+        ]);
+
+        $q = $quiz->questions()->create([
+            'question_text' => 'Soal Keamanan',
+            'question_type' => 'multiple_choice',
+            'points'        => 100,
+        ]);
+        $opt = $q->options()->create(['option_text' => 'Benar', 'is_correct' => true, 'order_num' => 1]);
+
+        // Student 1 starts quiz
+        $resStart1 = $this->post(route('quiz.start', $quiz->unique_token), [
+            'nim'  => '11111111',
+            'nama' => 'Student One',
+        ]);
+        $attempt1 = QuizAttempt::where('nim', '11111111')->first();
+        $this->assertNotNull($attempt1);
+
+        // Student 2 starts quiz in separate session
+        $attempt2 = QuizAttempt::create([
+            'quiz_id'               => $quiz->id,
+            'nim'                   => '22222222',
+            'student_name'          => 'Student Two',
+            'total_points_possible' => 100,
+            'started_at'            => now(),
+        ]);
+
+        // Student 1 tries to access Student 2 attempt
+        $idorRes = $this->withSession(['quiz_attempt_' . $quiz->id => $attempt1->id])
+            ->get(route('quiz.play', ['token' => $quiz->unique_token, 'attempt' => $attempt2->id]));
+        $idorRes->assertStatus(403);
+
+        // Student 1 tries to submit Student 2 attempt
+        $idorSubmit = $this->withSession(['quiz_attempt_' . $quiz->id => $attempt1->id])
+            ->post(route('quiz.submit', ['token' => $quiz->unique_token, 'attempt' => $attempt2->id]), []);
+        $idorSubmit->assertStatus(403);
+
+        // Test expired time draft recovery:
+        $attempt1->update([
+            'started_at'    => now()->subMinutes(10),
+            'draft_answers' => [$q->id => $opt->id],
+        ]);
+
+        // Accessing play should auto-finalize with draft answers!
+        $expiredRes = $this->withSession(['quiz_attempt_' . $quiz->id => $attempt1->id])
+            ->get(route('quiz.play', ['token' => $quiz->unique_token, 'attempt' => $attempt1->id]));
+        $expiredRes->assertRedirect(route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt1->id]));
+
+        $attempt1->refresh();
+        $this->assertNotNull($attempt1->completed_at);
+        $this->assertEquals(100.0, (float)$attempt1->score);
+        $this->assertEquals(1, $attempt1->correct_answers_count);
+    }
 }

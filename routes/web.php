@@ -32,15 +32,28 @@ Route::prefix('soal')->name('soal.')->group(function () {
 });
 
 // ─── Kuis Interaktif (Mahasiswa) ──────────────────────────────────────────────
-Route::post('/quiz/join', [PublicQuizController::class, 'joinByCode'])->name('quiz.join');
+Route::post('/quiz/join', [PublicQuizController::class, 'joinByCode'])
+    ->middleware('throttle:20,1')
+    ->name('quiz.join');
+
 Route::prefix('quiz')->name('quiz.')->group(function () {
     Route::get('/{token}', [PublicQuizController::class, 'lobby'])->name('lobby');
-    Route::post('/{token}/start', [PublicQuizController::class, 'start'])->name('start');
+    Route::post('/{token}/start', [PublicQuizController::class, 'start'])
+        ->middleware('throttle:15,1')
+        ->name('start');
     Route::get('/{token}/play/{attempt}', [PublicQuizController::class, 'play'])->name('play');
-    Route::post('/{token}/attempt/{attempt}/tab-switch', [PublicQuizController::class, 'recordTabSwitch'])->name('tab-switch');
-    Route::post('/{token}/attempt/{attempt}/unlock-password', [PublicQuizController::class, 'unlockWithPassword'])->name('unlock-password');
-    Route::post('/{token}/attempt/{attempt}/autosave', [PublicQuizController::class, 'autosave'])->name('autosave');
-    Route::post('/{token}/submit/{attempt}', [PublicQuizController::class, 'submit'])->name('submit');
+    Route::post('/{token}/attempt/{attempt}/tab-switch', [PublicQuizController::class, 'recordTabSwitch'])
+        ->middleware('throttle:60,1')
+        ->name('tab-switch');
+    Route::post('/{token}/attempt/{attempt}/unlock-password', [PublicQuizController::class, 'unlockWithPassword'])
+        ->middleware('throttle:5,1')
+        ->name('unlock-password');
+    Route::post('/{token}/attempt/{attempt}/autosave', [PublicQuizController::class, 'autosave'])
+        ->middleware('throttle:120,1')
+        ->name('autosave');
+    Route::post('/{token}/submit/{attempt}', [PublicQuizController::class, 'submit'])
+        ->middleware('throttle:15,1')
+        ->name('submit');
     Route::get('/{token}/results/{attempt}', [PublicQuizController::class, 'results'])->name('results');
 });
 

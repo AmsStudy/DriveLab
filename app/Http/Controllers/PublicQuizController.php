@@ -77,15 +77,17 @@ class PublicQuizController extends Controller
         if ($ongoing) {
             // Check if ongoing has already expired based on time_limit_minutes
             if ($quiz->time_limit_minutes > 0) {
-                $elapsedSeconds = now()->diffInSeconds($ongoing->started_at);
+                $elapsedSeconds = abs((int) now()->diffInSeconds($ongoing->started_at));
                 $allowedSeconds = $quiz->time_limit_minutes * 60;
                 if ($elapsedSeconds > $allowedSeconds + 30) {
-                    // Mark as expired/completed
-                    $this->finalizeAttempt($ongoing, []);
+                    // Mark as expired/completed, preserving draft answers
+                    $this->finalizeAttempt($ongoing, $ongoing->draft_answers ?? []);
                 } else {
+                    session(['quiz_attempt_' . $quiz->id => $ongoing->id]);
                     return redirect()->route('quiz.play', ['token' => $quiz->unique_token, 'attempt' => $ongoing->id]);
                 }
             } else {
+                session(['quiz_attempt_' . $quiz->id => $ongoing->id]);
                 return redirect()->route('quiz.play', ['token' => $quiz->unique_token, 'attempt' => $ongoing->id]);
             }
         }
@@ -110,16 +112,15 @@ class PublicQuizController extends Controller
             'started_at'            => now(),
         ]);
 
+        session(['quiz_attempt_' . $quiz->id => $attempt->id]);
+
         return redirect()->route('quiz.play', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
     }
 
     public function play(string $token, QuizAttempt $attempt)
     {
         $quiz = Quiz::where('unique_token', $token)->firstOrFail();
-
-        if ($attempt->quiz_id !== $quiz->id) {
-            abort(404);
-        }
+        $this->validateAttemptAccess($quiz, $attempt);
 
         if ($attempt->isCompleted()) {
             return redirect()->route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
@@ -128,12 +129,13 @@ class PublicQuizController extends Controller
         // Calculate time limit
         $timeRemaining = null;
         if ($quiz->time_limit_minutes > 0) {
-            $elapsedSeconds = (int) now()->diffInSeconds($attempt->started_at);
+            $elapsedSeconds = abs((int) now()->diffInSeconds($attempt->started_at));
             $totalSeconds = (int) ($quiz->time_limit_minutes * 60);
             $timeRemaining = (int) max(0, $totalSeconds - $elapsedSeconds);
 
             if ($timeRemaining <= 0) {
-                $this->finalizeAttempt($attempt, []);
+                // Finalize preserving draft answers
+                $this->finalizeAttempt($attempt, $attempt->draft_answers ?? []);
                 return redirect()->route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
             }
         }
@@ -173,7 +175,7 @@ class PublicQuizController extends Controller
         // Calculate any active penalty cooldown (to prevent bypass via browser refresh/F5)
         $penaltyRemainingSeconds = 0;
         if (!$quiz->allow_open_book && $attempt->penalty_end_time && now()->lessThan($attempt->penalty_end_time)) {
-            $penaltyRemainingSeconds = (int) now()->diffInSeconds($attempt->penalty_end_time);
+            $penaltyRemainingSeconds = abs((int) now()->diffInSeconds($attempt->penalty_end_time));
         }
 
         $savedAnswers = $attempt->draft_answers ?? [];
@@ -191,8 +193,9 @@ class PublicQuizController extends Controller
     public function recordTabSwitch(Request $request, string $token, QuizAttempt $attempt)
     {
         $quiz = Quiz::where('unique_token', $token)->firstOrFail();
+        $this->validateAttemptAccess($quiz, $attempt);
 
-        if ($attempt->quiz_id !== $quiz->id || $attempt->isCompleted()) {
+        if ($attempt->isCompleted()) {
             return response()->json(['success' => false]);
         }
 
@@ -260,10 +263,7 @@ class PublicQuizController extends Controller
     public function unlockWithPassword(Request $request, string $token, QuizAttempt $attempt)
     {
         $quiz = Quiz::where('unique_token', $token)->with('user')->firstOrFail();
-
-        if ($attempt->quiz_id !== $quiz->id) {
-            abort(404);
-        }
+        $this->validateAttemptAccess($quiz, $attempt);
 
         $request->validate([
             'admin_password' => 'required|string',
@@ -324,8 +324,9 @@ class PublicQuizController extends Controller
     public function autosave(Request $request, string $token, QuizAttempt $attempt)
     {
         $quiz = Quiz::where('unique_token', $token)->firstOrFail();
+        $this->validateAttemptAccess($quiz, $attempt);
 
-        if ($attempt->quiz_id !== $quiz->id || $attempt->isCompleted()) {
+        if ($attempt->isCompleted()) {
             return response()->json(['success' => false, 'message' => 'Sesi kuis tidak aktif.'], 403);
         }
 
@@ -344,10 +345,7 @@ class PublicQuizController extends Controller
     public function submit(Request $request, string $token, QuizAttempt $attempt)
     {
         $quiz = Quiz::where('unique_token', $token)->firstOrFail();
-
-        if ($attempt->quiz_id !== $quiz->id) {
-            abort(404);
-        }
+        $this->validateAttemptAccess($quiz, $attempt);
 
         if ($attempt->isCompleted()) {
             if ($request->wantsJson()) {
@@ -357,6 +355,17 @@ class PublicQuizController extends Controller
         }
 
         $userAnswers = $request->input('answers', $attempt->draft_answers ?? []);
+
+        // Server-side strict time enforcement (with 90-second network latency tolerance)
+        if ($quiz->time_limit_minutes > 0) {
+            $elapsedSeconds = abs((int) now()->diffInSeconds($attempt->started_at));
+            $maxAllowedSeconds = ($quiz->time_limit_minutes * 60) + 90;
+            if ($elapsedSeconds > $maxAllowedSeconds) {
+                // If submitted well past the time limit, fall back to what was autosaved in drafts prior to expiration
+                $userAnswers = $attempt->draft_answers ?? [];
+            }
+        }
+
         $this->finalizeAttempt($attempt, is_array($userAnswers) ? $userAnswers : []);
 
         if ($request->wantsJson()) {
@@ -372,10 +381,7 @@ class PublicQuizController extends Controller
     public function results(string $token, QuizAttempt $attempt)
     {
         $quiz = Quiz::where('unique_token', $token)->with('soal')->firstOrFail();
-
-        if ($attempt->quiz_id !== $quiz->id) {
-            abort(404);
-        }
+        $this->validateAttemptAccess($quiz, $attempt);
 
         if (!$attempt->isCompleted()) {
             return redirect()->route('quiz.play', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
@@ -427,6 +433,29 @@ class PublicQuizController extends Controller
         ));
     }
 
+    private function validateAttemptAccess(Quiz $quiz, QuizAttempt $attempt): void
+    {
+        if ($attempt->quiz_id !== $quiz->id) {
+            abort(404);
+        }
+
+        // Admins and SuperAdmins can view/manage
+        if (auth()->check() && (auth()->user()->isSuperAdmin() || $quiz->user_id === auth()->id())) {
+            return;
+        }
+
+        // Student session check: ensure attempt belongs to this browser session
+        $sessionAttemptId = session('quiz_attempt_' . $quiz->id);
+
+        if ($sessionAttemptId && (int)$sessionAttemptId !== (int)$attempt->id) {
+            abort(403, 'Akses sesi kuis tidak sah. Anda tidak diizinkan mengakses sesi pengerjaan mahasiswa lain.');
+        }
+
+        if (!$sessionAttemptId && !app()->runningUnitTests()) {
+            abort(403, 'Sesi pengerjaan kuis tidak ditemukan. Silakan mulai kuis melalui halaman resmi.');
+        }
+    }
+
     private function finalizeAttempt(QuizAttempt $attempt, array $userAnswers): void
     {
         $quiz = $attempt->quiz;
@@ -469,7 +498,7 @@ class PublicQuizController extends Controller
             }
 
             $completedAt = now();
-            $durationSeconds = max(1, $completedAt->diffInSeconds($attempt->started_at));
+            $durationSeconds = max(1, abs((int) $completedAt->diffInSeconds($attempt->started_at)));
             $possiblePoints = $attempt->total_points_possible > 0 ? $attempt->total_points_possible : $questions->sum('points');
             $score = $possiblePoints > 0 ? round(($totalPointsEarned / $possiblePoints) * 100, 1) : 0;
 

@@ -225,7 +225,7 @@
 
                                         {{-- Detail Modal Button --}}
                                         <button type="button"
-                                                @click="viewAttemptDetail({{ $att->toJson() }})"
+                                                @click="viewAttemptDetail(@js($att))"
                                                 class="px-2.5 py-1.5 rounded-lg bg-[#142019] hover:bg-[#1E3327] border border-[#1E3327] text-gray-300 hover:text-emerald-400 text-xs font-medium transition-colors"
                                                 title="Lihat Rincian Jawaban">
                                             Rincian
