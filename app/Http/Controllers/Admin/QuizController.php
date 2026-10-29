@@ -11,6 +11,7 @@ use App\Models\Soal;
 use App\Services\QuizImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class QuizController extends Controller
@@ -77,8 +78,13 @@ class QuizController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->filled('access_code')) {
+            $request->merge(['access_code' => strtoupper(trim($request->access_code))]);
+        }
+
         $validated = $request->validate([
             'title'              => 'required|string|max:255',
+            'access_code'        => 'nullable|string|min:3|max:20|regex:/^[A-Z0-9_-]+$/|unique:quizzes,access_code',
             'description'        => 'nullable|string|max:1000',
             'soal_id'            => 'nullable|exists:soals,id',
             'access_password'    => 'nullable|string|max:50',
@@ -94,11 +100,19 @@ class QuizController extends Controller
             'admin_unlock_password' => 'nullable|string|max:50',
             'max_attempts'       => 'nullable|integer|min:1|max:20',
             'is_active'          => 'nullable|boolean',
+        ], [
+            'access_code.unique' => 'Kode akses kuis ini sudah digunakan oleh kuis lain. Silakan buat kode unik lain.',
+            'access_code.regex'  => 'Kode akses hanya boleh berisi huruf, angka, tanda hubung (-), dan garis bawah (_).',
+            'access_code.min'    => 'Kode akses kuis minimal 3 karakter.',
+            'access_code.max'    => 'Kode akses kuis maksimal 20 karakter.',
         ]);
 
         $quiz = new Quiz();
         $quiz->user_id               = auth()->id();
         $quiz->title                 = $validated['title'];
+        if (!empty($validated['access_code'])) {
+            $quiz->access_code       = $validated['access_code'];
+        }
         $quiz->description           = $validated['description'] ?? null;
         $quiz->soal_id               = $validated['soal_id'] ?? null;
         $quiz->access_password       = $request->filled('access_password') ? trim($request->access_password) : null;
@@ -132,8 +146,20 @@ class QuizController extends Controller
     {
         $this->authorizeQuiz($quiz);
 
+        if ($request->filled('access_code')) {
+            $request->merge(['access_code' => strtoupper(trim($request->access_code))]);
+        }
+
         $validated = $request->validate([
             'title'              => 'required|string|max:255',
+            'access_code'        => [
+                'required',
+                'string',
+                'min:3',
+                'max:20',
+                'regex:/^[A-Z0-9_-]+$/',
+                Rule::unique('quizzes', 'access_code')->ignore($quiz->id),
+            ],
             'description'        => 'nullable|string|max:1000',
             'soal_id'            => 'nullable|exists:soals,id',
             'access_password'    => 'nullable|string|max:50',
@@ -149,9 +175,16 @@ class QuizController extends Controller
             'admin_unlock_password' => 'nullable|string|max:50',
             'max_attempts'       => 'nullable|integer|min:1|max:20',
             'is_active'          => 'nullable|boolean',
+        ], [
+            'access_code.required' => 'Kode akses kuis tidak boleh kosong.',
+            'access_code.unique'   => 'Kode akses kuis ini sudah digunakan oleh kuis lain. Silakan buat kode unik lain.',
+            'access_code.regex'    => 'Kode akses hanya boleh berisi huruf, angka, tanda hubung (-), dan garis bawah (_).',
+            'access_code.min'      => 'Kode akses kuis minimal 3 karakter.',
+            'access_code.max'      => 'Kode akses kuis maksimal 20 karakter.',
         ]);
 
         $quiz->title                 = $validated['title'];
+        $quiz->access_code           = $validated['access_code'];
         $quiz->description           = $validated['description'] ?? null;
         $quiz->soal_id               = $validated['soal_id'] ?? null;
         $quiz->access_password       = $request->filled('access_password') ? trim($request->access_password) : null;

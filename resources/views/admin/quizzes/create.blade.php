@@ -52,6 +52,21 @@
                            class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-500">
                 </div>
 
+                {{-- Custom Kode Akses Kuis --}}
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider flex items-center justify-between">
+                        <span>Kode Akses Kuis (Custom Kode)</span>
+                        <span class="text-[10px] text-gray-400 font-normal">Opsional &bull; Digunakan mahasiswa untuk bergabung</span>
+                    </label>
+                    <div class="relative">
+                        <input type="text" name="access_code" value="{{ old('access_code') }}"
+                               maxlength="20"
+                               placeholder="Contoh: ALGO-01 atau MODUL2 (Kosongkan untuk acak otomatis: LAB-XXXXX)"
+                               class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-emerald-400 placeholder-gray-600 font-mono font-bold uppercase tracking-wider">
+                    </div>
+                    <p class="text-[11px] text-gray-500 mt-1">Kode unik yang dibagikan ke mahasiswa. Huruf besar, angka, dan strip (maks. 20 karakter). Kosongkan jika ingin digenerate acak otomatis.</p>
+                </div>
+
                 {{-- Deskripsi --}}
                 <div>
                     <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">

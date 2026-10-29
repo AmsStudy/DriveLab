@@ -696,4 +696,50 @@ class QuizFeatureTest extends TestCase
         $this->assertEquals(0.0, (float)$attempt3->score); // penalty: wrong answer selected = 0 points
         $this->assertEquals(0, $attempt3->correct_answers_count);
     }
+
+    public function test_custom_quiz_access_code_creation_update_and_join(): void
+    {
+        // 1. Admin creates quiz with custom access code 'algo-modul-1'
+        $postRes = $this->actingAs($this->admin)->post(route('admin.quizzes.store'), [
+            'title'       => 'Kuis Algoritma Pemrograman',
+            'access_code' => 'algo-modul-1',
+        ]);
+        $postRes->assertSessionHas('success');
+
+        $quiz = Quiz::where('title', 'Kuis Algoritma Pemrograman')->first();
+        $this->assertNotNull($quiz);
+        $this->assertEquals('ALGO-MODUL-1', $quiz->access_code);
+
+        // Student can join using the custom access code (case-insensitive)
+        $joinRes = $this->post(route('quiz.join'), ['access_code' => 'algo-modul-1']);
+        $joinRes->assertRedirect(route('quiz.lobby', $quiz->unique_token));
+
+        // 2. Admin updates the access code to 'STRUKDAT-99'
+        $updateRes = $this->actingAs($this->admin)->put(route('admin.quizzes.update', $quiz), [
+            'title'       => 'Kuis Algoritma Pemrograman (Updated)',
+            'access_code' => 'STRUKDAT-99',
+            'is_active'   => '1',
+        ]);
+        $updateRes->assertSessionHas('success');
+
+        $quiz->refresh();
+        $this->assertEquals('STRUKDAT-99', $quiz->access_code);
+
+        $joinNewRes = $this->post(route('quiz.join'), ['access_code' => 'strukdat-99']);
+        $joinNewRes->assertRedirect(route('quiz.lobby', $quiz->unique_token));
+
+        // 3. Duplicate access code is rejected
+        $dupRes = $this->actingAs($this->admin)->post(route('admin.quizzes.store'), [
+            'title'       => 'Kuis Lain Duplikat',
+            'access_code' => 'STRUKDAT-99',
+        ]);
+        $dupRes->assertSessionHasErrors('access_code');
+
+        // 4. Invalid characters with spaces or symbols are rejected
+        $invalidRes = $this->actingAs($this->admin)->post(route('admin.quizzes.store'), [
+            'title'       => 'Kuis Invalid Code',
+            'access_code' => 'INVALID CODE!',
+        ]);
+        $invalidRes->assertSessionHasErrors('access_code');
+    }
 }
