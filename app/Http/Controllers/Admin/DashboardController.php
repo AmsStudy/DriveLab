@@ -15,6 +15,8 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $todayStart = today()->startOfDay();
+        $todayEnd = today()->endOfDay();
 
         if ($user->isSuperAdmin()) {
             $stats = [
@@ -22,7 +24,7 @@ class DashboardController extends Controller
                 'soal_aktif'        => Soal::where('is_active', true)->count(),
                 'total_views'       => (int) Soal::sum('access_count'),
                 'tugas_masuk'       => Submission::count(),
-                'tugas_hari_ini'    => Submission::whereDate('created_at', today())->count(),
+                'tugas_hari_ini'    => Submission::whereBetween('created_at', [$todayStart, $todayEnd])->count(),
                 'total_lampiran'    => SoalAttachment::count(),
                 'total_admin'       => User::where('role', 'admin')->count(),
                 'admin_pending'     => User::where('role', 'admin')->where('status', 'pending')->count(),
@@ -48,18 +50,20 @@ class DashboardController extends Controller
             return view('admin.dashboard', compact('stats', 'recent_submissions', 'top_soals', 'recent_activities'));
         }
 
-        // Admin / Asisten Biasa
+        // Admin / Asisten Biasa (Optimized using pre-fetched IDs instead of repeated whereHas subqueries)
+        $soalIds = Soal::where('user_id', $user->id)->pluck('id');
+
         $stats = [
-            'total_soal'     => Soal::where('user_id', $user->id)->count(),
+            'total_soal'     => $soalIds->count(),
             'soal_aktif'     => Soal::where('user_id', $user->id)->where('is_active', true)->count(),
             'total_views'    => (int) Soal::where('user_id', $user->id)->sum('access_count'),
-            'tugas_masuk'    => Submission::whereHas('soal', fn($q) => $q->where('user_id', $user->id))->count(),
-            'tugas_hari_ini' => Submission::whereHas('soal', fn($q) => $q->where('user_id', $user->id))
-                ->whereDate('created_at', today())->count(),
-            'total_lampiran' => SoalAttachment::whereHas('soal', fn($q) => $q->where('user_id', $user->id))->count(),
+            'tugas_masuk'    => Submission::whereIn('soal_id', $soalIds)->count(),
+            'tugas_hari_ini' => Submission::whereIn('soal_id', $soalIds)
+                ->whereBetween('created_at', [$todayStart, $todayEnd])->count(),
+            'total_lampiran' => SoalAttachment::whereIn('soal_id', $soalIds)->count(),
         ];
 
-        $recent_submissions = Submission::whereHas('soal', fn($q) => $q->where('user_id', $user->id))
+        $recent_submissions = Submission::whereIn('soal_id', $soalIds)
             ->with('soal.category')
             ->latest()
             ->take(8)
