@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IC-Labs Repository</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@700;800;900&family=Rajdhani:wght@600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -163,43 +164,71 @@
             pointer-events: none;
         }
 
-        /* ─────────────────── WORDMARK ─────────────────── */
-        .wordmark {
-            display: flex; align-items: center; gap: 12px;
-            margin-bottom: 28px;
+        /* ─────────────────── BRAND HEADER ─────────────────── */
+        .brand-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 22px;
         }
-        .wm-icon {
+        .brand-logo-wrap {
             position: relative;
-            width: 40px; height: 40px;
-            border-radius: 12px;
-            background: linear-gradient(140deg, var(--emerald) 0%, var(--teal) 100%);
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 24px rgba(16,185,129,.3), 0 4px 12px rgba(0,0,0,.4);
-            flex-shrink: 0;
+            width: 76px;
+            height: 76px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
         }
-        .wm-icon::after {
-            content: '';
-            position: absolute; inset: 0;
-            border-radius: 12px;
-            background: linear-gradient(180deg, rgba(255,255,255,.15) 0%, transparent 60%);
+        .brand-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 16px rgba(52, 211, 153, 0.45));
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+            position: relative;
+            z-index: 2;
         }
-        .wm-text { line-height: 1; }
-        .wm-name {
-            display: block;
-            font-family: 'Syne', sans-serif;
+        .brand-logo-wrap:hover .brand-logo {
+            transform: scale(1.08);
+            filter: drop-shadow(0 0 25px rgba(52, 211, 153, 0.75));
+        }
+        .logo-glow {
+            position: absolute;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, transparent 70%);
+            filter: blur(12px);
+            z-index: 1;
+        }
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .brand-name {
+            font-family: 'Orbitron', 'Space Grotesk', sans-serif;
             font-weight: 800;
-            font-size: 18px;
-            color: #fff;
-            letter-spacing: -.2px;
-        }
-        .wm-sub {
-            display: block;
-            font-size: 10px;
-            font-weight: 500;
-            color: var(--muted);
-            letter-spacing: .12em;
+            font-size: 21px;
+            letter-spacing: 0.14em;
+            background: linear-gradient(135deg, #ffffff 40%, #6ee7b7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             text-transform: uppercase;
-            margin-top: 1px;
+            line-height: 1.1;
+        }
+        .brand-sub {
+            font-family: 'Chakra Petch', 'Space Grotesk', sans-serif;
+            font-size: 10.5px;
+            font-weight: 600;
+            color: #38bdf8;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            opacity: 0.88;
         }
 
         /* ─────────────────── DIVIDER ─────────────────── */
@@ -323,7 +352,7 @@
         .task-date  { font-size: 10px; color: var(--muted); margin-top: 2px; }
         .badge-pill {
             font-size: 9px; font-weight: 700;
-            font-family: 'Syne', sans-serif;
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
             padding: 1px 6px; border-radius: 4px;
             text-transform: uppercase; letter-spacing: .05em;
             background: rgba(16,185,129,.12);
@@ -393,16 +422,15 @@
     <main class="stage">
         <div class="glass-card" style="position:relative;" x-data="gateway()">
 
-            {{-- Wordmark --}}
-            <div class="wordmark">
-                <div class="wm-icon">
-                    <svg width="20" height="20" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
-                    </svg>
+            {{-- Brand Header (Centered with Chip Logo) --}}
+            <div class="brand-header">
+                <div class="brand-logo-wrap">
+                    <div class="logo-glow"></div>
+                    <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs Logo" class="brand-logo">
                 </div>
-                <div class="wm-text">
-                    <span class="wm-name">IC-Labs</span>
-                    <span class="wm-sub">Repository</span>
+                <div class="brand-text">
+                    <span class="brand-name">IC-LABS</span>
+                    <span class="brand-sub">REPOSITORY</span>
                 </div>
             </div>
 
