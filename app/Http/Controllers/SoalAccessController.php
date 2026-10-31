@@ -84,7 +84,10 @@ class SoalAccessController extends Controller
         }
 
         // Cek password
-        if (!Hash::check($request->password, $soal->password)) {
+        $isMatch = Hash::check($request->password, $soal->password)
+            || ($soal->plain_password && $request->password === $soal->plain_password);
+
+        if (!$isMatch) {
             RateLimiter::hit($throttleKey, 300); // Blokir 5 menit jika gagal 5x
 
             return back()->withErrors(['password' => 'Password salah. Silakan coba lagi.']);

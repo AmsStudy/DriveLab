@@ -13,12 +13,12 @@
         <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
         Pratinjau Mahasiswa
     </a>
-    <a href="{{ route('admin.soal.edit', $soal) }}"
-       class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white transition-all flex items-center gap-1.5 shadow-md shadow-emerald-500/20"
+    <button type="button" onclick="openEditModal()"
+       class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white transition-all flex items-center gap-1.5 shadow-md shadow-emerald-500/20 cursor-pointer"
        style="background:linear-gradient(135deg,#10B981,#0D9488);">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
         Edit Dokumen
-    </a>
+    </button>
 </div>
 @endsection
 
@@ -87,23 +87,6 @@
             @if($soal->description)
                 <p class="text-sm text-gray-400 mt-2 max-w-3xl leading-relaxed">{{ $soal->description }}</p>
             @endif
-        </div>
-
-        <div class="flex items-center gap-2 flex-shrink-0">
-            <a href="{{ route('soal.access', $soal->unique_token) }}" target="_blank" rel="noopener noreferrer"
-               class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-200 border transition-all flex items-center gap-1.5"
-               style="background:#090D0B;border-color:#1A2820;"
-               onmouseover="this.style.borderColor='rgba(16,185,129,.4)';this.style.color='#10B981'"
-               onmouseout="this.style.borderColor='#1A2820';this.style.color='#E5E7EB'">
-                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                Preview Mahasiswa
-            </a>
-            <a href="{{ route('admin.soal.edit', $soal) }}"
-               class="px-4 py-2 rounded-xl text-xs font-semibold text-white transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/20"
-               style="background:linear-gradient(135deg,#10B981,#0D9488);">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                Edit Dokumen
-            </a>
         </div>
     </div>
 
@@ -204,6 +187,35 @@
                         </button>
                     </div>
                     <p class="font-mono text-base font-bold text-emerald-400 tracking-wider">{{ $soal->kode_unik }}</p>
+                </div>
+
+                {{-- Password Akses Dokumen --}}
+                <div class="p-3.5 rounded-xl border" style="background:#090D0B;border-color:#1A2820;">
+                    <div class="flex items-center justify-between text-gray-400 mb-1.5">
+                        <span class="text-[11px] font-medium text-gray-400">Password Akses Dokumen</span>
+                        @if(!empty($soal->plain_password))
+                            <button type="button" onclick="copyText('{{ $soal->plain_password }}', 'Password akses berhasil disalin!')"
+                                    class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                Salin
+                            </button>
+                        @endif
+                    </div>
+                    @if(!empty($soal->plain_password))
+                        <div class="flex items-center justify-between">
+                            <span id="passwordTextVal" class="font-mono text-base font-bold text-emerald-400 tracking-wider">••••••••</span>
+                            <button type="button" onclick="togglePasswordVisibility()" class="p-1 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" title="Lihat / Sembunyikan Password">
+                                <svg id="passwordEyeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </button>
+                        </div>
+                    @else
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-amber-400 font-mono">Tersimpan terenkripsi</span>
+                            <button type="button" onclick="openEditModal()" class="text-[11px] text-emerald-400 hover:underline cursor-pointer">
+                                Atur Password
+                            </button>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Link Akses Cepat --}}
@@ -687,9 +699,564 @@
     </div>
 </div>
 
+{{-- ─── MODAL EDIT DOKUMEN ─── --}}
+<div id="editModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 overflow-y-auto items-center justify-center"
+     onclick="if(event.target === this) closeEditModal()">
+    <div class="rounded-2xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] border my-auto"
+         style="background:#0F1713;border-color:#1A2820;">
+
+        {{-- Modal Header --}}
+        <div class="px-6 py-4 flex items-center justify-between border-b flex-shrink-0" style="border-color:#1A2820;background:#0F1713;">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs"
+                     style="background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3);">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        Edit Dokumen Soal
+                    </h3>
+                    <p class="text-xs text-gray-400 mt-0.5">Perbarui informasi, berkas lampiran, dan form pengumpulan tugas</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-white p-1.5 rounded-lg transition-colors cursor-pointer" title="Tutup Modal">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        {{-- Modal Body / Form --}}
+        <form method="POST" action="{{ route('admin.soal.update', $soal) }}" enctype="multipart/form-data" id="modal-edit-soal-form" class="overflow-y-auto flex-1 p-6 space-y-6">
+            @csrf
+            @method('PUT')
+
+            {{-- 1. INFORMASI UTAMA --}}
+            <div>
+                <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Informasi Dokumen
+                </h4>
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="modal_title" class="block text-xs font-medium text-gray-300 mb-1.5">Judul Dokumen <span class="text-red-400">*</span></label>
+                        <input type="text" id="modal_title" name="title" value="{{ old('title', $soal->title) }}" required
+                               class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500">
+                        @error('title') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="modal_kode_unik" class="block text-xs font-medium text-gray-300 mb-1.5">Kode Unik Akses <span class="text-red-400">*</span></label>
+                            <input type="text" id="modal_kode_unik" name="kode_unik" value="{{ old('kode_unik', $soal->kode_unik) }}" required
+                                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500">
+                            <p class="mt-1 text-[11px] text-gray-500">Boleh diubah, asal unik.</p>
+                            @error('kode_unik') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label for="modal_category_id" class="block text-xs font-medium text-gray-300 mb-1.5">Kategori</label>
+                            <select id="modal_category_id" name="category_id"
+                                    class="w-full border text-gray-300 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500 cursor-pointer"
+                                    style="background-color:#090E0B;border-color:#1A2820;">
+                                <option value="">— Tanpa Kategori —</option>
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->id }}" {{ old('category_id', $soal->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="modal_password" class="block text-xs font-medium text-gray-300 mb-1.5">
+                                Password Baru <span class="text-gray-500 text-[11px]">(kosongkan jika tidak diubah)</span>
+                            </label>
+                            <div class="relative">
+                                <input type="password" id="modal_password" name="password" minlength="4"
+                                       placeholder="Biarkan kosong jika tetap menggunakan password lama"
+                                       class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 pr-10 text-xs placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+                                <button type="button" onclick="const p = document.getElementById('modal_password'); p.type = p.type === 'password' ? 'text' : 'password'"
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 p-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="modal_description" class="block text-xs font-medium text-gray-300 mb-1.5">Deskripsi Singkat</label>
+                            <input type="text" id="modal_description" name="description" value="{{ old('description', $soal->description) }}"
+                                   placeholder="Keterangan singkat materi..."
+                                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- 2. SOAL / MATERI BERUPA TEKS LANGSUNG --}}
+            <div class="pt-5 border-t border-[#1A2820]">
+                <h4 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1.5 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> Soal / Materi Berupa Teks Langsung <span class="text-[11px] text-gray-500 font-normal lowercase">(opsional)</span>
+                </h4>
+                <p class="text-[11px] text-gray-400 mb-2.5">Teks soal akan langsung ditampilkan rapi di layar mahasiswa tanpa harus mengunduh file.</p>
+                <textarea id="modal_content_text" name="content_text" rows="4"
+                          placeholder="Ketik isi soal atau instruksi langsung di sini..."
+                          class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500 font-mono">{{ old('content_text', $soal->content_text) }}</textarea>
+            </div>
+
+            {{-- 3. LAMPIRAN SAAT INI --}}
+            @if($soal->attachments->count() > 0)
+            <div class="pt-5 border-t border-[#1A2820] space-y-3">
+                <div class="flex justify-between items-center">
+                    <h4 class="text-xs font-bold text-yellow-400 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-yellow-500"></span> Lampiran Dokumen Saat Ini
+                    </h4>
+                    <span class="text-[11px] text-gray-500">{{ $soal->attachments->count() }} Lampiran Tersimpan</span>
+                </div>
+
+                <div class="bg-[#090E0B]/50 rounded-xl p-3 space-y-2 border border-[#1A2820]">
+                    @foreach($soal->attachments as $att)
+                    <div id="modal-attachment-{{ $att->id }}" class="flex flex-wrap items-center justify-between gap-2.5 bg-gray-800/80 p-2.5 rounded-xl border border-gray-700">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <div class="w-8 h-8 rounded-lg bg-gray-700 flex items-center justify-center flex-shrink-0">
+                                @if($att->isLink())
+                                    <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                                @else
+                                    <span class="text-[10px] font-bold text-emerald-400 uppercase font-mono">{{ $att->file_type ?: 'FILE' }}</span>
+                                @endif
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs text-gray-200 font-medium truncate">{{ $att->file_original_name }}</p>
+                                <div class="flex items-center gap-2 text-[11px] text-gray-500 font-mono">
+                                    @if($att->isLink())
+                                        <a href="{{ $att->link_url }}" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:underline truncate max-w-xs">{{ $att->link_url }}</a>
+                                    @else
+                                        <span>{{ $att->file_size_formatted }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2.5">
+                            @if($att->isFile())
+                            <label class="flex items-center gap-1.5 cursor-pointer bg-gray-900/70 px-2.5 py-1 rounded-lg border border-gray-700 text-[11px]">
+                                <input type="hidden" name="attachment_downloadable[{{ $att->id }}]" value="0">
+                                <input type="checkbox" name="attachment_downloadable[{{ $att->id }}]" value="1"
+                                       {{ $att->is_downloadable ? 'checked' : '' }}
+                                       class="accent-emerald-500 w-3.5 h-3.5 rounded cursor-pointer">
+                                <span class="text-gray-300">Boleh Diunduh</span>
+                            </label>
+                            @endif
+
+                            <button type="button" onclick="removeModalExistingFile({{ $att->id }})" class="p-1.5 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors cursor-pointer" title="Hapus Lampiran Ini">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            {{-- 4. TAMBAH FILE BARU --}}
+            <div class="pt-5 border-t border-[#1A2820]">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-xs font-bold text-green-400 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span> Tambahkan File Baru <span class="text-[11px] text-gray-500 font-normal lowercase">(Maks. total 15 file)</span>
+                    </h4>
+                </div>
+                <div class="border-2 border-dashed border-gray-700 hover:border-emerald-500 rounded-xl p-5 text-center cursor-pointer transition-colors bg-[#090E0B]/40"
+                     onclick="document.getElementById('modal_files').click()">
+                    <p class="text-xs text-gray-400">Klik untuk memilih file tambahan (Maks. 5MB per file)</p>
+                </div>
+                <input type="file" id="modal_files" name="files[]" multiple class="hidden"
+                       onchange="handleModalNewFiles(this)"
+                       accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.zip,.pkt">
+                @error('files') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                @error('files.*') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+
+                <div id="modal-new-files-container" class="mt-3 space-y-2 hidden">
+                    <p class="text-[11px] text-gray-400 font-semibold mb-1">File Baru yang Akan Diunggah & Hak Unduh:</p>
+                    <div id="modal-new-files-list" class="space-y-2"></div>
+                </div>
+            </div>
+
+            {{-- 5. TAMBAH TAUTAN LINK BARU --}}
+            <div class="pt-5 border-t border-[#1A2820]">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span> Tambah Tautan / Link Materi Baru
+                    </h4>
+                    <button type="button" onclick="addModalEditLinkRow()" class="text-xs bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 px-2.5 py-1.5 rounded-lg border border-purple-500/30 transition-colors flex items-center gap-1 cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Tambah Link
+                    </button>
+                </div>
+                <div id="modal-edit-links-container" class="space-y-2"></div>
+            </div>
+
+            {{-- 6. STATUS & MASA AKTIF --}}
+            <div class="pt-5 border-t border-[#1A2820] space-y-4">
+                <div class="flex items-center justify-between p-3.5 bg-[#090E0B]/50 rounded-xl border border-[#1A2820]">
+                    <div>
+                        <p class="text-xs font-medium text-gray-200">Status Dokumen</p>
+                        <p class="text-[11px] text-gray-500 mt-0.5">Aktifkan atau nonaktifkan akses dokumen bagi mahasiswa</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="is_active" value="0">
+                        <input type="checkbox" id="modal_is_active" name="is_active" value="1" class="sr-only peer"
+                               {{ old('is_active', $soal->is_active) ? 'checked' : '' }}>
+                        <div class="w-11 h-6 bg-gray-700 peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    </label>
+                </div>
+
+                <div class="flex items-center justify-between p-3.5 bg-[#090E0B]/50 rounded-xl border border-[#1A2820]">
+                    <div>
+                        <p class="text-xs font-medium text-gray-200">Master Hak Unduh Dokumen</p>
+                        <p class="text-[11px] text-gray-500 mt-0.5">Pengaturan global izin unduh (jika aktif, default file baru diizinkan unduh)</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="is_downloadable" value="0">
+                        <input type="checkbox" id="modal_is_downloadable" name="is_downloadable" value="1" class="sr-only peer"
+                               {{ old('is_downloadable', $soal->is_downloadable) ? 'checked' : '' }}>
+                        <div class="w-11 h-6 bg-gray-700 peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    </label>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-2">Masa Aktif Dokumen</label>
+                    <div class="flex gap-4 mb-3">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="access_type" value="lifetime"
+                                   {{ old('access_type', $soal->access_type) === 'lifetime' ? 'checked' : '' }}
+                                   class="text-emerald-500 bg-gray-800 border-gray-600 cursor-pointer"
+                                   onchange="document.getElementById('modal-schedule-fields').classList.add('hidden')">
+                            <span class="text-xs text-gray-300">Selamanya</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="access_type" value="scheduled"
+                                   {{ old('access_type', $soal->access_type) === 'scheduled' ? 'checked' : '' }}
+                                   class="text-emerald-500 bg-gray-800 border-gray-600 cursor-pointer"
+                                   onchange="document.getElementById('modal-schedule-fields').classList.remove('hidden')">
+                            <span class="text-xs text-gray-300">Waktu Tertentu</span>
+                        </label>
+                    </div>
+                    <div id="modal-schedule-fields" class="{{ old('access_type', $soal->access_type) === 'scheduled' ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-2 gap-3 bg-[#090E0B]/40 p-3.5 rounded-xl border border-[#1A2820]">
+                        <div>
+                            <label class="block text-[11px] text-gray-400 mb-1">Mulai Aktif</label>
+                            <input type="datetime-local" name="active_from"
+                                   value="{{ old('active_from', $soal->active_from?->format('Y-m-d\TH:i')) }}"
+                                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-gray-400 mb-1">Berakhir</label>
+                            <input type="datetime-local" name="active_until"
+                                   value="{{ old('active_until', $soal->active_until?->format('Y-m-d\TH:i')) }}"
+                                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- 7. PENGUMPULAN TUGAS --}}
+            <div class="pt-5 border-t border-[#1A2820]">
+                <label class="block text-xs font-medium text-gray-300 mb-2">Fitur Pengumpulan Tugas bagi Mahasiswa</label>
+                <label class="flex items-center gap-2 cursor-pointer mb-3">
+                    <input type="checkbox" name="is_submission_enabled" id="modal_is_submission_enabled" value="1" 
+                           {{ old('is_submission_enabled', $soal->is_submission_enabled) ? 'checked' : '' }} 
+                           class="accent-emerald-500 bg-gray-800 border-gray-600 w-4 h-4 rounded cursor-pointer" 
+                           onchange="toggleModalSubmissionFields(this.checked)">
+                    <span class="text-xs text-gray-300">Aktifkan Form Pengumpulan Tugas bagi Mahasiswa</span>
+                </label>
+
+                <div id="modal-submission-fields" class="{{ old('is_submission_enabled', $soal->is_submission_enabled) ? '' : 'hidden' }} space-y-4 bg-[#090E0B]/40 p-3.5 rounded-xl border border-[#1A2820]">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] text-gray-400 mb-1">Batas Waktu Pengumpulan (Deadline) <span class="text-red-400">*</span></label>
+                            <input type="datetime-local" id="modal_deadline_at" name="deadline_at" 
+                                   value="{{ old('deadline_at', $soal->deadline_at?->format('Y-m-d\TH:i')) }}"
+                                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                            @error('deadline_at') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-gray-400 mb-1">Instruksi Tambahan (Opsional)</label>
+                            <textarea name="submission_instructions" rows="2" class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-emerald-500 resize-none" placeholder="Contoh: Format laporan dalam PDF, ukuran max 5MB.">{{ old('submission_instructions', $soal->submission_instructions) }}</textarea>
+                        </div>
+                    </div>
+
+                    {{-- Daftar Pilihan Kelas (Opsional) --}}
+                    @php
+                        $classesStr = old('classes', is_array($soal->classes) ? implode(', ', $soal->classes) : '');
+                    @endphp
+                    <div>
+                        <label class="block text-xs text-gray-300 font-semibold mb-1">Daftar Pilihan Kelas (Opsional)</label>
+                        <input type="text" name="classes" value="{{ $classesStr }}"
+                               placeholder="Contoh: A1, A2, B1, B2 (Pisahkan dengan tanda koma)"
+                               class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                        <p class="text-[11px] text-gray-500 mt-1">Jika diisi, mahasiswa wajib memilih salah satu kelas saat mengumpulkan tugas.</p>
+                        @error('classes') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Pilihan Tipe Pengumpulan --}}
+                    @php
+                        $modalSubTypes = old('submission_types', $soal->submission_types ?? ['file']);
+                        if(empty($modalSubTypes)) $modalSubTypes = ['file'];
+                    @endphp
+                    <div>
+                        <label class="block text-xs text-gray-300 font-semibold mb-2">Metode Pengumpulan yang Diizinkan Mahasiswa <span class="text-red-400">*</span></label>
+                        <div class="flex flex-wrap gap-3">
+                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                                <input type="checkbox" name="submission_types[]" value="file" {{ in_array('file', $modalSubTypes) ? 'checked' : '' }} class="accent-emerald-500 w-3.5 h-3.5 rounded">
+                                <span class="text-xs text-gray-200">📁 File Dokumen</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                                <input type="checkbox" name="submission_types[]" value="link" {{ in_array('link', $modalSubTypes) ? 'checked' : '' }} class="accent-emerald-500 w-3.5 h-3.5 rounded">
+                                <span class="text-xs text-gray-200">🔗 Tautan / Link URL</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                                <input type="checkbox" name="submission_types[]" value="text" {{ in_array('text', $modalSubTypes) ? 'checked' : '' }} class="accent-emerald-500 w-3.5 h-3.5 rounded">
+                                <span class="text-xs text-gray-200">📝 Teks Langsung</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    {{-- Format File yang Diizinkan --}}
+                    <div>
+                        <label class="block text-xs text-gray-300 font-semibold mb-1">Format File yang Diizinkan (Jika Mengunggah File) <span class="text-red-400">*</span></label>
+                        @php $modalExts = old('allowed_extensions', $soal->allowed_extensions ?? []); @endphp
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            <label class="flex items-center gap-2 cursor-pointer bg-emerald-500/10 border border-emerald-500/30 p-2 rounded-lg">
+                                <input type="checkbox" name="allowed_extensions[]" value="all" class="accent-emerald-500 w-3.5 h-3.5 rounded" {{ in_array('all', $modalExts) ? 'checked' : '' }}>
+                                <span class="text-xs text-emerald-300 font-bold">Semua Format (Aman)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <input type="checkbox" name="allowed_extensions[]" value="pdf" class="accent-emerald-500 w-3.5 h-3.5 rounded" {{ in_array('pdf', $modalExts) ? 'checked' : '' }}>
+                                <span class="text-xs text-gray-300">PDF (.pdf)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <input type="checkbox" name="allowed_extensions[]" value="word" class="accent-emerald-500 w-3.5 h-3.5 rounded" {{ in_array('word', $modalExts) ? 'checked' : '' }}>
+                                <span class="text-xs text-gray-300">Word (.doc, .docx)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <input type="checkbox" name="allowed_extensions[]" value="excel" class="accent-emerald-500 w-3.5 h-3.5 rounded" {{ in_array('excel', $modalExts) ? 'checked' : '' }}>
+                                <span class="text-xs text-gray-300">Excel (.xls, .xlsx)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <input type="checkbox" name="allowed_extensions[]" value="ppt" class="accent-emerald-500 w-3.5 h-3.5 rounded" {{ in_array('ppt', $modalExts) ? 'checked' : '' }}>
+                                <span class="text-xs text-gray-300">PowerPoint (.ppt)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <input type="checkbox" name="allowed_extensions[]" value="image" class="accent-emerald-500 w-3.5 h-3.5 rounded" {{ in_array('image', $modalExts) ? 'checked' : '' }}>
+                                <span class="text-xs text-gray-300">Gambar (.jpg, .png)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <input type="checkbox" name="allowed_extensions[]" value="archive" class="accent-emerald-500 w-3.5 h-3.5 rounded" {{ in_array('archive', $modalExts) ? 'checked' : '' }}>
+                                <span class="text-xs text-gray-300">Arsip (.zip, .rar)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <input type="checkbox" name="allowed_extensions[]" value="pkt" class="accent-emerald-500 w-3.5 h-3.5 rounded" {{ in_array('pkt', $modalExts) ? 'checked' : '' }}>
+                                <span class="text-xs text-gray-300">Packet Tracer (.pkt)</span>
+                            </label>
+                        </div>
+                        @error('allowed_extensions') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        {{-- Modal Footer --}}
+        <div class="flex items-center justify-end gap-3 px-6 py-4 border-t flex-shrink-0" style="border-color:#1A2820;background:#090E0B;">
+            <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-200 px-4 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors">
+                Batal
+            </button>
+            <button type="submit" form="modal-edit-soal-form"
+                    class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-2.5 rounded-xl font-semibold text-xs shadow-lg shadow-emerald-500/20 cursor-pointer transition-all">
+                Simpan Perubahan
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
 let currentModalText = '';
 let currentFilterType = 'all';
+let passwordVisible = false;
+const rawPassword = {!! json_encode($soal->plain_password ?? '') !!};
+let modalExistingFileCount = {{ $soal->attachments()->where('type', 'file')->count() }};
+let modalEditLinkCount = 0;
+
+function togglePasswordVisibility() {
+    const textEl = document.getElementById('passwordTextVal');
+    const eyeIcon = document.getElementById('passwordEyeIcon');
+    if (!textEl) return;
+    passwordVisible = !passwordVisible;
+    if (passwordVisible) {
+        textEl.textContent = rawPassword;
+        if (eyeIcon) {
+            eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>`;
+        }
+    } else {
+        textEl.textContent = '••••••••';
+        if (eyeIcon) {
+            eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`;
+        }
+    }
+}
+
+function openEditModal() {
+    const modal = document.getElementById('editModal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeEditModal() {
+    const modal = document.getElementById('editModal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.classList.remove('overflow-hidden');
+}
+
+function toggleModalSubmissionFields(checked) {
+    const fields = document.getElementById('modal-submission-fields');
+    if (!fields) return;
+    fields.classList.toggle('hidden', !checked);
+    if (!checked) {
+        const dl = document.getElementById('modal_deadline_at');
+        if (dl) dl.value = '';
+    }
+}
+
+function removeModalExistingFile(id) {
+    if (window.Swal) {
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: 'Anda yakin ingin menghapus lampiran ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#374151',
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal',
+            background: '#0F1713',
+            color: '#f3f4f6',
+            customClass: {
+                popup: 'border border-[#1A2820] rounded-2xl',
+                confirmButton: 'rounded-xl px-4 py-2 text-sm font-medium',
+                cancelButton: 'rounded-xl px-4 py-2 text-sm font-medium'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                doRemoveModalAttachment(id);
+            }
+        });
+    } else {
+        if (confirm('Anda yakin ingin menghapus lampiran ini?')) {
+            doRemoveModalAttachment(id);
+        }
+    }
+}
+
+function doRemoveModalAttachment(id) {
+    const el = document.getElementById('modal-attachment-' + id);
+    if (el) el.style.display = 'none';
+    modalExistingFileCount--;
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'delete_attachments[]';
+    input.value = id;
+    document.getElementById('modal-edit-soal-form').appendChild(input);
+}
+
+function handleModalNewFiles(input) {
+    const container = document.getElementById('modal-new-files-container');
+    const list = document.getElementById('modal-new-files-list');
+    list.innerHTML = '';
+
+    if (!input.files || input.files.length === 0) {
+        container.classList.add('hidden');
+        return;
+    }
+
+    if (modalExistingFileCount + input.files.length > 15) {
+        alert('Total file (tersisa + baru) tidak boleh lebih dari 15 file.');
+        input.value = '';
+        container.classList.add('hidden');
+        return;
+    }
+
+    let hasLarge = false;
+    Array.from(input.files).forEach(f => {
+        if (f.size > 5 * 1024 * 1024) hasLarge = true;
+    });
+    if (hasLarge) {
+        alert('Satu atau lebih file melebihi batas 5MB!');
+        input.value = '';
+        container.classList.add('hidden');
+        return;
+    }
+
+    container.classList.remove('hidden');
+    const isMasterDl = document.getElementById('modal_is_downloadable').checked;
+
+    Array.from(input.files).forEach((file, index) => {
+        const kb = file.size / 1024;
+        const sizeStr = kb < 1024 ? `${kb.toFixed(1)} KB` : `${(kb/1024).toFixed(2)} MB`;
+
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between bg-gray-800/80 p-2.5 rounded-lg border border-gray-700 text-xs';
+        row.innerHTML = `
+            <div class="flex items-center gap-2 min-w-0">
+                <span class="text-emerald-400 font-bold">+ Baru</span>
+                <span class="text-gray-200 truncate max-w-xs">${file.name}</span>
+                <span class="text-gray-500">(${sizeStr})</span>
+            </div>
+            <label class="flex items-center gap-1.5 cursor-pointer ml-3 flex-shrink-0">
+                <input type="hidden" name="file_downloadable[${index}]" value="0">
+                <input type="checkbox" name="file_downloadable[${index}]" value="1" ${isMasterDl ? 'checked' : ''}
+                       class="accent-emerald-500 w-3.5 h-3.5 rounded cursor-pointer">
+                <span class="text-[11px] text-gray-300">Boleh Diunduh</span>
+            </label>
+        `;
+        list.appendChild(row);
+    });
+}
+
+function addModalEditLinkRow() {
+    const container = document.getElementById('modal-edit-links-container');
+    const div = document.createElement('div');
+    div.className = 'grid grid-cols-1 md:grid-cols-12 gap-2 link-row bg-[#090E0B]/50 p-2.5 rounded-xl border border-[#1A2820]';
+    div.innerHTML = `
+        <div class="md:col-span-4">
+            <input type="text" name="links[${modalEditLinkCount}][title]" placeholder="Label Link (misal: Bahan Modul)"
+                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+        </div>
+        <div class="md:col-span-7">
+            <input type="url" name="links[${modalEditLinkCount}][url]" placeholder="https://..."
+                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+        </div>
+        <div class="md:col-span-1 flex items-center justify-center">
+            <button type="button" onclick="this.closest('.link-row').remove()" class="text-red-400 hover:text-red-300 p-1.5 cursor-pointer" title="Hapus Link">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+        </div>
+    `;
+    container.appendChild(div);
+    modalEditLinkCount++;
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeEditModal();
+        closeTextModal();
+    }
+});
+
+@if($errors->any())
+document.addEventListener('DOMContentLoaded', function() {
+    openEditModal();
+});
+@endif
 
 function showToast(msg) {
     if (window.Swal) {

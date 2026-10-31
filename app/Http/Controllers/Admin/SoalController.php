@@ -114,6 +114,7 @@ class SoalController extends Controller
             'kode_unik'           => $validated['kode_unik'],
             'unique_token'        => $token,
             'password'            => Hash::make($validated['password']),
+            'plain_password'      => $validated['password'],
             'category_id'         => $validated['category_id'] ?? null,
             'user_id'             => auth()->id(),
             'access_type'         => $validated['access_type'],
@@ -171,7 +172,8 @@ class SoalController extends Controller
     {
         $this->authorizeAccess($soal);
         $submissions = Submission::where('soal_id', $soal->id)->orderBy('created_at', 'desc')->get();
-        return view('admin.soal.show', compact('soal', 'submissions'));
+        $categories  = Category::all();
+        return view('admin.soal.show', compact('soal', 'submissions', 'categories'));
     }
 
     public function edit(Soal $soal)
@@ -261,7 +263,8 @@ class SoalController extends Controller
 
         // Update password hanya jika diisi
         if (!empty($validated['password'])) {
-            $data['password'] = Hash::make($validated['password']);
+            $data['password']       = Hash::make($validated['password']);
+            $data['plain_password'] = $validated['password'];
         }
 
         $soal->update($data);
@@ -329,7 +332,7 @@ class SoalController extends Controller
             }
         }
 
-        return redirect()->route('admin.soal.index')
+        return redirect()->route('admin.soal.show', $soal)
             ->with('success', 'Dokumen soal berhasil diperbarui!');
     }
 

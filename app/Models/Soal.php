@@ -21,6 +21,7 @@ class Soal extends Model
         'unique_token',
         'kode_unik',
         'password',
+        'plain_password',
         'category_id',
         'user_id',
         'file_path',
