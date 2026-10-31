@@ -83,7 +83,7 @@
                         Tautkan ke Dokumen Soal Praktikum (Opsional)
                     </label>
                     <select name="soal_id"
-                            class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                            class="cyber-select w-full pl-4 pr-10 py-2.5 text-sm cursor-pointer">
                         <option value="">-- Tidak Ditautkan (Kuis Mandiri) --</option>
                         @foreach($soals as $s)
                             <option value="{{ $s->id }}" {{ old('soal_id') == $s->id ? 'selected' : '' }}>

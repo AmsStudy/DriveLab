@@ -228,37 +228,48 @@
             height: 3px !important;
         }
 
-        /* Global Custom Themed Dropdowns for Admin */
-        select:not([multiple]) {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-color: #090D0B;
-            border-color: #1A2820;
-            color: #E5E7EB;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2310B981' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1rem 1rem;
-            padding-right: 2.5rem !important;
-            cursor: pointer;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        /* Global Custom Cyber Themed Dropdowns for Admin */
+        select:not([multiple]),
+        .cyber-select {
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            background-color: #090D0B !important;
+            border: 1px solid #1A2820 !important;
+            border-radius: 0.75rem !important;
+            color: #E5E7EB !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M6 8L10 12L14 8' stroke='%2310B981' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.85rem center !important;
+            background-size: 1.15rem 1.15rem !important;
+            padding-right: 2.75rem !important;
+            cursor: pointer !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4) !important;
         }
-        select:not([multiple]):hover {
-            border-color: rgba(16, 185, 129, 0.45) !important;
+        select:not([multiple]):hover,
+        .cyber-select:hover {
+            background-color: #0D1512 !important;
+            border-color: rgba(16, 185, 129, 0.5) !important;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.18), inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
         }
-        select:not([multiple]):focus {
+        select:not([multiple]):focus,
+        .cyber-select:focus {
+            background-color: #070C09 !important;
             border-color: #10B981 !important;
             outline: none !important;
-            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25), 0 0 18px rgba(16, 185, 129, 0.22) !important;
         }
-        select:not([multiple]) option {
-            background-color: #0F1713;
-            color: #F3F4F6;
-            padding: 8px 12px;
+        select:not([multiple]) option,
+        .cyber-select option {
+            background-color: #0F1713 !important;
+            color: #F3F4F6 !important;
+            padding: 10px 14px !important;
+            font-family: 'Inter', sans-serif !important;
         }
-        select:not([multiple]) option:disabled {
-            color: #6B7280;
+        select:not([multiple]) option:disabled,
+        .cyber-select option:disabled {
+            color: #6B7280 !important;
         }
     </style>
 </head>

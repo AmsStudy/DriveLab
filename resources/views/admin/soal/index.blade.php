@@ -20,20 +20,18 @@
                    style="background-color:#090D0B;border-color:#1A2820;padding-left:2.5rem !important;">
         </div>
 
-        {{-- Category Select (Single chevron via Tailwind Forms) --}}
+        {{-- Category Select --}}
         <select id="category-filter" name="category"
-                class="border text-gray-300 rounded-xl pl-3.5 pr-10 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
-                style="background-color:#090D0B;border-color:#1A2820;">
+                class="cyber-select text-sm pl-3.5 pr-10 py-2">
             <option value="">Semua Kategori</option>
             @foreach($categories as $cat)
                 <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
             @endforeach
         </select>
 
-        {{-- Status Select (Single chevron via Tailwind Forms) --}}
+        {{-- Status Select --}}
         <select id="status-filter" name="status"
-                class="border text-gray-300 rounded-xl pl-3.5 pr-10 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
-                style="background-color:#090D0B;border-color:#1A2820;">
+                class="cyber-select text-sm pl-3.5 pr-10 py-2">
             <option value="">Semua Status</option>
             <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
             <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
@@ -322,8 +320,7 @@
                             <div>
                                 <label for="modal_category_id" class="block text-sm font-medium text-gray-300 mb-2">Kategori</label>
                                 <select id="modal_category_id" name="category_id"
-                                        class="w-full border text-gray-300 rounded-xl pl-4 pr-10 py-3 text-sm focus:outline-none focus:border-emerald-500"
-                                        style="background-color:#090E0B;border-color:#1A2820;">
+                                        class="cyber-select w-full pl-4 pr-10 py-3 text-sm">
                                     <option value="">— Pilih Kategori —</option>
                                     @foreach($categories as $cat)
                                         <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>

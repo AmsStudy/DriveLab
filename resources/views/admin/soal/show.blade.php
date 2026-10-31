@@ -508,8 +508,7 @@
                     @if($soal->hasClasses())
                         <div class="relative flex-shrink-0">
                             <select id="classFilterSelect" onchange="filterSubmissions()"
-                                    class="border text-gray-200 rounded-xl pl-3 pr-8 py-2 text-xs focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
-                                    style="background-color:#090D0B;border-color:#1A2820;">
+                                    class="cyber-select text-xs pl-3.5 pr-10 py-2 cursor-pointer">
                                 <option value="all">Semua Kelas ({{ $submissions->count() }})</option>
                                 @foreach($soal->getClassesList() as $cls)
                                     <option value="{{ $cls }}">Kelas {{ $cls }} ({{ $submissions->where('kelas', $cls)->count() }})</option>
@@ -755,8 +754,7 @@
                         <div>
                             <label for="modal_category_id" class="block text-xs font-medium text-gray-300 mb-1.5">Kategori</label>
                             <select id="modal_category_id" name="category_id"
-                                    class="w-full border text-gray-300 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500 cursor-pointer"
-                                    style="background-color:#090E0B;border-color:#1A2820;">
+                                    class="cyber-select w-full pl-3.5 pr-10 py-2.5 text-xs cursor-pointer">
                                 <option value="">— Tanpa Kategori —</option>
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat->id }}" {{ old('category_id', $soal->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>

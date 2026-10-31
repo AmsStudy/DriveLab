@@ -89,7 +89,7 @@
 
                 {{-- Status Filter --}}
                 <select name="status" onchange="this.form.submit()"
-                        class="bg-[#090D0B] border border-[#1A2820] text-gray-300 text-sm rounded-xl px-3 py-2 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+                        class="cyber-select text-sm pl-3.5 pr-10 py-2">
                     <option value="">Semua Status</option>
                     <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
                     <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
@@ -98,7 +98,7 @@
                 {{-- Soal Attachment Filter --}}
                 @if(isset($soals) && $soals->count() > 0)
                 <select name="soal_id" onchange="this.form.submit()"
-                        class="bg-[#090D0B] border border-[#1A2820] text-gray-300 text-sm rounded-xl px-3 py-2 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 max-w-xs truncate">
+                        class="cyber-select text-sm pl-3.5 pr-10 py-2 max-w-xs truncate">
                     <option value="">Semua Dokumen Soal</option>
                     @foreach($soals as $s)
                         <option value="{{ $s->id }}" {{ request('soal_id') == $s->id ? 'selected' : '' }}>{{ Str::limit($s->title, 25) }}</option>

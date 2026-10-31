@@ -408,7 +408,8 @@
                                             </svg>
                                         </div>
                                         <select name="kelas" required
-                                                class="w-full pl-10 pr-10 py-3 bg-[#090D0B] border border-[#1A2820] hover:border-emerald-500/40 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 cursor-pointer appearance-none transition-all shadow-inner">
+                                                class="w-full pl-10 pr-10 py-3 bg-[#090D0B] border border-[#1A2820] hover:border-emerald-500/60 hover:bg-[#0D1512] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/25 focus:bg-[#070C09] rounded-xl text-sm text-gray-100 cursor-pointer appearance-none transition-all shadow-inner"
+                                                style="background-image: none !important;">
                                             <option value="" disabled {{ old('kelas') ? '' : 'selected' }} class="bg-[#0F1713] text-gray-500">— Pilih Kelas Anda —</option>
                                             @foreach($quiz->getClassesList() as $cls)
                                                 <option value="{{ $cls }}" {{ old('kelas') == $cls ? 'selected' : '' }} class="bg-[#0F1713] text-gray-100 py-2">Kelas {{ $cls }}</option>

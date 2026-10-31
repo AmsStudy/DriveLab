@@ -458,38 +458,50 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
   background:#070C09;
 }
 .field-wrap select.field-input{
-  appearance:none;
-  -webkit-appearance:none;
-  -moz-appearance:none;
-  padding-left:38px;
-  padding-right:36px;
-  cursor:pointer;
-  background-color:#080810;
-  color:var(--text1);
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  -moz-appearance:none !important;
+  background-image:none !important;
+  padding-left:38px !important;
+  padding-right:40px !important;
+  cursor:pointer !important;
+  background-color:#090D0B !important;
+  border:1px solid #1A2820 !important;
+  border-radius:12px !important;
+  color:var(--text1) !important;
+  font-family:'DM Sans',sans-serif !important;
+  transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 .field-wrap select.field-input:hover{
-  border-color:rgba(16,185,129,0.4);
+  background-color:#0D1512 !important;
+  border-color:rgba(16,185,129,0.5) !important;
+  box-shadow:0 0 14px rgba(16,185,129,0.18) !important;
 }
 .field-wrap select.field-input:focus{
-  border-color:var(--emerald);
-  box-shadow:0 0 0 3px rgba(16,185,129,0.15);
-  background-color:#070C09;
+  background-color:#070C09 !important;
+  border-color:var(--emerald) !important;
+  outline:none !important;
+  box-shadow:0 0 0 2px rgba(16,185,129,0.25), 0 0 18px rgba(16,185,129,0.2) !important;
 }
 .field-wrap select.field-input option{
-  background-color:#0F1713;
-  color:#F3F4F6;
-  padding:10px 14px;
+  background-color:#0F1713 !important;
+  color:#F3F4F6 !important;
+  padding:12px 14px !important;
+  font-family:'DM Sans',sans-serif !important;
+}
+.field-wrap select.field-input option:disabled{
+  color:#6B7280 !important;
 }
 .field-wrap .select-chevron{
   position:absolute;
-  right:13px;
+  right:14px;
   top:50%;
   transform:translateY(-50%);
-  width:14px;
-  height:14px;
+  width:16px;
+  height:16px;
   color:#10B981;
   pointer-events:none;
-  transition:transform 0.2s ease,color 0.2s ease;
+  transition:transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
 }
 .field-wrap:focus-within .select-chevron{
   color:#34D399;

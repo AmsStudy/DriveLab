@@ -137,7 +137,7 @@
                 @if($quiz->hasClasses())
                     <div class="relative flex-shrink-0">
                         <select name="kelas" onchange="this.form.submit()"
-                                class="px-3.5 py-2 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 rounded-xl text-xs text-gray-200 cursor-pointer">
+                                class="cyber-select text-xs pl-3.5 pr-10 py-2 cursor-pointer">
                             <option value="all" {{ request('kelas') === 'all' || !request('kelas') ? 'selected' : '' }}>Semua Kelas ({{ $totalParticipants }})</option>
                             @foreach($quiz->getClassesList() as $cls)
                                 @php $clsCount = $quiz->attempts()->whereNotNull('completed_at')->where('kelas', $cls)->count(); @endphp

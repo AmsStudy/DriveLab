@@ -53,8 +53,7 @@
                         <div>
                             <label for="category_id" class="block text-sm font-medium text-gray-300 mb-2">Kategori</label>
                             <select id="category_id" name="category_id"
-                                    class="w-full border text-gray-300 rounded-xl pl-4 pr-10 py-3 text-sm focus:outline-none focus:border-emerald-500"
-                                    style="background-color:#090E0B;border-color:#1A2820;">
+                                    class="cyber-select w-full pl-4 pr-10 py-3 text-sm cursor-pointer">
                                 <option value="">— Pilih Kategori —</option>
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>

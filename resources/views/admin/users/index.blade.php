@@ -17,8 +17,7 @@
                    style="background-color:#090D0B;border-color:#1A2820;padding-left:2.5rem !important;">
         </div>
         <select name="status"
-                class="border text-gray-300 rounded-xl pl-3.5 pr-10 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-colors"
-                style="background-color:#090D0B;border-color:#1A2820;">
+                class="cyber-select text-sm pl-3.5 pr-10 py-2">
             <option value="">Semua Status</option>
             <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>✓ Aktif</option>
             <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>✕ Nonaktif</option>

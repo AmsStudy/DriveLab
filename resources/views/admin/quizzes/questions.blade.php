@@ -167,7 +167,7 @@
                             Jenis Pertanyaan <span class="text-red-400">*</span>
                         </label>
                         <select name="question_type" x-model="formData.question_type" @change="handleTypeChange()"
-                                class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 font-medium">
+                                class="cyber-select w-full pl-4 pr-10 py-2.5 text-sm font-medium cursor-pointer">
                             <option value="multiple_choice">Pilihan Ganda (Tunggal - 1 Jawaban Benar)</option>
                             <option value="multi_select">Pilihan Jamak (Checkbox - Lebih dari 1 Jawaban Benar)</option>
                             <option value="true_false">Benar / Salah (True / False)</option>
