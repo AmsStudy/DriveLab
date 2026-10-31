@@ -178,3 +178,4 @@ class QuizClassFeatureTest extends TestCase
         $this->assertStringContainsString('Peserta A2', $contentAll);
     }
 }
+

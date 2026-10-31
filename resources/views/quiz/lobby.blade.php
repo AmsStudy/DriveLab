@@ -269,16 +269,27 @@
                             {{-- Pilihan Kelas Mahasiswa --}}
                             @if($quiz->hasClasses())
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
-                                        Pilih Kelas <span class="text-emerald-400">*</span>
+                                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                        <span>Pilih Kelas <span class="text-emerald-400">*</span></span>
+                                        <span class="text-[10px] text-gray-500 font-normal">Wajib dipilih sesuai kelas Anda</span>
                                     </label>
-                                    <select name="kelas" required
-                                            class="w-full px-4 py-3 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 cursor-pointer">
-                                        <option value="" disabled {{ old('kelas') ? '' : 'selected' }}>— Pilih Kelas Anda —</option>
-                                        @foreach($quiz->getClassesList() as $cls)
-                                            <option value="{{ $cls }}" {{ old('kelas') == $cls ? 'selected' : '' }}>Kelas {{ $cls }}</option>
-                                        @endforeach
-                                    </select>
+                                    <div class="relative group">
+                                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-500 group-focus-within:text-emerald-400 transition-colors">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                            </svg>
+                                        </div>
+                                        <select name="kelas" required
+                                                class="w-full pl-10 pr-10 py-3 bg-[#090D0B] border border-[#1A2820] hover:border-emerald-500/40 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 cursor-pointer appearance-none transition-all shadow-inner">
+                                            <option value="" disabled {{ old('kelas') ? '' : 'selected' }} class="bg-[#0F1713] text-gray-500">— Pilih Kelas Anda —</option>
+                                            @foreach($quiz->getClassesList() as $cls)
+                                                <option value="{{ $cls }}" {{ old('kelas') == $cls ? 'selected' : '' }} class="bg-[#0F1713] text-gray-100 py-2">Kelas {{ $cls }}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-emerald-400 transition-transform group-focus-within:rotate-180">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </div>
+                                    </div>
                                     @error('kelas')
                                         <p class="text-xs text-red-400 mt-1">{{ $message }}</p>
                                     @enderror

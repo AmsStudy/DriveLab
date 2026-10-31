@@ -48,25 +48,25 @@
                             <svg class="w-3.5 h-3.5 ml-0.5 text-teal-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
                         <div x-show="open" x-cloak
-                             x-transition:enter="transition ease-out duration-100"
-                             x-transition:enter-start="transform opacity-0 scale-95"
-                             x-transition:enter-end="transform opacity-100 scale-100"
-                             x-transition:leave="transition ease-in duration-75"
-                             x-transition:leave-start="transform opacity-100 scale-100"
-                             x-transition:leave-end="transform opacity-0 scale-95"
-                             class="absolute right-0 mt-2 w-56 rounded-xl shadow-2xl py-1.5 z-30 border"
-                             style="background:#0F1713;border-color:#1A2820;">
-                            <div class="px-3.5 py-1.5 text-[10px] uppercase font-bold text-gray-500 tracking-wider">Rekap Hasil Kuis</div>
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="transform opacity-0 scale-95 -translate-y-1"
+                             x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+                             x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
+                             class="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl py-2 z-30 border backdrop-blur-md"
+                             style="background:rgba(15,23,19,0.96);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
+                            <div class="px-4 py-1.5 text-[10px] uppercase font-bold text-gray-500 tracking-wider">Rekap Hasil Kuis</div>
                             <a href="{{ route('admin.quizzes.export-csv', $quiz) }}"
-                               class="flex items-center justify-between px-3.5 py-2 text-xs text-emerald-400 hover:bg-emerald-950/40 font-semibold">
+                               class="flex items-center justify-between px-4 py-2 text-xs text-emerald-400 hover:bg-emerald-500/10 font-semibold transition-colors">
                                 <span>Semua Kelas</span>
                                 <span class="text-[10px] text-gray-500 font-mono">{{ $totalParticipants }}</span>
                             </a>
-                            <div class="border-t my-1" style="border-color:#1A2820;"></div>
+                            <div class="border-t my-1.5" style="border-color:#1A2820;"></div>
                             @foreach($quiz->getClassesList() as $cls)
                                 @php $cCount = $quiz->attempts()->whereNotNull('completed_at')->where('kelas', $cls)->count(); @endphp
                                 <a href="{{ route('admin.quizzes.export-csv', [$quiz, 'kelas' => $cls]) }}"
-                                   class="flex items-center justify-between px-3.5 py-2 text-xs text-gray-300 hover:text-white hover:bg-white/5">
+                                   class="flex items-center justify-between px-4 py-2 text-xs text-gray-300 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors">
                                     <span>Kelas {{ $cls }}</span>
                                     <span class="text-[10px] font-mono {{ $cCount > 0 ? 'text-emerald-400' : 'text-gray-600' }}">{{ $cCount }}</span>
                                 </a>

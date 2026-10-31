@@ -23,12 +23,37 @@
         .flash-msg { animation: fadeSlideDown .3s ease forwards; }
         @keyframes glow-pulse { 0%,100% { box-shadow:0 0 14px rgba(16,185,129,.3); } 50% { box-shadow:0 0 24px rgba(16,185,129,.55); } }
         .logo-icon { animation: glow-pulse 3s ease-in-out infinite; }
-        /* Prevent dropdown arrow overlap with text across all select elements */
-        select {
+        /* Global Custom Themed Dropdowns for Admin */
+        select:not([multiple]) {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
+            background-color: #090D0B;
+            border-color: #1A2820;
+            color: #E5E7EB;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2310B981' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem 1rem;
             padding-right: 2.5rem !important;
+            cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+        select:not([multiple]):hover {
+            border-color: rgba(16, 185, 129, 0.45) !important;
+        }
+        select:not([multiple]):focus {
+            border-color: #10B981 !important;
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+        }
+        select:not([multiple]) option {
+            background-color: #0F1713;
+            color: #F3F4F6;
+            padding: 8px 12px;
+        }
+        select:not([multiple]) option:disabled {
+            color: #6B7280;
         }
     </style>
 </head>

@@ -457,6 +457,44 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
   box-shadow:0 0 0 3px rgba(16,185,129,0.12);
   background:#070C09;
 }
+.field-wrap select.field-input{
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  padding-left:38px;
+  padding-right:36px;
+  cursor:pointer;
+  background-color:#080810;
+  color:var(--text1);
+}
+.field-wrap select.field-input:hover{
+  border-color:rgba(16,185,129,0.4);
+}
+.field-wrap select.field-input:focus{
+  border-color:var(--emerald);
+  box-shadow:0 0 0 3px rgba(16,185,129,0.15);
+  background-color:#070C09;
+}
+.field-wrap select.field-input option{
+  background-color:#0F1713;
+  color:#F3F4F6;
+  padding:10px 14px;
+}
+.field-wrap .select-chevron{
+  position:absolute;
+  right:13px;
+  top:50%;
+  transform:translateY(-50%);
+  width:14px;
+  height:14px;
+  color:#10B981;
+  pointer-events:none;
+  transition:transform 0.2s ease,color 0.2s ease;
+}
+.field-wrap:focus-within .select-chevron{
+  color:#34D399;
+  transform:translateY(-50%) rotate(180deg);
+}
 
 /* Dropzone */
 .dropzone{
@@ -901,15 +939,20 @@ footer{
                                     Kelas <span class="req">*</span>
                                 </label>
                                 <div class="field-wrap">
-                                    <select id="sub_kelas" name="kelas" required class="field-input" style="padding-left:38px;padding-right:24px;appearance:auto;cursor:pointer;">
-                                        <option value="" disabled selected>— Pilih Kelas —</option>
+                                    <select id="sub_kelas" name="kelas" required class="field-input">
+                                        <option value="" disabled selected>— Pilih Kelas Anda —</option>
                                         @foreach($soal->getClassesList() as $kelasOption)
-                                            <option value="{{ $kelasOption }}" style="background:#0F1713;color:#F9FAFB;">Kelas {{ $kelasOption }}</option>
+                                            <option value="{{ $kelasOption }}">Kelas {{ $kelasOption }}</option>
                                         @endforeach
                                     </select>
                                     <svg class="field-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                     </svg>
+                                    <div class="select-chevron">
+                                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </div>
                                 </div>
                             </div>
                             @endif
