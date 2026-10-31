@@ -12,11 +12,11 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Display the login view (redirected to home with modal trigger).
      */
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        return view('auth.login');
+        return redirect()->route('home', ['admin_login' => 1]);
     }
 
     /**
