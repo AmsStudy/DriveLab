@@ -1,24 +1,80 @@
-*.log
-.DS_Store
-.env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
+# =============================================================================
+# IC-Labs Repository - .gitignore
+# =============================================================================
+
+# --- Environment & Secret Credentials ---
+/.env
+/.env.*
+!/.env.example
+*.key
 /auth.json
+
+# --- Dependency Directories ---
 /node_modules
+/vendor
+
+# --- Compiled Assets & Build Artifacts ---
 /public/build
 /public/hot
 /public/storage
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Laravel Framework & Logs ---
 /storage/*.key
 /storage/pail
-/vendor
+/storage/app/temp/*
+!/storage/app/temp/.gitignore
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+*.log
+
+# --- Database & Local Storage ---
+*.sqlite
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+database.sqlite
+
+# --- Testing & Code Coverage ---
+/.phpunit.cache
+.phpunit.result.cache
+/coverage
+/.pest
+
+# --- IDEs, Text Editors & Tooling ---
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+.phpactor.json
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+
+# --- Operating System Artifacts (Windows / macOS / Linux) ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.bak
+*.tmp
+*.swp
+*~
+
+# --- Virtualization & Containers ---
 Homestead.json
 Homestead.yaml
-Thumbs.db
+/.vagrant
