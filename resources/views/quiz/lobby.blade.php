@@ -396,27 +396,78 @@
 
                             {{-- Pilihan Kelas Mahasiswa --}}
                             @if($quiz->hasClasses())
-                                <div>
+                                <div x-data="{
+                                    open: false,
+                                    selected: '{{ old('kelas', '') }}',
+                                    selectedLabel: '{{ old('kelas') ? 'Kelas ' . old('kelas') : '— Pilih Kelas Anda —' }}',
+                                    selectClass(val, label) {
+                                        this.selected = val;
+                                        this.selectedLabel = label;
+                                        this.open = false;
+                                        const selEl = document.getElementById('lobby_kelas_select');
+                                        if (selEl) {
+                                            selEl.value = val;
+                                            selEl.dispatchEvent(new Event('change', { bubbles: true }));
+                                        }
+                                    }
+                                }" @click.outside="open = false" @keydown.escape.window="open = false">
                                     <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
                                         <span>Pilih Kelas <span class="text-emerald-400">*</span></span>
                                         <span class="text-[10px] text-gray-500 font-normal">Wajib dipilih sesuai kelas Anda</span>
                                     </label>
-                                    <div class="relative group">
-                                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-500 group-focus-within:text-emerald-400 transition-colors">
+                                    <div class="relative">
+                                        {{-- Native hidden select for form validation and submission --}}
+                                        <select name="kelas" id="lobby_kelas_select" required class="sr-only" tabindex="-1" :value="selected">
+                                            <option value="">— Pilih Kelas Anda —</option>
+                                            @foreach($quiz->getClassesList() as $cls)
+                                                <option value="{{ $cls }}">Kelas {{ $cls }}</option>
+                                            @endforeach
+                                        </select>
+
+                                        <button type="button" 
+                                                @click="open = !open"
+                                                class="w-full pl-10 pr-10 py-3 bg-[#090D0B] border border-[#1A2820] hover:border-emerald-500/60 hover:bg-[#0D1512] rounded-xl text-sm transition-all shadow-inner text-left flex items-center justify-between cursor-pointer"
+                                                :class="{ 'border-emerald-500 ring-2 ring-emerald-500/25 bg-[#070C09]': open }">
+                                            <span x-text="selectedLabel" :class="selected ? 'text-gray-100 font-semibold' : 'text-gray-500'"></span>
+                                        </button>
+
+                                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-500" :class="{ 'text-emerald-400': open }">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                             </svg>
                                         </div>
-                                        <select name="kelas" required
-                                                class="w-full pl-10 pr-10 py-3 bg-[#090D0B] border border-[#1A2820] hover:border-emerald-500/60 hover:bg-[#0D1512] focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/25 focus:bg-[#070C09] rounded-xl text-sm text-gray-100 cursor-pointer appearance-none transition-all shadow-inner"
-                                                style="background-image: none !important;">
-                                            <option value="" disabled {{ old('kelas') ? '' : 'selected' }} class="bg-[#0F1713] text-gray-500">— Pilih Kelas Anda —</option>
-                                            @foreach($quiz->getClassesList() as $cls)
-                                                <option value="{{ $cls }}" {{ old('kelas') == $cls ? 'selected' : '' }} class="bg-[#0F1713] text-gray-100 py-2">Kelas {{ $cls }}</option>
-                                            @endforeach
-                                        </select>
-                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-emerald-400 transition-transform group-focus-within:rotate-180">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-emerald-400 transition-transform duration-200" :class="{ 'rotate-180': open }">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
+                                        </div>
+
+                                        {{-- Custom Cyber Options Menu Popup --}}
+                                        <div x-show="open" 
+                                             x-cloak
+                                             x-transition:enter="transition ease-out duration-150"
+                                             x-transition:enter-start="opacity-0 -translate-y-2 scale-98"
+                                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                             x-transition:leave="transition ease-in duration-100"
+                                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                             x-transition:leave-end="opacity-0 -translate-y-2 scale-98"
+                                             class="absolute left-0 right-0 mt-2 z-50 p-1.5 rounded-2xl border backdrop-blur-xl shadow-2xl max-h-60 overflow-y-auto"
+                                             style="background:rgba(15,23,19,0.98);border-color:rgba(16,185,129,0.35);box-shadow:0 20px 45px -10px rgba(0,0,0,0.9), 0 0 25px rgba(16,185,129,0.18);">
+                                             <div class="px-3 py-1.5 text-[10px] uppercase font-bold text-gray-500 tracking-wider border-b border-[#1A2820] mb-1 flex items-center justify-between">
+                                                 <span>Pilih Kelas Ujian</span>
+                                                 <span class="text-emerald-400 font-mono text-[9px]">{{ count($quiz->getClassesList()) }} Kelas</span>
+                                             </div>
+                                             @foreach($quiz->getClassesList() as $cls)
+                                                 <button type="button" 
+                                                         @click="selectClass('{{ $cls }}', 'Kelas {{ $cls }}')"
+                                                         class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all cursor-pointer mb-0.5"
+                                                         :class="selected === '{{ $cls }}' ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30' : 'text-gray-200 hover:bg-emerald-500/10 hover:text-emerald-300'">
+                                                     <span class="flex items-center gap-2">
+                                                         <span class="w-1.5 h-1.5 rounded-full" :class="selected === '{{ $cls }}' ? 'bg-emerald-400 shadow-[0_0_8px_#10B981]' : 'bg-gray-600'"></span>
+                                                         <span>Kelas {{ $cls }}</span>
+                                                     </span>
+                                                     <svg x-show="selected === '{{ $cls }}'" class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                                 </button>
+                                             @endforeach
                                         </div>
                                     </div>
                                     @error('kelas')

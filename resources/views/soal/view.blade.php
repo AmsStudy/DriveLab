@@ -508,6 +508,150 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
   transform:translateY(-50%) rotate(180deg);
 }
 
+/* ─── Custom Cyber Dropdown (Mahasiswa & Form Choices) ─── */
+.custom-cyber-dropdown {
+  position: relative;
+  width: 100%;
+}
+.custom-cyber-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 12px 38px;
+  background-color: #090D0B;
+  border: 1px solid #1A2820;
+  border-radius: 12px;
+  color: var(--text1);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+}
+.custom-cyber-trigger:hover,
+.custom-cyber-trigger.is-open {
+  background-color: #0D1512;
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.18);
+}
+.custom-cyber-trigger.is-open {
+  border-color: var(--emerald);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25), 0 0 18px rgba(16, 185, 129, 0.2);
+}
+.custom-cyber-trigger .trigger-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.custom-cyber-trigger .trigger-chevron {
+  width: 16px;
+  height: 16px;
+  color: #10B981;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+.custom-cyber-trigger.is-open .trigger-chevron {
+  transform: rotate(180deg);
+  color: #34D399;
+}
+.custom-cyber-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 19, 0.98);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.9), 0 0 25px rgba(16, 185, 129, 0.18);
+  border-radius: 16px;
+  padding: 8px;
+  z-index: 100;
+  max-height: 250px;
+  overflow-y: auto;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.custom-cyber-menu::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-cyber-menu::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.35);
+  border-radius: 4px;
+}
+.custom-cyber-menu::-webkit-scrollbar-thumb:hover {
+  background: #10B981;
+}
+.custom-cyber-menu-header {
+  padding: 6px 10px 6px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid rgba(26, 40, 32, 0.8);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.custom-cyber-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  margin-bottom: 3px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #E5E7EB;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+.custom-cyber-menu-item:last-child {
+  margin-bottom: 0;
+}
+.custom-cyber-menu-item:hover {
+  background: rgba(16, 185, 129, 0.14);
+  color: #34D399;
+  border-color: rgba(16, 185, 129, 0.25);
+  transform: translateX(2px);
+}
+.custom-cyber-menu-item.is-selected {
+  background: rgba(16, 185, 129, 0.22);
+  color: #10B981;
+  font-weight: 600;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+.custom-cyber-menu-item .item-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4B5563;
+  margin-right: 8px;
+  transition: all 0.15s ease;
+}
+.custom-cyber-menu-item:hover .item-dot {
+  background: #34D399;
+  box-shadow: 0 0 6px #10B981;
+}
+.custom-cyber-menu-item.is-selected .item-dot {
+  background: #10B981;
+  box-shadow: 0 0 8px #10B981;
+}
+.custom-cyber-menu-item .check-svg {
+  width: 16px;
+  height: 16px;
+  color: #10B981;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
 /* Dropzone */
 .dropzone{
   border:1.5px dashed rgba(255,255,255,0.1);
@@ -1092,24 +1236,69 @@ footer{
                                 </div>
                             </div>
                             @if($soal->hasClasses())
-                            <div class="field-group">
+                            <div class="field-group" x-data="{
+                                open: false,
+                                selected: '',
+                                selectedLabel: '— Pilih Kelas Anda —',
+                                selectClass(val, label) {
+                                    this.selected = val;
+                                    this.selectedLabel = label;
+                                    this.open = false;
+                                    const hiddenEl = document.getElementById('sub_kelas');
+                                    if (hiddenEl) {
+                                        hiddenEl.value = val;
+                                        hiddenEl.dispatchEvent(new Event('change', { bubbles: true }));
+                                    }
+                                }
+                            }" @click.outside="open = false" @keydown.escape.window="open = false">
                                 <label class="field-label">
                                     Kelas <span class="req">*</span>
                                 </label>
-                                <div class="field-wrap">
-                                    <select id="sub_kelas" name="kelas" required class="field-input">
-                                        <option value="" disabled selected>— Pilih Kelas Anda —</option>
-                                        @foreach($soal->getClassesList() as $kelasOption)
-                                            <option value="{{ $kelasOption }}">Kelas {{ $kelasOption }}</option>
-                                        @endforeach
-                                    </select>
-                                    <svg class="field-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <div class="custom-cyber-dropdown">
+                                    <input type="hidden" id="sub_kelas" name="kelas" :value="selected" required>
+                                    
+                                    <button type="button" 
+                                            @click="open = !open" 
+                                            class="custom-cyber-trigger"
+                                            :class="{ 'is-open': open }">
+                                        <span class="trigger-text" x-text="selectedLabel" :style="selected ? 'color:#F1EEF6;font-weight:600;' : 'color:var(--text3);'"></span>
+                                        <svg class="trigger-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+
+                                    <svg class="field-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="pointer-events:none;">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                     </svg>
-                                    <div class="select-chevron">
-                                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                                        </svg>
+
+                                    {{-- Cyber Dropdown Options Menu Popup --}}
+                                    <div x-show="open" 
+                                         x-cloak
+                                         x-transition:enter="transition ease-out duration-150"
+                                         x-transition:enter-start="opacity-0 -translate-y-2 scale-98"
+                                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                         x-transition:leave="transition ease-in duration-100"
+                                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                         x-transition:leave-end="opacity-0 -translate-y-2 scale-98"
+                                         class="custom-cyber-menu">
+                                         <div class="custom-cyber-menu-header">
+                                             <span>Pilih Kelas Praktikum</span>
+                                             <span style="font-size:9px;color:#10B981;font-weight:600;">{{ count($soal->getClassesList()) }} Kelas</span>
+                                         </div>
+                                         @foreach($soal->getClassesList() as $kelasOption)
+                                             <button type="button" 
+                                                     @click="selectClass('{{ $kelasOption }}', 'Kelas {{ $kelasOption }}')"
+                                                     class="custom-cyber-menu-item"
+                                                     :class="{ 'is-selected': selected === '{{ $kelasOption }}' }">
+                                                 <span style="display:flex;align-items:center;">
+                                                     <span class="item-dot"></span>
+                                                     <span>Kelas {{ $kelasOption }}</span>
+                                                 </span>
+                                                 <svg x-show="selected === '{{ $kelasOption }}'" class="check-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                                 </svg>
+                                             </button>
+                                         @endforeach
                                     </div>
                                 </div>
                             </div>
@@ -1387,6 +1576,12 @@ if (dropzone) {
 
 document.getElementById('submission-form').addEventListener('submit', async function(e) {
     e.preventDefault();
+
+    const subKelasEl = document.getElementById('sub_kelas');
+    if (subKelasEl && !subKelasEl.value) {
+        showAlert('error', 'Silakan pilih kelas Anda terlebih dahulu.');
+        return;
+    }
 
     const currentType = subTypeInput ? subTypeInput.value : 'file';
 

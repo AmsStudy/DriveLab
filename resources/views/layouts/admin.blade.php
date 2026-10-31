@@ -271,6 +271,14 @@
         .cyber-select option:disabled {
             color: #6B7280 !important;
         }
+        .cyber-dropdown-trigger:hover {
+            border-color: rgba(16, 185, 129, 0.5) !important;
+            background-color: #0D1512 !important;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.18) !important;
+        }
+        .cyber-dropdown-menu::-webkit-scrollbar { width: 4px; }
+        .cyber-dropdown-menu::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.35); border-radius: 4px; }
+        .cyber-dropdown-menu::-webkit-scrollbar-thumb:hover { background: #10B981; }
     </style>
 </head>
 <body class="text-gray-100 min-h-screen" style="background:#090D0B; font-family:'Inter',sans-serif;">
@@ -667,6 +675,166 @@
         });
     </script>
     @endif
+
+    {{-- Universal Cyber Select Dropdown Enhancer for Admin --}}
+    <script>
+    function initCyberSelects(root = document) {
+        root.querySelectorAll('select.cyber-select').forEach(select => {
+            if (select.dataset.cyberEnhanced === 'true') return;
+            select.dataset.cyberEnhanced = 'true';
+
+            // Hide original select visually but keep it in DOM for forms & events
+            select.style.display = 'none';
+
+            // Wrapper container
+            const isFull = select.classList.contains('w-full') || (select.getAttribute('style') && select.getAttribute('style').includes('width'));
+            const wrapper = document.createElement('div');
+            wrapper.className = 'cyber-custom-dropdown relative inline-block text-left ' + (isFull ? 'w-full' : '');
+
+            // Selected option
+            let selectedOption = select.options[select.selectedIndex] || select.options[0];
+
+            // Trigger button
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'cyber-dropdown-trigger flex items-center justify-between gap-2.5 transition-all cursor-pointer rounded-xl ' +
+                (isFull ? 'w-full ' : '') +
+                (select.classList.contains('text-xs') ? 'text-xs py-2 px-3.5 ' : 'text-sm py-2 px-3.5 ');
+            trigger.style.backgroundColor = '#090D0B';
+            trigger.style.borderColor = '#1A2820';
+            trigger.style.borderWidth = '1px';
+            trigger.style.borderStyle = 'solid';
+            trigger.style.color = '#E5E7EB';
+
+            const labelSpan = document.createElement('span');
+            labelSpan.className = 'truncate ' + (selectedOption && selectedOption.value ? 'text-gray-100 font-semibold' : 'text-gray-400');
+            labelSpan.textContent = selectedOption ? selectedOption.textContent : 'Pilih...';
+
+            const chevron = document.createElement('div');
+            chevron.className = 'chevron-icon text-emerald-400 transition-transform duration-200 flex-shrink-0';
+            chevron.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>`;
+
+            trigger.appendChild(labelSpan);
+            trigger.appendChild(chevron);
+            wrapper.appendChild(trigger);
+
+            // Floating Options Menu
+            const menu = document.createElement('div');
+            menu.className = 'cyber-dropdown-menu hidden absolute left-0 mt-2 z-50 p-1.5 rounded-2xl border backdrop-blur-xl shadow-2xl max-h-60 overflow-y-auto ' +
+                (isFull ? 'w-full right-0' : 'min-w-[190px] w-max');
+            menu.style.background = 'rgba(15, 23, 19, 0.98)';
+            menu.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+            menu.style.boxShadow = '0 20px 45px -10px rgba(0,0,0,0.9), 0 0 25px rgba(16,185,129,0.18)';
+
+            function renderOptions() {
+                menu.innerHTML = '';
+                Array.from(select.options).forEach((opt, idx) => {
+                    const isSelected = select.selectedIndex === idx;
+                    const item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'cyber-dropdown-item w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm transition-all cursor-pointer mb-1 ' +
+                        (isSelected ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30' : 'text-gray-300 hover:bg-emerald-500/10 hover:text-emerald-300');
+
+                    const itemContent = document.createElement('span');
+                    itemContent.className = 'flex items-center gap-2 truncate';
+                    itemContent.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-emerald-400 shadow-[0_0_8px_#10B981]' : 'bg-gray-600'}"></span><span>${opt.textContent}</span>`;
+
+                    const checkIcon = document.createElement('span');
+                    checkIcon.className = 'check-icon flex-shrink-0 ' + (isSelected ? 'text-emerald-400' : 'opacity-0');
+                    checkIcon.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
+
+                    item.appendChild(itemContent);
+                    item.appendChild(checkIcon);
+
+                    item.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        select.selectedIndex = idx;
+                        select.value = opt.value;
+                        labelSpan.textContent = opt.textContent;
+                        labelSpan.className = 'truncate ' + (opt.value ? 'text-gray-100 font-semibold' : 'text-gray-400');
+
+                        closeMenu();
+
+                        // Fire native events
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                        select.dispatchEvent(new Event('input', { bubbles: true }));
+                    });
+
+                    menu.appendChild(item);
+                });
+            }
+
+            renderOptions();
+
+            function openMenu() {
+                document.querySelectorAll('.cyber-dropdown-menu').forEach(m => {
+                    if (m !== menu) m.classList.add('hidden');
+                });
+                document.querySelectorAll('.cyber-dropdown-trigger').forEach(t => {
+                    if (t !== trigger) {
+                        t.classList.remove('is-open');
+                        t.style.borderColor = '#1A2820';
+                        t.style.boxShadow = '';
+                        const ch = t.querySelector('.chevron-icon');
+                        if (ch) ch.style.transform = '';
+                    }
+                });
+
+                renderOptions();
+                menu.classList.remove('hidden');
+                trigger.classList.add('is-open');
+                trigger.style.borderColor = '#10B981';
+                trigger.style.boxShadow = '0 0 0 2px rgba(16, 185, 129, 0.25), 0 0 18px rgba(16, 185, 129, 0.22)';
+                chevron.style.transform = 'rotate(180deg)';
+            }
+
+            function closeMenu() {
+                menu.classList.add('hidden');
+                trigger.classList.remove('is-open');
+                trigger.style.borderColor = '#1A2820';
+                trigger.style.boxShadow = '';
+                chevron.style.transform = '';
+            }
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (menu.classList.contains('hidden')) {
+                    openMenu();
+                } else {
+                    closeMenu();
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!wrapper.contains(e.target)) {
+                    closeMenu();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeMenu();
+                }
+            });
+
+            select.addEventListener('change', () => {
+                const current = select.options[select.selectedIndex];
+                if (current) {
+                    labelSpan.textContent = current.textContent;
+                    labelSpan.className = 'truncate ' + (current.value ? 'text-gray-100 font-semibold' : 'text-gray-400');
+                }
+            });
+
+            wrapper.appendChild(menu);
+            select.parentNode.insertBefore(wrapper, select.nextSibling);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initCyberSelects();
+    });
+    window.initCyberSelects = initCyberSelects;
+    </script>
     @stack('scripts')
 </body>
 </html>
