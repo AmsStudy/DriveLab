@@ -95,7 +95,8 @@ class QuizAttempt extends Model
     public function answeredQuestionsCount(): int
     {
         if ($this->isCompleted()) {
-            return $this->answers()->count();
+            // Use eager-loaded answers_count if available to eliminate N+1 query
+            return $this->answers_count ?? $this->answers()->count();
         }
         $draft = $this->draft_answers ?? [];
         unset($draft['__flagged']);
@@ -108,12 +109,12 @@ class QuizAttempt extends Model
         return isset($draft['__flagged']) && is_array($draft['__flagged']) ? count($draft['__flagged']) : 0;
     }
 
-    public function timeRemainingSeconds(): ?int
+    public function timeRemainingSeconds(?Quiz $quiz = null): ?int
     {
         if ($this->isCompleted()) {
             return 0;
         }
-        $quiz = $this->quiz;
+        $quiz = $quiz ?? $this->quiz;
         if (!$quiz || $quiz->time_limit_minutes <= 0) {
             return null; // Unlimited
         }

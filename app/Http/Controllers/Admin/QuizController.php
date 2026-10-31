@@ -570,18 +570,25 @@ class QuizController extends Controller
     {
         $this->authorizeQuiz($quiz);
 
-        $totalQuestions = $quiz->questions()->count();
-        $attempts = $quiz->attempts()->latest('started_at')->get();
+        // Preload counts to eliminate N+1 queries during 5s polling
+        $quiz->loadCount('questions');
+        $totalQuestions = (int) $quiz->questions_count;
+
+        $attempts = $quiz->attempts()
+            ->withCount('answers')
+            ->latest('started_at')
+            ->get();
 
         $activeAttempts = [];
         $completedAttempts = [];
 
         foreach ($attempts as $att) {
+            $att->setRelation('quiz', $quiz);
             $isCompleted = $att->isCompleted();
             $isOnline = $att->isOnline();
             $answeredCount = $att->answeredQuestionsCount();
             $flaggedCount = $att->flaggedQuestionsCount();
-            $timeRemainingSeconds = $att->timeRemainingSeconds();
+            $timeRemainingSeconds = $att->timeRemainingSeconds($quiz);
 
             $data = [
                 'id'                     => $att->id,
