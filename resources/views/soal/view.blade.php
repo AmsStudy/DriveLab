@@ -599,6 +599,89 @@ footer{
   font-size:11.5px;color:var(--text3);
   position:relative;z-index:1;
 }
+
+/* ─── Cyber Loading Spinner Animations ("Wah" & Futuristik) ─── */
+@keyframes cyberSpinCW { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes cyberSpinCCW { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+@keyframes cyberCorePulse {
+  0%, 100% { transform: scale(0.92); opacity: 0.85; filter: drop-shadow(0 0 8px rgba(16,185,129,0.4)); }
+  50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 18px rgba(16,185,129,0.85)); }
+}
+@keyframes cyberShimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+.cyber-spin-cw { animation: cyberSpinCW 2s cubic-bezier(0.4, 0.1, 0.2, 1) infinite; }
+.cyber-spin-ccw { animation: cyberSpinCCW 2.6s linear infinite; }
+.cyber-spin-fast { animation: cyberSpinCW 1.1s ease-in-out infinite; }
+.cyber-core-pulse { animation: cyberCorePulse 1.8s ease-in-out infinite; }
+.cyber-loading-shimmer-bar {
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, #10B981, #34D399, transparent);
+  animation: cyberShimmer 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* ─── SweetAlert2 Cyber Theme ─── */
+.cyber-swal-popup {
+  background: rgba(15, 23, 19, 0.96) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-radius: 24px !important;
+  padding: 26px 28px !important;
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(16, 185, 129, 0.15) !important;
+}
+.cyber-swal-popup.cyber-swal-success {
+  border: 1px solid rgba(16, 185, 129, 0.45) !important;
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(16, 185, 129, 0.22) !important;
+}
+.cyber-swal-popup.cyber-swal-error {
+  border: 1px solid rgba(239, 68, 68, 0.45) !important;
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(239, 68, 68, 0.22) !important;
+}
+.cyber-swal-title {
+  font-family: 'Syne', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+  color: #FFFFFF !important;
+  margin-bottom: 6px !important;
+}
+.cyber-swal-text {
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 0.9rem !important;
+  line-height: 1.55 !important;
+  color: #D1D5DB !important;
+}
+.cyber-swal-btn {
+  border-radius: 12px !important;
+  font-family: 'Syne', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 0.875rem !important;
+  padding: 10px 24px !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+.cyber-swal-btn-success {
+  background: linear-gradient(135deg, #10B981, #0D9488) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35) !important;
+}
+.cyber-swal-btn-error {
+  background: linear-gradient(135deg, #EF4444, #DC2626) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 18px rgba(239, 68, 68, 0.35) !important;
+}
+.swal2-icon.swal2-success {
+  border-color: #10B981 !important; color: #10B981 !important;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.3) !important;
+}
+.swal2-icon.swal2-success [class^='swal2-success-line'] { background-color: #10B981 !important; }
+.swal2-icon.swal2-success .swal2-success-ring { border-color: rgba(16, 185, 129, 0.3) !important; }
+.swal2-icon.swal2-success .swal2-success-fix,
+.swal2-icon.swal2-success .swal2-success-circular-line-left,
+.swal2-icon.swal2-success .swal2-success-circular-line-right { background-color: transparent !important; }
+.swal2-icon.swal2-error {
+  border-color: #EF4444 !important; color: #EF4444 !important;
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.3) !important;
+}
+.swal2-icon.swal2-error [class^='swal2-x-mark-line'] { background-color: #EF4444 !important; }
 </style>
 </head>
 <body>
@@ -664,7 +747,7 @@ footer{
                     </svg>
                     Instruksi / Soal Teks
                 </div>
-                <button type="button" class="btn-copy-text" onclick="navigator.clipboard.writeText(document.getElementById('soal-raw-text').innerText).then(()=>alert('Teks soal berhasil disalin!'))">
+                <button type="button" class="btn-copy-text" onclick="navigator.clipboard.writeText(document.getElementById('soal-raw-text').innerText).then(()=>{ if(window.Swal) Swal.fire({toast:true,position:'top-end',icon:'success',title:'Teks instruksi soal berhasil disalin!',showConfirmButton:false,timer:2500,background:'#0F1713',color:'#F3F4F6',customClass:{popup:'border border-emerald-500/30 rounded-xl'}}); else alert('Teks soal berhasil disalin!'); })">
                     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                     </svg>
@@ -1143,10 +1226,29 @@ function switchSubmissionType(type) {
 }
 
 function showAlert(type, msg) {
-    subAlert.className = 'alert alert-' + type;
-    subAlert.textContent = msg;
-    subAlert.style.display = 'block';
-    setTimeout(() => { subAlert.style.display = 'none'; }, 6000);
+    if (window.Swal) {
+        Swal.fire({
+            icon: type === 'success' ? 'success' : 'error',
+            title: type === 'success' ? 'Tugas Berhasil Terkirim!' : 'Perhatian',
+            text: msg,
+            background: '#0F1713',
+            color: '#F3F4F6',
+            backdrop: 'rgba(9, 13, 11, 0.75)',
+            confirmButtonText: 'Oke, Mengerti',
+            customClass: {
+                popup: 'cyber-swal-popup ' + (type === 'success' ? 'cyber-swal-success' : 'cyber-swal-error'),
+                title: 'cyber-swal-title',
+                htmlContainer: 'cyber-swal-text',
+                confirmButton: 'cyber-swal-btn ' + (type === 'success' ? 'cyber-swal-btn-success' : 'cyber-swal-btn-error')
+            }
+        });
+    }
+    if (subAlert) {
+        subAlert.className = 'alert alert-' + type;
+        subAlert.textContent = msg;
+        subAlert.style.display = 'block';
+        setTimeout(() => { if (subAlert) subAlert.style.display = 'none'; }, 6000);
+    }
 }
 
 function setFileSelected(file) {
@@ -1170,10 +1272,16 @@ function setLoading(loading) {
         btnLabel.textContent = 'Mengirim Tugas...';
         const arrow = document.getElementById('btn-arrow');
         if (arrow) arrow.outerHTML = '<div class="spinner" id="btn-arrow"></div>';
+        if (window.showLoading) {
+            window.showLoading('MENGIRIM TUGAS...', 'Sedang mengunggah berkas ke server IC-Labs, mohon tunggu...');
+        }
     } else {
         btnLabel.textContent = 'Kirim Tugas Sekarang';
         const spinner = document.getElementById('btn-arrow');
         if (spinner) spinner.outerHTML = '<svg id="btn-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>';
+        if (window.hideLoading) {
+            window.hideLoading();
+        }
     }
 }
 
@@ -1283,6 +1391,62 @@ document.getElementById('submission-form').addEventListener('submit', async func
 });
 
 @endif
+</script>
+
+{{-- ─── CYBER SCI-FI LOADING MODAL OVERLAY ─── --}}
+<div id="cyberLoadingOverlay" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/80 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none" aria-live="assertive" role="alert" style="position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);backdrop-filter:blur(12px);">
+    <div class="relative p-8 md:p-10 rounded-3xl bg-[#0F1713]/95 border border-emerald-500/40 shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_50px_rgba(16,185,129,0.25)] max-w-sm w-full mx-4 text-center overflow-hidden transform transition-transform duration-300 scale-95" id="cyberLoadingBox" style="position:relative;padding:36px 32px;border-radius:24px;background:rgba(15,23,19,0.96);border:1px solid rgba(16,185,129,0.4);max-width:380px;width:90%;text-align:center;">
+        
+        {{-- Concentric Orbit Spinner --}}
+        <div style="position:relative;width:96px;height:96px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;">
+            <div class="cyber-spin-cw" style="position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:#10B981;border-right-color:rgba(16,185,129,0.5);box-shadow:0 0 20px rgba(16,185,129,0.4);"></div>
+            <div class="cyber-spin-ccw" style="position:absolute;inset:10px;border-radius:50%;border:2px dashed rgba(13,148,136,0.8);box-shadow:0 0 15px rgba(13,148,136,0.35);"></div>
+            <div class="cyber-spin-fast" style="position:absolute;inset:20px;border-radius:50%;border:2px solid transparent;border-bottom-color:#34D399;border-left-color:#10B981;box-shadow:0 0 12px rgba(52,211,153,0.5);"></div>
+            <div class="cyber-core-pulse" style="position:relative;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(16,185,129,0.3),rgba(13,148,136,0.1));border:1px solid rgba(52,211,153,0.5);display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(16,185,129,0.6);">
+                <svg style="width:18px;height:18px;color:#34D399;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+            </div>
+        </div>
+
+        <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);margin-bottom:12px;">
+            <span style="width:7px;height:7px;border-radius:50%;background:#10B981;"></span>
+            <span style="font-size:10px;font-family:monospace;font-weight:700;letter-spacing:1px;color:#34D399;text-transform:uppercase;">UPLOADING</span>
+        </div>
+
+        <h3 id="cyberLoadingTitle" style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#FFFFFF;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">
+            MENGIRIM TUGAS
+        </h3>
+        <p id="cyberLoadingDesc" style="font-family:'DM Sans',sans-serif;font-size:12px;color:#9CA3AF;line-height:1.5;margin-bottom:18px;">
+            Sedang mengunggah berkas ke server IC-Labs, mohon tunggu...
+        </p>
+
+        <div style="width:100%;height:3px;background:#1A2820;border-radius:999px;overflow:hidden;position:relative;">
+            <div class="cyber-loading-shimmer-bar"></div>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+window.showLoading = function(title = 'MENGIRIM TUGAS', desc = 'Sedang mengunggah berkas ke server IC-Labs, mohon tunggu...') {
+    const overlay = document.getElementById('cyberLoadingOverlay');
+    const titleEl = document.getElementById('cyberLoadingTitle');
+    const descEl = document.getElementById('cyberLoadingDesc');
+    if (overlay) {
+        if (titleEl) titleEl.textContent = title;
+        if (descEl) descEl.textContent = desc;
+        overlay.style.display = 'flex';
+    }
+};
+
+window.hideLoading = function() {
+    const overlay = document.getElementById('cyberLoadingOverlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+};
 </script>
 </body>
 </html>

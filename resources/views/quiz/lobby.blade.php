@@ -38,6 +38,71 @@
             box-shadow: 0 6px 28px rgba(16, 185, 129, 0.5);
             transform: translateY(-1px);
         }
+
+        /* ─── Cyber Loading Spinner Animations ("Wah" & Futuristik) ─── */
+        @keyframes cyberSpinCW { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes cyberSpinCCW { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+        @keyframes cyberCorePulse {
+            0%, 100% { transform: scale(0.92); opacity: 0.85; filter: drop-shadow(0 0 8px rgba(16,185,129,0.4)); }
+            50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 18px rgba(16,185,129,0.85)); }
+        }
+        @keyframes cyberShimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+        .cyber-spin-cw { animation: cyberSpinCW 2s cubic-bezier(0.4, 0.1, 0.2, 1) infinite; }
+        .cyber-spin-ccw { animation: cyberSpinCCW 2.6s linear infinite; }
+        .cyber-spin-fast { animation: cyberSpinCW 1.1s ease-in-out infinite; }
+        .cyber-core-pulse { animation: cyberCorePulse 1.8s ease-in-out infinite; }
+        .cyber-loading-shimmer-bar {
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, #10B981, #34D399, transparent);
+            animation: cyberShimmer 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        /* ─── SweetAlert2 Cyber Theme ─── */
+        .cyber-swal-popup {
+            background: rgba(15, 23, 19, 0.96) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border-radius: 24px !important;
+            padding: 26px 28px !important;
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(16, 185, 129, 0.15) !important;
+        }
+        .cyber-swal-popup.cyber-swal-error {
+            border: 1px solid rgba(239, 68, 68, 0.45) !important;
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(239, 68, 68, 0.22) !important;
+        }
+        .cyber-swal-title {
+            font-family: 'Chakra Petch', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 1.25rem !important;
+            color: #FFFFFF !important;
+            margin-bottom: 6px !important;
+        }
+        .cyber-swal-text {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 0.9rem !important;
+            line-height: 1.55 !important;
+            color: #D1D5DB !important;
+        }
+        .cyber-swal-btn {
+            border-radius: 12px !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 0.875rem !important;
+            padding: 10px 24px !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        .cyber-swal-btn-error {
+            background: linear-gradient(135deg, #EF4444, #DC2626) !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 18px rgba(239, 68, 68, 0.35) !important;
+        }
+        .swal2-icon.swal2-error {
+            border-color: #EF4444 !important; color: #EF4444 !important;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.3) !important;
+        }
+        .swal2-icon.swal2-error [class^='swal2-x-mark-line'] { background-color: #EF4444 !important; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen selection:bg-emerald-500 selection:text-white">
@@ -239,7 +304,7 @@
                             </div>
                         </div>
 
-                        <form method="POST" action="{{ route('quiz.start', $quiz->unique_token) }}" class="space-y-4">
+                        <form method="POST" action="{{ route('quiz.start', $quiz->unique_token) }}" class="space-y-4" onsubmit="if(this.checkValidity()){ window.showLoading && window.showLoading('MEMVERIFIKASI DATA...', 'Menghubungkan ke server dan mempersiapkan lembar ujian digital...'); }">
                             @csrf
 
                             <div>
@@ -391,5 +456,128 @@
         &copy; {{ date('Y') }} IC-Labs &bull; Platform Distribusi & Evaluasi Laboratorium
     </footer>
 
+    {{-- ─── CYBER SCI-FI LOADING MODAL OVERLAY ─── --}}
+    <div id="cyberLoadingOverlay" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/80 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none" aria-live="assertive" role="alert">
+        <div class="relative p-8 md:p-10 rounded-3xl bg-[#0F1713]/95 border border-emerald-500/40 shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_50px_rgba(16,185,129,0.25)] max-w-sm w-full mx-4 text-center overflow-hidden transform transition-transform duration-300 scale-95" id="cyberLoadingBox">
+            
+            {{-- Sci-Fi Tech Corner Accents --}}
+            <div class="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-emerald-400 rounded-tl-xl pointer-events-none"></div>
+            <div class="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-emerald-400 rounded-tr-xl pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-emerald-400 rounded-bl-xl pointer-events-none"></div>
+            <div class="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-emerald-400 rounded-br-xl pointer-events-none"></div>
+
+            {{-- Ambient Cyber Glow --}}
+            <div class="absolute -top-20 -left-20 w-40 h-40 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -right-20 w-40 h-40 bg-teal-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+            {{-- Spectacular Concentric Orbit Spinner --}}
+            <div class="relative w-28 h-28 mx-auto mb-6 flex items-center justify-center">
+                {{-- Outer Ring (Clockwise) --}}
+                <div class="cyber-spin-cw absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-400 border-r-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.4)]"></div>
+                
+                {{-- Outer Orbit Satellites --}}
+                <div class="cyber-spin-cw absolute inset-0 rounded-full">
+                    <span class="absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-emerald-300 shadow-[0_0_12px_#34D399,0_0_4px_#FFF]"></span>
+                    <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-teal-300 shadow-[0_0_10px_#14B8A6]"></span>
+                </div>
+
+                {{-- Mid Ring (Counter-Clockwise Dashed) --}}
+                <div class="cyber-spin-ccw absolute inset-3 rounded-full border-2 border-dashed border-teal-400/80 shadow-[0_0_15px_rgba(13,148,136,0.35)]"></div>
+
+                {{-- Inner Ring (Fast Clockwise) --}}
+                <div class="cyber-spin-fast absolute inset-6 rounded-full border-2 border-transparent border-b-mint-400 border-l-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.5)]"></div>
+
+                {{-- Center Core Pulsing Beacon --}}
+                <div class="cyber-core-pulse relative w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/30 to-teal-500/10 border border-emerald-400/50 flex items-center justify-center shadow-[0_0_18px_rgba(16,185,129,0.6)]">
+                    <svg class="w-5 h-5 text-emerald-300 filter drop-shadow-[0_0_6px_rgba(52,211,153,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+            </div>
+
+            {{-- Status Chip --}}
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 mb-3 shadow-[0_0_12px_rgba(16,185,129,0.15)]">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span class="text-[10px] font-mono font-bold tracking-widest text-emerald-300 uppercase">CONNECTING SERVER</span>
+            </div>
+
+            {{-- Dynamic Titles and Descriptions --}}
+            <h3 id="cyberLoadingTitle" class="text-base md:text-lg font-bold text-white tracking-wider uppercase mb-1.5" style="font-family:'Chakra Petch',sans-serif; text-shadow:0 0 12px rgba(16,185,129,0.35);">
+                MEMVERIFIKASI DATA
+            </h3>
+            <p id="cyberLoadingDesc" class="text-xs text-gray-400 font-medium leading-relaxed max-w-xs mx-auto mb-4">
+                Menghubungkan ke server dan mempersiapkan lembar ujian digital...
+            </p>
+
+            {{-- Shimmering Laser Progress Bar --}}
+            <div class="w-full h-1 bg-[#1A2820] rounded-full overflow-hidden relative">
+                <div class="cyber-loading-shimmer-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        window.showLoading = function(title = 'MEMVERIFIKASI DATA', desc = 'Menghubungkan ke server dan mempersiapkan lembar ujian...') {
+            const overlay = document.getElementById('cyberLoadingOverlay');
+            const box = document.getElementById('cyberLoadingBox');
+            const titleEl = document.getElementById('cyberLoadingTitle');
+            const descEl = document.getElementById('cyberLoadingDesc');
+            
+            if (overlay && box) {
+                if (titleEl) titleEl.textContent = title;
+                if (descEl) descEl.textContent = desc;
+                overlay.classList.remove('hidden');
+                overlay.classList.remove('pointer-events-none');
+                void overlay.offsetWidth;
+                overlay.classList.remove('opacity-0');
+                overlay.classList.add('opacity-100');
+                box.classList.remove('scale-95');
+                box.classList.add('scale-100');
+            }
+        };
+
+        window.hideLoading = function() {
+            const overlay = document.getElementById('cyberLoadingOverlay');
+            const box = document.getElementById('cyberLoadingBox');
+            if (overlay && box) {
+                overlay.classList.remove('opacity-100');
+                overlay.classList.add('opacity-0');
+                box.classList.remove('scale-100');
+                box.classList.add('scale-95');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    overlay.classList.add('pointer-events-none');
+                }, 300);
+            }
+        };
+
+        window.addEventListener('pageshow', function() {
+            window.hideLoading();
+        });
+    </script>
+
+    @if(session('error'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Akses Ditolak',
+                text: @json(session('error')),
+                background: '#0F1713',
+                color: '#F3F4F6',
+                backdrop: 'rgba(9, 13, 11, 0.75)',
+                confirmButtonText: 'Tutup',
+                customClass: {
+                    popup: 'cyber-swal-popup cyber-swal-error',
+                    title: 'cyber-swal-title',
+                    htmlContainer: 'cyber-swal-text',
+                    confirmButton: 'cyber-swal-btn cyber-swal-btn-error'
+                }
+            });
+        });
+    </script>
+    @endif
 </body>
 </html>

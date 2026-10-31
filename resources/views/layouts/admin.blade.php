@@ -23,6 +23,166 @@
         .flash-msg { animation: fadeSlideDown .3s ease forwards; }
         @keyframes glow-pulse { 0%,100% { box-shadow:0 0 14px rgba(16,185,129,.3); } 50% { box-shadow:0 0 24px rgba(16,185,129,.55); } }
         .logo-icon { animation: glow-pulse 3s ease-in-out infinite; }
+
+        /* ─── Cyber Loading Spinner Animations ("Wah" & Futuristik) ─── */
+        @keyframes cyberSpinCW {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes cyberSpinCCW {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+        @keyframes cyberCorePulse {
+            0%, 100% { transform: scale(0.92); opacity: 0.85; filter: drop-shadow(0 0 8px rgba(16,185,129,0.4)); }
+            50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 18px rgba(16,185,129,0.85)); }
+        }
+        @keyframes cyberShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(200%); }
+        }
+        .cyber-spin-cw {
+            animation: cyberSpinCW 2s cubic-bezier(0.4, 0.1, 0.2, 1) infinite;
+        }
+        .cyber-spin-ccw {
+            animation: cyberSpinCCW 2.6s linear infinite;
+        }
+        .cyber-spin-fast {
+            animation: cyberSpinCW 1.1s ease-in-out infinite;
+        }
+        .cyber-core-pulse {
+            animation: cyberCorePulse 1.8s ease-in-out infinite;
+        }
+        .cyber-loading-shimmer-bar {
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #10B981, #34D399, transparent);
+            animation: cyberShimmer 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        /* ─── SweetAlert2 Cyber Theme Customization ─── */
+        .cyber-swal-popup {
+            background: rgba(15, 23, 19, 0.96) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border-radius: 24px !important;
+            padding: 26px 28px !important;
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(16, 185, 129, 0.15) !important;
+        }
+        .cyber-swal-popup.cyber-swal-success {
+            border: 1px solid rgba(16, 185, 129, 0.45) !important;
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(16, 185, 129, 0.22) !important;
+        }
+        .cyber-swal-popup.cyber-swal-error {
+            border: 1px solid rgba(239, 68, 68, 0.45) !important;
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(239, 68, 68, 0.22) !important;
+        }
+        .cyber-swal-popup.cyber-swal-warning {
+            border: 1px solid rgba(245, 158, 11, 0.45) !important;
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(245, 158, 11, 0.22) !important;
+        }
+        .cyber-swal-popup.cyber-swal-info {
+            border: 1px solid rgba(14, 165, 233, 0.45) !important;
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(14, 165, 233, 0.22) !important;
+        }
+        .cyber-swal-title {
+            font-family: 'Chakra Petch', 'Inter', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 1.25rem !important;
+            color: #FFFFFF !important;
+            letter-spacing: -0.01em !important;
+            margin-bottom: 6px !important;
+        }
+        .cyber-swal-text {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 0.9rem !important;
+            line-height: 1.55 !important;
+            color: #D1D5DB !important;
+        }
+        .cyber-swal-btn {
+            border-radius: 12px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 0.875rem !important;
+            padding: 10px 24px !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        .cyber-swal-btn-success {
+            background: linear-gradient(135deg, #10B981, #0D9488) !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35) !important;
+        }
+        .cyber-swal-btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5) !important;
+        }
+        .cyber-swal-btn-error {
+            background: linear-gradient(135deg, #EF4444, #DC2626) !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 18px rgba(239, 68, 68, 0.35) !important;
+        }
+        .cyber-swal-btn-warning {
+            background: linear-gradient(135deg, #F59E0B, #D97706) !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 18px rgba(245, 158, 11, 0.35) !important;
+        }
+        .cyber-swal-btn-info {
+            background: linear-gradient(135deg, #0EA5E9, #0284C7) !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 18px rgba(14, 165, 233, 0.35) !important;
+        }
+        .cyber-swal-btn-cancel {
+            background: #1A2820 !important;
+            color: #9CA3AF !important;
+            border: 1px solid #2A3830 !important;
+        }
+        .cyber-swal-btn-cancel:hover {
+            background: #25382D !important;
+            color: #F3F4F6 !important;
+        }
+
+        /* Fix SweetAlert icon backgrounds for Dark Mode */
+        .swal2-icon.swal2-success {
+            border-color: #10B981 !important;
+            color: #10B981 !important;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.3) !important;
+        }
+        .swal2-icon.swal2-success [class^='swal2-success-line'] {
+            background-color: #10B981 !important;
+        }
+        .swal2-icon.swal2-success .swal2-success-ring {
+            border-color: rgba(16, 185, 129, 0.3) !important;
+        }
+        .swal2-icon.swal2-success .swal2-success-fix,
+        .swal2-icon.swal2-success .swal2-success-circular-line-left,
+        .swal2-icon.swal2-success .swal2-success-circular-line-right {
+            background-color: transparent !important;
+        }
+        .swal2-icon.swal2-error {
+            border-color: #EF4444 !important;
+            color: #EF4444 !important;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.3) !important;
+        }
+        .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+            background-color: #EF4444 !important;
+        }
+        .swal2-icon.swal2-warning {
+            border-color: #F59E0B !important;
+            color: #F59E0B !important;
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.3) !important;
+        }
+        .swal2-icon.swal2-info {
+            border-color: #0EA5E9 !important;
+            color: #0EA5E9 !important;
+            box-shadow: 0 0 25px rgba(14, 165, 233, 0.3) !important;
+        }
+        .swal2-timer-progress-bar {
+            background: linear-gradient(90deg, #10B981, #34D399) !important;
+            height: 3px !important;
+        }
+
         /* Global Custom Themed Dropdowns for Admin */
         select:not([multiple]) {
             -webkit-appearance: none;
@@ -180,48 +340,7 @@
                 </div>
             </header>
 
-            {{-- Flash Messages --}}
-            <div class="px-6 pt-4">
-                @if(session('success'))
-                    <div class="flash-msg flex items-center gap-3 px-4 py-3 rounded-xl mb-4" style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);" role="alert">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(16,185,129,.2);">
-                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <p class="text-sm text-emerald-300 font-medium flex-1">{{ session('success') }}</p>
-                        <button type="button" onclick="this.parentElement.remove()" class="text-emerald-700 hover:text-emerald-400 transition-colors ml-auto">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </div>
-                @endif
-                @if(session('error'))
-                    <div class="flash-msg flex items-center gap-3 bg-red-500/10 border border-red-500/25 px-4 py-3 rounded-xl mb-4" role="alert">
-                        <div class="w-7 h-7 rounded-lg bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <p class="text-sm text-red-300 font-medium flex-1">{{ session('error') }}</p>
-                        <button type="button" onclick="this.parentElement.remove()" class="text-red-700 hover:text-red-400 transition-colors ml-auto">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </div>
-                @endif
-                @if(session('warning'))
-                    <div class="flash-msg flex items-center gap-3 bg-amber-500/10 border border-amber-500/25 px-4 py-3 rounded-xl mb-4" role="alert">
-                        <div class="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                            </svg>
-                        </div>
-                        <p class="text-sm text-amber-300 font-medium flex-1">{{ session('warning') }}</p>
-                        <button type="button" onclick="this.parentElement.remove()" class="text-amber-700 hover:text-amber-400 transition-colors ml-auto">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </div>
-                @endif
-            </div>
+            {{-- Flash messages are handled dynamically via modern SweetAlert2 popups below --}}
 
             {{-- Page Content --}}
             <div class="p-6 flex-1">
@@ -230,36 +349,141 @@
         </main>
     </div>
 
+    {{-- ─── CYBER SCI-FI LOADING MODAL OVERLAY ("Wah" & Futuristik) ─── --}}
+    <div id="cyberLoadingOverlay" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/80 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none" aria-live="assertive" role="alert">
+        <div class="relative p-8 md:p-10 rounded-3xl bg-[#0F1713]/95 border border-emerald-500/40 shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_50px_rgba(16,185,129,0.25)] max-w-sm w-full mx-4 text-center overflow-hidden transform transition-transform duration-300 scale-95" id="cyberLoadingBox">
+            
+            {{-- Sci-Fi Tech Corner Accents --}}
+            <div class="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-emerald-400 rounded-tl-xl pointer-events-none"></div>
+            <div class="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-emerald-400 rounded-tr-xl pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-emerald-400 rounded-bl-xl pointer-events-none"></div>
+            <div class="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-emerald-400 rounded-br-xl pointer-events-none"></div>
+
+            {{-- Ambient Cyber Glow --}}
+            <div class="absolute -top-20 -left-20 w-40 h-40 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -right-20 w-40 h-40 bg-teal-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+            {{-- Spectacular Concentric Orbit Spinner --}}
+            <div class="relative w-28 h-28 mx-auto mb-6 flex items-center justify-center">
+                {{-- Outer Ring (Clockwise) --}}
+                <div class="cyber-spin-cw absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-400 border-r-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.4)]"></div>
+                
+                {{-- Outer Orbit Satellites (Glowing laser particles) --}}
+                <div class="cyber-spin-cw absolute inset-0 rounded-full">
+                    <span class="absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-emerald-300 shadow-[0_0_12px_#34D399,0_0_4px_#FFF]"></span>
+                    <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-teal-300 shadow-[0_0_10px_#14B8A6]"></span>
+                </div>
+
+                {{-- Mid Ring (Counter-Clockwise Dashed) --}}
+                <div class="cyber-spin-ccw absolute inset-3 rounded-full border-2 border-dashed border-teal-400/80 shadow-[0_0_15px_rgba(13,148,136,0.35)]"></div>
+
+                {{-- Inner Ring (Fast Clockwise) --}}
+                <div class="cyber-spin-fast absolute inset-6 rounded-full border-2 border-transparent border-b-mint-400 border-l-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.5)]"></div>
+
+                {{-- Center Core Pulsing Beacon --}}
+                <div class="cyber-core-pulse relative w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/30 to-teal-500/10 border border-emerald-400/50 flex items-center justify-center shadow-[0_0_18px_rgba(16,185,129,0.6)]">
+                    <svg class="w-5 h-5 text-emerald-300 filter drop-shadow-[0_0_6px_rgba(52,211,153,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+            </div>
+
+            {{-- Status Chip --}}
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 mb-3 shadow-[0_0_12px_rgba(16,185,129,0.15)]">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span class="text-[10px] font-mono font-bold tracking-widest text-emerald-300 uppercase">SYSTEM PROCESSING</span>
+            </div>
+
+            {{-- Dynamic Titles and Descriptions --}}
+            <h3 id="cyberLoadingTitle" class="text-base md:text-lg font-bold text-white tracking-wider uppercase mb-1.5" style="font-family:'Chakra Petch',sans-serif; text-shadow:0 0 12px rgba(16,185,129,0.35);">
+                MEMPROSES PERMINTAAN
+            </h3>
+            <p id="cyberLoadingDesc" class="text-xs text-gray-400 font-medium leading-relaxed max-w-xs mx-auto mb-4">
+                Mohon tunggu sebentar, sistem sedang memproses data...
+            </p>
+
+            {{-- Shimmering Laser Progress Bar --}}
+            <div class="w-full h-1 bg-[#1A2820] rounded-full overflow-hidden relative">
+                <div class="cyber-loading-shimmer-bar"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        window.confirmAction = function(event, message, confirmText = 'Ya', isDanger = false) {
+        // Cyber Loading Modal Controls
+        window.showLoading = function(title = 'MEMPROSES PERMINTAAN', desc = 'Mohon tunggu sebentar, sistem sedang memproses data...') {
+            const overlay = document.getElementById('cyberLoadingOverlay');
+            const box = document.getElementById('cyberLoadingBox');
+            const titleEl = document.getElementById('cyberLoadingTitle');
+            const descEl = document.getElementById('cyberLoadingDesc');
+            
+            if (overlay && box) {
+                if (titleEl) titleEl.textContent = title;
+                if (descEl) descEl.textContent = desc;
+                overlay.classList.remove('hidden');
+                overlay.classList.remove('pointer-events-none');
+                void overlay.offsetWidth; // Force reflow
+                overlay.classList.remove('opacity-0');
+                overlay.classList.add('opacity-100');
+                box.classList.remove('scale-95');
+                box.classList.add('scale-100');
+            }
+        };
+
+        window.hideLoading = function() {
+            const overlay = document.getElementById('cyberLoadingOverlay');
+            const box = document.getElementById('cyberLoadingBox');
+            if (overlay && box) {
+                overlay.classList.remove('opacity-100');
+                overlay.classList.add('opacity-0');
+                box.classList.remove('scale-100');
+                box.classList.add('scale-95');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    overlay.classList.add('pointer-events-none');
+                }, 300);
+            }
+        };
+
+        // Auto-dismiss loading if user uses browser back/forward buttons (BFcache)
+        window.addEventListener('pageshow', function() {
+            window.hideLoading();
+        });
+
+        // Global Confirmation Dialog with Cyber Styling & Loading Animation
+        window.confirmAction = function(event, message, confirmText = 'Ya', isDanger = false, customTitle = null) {
             event.preventDefault();
             const form = event.target.closest('form');
+            if (!form) return;
 
             Swal.fire({
-                title: 'Konfirmasi',
+                title: customTitle || (isDanger ? 'Konfirmasi Tindakan' : 'Konfirmasi'),
                 text: message,
                 icon: isDanger ? 'warning' : 'question',
                 showCancelButton: true,
-                confirmButtonColor: isDanger ? '#ef4444' : '#10B981',
-                cancelButtonColor: '#1A2820',
                 confirmButtonText: confirmText,
                 cancelButtonText: 'Batal',
                 background: '#0F1713',
-                color: '#f3f4f6',
+                color: '#F3F4F6',
+                backdrop: 'rgba(9, 13, 11, 0.75)',
                 customClass: {
-                    popup: 'border border-[#1A2820] rounded-2xl',
-                    confirmButton: 'rounded-xl px-4 py-2 text-sm font-semibold',
-                    cancelButton: 'rounded-xl px-4 py-2 text-sm font-semibold'
+                    popup: 'cyber-swal-popup ' + (isDanger ? 'cyber-swal-error' : 'cyber-swal-success'),
+                    title: 'cyber-swal-title',
+                    htmlContainer: 'cyber-swal-text',
+                    confirmButton: 'cyber-swal-btn ' + (isDanger ? 'cyber-swal-btn-error' : 'cyber-swal-btn-success'),
+                    cancelButton: 'cyber-swal-btn cyber-swal-btn-cancel'
                 }
             }).then((result) => {
-                if (result.isConfirmed && form) {
+                if (result.isConfirmed) {
+                    window.showLoading('MEMPROSES TINDAKAN...', 'Permintaan sedang dieksekusi oleh server...');
                     form.submit();
                 }
             });
         };
 
+        // Global Toast Notification
         window.showToast = function(message, icon = 'success') {
             Swal.fire({
                 toast: true,
@@ -276,6 +500,7 @@
             });
         };
 
+        // Copy to clipboard helper
         window.copyToClipboard = function(text, successMessage = 'Berhasil disalin!') {
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text).then(() => {
@@ -295,15 +520,157 @@
             }
         };
 
-        // Auto-dismiss flash after 5s
-        document.querySelectorAll('.flash-msg').forEach(el => {
+        // Automatically show loading spinner when any standard form is submitted
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.getAttribute('data-no-loading') !== null || form.classList.contains('no-loading')) {
+                return;
+            }
+            if (form.checkValidity && !form.checkValidity()) {
+                return;
+            }
+
+            const title = form.getAttribute('data-loading-title') || 'MEMPROSES DATA...';
+            const desc = form.getAttribute('data-loading-desc') || 'Mohon tunggu, sistem sedang memproses data...';
+
             setTimeout(() => {
-                el.style.transition = 'opacity .4s ease';
-                el.style.opacity = '0';
-                setTimeout(() => el.remove(), 400);
-            }, 5000);
+                if (!e.defaultPrevented) {
+                    window.showLoading(title, desc);
+                }
+            }, 10);
+        });
+
+        // Automatically show loading for ZIP download links
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a[href*="download-submissions-zip"]');
+            if (link) {
+                window.showLoading('MENYIAPKAN ARSIP ZIP...', 'Mengompres seluruh berkas tugas ke format ZIP...');
+                setTimeout(() => {
+                    window.hideLoading();
+                }, 4000);
+            }
         });
     </script>
+
+    {{-- ─── SweetAlert2 Modern Popups for Flash Notifications ─── --}}
+    @if(session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: @json(session('success')),
+                background: '#0F1713',
+                color: '#F3F4F6',
+                backdrop: 'rgba(9, 13, 11, 0.75)',
+                confirmButtonText: 'Oke, Mengerti',
+                timer: 4500,
+                timerProgressBar: true,
+                customClass: {
+                    popup: 'cyber-swal-popup cyber-swal-success',
+                    title: 'cyber-swal-title',
+                    htmlContainer: 'cyber-swal-text',
+                    confirmButton: 'cyber-swal-btn cyber-swal-btn-success'
+                }
+            });
+        });
+    </script>
+    @endif
+
+    @if(session('error'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan',
+                text: @json(session('error')),
+                background: '#0F1713',
+                color: '#F3F4F6',
+                backdrop: 'rgba(9, 13, 11, 0.75)',
+                confirmButtonText: 'Tutup',
+                customClass: {
+                    popup: 'cyber-swal-popup cyber-swal-error',
+                    title: 'cyber-swal-title',
+                    htmlContainer: 'cyber-swal-text',
+                    confirmButton: 'cyber-swal-btn cyber-swal-btn-error'
+                }
+            });
+        });
+    </script>
+    @endif
+
+    @if(session('warning'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian Sistem',
+                text: @json(session('warning')),
+                background: '#0F1713',
+                color: '#F3F4F6',
+                backdrop: 'rgba(9, 13, 11, 0.75)',
+                confirmButtonText: 'Mengerti',
+                customClass: {
+                    popup: 'cyber-swal-popup cyber-swal-warning',
+                    title: 'cyber-swal-title',
+                    htmlContainer: 'cyber-swal-text',
+                    confirmButton: 'cyber-swal-btn cyber-swal-btn-warning'
+                }
+            });
+        });
+    </script>
+    @endif
+
+    @if(session('info') || session('status'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'info',
+                title: 'Informasi',
+                text: @json(session('info') ?? session('status')),
+                background: '#0F1713',
+                color: '#F3F4F6',
+                backdrop: 'rgba(9, 13, 11, 0.75)',
+                confirmButtonText: 'Tutup',
+                customClass: {
+                    popup: 'cyber-swal-popup cyber-swal-info',
+                    title: 'cyber-swal-title',
+                    htmlContainer: 'cyber-swal-text',
+                    confirmButton: 'cyber-swal-btn cyber-swal-btn-info'
+                }
+            });
+        });
+    </script>
+    @endif
+
+    @if($errors->any())
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorHtml = `<div class="text-left text-sm space-y-2 mt-2">
+                @foreach($errors->all() as $err)
+                    <div class="flex items-start gap-2 text-rose-300">
+                        <span class="text-rose-500 font-bold">&bull;</span>
+                        <span>{{ $err }}</span>
+                    </div>
+                @endforeach
+            </div>`;
+            Swal.fire({
+                icon: 'error',
+                title: 'Periksa Kembali Inputan',
+                html: errorHtml,
+                background: '#0F1713',
+                color: '#F3F4F6',
+                backdrop: 'rgba(9, 13, 11, 0.75)',
+                confirmButtonText: 'Perbaiki',
+                customClass: {
+                    popup: 'cyber-swal-popup cyber-swal-error',
+                    title: 'cyber-swal-title',
+                    confirmButton: 'cyber-swal-btn cyber-swal-btn-error'
+                }
+            });
+        });
+    </script>
+    @endif
     @stack('scripts')
 </body>
 </html>

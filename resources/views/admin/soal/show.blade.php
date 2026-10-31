@@ -1179,7 +1179,25 @@ function handleModalNewFiles(input) {
     }
 
     if (modalExistingFileCount + input.files.length > 15) {
-        alert('Total file (tersisa + baru) tidak boleh lebih dari 15 file.');
+        if (window.Swal) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Batas Maksimum Berkas',
+                text: 'Total file (tersisa + baru) tidak boleh lebih dari 15 file.',
+                background: '#0F1713',
+                color: '#F3F4F6',
+                backdrop: 'rgba(9, 13, 11, 0.75)',
+                confirmButtonText: 'Mengerti',
+                customClass: {
+                    popup: 'cyber-swal-popup cyber-swal-warning',
+                    title: 'cyber-swal-title',
+                    htmlContainer: 'cyber-swal-text',
+                    confirmButton: 'cyber-swal-btn cyber-swal-btn-warning'
+                }
+            });
+        } else {
+            alert('Total file (tersisa + baru) tidak boleh lebih dari 15 file.');
+        }
         input.value = '';
         container.classList.add('hidden');
         return;
@@ -1190,7 +1208,25 @@ function handleModalNewFiles(input) {
         if (f.size > 5 * 1024 * 1024) hasLarge = true;
     });
     if (hasLarge) {
-        alert('Satu atau lebih file melebihi batas 5MB!');
+        if (window.Swal) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Ukuran Berkas Terlalu Besar',
+                text: 'Satu atau lebih berkas melebihi batas maksimal 5 MB per file!',
+                background: '#0F1713',
+                color: '#F3F4F6',
+                backdrop: 'rgba(9, 13, 11, 0.75)',
+                confirmButtonText: 'Perbaiki',
+                customClass: {
+                    popup: 'cyber-swal-popup cyber-swal-error',
+                    title: 'cyber-swal-title',
+                    htmlContainer: 'cyber-swal-text',
+                    confirmButton: 'cyber-swal-btn cyber-swal-btn-error'
+                }
+            });
+        } else {
+            alert('Satu atau lebih file melebihi batas 5MB!');
+        }
         input.value = '';
         container.classList.add('hidden');
         return;
