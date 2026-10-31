@@ -280,7 +280,6 @@
     <div class="viewer-viewport" id="viewport">
         <div id="loading">
             <div class="spinner"></div>
-            <span>Memuat dokumen terproteksi...</span>
         </div>
 
         <div class="zoom-container" id="zoom-container">

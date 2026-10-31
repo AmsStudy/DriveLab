@@ -1273,7 +1273,7 @@ function setLoading(loading) {
         const arrow = document.getElementById('btn-arrow');
         if (arrow) arrow.outerHTML = '<div class="spinner" id="btn-arrow"></div>';
         if (window.showLoading) {
-            window.showLoading('MENGIRIM TUGAS...', 'Sedang mengunggah berkas ke server IC-Labs, mohon tunggu...');
+            window.showLoading();
         }
     } else {
         btnLabel.textContent = 'Kirim Tugas Sekarang';
@@ -1393,58 +1393,72 @@ document.getElementById('submission-form').addEventListener('submit', async func
 @endif
 </script>
 
-{{-- ─── CYBER SCI-FI LOADING MODAL OVERLAY ─── --}}
-<div id="cyberLoadingOverlay" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/80 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none" aria-live="assertive" role="alert" style="position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);backdrop-filter:blur(12px);">
-    <div class="relative p-8 md:p-10 rounded-3xl bg-[#0F1713]/95 border border-emerald-500/40 shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_50px_rgba(16,185,129,0.25)] max-w-sm w-full mx-4 text-center overflow-hidden transform transition-transform duration-300 scale-95" id="cyberLoadingBox" style="position:relative;padding:36px 32px;border-radius:24px;background:rgba(15,23,19,0.96);border:1px solid rgba(16,185,129,0.4);max-width:380px;width:90%;text-align:center;">
+{{-- ─── PURE CYBER LOADING SPINNER (100% CENTERED & MINIMALIST) ─── --}}
+<div id="cyberLoadingOverlay" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-black/75 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none" style="position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;margin:0;padding:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);" aria-live="assertive" role="alert">
+    <div class="relative flex items-center justify-center transform transition-transform duration-300 scale-90 m-auto" id="cyberLoadingBox" style="position:relative;display:flex;align-items:center;justify-content:center;margin:auto;">
         
-        {{-- Concentric Orbit Spinner --}}
-        <div style="position:relative;width:96px;height:96px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;">
-            <div class="cyber-spin-cw" style="position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:#10B981;border-right-color:rgba(16,185,129,0.5);box-shadow:0 0 20px rgba(16,185,129,0.4);"></div>
-            <div class="cyber-spin-ccw" style="position:absolute;inset:10px;border-radius:50%;border:2px dashed rgba(13,148,136,0.8);box-shadow:0 0 15px rgba(13,148,136,0.35);"></div>
-            <div class="cyber-spin-fast" style="position:absolute;inset:20px;border-radius:50%;border:2px solid transparent;border-bottom-color:#34D399;border-left-color:#10B981;box-shadow:0 0 12px rgba(52,211,153,0.5);"></div>
-            <div class="cyber-core-pulse" style="position:relative;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(16,185,129,0.3),rgba(13,148,136,0.1));border:1px solid rgba(52,211,153,0.5);display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(16,185,129,0.6);">
-                <svg style="width:18px;height:18px;color:#34D399;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {{-- Ambient Radial Glow Aura in Center --}}
+        <div style="position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(16,185,129,0.22);filter:blur(32px);pointer-events:none;"></div>
+
+        {{-- Pure Concentric Orbit Hologram Spinner --}}
+        <div style="position:relative;width:112px;height:112px;display:flex;align-items:center;justify-content:center;">
+            {{-- Outer Ring (Clockwise) --}}
+            <div class="cyber-spin-cw" style="position:absolute;inset:0;border-radius:50%;border:3px solid transparent;border-top-color:#10B981;border-right-color:rgba(16,185,129,0.6);box-shadow:0 0 24px rgba(16,185,129,0.55);"></div>
+            
+            {{-- Outer Orbit Satellites --}}
+            <div class="cyber-spin-cw" style="position:absolute;inset:0;border-radius:50%;">
+                <span style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;background:#34D399;box-shadow:0 0 14px #34D399, 0 0 6px #FFF;"></span>
+                <span style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:#2DD4BF;box-shadow:0 0 12px #14B8A6;"></span>
+            </div>
+
+            {{-- Mid Ring (Counter-Clockwise Dashed) --}}
+            <div class="cyber-spin-ccw" style="position:absolute;inset:12px;border-radius:50%;border:2.5px dashed #2DD4BF;box-shadow:0 0 18px rgba(13,148,136,0.45);"></div>
+
+            {{-- Inner Ring (Fast Clockwise) --}}
+            <div class="cyber-spin-fast" style="position:absolute;inset:24px;border-radius:50%;border:2px solid transparent;border-bottom-color:#34D399;border-left-color:#10B981;box-shadow:0 0 14px rgba(52,211,153,0.6);"></div>
+
+            {{-- Center Core Pulsing Beacon --}}
+            <div class="cyber-core-pulse" style="position:relative;width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(16,185,129,0.35),rgba(13,148,136,0.15));border:1px solid rgba(52,211,153,0.6);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(16,185,129,0.7);">
+                <svg style="width:22px;height:22px;color:#6EE7B7;filter:drop-shadow(0 0 8px rgba(52,211,153,0.9));" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
             </div>
         </div>
 
-        <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);margin-bottom:12px;">
-            <span style="width:7px;height:7px;border-radius:50%;background:#10B981;"></span>
-            <span style="font-size:10px;font-family:monospace;font-weight:700;letter-spacing:1px;color:#34D399;text-transform:uppercase;">UPLOADING</span>
-        </div>
-
-        <h3 id="cyberLoadingTitle" style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#FFFFFF;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">
-            MENGIRIM TUGAS
-        </h3>
-        <p id="cyberLoadingDesc" style="font-family:'DM Sans',sans-serif;font-size:12px;color:#9CA3AF;line-height:1.5;margin-bottom:18px;">
-            Sedang mengunggah berkas ke server IC-Labs, mohon tunggu...
-        </p>
-
-        <div style="width:100%;height:3px;background:#1A2820;border-radius:999px;overflow:hidden;position:relative;">
-            <div class="cyber-loading-shimmer-bar"></div>
-        </div>
     </div>
 </div>
 
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-window.showLoading = function(title = 'MENGIRIM TUGAS', desc = 'Sedang mengunggah berkas ke server IC-Labs, mohon tunggu...') {
+window.showLoading = function() {
     const overlay = document.getElementById('cyberLoadingOverlay');
-    const titleEl = document.getElementById('cyberLoadingTitle');
-    const descEl = document.getElementById('cyberLoadingDesc');
-    if (overlay) {
-        if (titleEl) titleEl.textContent = title;
-        if (descEl) descEl.textContent = desc;
+    const box = document.getElementById('cyberLoadingBox');
+    if (overlay && box) {
+        overlay.classList.remove('hidden');
+        overlay.classList.remove('pointer-events-none');
         overlay.style.display = 'flex';
+        void overlay.offsetWidth;
+        overlay.classList.remove('opacity-0');
+        overlay.classList.add('opacity-100');
+        box.classList.remove('scale-90');
+        box.classList.add('scale-100');
     }
 };
 
 window.hideLoading = function() {
     const overlay = document.getElementById('cyberLoadingOverlay');
-    if (overlay) {
-        overlay.style.display = 'none';
+    const box = document.getElementById('cyberLoadingBox');
+    if (overlay && box) {
+        overlay.classList.remove('opacity-100');
+        overlay.classList.add('opacity-0');
+        box.classList.remove('scale-100');
+        box.classList.add('scale-90');
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+            overlay.classList.add('pointer-events-none');
+            overlay.style.display = 'none';
+        }, 300);
     }
 };
 </script>
