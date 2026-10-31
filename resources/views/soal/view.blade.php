@@ -600,22 +600,85 @@ footer{
   position:relative;z-index:1;
 }
 
-/* ─── Cyber Loading Spinner Animations ("Wah" & Futuristik) ─── */
-@keyframes cyberSpinCW { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@keyframes cyberSpinCCW { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
-@keyframes cyberCorePulse {
-  0%, 100% { transform: scale(0.92); opacity: 0.85; filter: drop-shadow(0 0 8px rgba(16,185,129,0.4)); }
-  50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 18px rgba(16,185,129,0.85)); }
+/* ─── Ultra-Reliable Pure Cyber Orbit Spinner ("Wah", Centered & Futuristik) ─── */
+@keyframes cyberSpinRingCW {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
-@keyframes cyberShimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
-.cyber-spin-cw { animation: cyberSpinCW 2s cubic-bezier(0.4, 0.1, 0.2, 1) infinite; }
-.cyber-spin-ccw { animation: cyberSpinCCW 2.6s linear infinite; }
-.cyber-spin-fast { animation: cyberSpinCW 1.1s ease-in-out infinite; }
-.cyber-core-pulse { animation: cyberCorePulse 1.8s ease-in-out infinite; }
-.cyber-loading-shimmer-bar {
-  width: 50%; height: 100%;
-  background: linear-gradient(90deg, transparent, #10B981, #34D399, transparent);
-  animation: cyberShimmer 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+@keyframes cyberSpinRingCCW {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes cyberCoreBreathing {
+  0% { transform: scale(0.8); opacity: 0.75; box-shadow: 0 0 10px #10B981; }
+  100% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 24px #34D399, 0 0 40px rgba(16,185,129,0.85); }
+}
+
+.pure-cyber-loader {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pure-cyber-loader .spinner-ring-1 {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 4px solid rgba(16, 185, 129, 0.15);
+  border-top: 4px solid #10B981;
+  border-right: 4px solid #34D399;
+  box-shadow: 0 0 22px rgba(16, 185, 129, 0.6), inset 0 0 12px rgba(16, 185, 129, 0.25);
+  animation: cyberSpinRingCW 1.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.pure-cyber-loader .spinner-dot {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  animation: cyberSpinRingCW 1.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.pure-cyber-loader .spinner-dot::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: calc(50% - 5px);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 0 14px #34D399, 0 0 6px #10B981;
+}
+.pure-cyber-loader .spinner-ring-2 {
+  position: absolute;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  border: 3px dashed #0D9488;
+  box-shadow: 0 0 16px rgba(13, 148, 136, 0.45);
+  animation: cyberSpinRingCCW 2.2s linear infinite;
+}
+.pure-cyber-loader .spinner-ring-3 {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-bottom: 3px solid #6EE7B7;
+  border-left: 3px solid #10B981;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
+  animation: cyberSpinRingCW 0.85s ease-in-out infinite;
+}
+.pure-cyber-loader .spinner-core {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #34D399 0%, #10B981 60%, #0D9488 100%);
+  box-shadow: 0 0 18px #10B981, 0 0 30px rgba(16, 185, 129, 0.8);
+  animation: cyberCoreBreathing 1.2s ease-in-out infinite alternate;
 }
 
 /* ─── SweetAlert2 Cyber Theme ─── */
@@ -1394,35 +1457,19 @@ document.getElementById('submission-form').addEventListener('submit', async func
 </script>
 
 {{-- ─── PURE CYBER LOADING SPINNER (100% CENTERED & MINIMALIST) ─── --}}
-<div id="cyberLoadingOverlay" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-black/75 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none" style="position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;margin:0;padding:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);" aria-live="assertive" role="alert">
-    <div class="relative flex items-center justify-center transform transition-transform duration-300 scale-90 m-auto" id="cyberLoadingBox" style="position:relative;display:flex;align-items:center;justify-content:center;margin:auto;">
+<div id="cyberLoadingOverlay" style="position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;margin:0;padding:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(5,9,7,0.8);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);" aria-live="assertive" role="alert">
+    <div style="position:relative;display:flex;align-items:center;justify-content:center;margin:auto;" id="cyberLoadingBox">
         
         {{-- Ambient Radial Glow Aura in Center --}}
-        <div style="position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(16,185,129,0.22);filter:blur(32px);pointer-events:none;"></div>
+        <div style="position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(16,185,129,0.18);filter:blur(36px);pointer-events:none;"></div>
 
-        {{-- Pure Concentric Orbit Hologram Spinner --}}
-        <div style="position:relative;width:112px;height:112px;display:flex;align-items:center;justify-content:center;">
-            {{-- Outer Ring (Clockwise) --}}
-            <div class="cyber-spin-cw" style="position:absolute;inset:0;border-radius:50%;border:3px solid transparent;border-top-color:#10B981;border-right-color:rgba(16,185,129,0.6);box-shadow:0 0 24px rgba(16,185,129,0.55);"></div>
-            
-            {{-- Outer Orbit Satellites --}}
-            <div class="cyber-spin-cw" style="position:absolute;inset:0;border-radius:50%;">
-                <span style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;background:#34D399;box-shadow:0 0 14px #34D399, 0 0 6px #FFF;"></span>
-                <span style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:#2DD4BF;box-shadow:0 0 12px #14B8A6;"></span>
-            </div>
-
-            {{-- Mid Ring (Counter-Clockwise Dashed) --}}
-            <div class="cyber-spin-ccw" style="position:absolute;inset:12px;border-radius:50%;border:2.5px dashed #2DD4BF;box-shadow:0 0 18px rgba(13,148,136,0.45);"></div>
-
-            {{-- Inner Ring (Fast Clockwise) --}}
-            <div class="cyber-spin-fast" style="position:absolute;inset:24px;border-radius:50%;border:2px solid transparent;border-bottom-color:#34D399;border-left-color:#10B981;box-shadow:0 0 14px rgba(52,211,153,0.6);"></div>
-
-            {{-- Center Core Pulsing Beacon --}}
-            <div class="cyber-core-pulse" style="position:relative;width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(16,185,129,0.35),rgba(13,148,136,0.15));border:1px solid rgba(52,211,153,0.6);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(16,185,129,0.7);">
-                <svg style="width:22px;height:22px;color:#6EE7B7;filter:drop-shadow(0 0 8px rgba(52,211,153,0.9));" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-            </div>
+        {{-- Multi-Ring Cyber Orbit Spinner --}}
+        <div class="pure-cyber-loader">
+            <div class="spinner-ring-1"></div>
+            <div class="spinner-dot"></div>
+            <div class="spinner-ring-2"></div>
+            <div class="spinner-ring-3"></div>
+            <div class="spinner-core"></div>
         </div>
 
     </div>
@@ -1433,28 +1480,22 @@ document.getElementById('submission-form').addEventListener('submit', async func
 <script>
 window.showLoading = function() {
     const overlay = document.getElementById('cyberLoadingOverlay');
-    const box = document.getElementById('cyberLoadingBox');
-    if (overlay && box) {
-        overlay.classList.remove('hidden');
-        overlay.classList.remove('pointer-events-none');
+    if (overlay) {
         overlay.style.display = 'flex';
-        void overlay.offsetWidth;
-        overlay.classList.remove('opacity-0');
-        overlay.classList.add('opacity-100');
-        box.classList.remove('scale-90');
-        box.classList.add('scale-100');
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
     }
 };
 
 window.hideLoading = function() {
     const overlay = document.getElementById('cyberLoadingOverlay');
-    const box = document.getElementById('cyberLoadingBox');
-    if (overlay && box) {
-        overlay.classList.remove('opacity-100');
-        overlay.classList.add('opacity-0');
-        box.classList.remove('scale-100');
-        box.classList.add('scale-90');
-        setTimeout(() => {
+    if (overlay) {
+        overlay.style.display = 'none';
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+    }
+};
+</script>
             overlay.classList.add('hidden');
             overlay.classList.add('pointer-events-none');
             overlay.style.display = 'none';
