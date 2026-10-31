@@ -98,6 +98,15 @@ Route::prefix('admin')
         Route::post('quizzes/{quiz}/questions', [QuizController::class, 'storeQuestion'])->name('quizzes.questions.store');
         Route::put('quizzes/{quiz}/questions/{question}', [QuizController::class, 'updateQuestion'])->name('quizzes.questions.update');
         Route::delete('quizzes/{quiz}/questions/{question}', [QuizController::class, 'destroyQuestion'])->name('quizzes.questions.destroy');
+        Route::get('quizzes/{quiz}/questions/template', [QuizController::class, 'downloadQuestionsTemplate'])->name('quizzes.questions.template');
+        Route::post('quizzes/{quiz}/questions/import', [QuizController::class, 'importQuestions'])->name('quizzes.questions.import');
+
+        // Live Exam Monitoring & Proctoring
+        Route::get('quizzes/{quiz}/monitor', [QuizController::class, 'liveMonitor'])->name('quizzes.monitor');
+        Route::get('quizzes/{quiz}/monitor/data', [QuizController::class, 'liveMonitorData'])->name('quizzes.monitor.data');
+        Route::post('quizzes/{quiz}/attempts/{attempt}/add-time', [QuizController::class, 'addTimeAttempt'])->name('quizzes.attempts.add-time');
+        Route::post('quizzes/{quiz}/attempts/{attempt}/force-submit', [QuizController::class, 'forceSubmitAttempt'])->name('quizzes.attempts.force-submit');
+
         Route::get('quizzes/{quiz}/results', [QuizController::class, 'results'])->name('quizzes.results');
         Route::get('quizzes/{quiz}/export-csv', [QuizController::class, 'exportResultsCsv'])->name('quizzes.export-csv');
         Route::post('quizzes/{quiz}/attempts/{attempt}/unlock', [QuizController::class, 'remoteUnlockAttempt'])->name('quizzes.attempts.unlock');

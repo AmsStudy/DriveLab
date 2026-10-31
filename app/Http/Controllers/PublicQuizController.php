@@ -8,6 +8,7 @@ use App\Models\QuizAttemptAnswer;
 use App\Models\QuizOption;
 use App\Models\QuizQuestion;
 use App\Models\User;
+use App\Services\QuizScoringService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -107,13 +108,14 @@ class PublicQuizController extends Controller
             ->first();
 
         if ($ongoing) {
-            // Check if ongoing has already expired based on time_limit_minutes
-            if ($quiz->time_limit_minutes > 0) {
+            // Check if ongoing has already expired based on time_limit_minutes + extra_time_minutes
+            $totalAllowedMinutes = $quiz->time_limit_minutes + ($ongoing->extra_time_minutes ?? 0);
+            if ($totalAllowedMinutes > 0) {
                 $elapsedSeconds = abs((int) now()->diffInSeconds($ongoing->started_at));
-                $allowedSeconds = $quiz->time_limit_minutes * 60;
+                $allowedSeconds = $totalAllowedMinutes * 60;
                 if ($elapsedSeconds > $allowedSeconds + 30) {
                     // Mark as expired/completed, preserving draft answers
-                    $this->finalizeAttempt($ongoing, $ongoing->draft_answers ?? []);
+                    QuizScoringService::finalize($ongoing, $ongoing->draft_answers ?? []);
                 } else {
                     session(['quiz_attempt_' . $quiz->id => $ongoing->id]);
                     return redirect()->route('quiz.play', ['token' => $quiz->unique_token, 'attempt' => $ongoing->id]);
@@ -142,6 +144,7 @@ class PublicQuizController extends Controller
             'student_name'          => $nama,
             'total_points_possible' => $totalPoints,
             'started_at'            => now(),
+            'last_heartbeat_at'     => now(),
         ]);
 
         session(['quiz_attempt_' . $quiz->id => $attempt->id]);
@@ -158,19 +161,22 @@ class PublicQuizController extends Controller
             return redirect()->route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
         }
 
-        // Calculate time limit
+        // Calculate time limit including any instructor extra time
+        $totalAllowedMinutes = $quiz->time_limit_minutes + ($attempt->extra_time_minutes ?? 0);
         $timeRemaining = null;
-        if ($quiz->time_limit_minutes > 0) {
+        if ($totalAllowedMinutes > 0) {
             $elapsedSeconds = abs((int) now()->diffInSeconds($attempt->started_at));
-            $totalSeconds = (int) ($quiz->time_limit_minutes * 60);
+            $totalSeconds = (int) ($totalAllowedMinutes * 60);
             $timeRemaining = (int) max(0, $totalSeconds - $elapsedSeconds);
 
             if ($timeRemaining <= 0) {
                 // Finalize preserving draft answers
-                $this->finalizeAttempt($attempt, $attempt->draft_answers ?? []);
+                QuizScoringService::finalize($attempt, $attempt->draft_answers ?? []);
                 return redirect()->route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
             }
         }
+
+        $attempt->update(['last_heartbeat_at' => now()]);
 
         // Load questions
         $questionsQuery = $quiz->questions()->with(['options' => function ($q) use ($quiz) {
@@ -360,19 +366,37 @@ class PublicQuizController extends Controller
         $quiz = Quiz::where('unique_token', $token)->firstOrFail();
         $this->validateAttemptAccess($quiz, $attempt);
 
-        if ($attempt->isCompleted()) {
-            return response()->json(['success' => false, 'message' => 'Sesi kuis tidak aktif.'], 403);
+        if ($attempt->isCompleted() || $attempt->is_force_submitted) {
+            return response()->json([
+                'success'      => false,
+                'is_completed' => true,
+                'redirect'     => route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]),
+                'message'      => $attempt->is_force_submitted ? 'Ujian telah dikumpulkan oleh pengawas lab.' : 'Sesi kuis telah selesai.',
+            ]);
         }
 
         $answers = $request->input('answers', []);
         if (is_array($answers)) {
             $attempt->draft_answers = $answers;
-            $attempt->save();
+        }
+        $attempt->last_heartbeat_at = now();
+        $attempt->save();
+
+        $totalAllowedMinutes = $quiz->time_limit_minutes + ($attempt->extra_time_minutes ?? 0);
+        $timeRemaining = null;
+        if ($totalAllowedMinutes > 0) {
+            $elapsedSeconds = abs((int) now()->diffInSeconds($attempt->started_at));
+            $totalSeconds = (int) ($totalAllowedMinutes * 60);
+            $timeRemaining = (int) max(0, $totalSeconds - $elapsedSeconds);
         }
 
         return response()->json([
-            'success'  => true,
-            'saved_at' => now()->toIso8601String(),
+            'success'            => true,
+            'saved_at'           => now()->toIso8601String(),
+            'time_remaining'     => $timeRemaining,
+            'extra_time_minutes' => (int) ($attempt->extra_time_minutes ?? 0),
+            'is_locked'          => (bool) $attempt->is_locked,
+            'tab_switch_count'   => (int) $attempt->tab_switch_count,
         ]);
     }
 
@@ -391,16 +415,17 @@ class PublicQuizController extends Controller
         $userAnswers = $request->input('answers', $attempt->draft_answers ?? []);
 
         // Server-side strict time enforcement (with 90-second network latency tolerance)
-        if ($quiz->time_limit_minutes > 0) {
+        $totalAllowedMinutes = $quiz->time_limit_minutes + ($attempt->extra_time_minutes ?? 0);
+        if ($totalAllowedMinutes > 0) {
             $elapsedSeconds = abs((int) now()->diffInSeconds($attempt->started_at));
-            $maxAllowedSeconds = ($quiz->time_limit_minutes * 60) + 90;
+            $maxAllowedSeconds = ($totalAllowedMinutes * 60) + 90;
             if ($elapsedSeconds > $maxAllowedSeconds) {
                 // If submitted well past the time limit, fall back to what was autosaved in drafts prior to expiration
                 $userAnswers = $attempt->draft_answers ?? [];
             }
         }
 
-        $this->finalizeAttempt($attempt, is_array($userAnswers) ? $userAnswers : []);
+        QuizScoringService::finalize($attempt, is_array($userAnswers) ? $userAnswers : []);
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -492,98 +517,7 @@ class PublicQuizController extends Controller
 
     private function finalizeAttempt(QuizAttempt $attempt, array $userAnswers): void
     {
-        $quiz = $attempt->quiz;
-        $questions = $quiz->questions()->with('options')->get();
-
-        $totalPointsEarned = 0;
-        $correctCount = 0;
-        $wrongCount = 0;
-
-        DB::transaction(function () use ($attempt, $questions, $userAnswers, &$totalPointsEarned, &$correctCount, &$wrongCount) {
-            foreach ($questions as $q) {
-                $rawAns = $userAnswers[$q->id] ?? null;
-                $isCorrect = false;
-                $points = 0;
-                $selectedOptionId = null;
-                $selectedOptionIds = null;
-
-                if ($q->isMultiSelect()) {
-                    $correctOptionIds = $q->options->where('is_correct', true)->pluck('id')->values()->all();
-                    $userAnsIds = [];
-                    if (is_array($rawAns)) {
-                        $userAnsIds = array_values(array_map('intval', $rawAns));
-                    } elseif ($rawAns) {
-                        $userAnsIds = [(int)$rawAns];
-                    }
-
-                    $selectedOptionIds = $userAnsIds;
-                    $selectedOptionId = $userAnsIds[0] ?? null;
-
-                    if (!empty($userAnsIds)) {
-                        $correctSelected = array_intersect($userAnsIds, $correctOptionIds);
-                        $wrongSelected = array_diff($userAnsIds, $correctOptionIds);
-
-                        // If user selected exactly all correct options and no wrong options
-                        if (count($wrongSelected) === 0 && count($correctSelected) === count($correctOptionIds)) {
-                            $isCorrect = true;
-                            $points = $q->points;
-                            $correctCount++;
-                        } elseif (count($wrongSelected) === 0 && count($correctSelected) > 0) {
-                            // Partial credit: proportional to correctly selected items
-                            $ratio = count($correctSelected) / max(1, count($correctOptionIds));
-                            $points = (int) round($q->points * $ratio);
-                            $wrongCount++;
-                        } else {
-                            $wrongCount++;
-                        }
-                    } else {
-                        $wrongCount++;
-                    }
-                } else {
-                    $selectedOptionId = $rawAns ? (int)(is_array($rawAns) ? ($rawAns[0] ?? 0) : $rawAns) : null;
-                    if ($selectedOptionId) {
-                        $selectedOptionIds = [$selectedOptionId];
-                        $selectedOption = $q->options->firstWhere('id', (int)$selectedOptionId);
-                        if ($selectedOption && $selectedOption->is_correct) {
-                            $isCorrect = true;
-                            $points = $q->points;
-                            $correctCount++;
-                        } else {
-                            $wrongCount++;
-                        }
-                    } else {
-                        $wrongCount++;
-                    }
-                }
-
-                if ($points > 0) {
-                    $totalPointsEarned += $points;
-                }
-
-                QuizAttemptAnswer::create([
-                    'quiz_attempt_id'     => $attempt->id,
-                    'quiz_question_id'    => $q->id,
-                    'selected_option_id'  => $selectedOptionId,
-                    'selected_option_ids' => $selectedOptionIds,
-                    'is_correct'          => $isCorrect,
-                    'points_earned'       => $points,
-                ]);
-            }
-
-            $completedAt = now();
-            $durationSeconds = max(1, abs((int) $completedAt->diffInSeconds($attempt->started_at)));
-            $possiblePoints = $attempt->total_points_possible > 0 ? $attempt->total_points_possible : $questions->sum('points');
-            $score = $possiblePoints > 0 ? round(($totalPointsEarned / $possiblePoints) * 100, 1) : 0;
-
-            $attempt->update([
-                'completed_at'          => $completedAt,
-                'duration_seconds'      => $durationSeconds,
-                'total_points_earned'   => $totalPointsEarned,
-                'total_points_possible' => $possiblePoints,
-                'correct_answers_count' => $correctCount,
-                'wrong_answers_count'   => $wrongCount,
-                'score'                 => $score,
-            ]);
-        });
+        QuizScoringService::finalize($attempt, $userAnswers);
     }
 }
+

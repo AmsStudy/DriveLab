@@ -136,6 +136,7 @@
                             {{-- Hak Unduh Per-File --}}
                             @if($attachment->isFile())
                             <label class="flex items-center gap-1.5 cursor-pointer bg-gray-900/60 px-3 py-1.5 rounded-lg border border-gray-700 text-xs">
+                                <input type="hidden" name="attachment_downloadable[{{ $attachment->id }}]" value="0">
                                 <input type="checkbox" name="attachment_downloadable[{{ $attachment->id }}]" value="1"
                                        {{ $attachment->is_downloadable ? 'checked' : '' }}
                                        class="accent-emerald-500 w-3.5 h-3.5 rounded">

@@ -9,6 +9,8 @@ use App\Models\QuizOption;
 use App\Models\QuizQuestion;
 use App\Models\Soal;
 use App\Services\QuizImageService;
+use App\Services\QuizImportService;
+use App\Services\QuizScoringService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -547,7 +549,174 @@ class QuizController extends Controller
             'violations_log'   => $logs,
         ]);
 
+        if (request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Kunci pengerjaan mahasiswa {$attempt->student_name} ({$attempt->nim}) berhasil dibuka!",
+            ]);
+        }
+
         return back()->with('success', "Kunci pengerjaan mahasiswa {$attempt->student_name} ({$attempt->nim}) berhasil dibuka!");
+    }
+
+    public function liveMonitor(Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+        $quiz->loadCount(['questions', 'attempts']);
+        return view('admin.quizzes.monitor', compact('quiz'));
+    }
+
+    public function liveMonitorData(Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+
+        $totalQuestions = $quiz->questions()->count();
+        $attempts = $quiz->attempts()->latest('started_at')->get();
+
+        $activeAttempts = [];
+        $completedAttempts = [];
+
+        foreach ($attempts as $att) {
+            $isCompleted = $att->isCompleted();
+            $isOnline = $att->isOnline();
+            $answeredCount = $att->answeredQuestionsCount();
+            $flaggedCount = $att->flaggedQuestionsCount();
+            $timeRemainingSeconds = $att->timeRemainingSeconds();
+
+            $data = [
+                'id'                     => $att->id,
+                'nim'                    => $att->nim,
+                'student_name'           => $att->student_name,
+                'is_completed'           => $isCompleted,
+                'is_online'              => $isOnline,
+                'is_locked'              => (bool) $att->is_locked,
+                'lock_reason'            => $att->lock_reason,
+                'tab_switch_count'       => (int) $att->tab_switch_count,
+                'answered_count'         => $answeredCount,
+                'flagged_count'          => $flaggedCount,
+                'total_questions'        => $totalQuestions,
+                'progress_percent'       => $totalQuestions > 0 ? round(($answeredCount / $totalQuestions) * 100) : 0,
+                'score'                  => $att->score,
+                'extra_time_minutes'     => (int) ($att->extra_time_minutes ?? 0),
+                'time_remaining_seconds' => $timeRemainingSeconds,
+                'time_remaining_human'   => $timeRemainingSeconds !== null ? gmdate('i\m s\s', max(0, $timeRemainingSeconds)) : 'Tanpa Batas',
+                'started_at_human'       => $att->started_at ? $att->started_at->format('H:i:s') : '-',
+                'last_heartbeat_human'   => $att->last_heartbeat_at ? $att->last_heartbeat_at->diffForHumans() : 'Belum ada sinyal',
+                'is_force_submitted'     => (bool) $att->is_force_submitted,
+            ];
+
+            if ($isCompleted) {
+                $completedAttempts[] = $data;
+            } else {
+                $activeAttempts[] = $data;
+            }
+        }
+
+        return response()->json([
+            'success'   => true,
+            'summary'   => [
+                'total_active'    => count($activeAttempts),
+                'total_completed' => count($completedAttempts),
+                'total_locked'    => count(array_filter($activeAttempts, fn($a) => $a['is_locked'])),
+                'total_online'    => count(array_filter($activeAttempts, fn($a) => $a['is_online'])),
+                'quiz_time_limit' => $quiz->time_limit_minutes,
+            ],
+            'active'    => $activeAttempts,
+            'completed' => $completedAttempts,
+        ]);
+    }
+
+    public function addTimeAttempt(Request $request, Quiz $quiz, QuizAttempt $attempt)
+    {
+        $this->authorizeQuiz($quiz);
+        if ($attempt->quiz_id !== $quiz->id) abort(404);
+
+        if ($attempt->isCompleted()) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Sesi mahasiswa ini telah selesai.'], 422);
+            }
+            return back()->with('error', 'Sesi mahasiswa ini telah selesai dan tidak dapat ditambah waktu.');
+        }
+
+        $request->validate([
+            'minutes' => 'required|integer|min:1|max:60',
+        ]);
+
+        $addedMinutes = (int) $request->minutes;
+        $attempt->increment('extra_time_minutes', $addedMinutes);
+
+        $logs = $attempt->violations_log ?? [];
+        $logs[] = [
+            'type'        => 'extra_time_added_by_admin',
+            'added'       => "+{$addedMinutes} menit",
+            'by'          => auth()->user()->name,
+            'timestamp'   => now()->toIso8601String(),
+        ];
+        $attempt->violations_log = $logs;
+        $attempt->save();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Waktu ujian {$attempt->student_name} ({$attempt->nim}) berhasil ditambah {$addedMinutes} menit!",
+                'extra_time_minutes' => $attempt->extra_time_minutes,
+            ]);
+        }
+
+        return back()->with('success', "Waktu ujian {$attempt->student_name} berhasil ditambah {$addedMinutes} menit!");
+    }
+
+    public function forceSubmitAttempt(Request $request, Quiz $quiz, QuizAttempt $attempt)
+    {
+        $this->authorizeQuiz($quiz);
+        if ($attempt->quiz_id !== $quiz->id) abort(404);
+
+        if ($attempt->isCompleted()) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Sesi mahasiswa ini sudah selesai sebelumnya.'], 422);
+            }
+            return back()->with('error', 'Sesi mahasiswa ini sudah selesai sebelumnya.');
+        }
+
+        QuizScoringService::finalize($attempt, $attempt->draft_answers ?? [], true);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Sesi ujian {$attempt->student_name} ({$attempt->nim}) telah dikumpulkan secara paksa (Force Submit). Skor berhasil dihitung!",
+            ]);
+        }
+
+        return back()->with('success', "Sesi ujian {$attempt->student_name} ({$attempt->nim}) berhasil disubmit secara paksa!");
+    }
+
+    public function downloadQuestionsTemplate(Request $request, Quiz $quiz): StreamedResponse
+    {
+        $this->authorizeQuiz($quiz);
+        $format = $request->query('format', 'excel');
+        $delimiter = ($format === 'csv' || $format === 'comma' || $format === 'standar') ? ',' : ';';
+        return QuizImportService::downloadTemplate($delimiter);
+    }
+
+    public function importQuestions(Request $request, Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+
+        $request->validate([
+            'file' => 'required|file|max:10240|mimes:csv,txt,xlsx',
+        ], [
+            'file.required' => 'Pilih file template CSV atau Excel (.xlsx) untuk diimpor.',
+            'file.mimes'    => 'Format file harus berupa CSV (.csv) atau Excel (.xlsx).',
+            'file.max'      => 'Ukuran file maksimal 10MB.',
+        ]);
+
+        $result = QuizImportService::import($quiz, $request->file('file'));
+
+        if (!$result['success']) {
+            return back()->with('error', $result['message']);
+        }
+
+        return back()->with('success', $result['message']);
     }
 
     private function authorizeQuiz(Quiz $quiz): void

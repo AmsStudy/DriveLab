@@ -268,7 +268,9 @@
                     </div>
                     Teks / Soal Langsung
                 </h3>
-                <button type="button" onclick="copyText({{ json_encode($soal->content_text) }}, 'Teks soal berhasil disalin!')"
+                <button type="button"
+                        data-copy="{{ $soal->content_text }}"
+                        onclick="copyText(this.dataset.copy, 'Teks soal berhasil disalin!')"
                         class="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                     Salin
@@ -489,7 +491,11 @@
                                             <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                         </a>
                                     @elseif($sub->isText())
-                                        <button type="button" onclick="showTextModal({{ json_encode($sub->nama) }}, {{ json_encode($sub->nim) }}, {{ json_encode($sub->text_content) }})"
+                                        <button type="button"
+                                                data-nama="{{ $sub->nama }}"
+                                                data-nim="{{ $sub->nim }}"
+                                                data-content="{{ $sub->text_content }}"
+                                                onclick="showTextModal(this.dataset.nama, this.dataset.nim, this.dataset.content)"
                                                 class="text-amber-400 hover:text-amber-300 font-mono text-xs max-w-xs truncate text-left block hover:underline">
                                             {{ Str::limit($sub->text_content, 45) }}
                                         </button>
@@ -512,7 +518,11 @@
                                             <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                         </a>
                                     @elseif($sub->isText())
-                                        <button type="button" onclick="showTextModal({{ json_encode($sub->nama) }}, {{ json_encode($sub->nim) }}, {{ json_encode($sub->text_content) }})"
+                                        <button type="button"
+                                                data-nama="{{ $sub->nama }}"
+                                                data-nim="{{ $sub->nim }}"
+                                                data-content="{{ $sub->text_content }}"
+                                                onclick="showTextModal(this.dataset.nama, this.dataset.nim, this.dataset.content)"
                                                 class="p-2 text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors inline-block" title="Baca Teks Lengkap">
                                             <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         </button>

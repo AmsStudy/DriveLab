@@ -4,6 +4,10 @@
 @section('page-description', 'Kelola daftar pertanyaan, gambar soal/jawaban, kunci jawaban jamak, dan pembahasan')
 
 @section('content')
+<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
 <div x-data="questionManager()" class="space-y-6">
 
     {{-- Top Header & Navigation --}}
@@ -27,17 +31,32 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-2">
-            <a href="{{ route('admin.quizzes.results', $quiz) }}"
-               class="px-4 py-2.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-amber-500/40 text-gray-300 hover:text-amber-400 text-sm font-semibold transition-all flex items-center gap-2">
-                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                Lihat Hasil Mahasiswa
+        <div class="flex items-center gap-2 flex-wrap">
+            <a href="{{ route('admin.quizzes.monitor', $quiz) }}"
+               class="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500/15 to-teal-500/15 border border-emerald-500/40 hover:border-emerald-500 text-emerald-300 hover:text-white text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 shadow-sm">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span>Live Monitor</span>
             </a>
 
+            <a href="{{ route('admin.quizzes.results', $quiz) }}"
+               class="px-3.5 py-2.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-amber-500/40 text-gray-300 hover:text-amber-400 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2">
+                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                <span class="hidden sm:inline">Hasil Mahasiswa</span>
+            </a>
+
+            <button type="button" @click="showImportModal = true"
+                    class="px-3.5 py-2.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-sky-500/40 text-sky-400 hover:text-white text-xs sm:text-sm font-semibold transition-all flex items-center gap-2">
+                <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                <span>Import Excel/CSV</span>
+            </button>
+
             <button type="button" @click="openCreateModal()"
-                    class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+                    class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                Tambah Pertanyaan Baru
+                <span>Tambah Soal</span>
             </button>
         </div>
     </div>
@@ -314,12 +333,251 @@
         </div>
     </div>
 
+    {{-- Modal Import Massal Soal (Excel / CSV Spreadsheet) --}}
+    <div x-show="showImportModal"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+
+        <div @click.away="showImportModal = false"
+             class="bg-[#0F1713] border border-[#1A2820] rounded-3xl w-full max-w-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            
+            {{-- Glowing Ambient Top --}}
+            <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-32 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            {{-- Modal Header --}}
+            <div class="flex items-center justify-between pb-5 border-b border-[#1A2820] relative">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500/20 to-teal-500/20 border border-emerald-500/35 flex items-center justify-center text-emerald-400 shadow-md shadow-emerald-500/10 flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg sm:text-xl font-bold text-white heading-font tracking-tight">Import Massal Soal Kuis</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Unggah spreadsheet Excel (.xlsx) atau CSV untuk mengisi bank soal secara otomatis</p>
+                    </div>
+                </div>
+                <button type="button" @click="showImportModal = false"
+                        class="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-[#1A2820] transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            {{-- Template Download Showcase Card --}}
+            <div class="my-5 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#122219] to-[#0D1812] border border-emerald-500/30 relative overflow-hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-300">Format Template Resmi</span>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Dilengkapi contoh nyata: <strong>Pilihan Tunggal (dengan blok kode C++)</strong>, <strong>Pilihan Jamak</strong>, dan <strong>Benar/Salah</strong>.
+                        </p>
+                    </div>
+
+                    {{-- Dual Download Buttons --}}
+                    <div class="flex items-center gap-2 flex-shrink-0 flex-wrap">
+                        {{-- Excel Compatible (Semicolon) --}}
+                        <a href="{{ route('admin.quizzes.questions.template', [$quiz, 'format' => 'excel']) }}"
+                           title="Rekomendasi untuk Microsoft Excel (Regional Indonesia) agar langsung rapi terpisah per kolom"
+                           class="px-3.5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-md shadow-emerald-500/20 group">
+                            <svg class="w-4 h-4 text-emerald-100 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            <span>Unduh Template Excel</span>
+                        </a>
+
+                        {{-- Standard CSV (Comma) --}}
+                        <a href="{{ route('admin.quizzes.questions.template', [$quiz, 'format' => 'csv']) }}"
+                           title="Format standar koma untuk Google Sheets, WPS Office, LibreOffice, atau Text Editor"
+                           class="px-3.5 py-2.5 rounded-xl bg-[#142019] hover:bg-[#1C2E24] border border-[#1E3327] hover:border-emerald-500/40 text-gray-300 hover:text-white font-semibold text-xs transition-all flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            <span>CSV Standar (Koma)</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Import Form --}}
+            <form action="{{ route('admin.quizzes.questions.import', $quiz) }}"
+                  method="POST" enctype="multipart/form-data"
+                  @submit="isSubmittingImport = true"
+                  class="space-y-4">
+                @csrf
+
+                {{-- Hidden Real File Input --}}
+                <input type="file" x-ref="importFileInput" name="file"
+                       @change="handleFileSelect($event)"
+                       accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                       class="hidden">
+
+                {{-- Modern Drag & Drop Zone --}}
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-2 uppercase tracking-wider">
+                        Pilih File Spreadsheet:
+                    </label>
+
+                    {{-- Dropzone Area --}}
+                    <div @dragover.prevent="isDraggingFile = true"
+                         @dragleave.prevent="isDraggingFile = false"
+                         @drop.prevent="handleDrop($event)"
+                         @click="$refs.importFileInput.click()"
+                         class="relative border-2 border-dashed rounded-2xl p-6 sm:p-7 text-center cursor-pointer transition-all duration-200 group"
+                         :class="isDraggingFile ? 'border-emerald-400 bg-emerald-500/15 scale-[1.01]' : (importFile ? 'border-emerald-500/50 bg-[#122219]' : 'border-[#1E3327] hover:border-emerald-500/40 bg-[#090D0B] hover:bg-[#0c1410]')">
+
+                        {{-- State 1: No file chosen --}}
+                        <template x-if="!importFile">
+                            <div>
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-3 transition-transform group-hover:scale-110">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                </div>
+                                <p class="text-sm font-bold text-white mb-1">
+                                    <span class="text-emerald-400 underline decoration-emerald-500/40 underline-offset-4">Klik untuk memilih file</span> atau seret file ke sini
+                                </p>
+                                <p class="text-xs text-gray-400">
+                                    Mendukung format <strong class="text-gray-200">.XLSX</strong> (Excel) dan <strong class="text-gray-200">.CSV</strong> (Maksimal 10 MB)
+                                </p>
+                            </div>
+                        </template>
+
+                        {{-- State 2: File Selected with Details --}}
+                        <template x-if="importFile">
+                            <div class="flex items-center justify-between gap-3 text-left p-3.5 rounded-xl bg-[#090D0B] border border-emerald-500/40">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-500/25 to-teal-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-mono font-bold text-xs uppercase flex-shrink-0">
+                                        <span x-text="importFileExt || 'FILE'"></span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-1.5">
+                                            <p class="text-sm font-bold text-white truncate" x-text="importFileName"></p>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 flex-shrink-0">Siap Diimpor</span>
+                                        </div>
+                                        <p class="text-xs text-gray-400 font-mono mt-0.5" x-text="importFileSize + ' • Klik untuk ganti file'"></p>
+                                    </div>
+                                </div>
+                                <button type="button" @click.stop="clearImportFile()"
+                                        class="p-2 text-gray-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors flex-shrink-0"
+                                        title="Hapus file ini">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- Interactive Collapsible Guide: Panduan Kolom Spreadsheet --}}
+                <div class="rounded-2xl bg-[#090D0B] border border-[#1A2820] overflow-hidden">
+                    <button type="button" @click="showGuideTable = !showGuideTable"
+                            class="w-full px-4 py-3 text-left flex items-center justify-between text-xs font-semibold text-gray-300 hover:text-emerald-400 transition-colors">
+                        <span class="flex items-center gap-2">
+                            <span>💡</span>
+                            <span>Panduan Format Kolom Spreadsheet (RFC 4180)</span>
+                        </span>
+                        <div class="flex items-center gap-1.5 text-[11px] text-gray-400">
+                            <span x-text="showGuideTable ? 'Sembunyikan' : 'Lihat Detail Kolom'"></span>
+                            <svg class="w-4 h-4 transition-transform duration-200"
+                                 :class="showGuideTable ? 'rotate-180 text-emerald-400' : ''"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </button>
+
+                    <div x-show="showGuideTable" x-collapse class="border-t border-[#1A2820] p-4 text-xs space-y-2.5">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-[11px] border-collapse">
+                                <thead>
+                                    <tr class="border-b border-[#1A2820] text-gray-400 font-semibold uppercase tracking-wider">
+                                        <th class="py-2 pr-3">Kolom</th>
+                                        <th class="py-2 px-3">Status</th>
+                                        <th class="py-2 px-3">Tipe Data / Pilihan</th>
+                                        <th class="py-2 pl-3">Contoh Nilai</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#1A2820] text-gray-300 font-mono">
+                                    <tr>
+                                        <td class="py-2 pr-3 font-bold text-white">Pertanyaan</td>
+                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-sans font-bold text-[10px]">Wajib</span></td>
+                                        <td class="py-2 px-3 font-sans">Teks biasa atau blok kode Markdown</td>
+                                        <td class="py-2 pl-3 text-gray-400 font-sans">Perhatikan kode <code>```cpp int x; ```</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 pr-3 font-bold text-white">Tipe_Soal</td>
+                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-sans font-bold text-[10px]">Wajib</span></td>
+                                        <td class="py-2 px-3 text-sky-300">multiple_choice | multi_select | true_false</td>
+                                        <td class="py-2 pl-3 text-gray-400">multiple_choice</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 pr-3 font-bold text-white">Poin</td>
+                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-400 font-sans text-[10px]">Opsional</span></td>
+                                        <td class="py-2 px-3 font-sans">Angka bulat positif (default: 10)</td>
+                                        <td class="py-2 pl-3 text-amber-400">10</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 pr-3 font-bold text-white">Pilihan_A s/d E</td>
+                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-sans font-bold text-[10px]">A & B Wajib</span></td>
+                                        <td class="py-2 px-3 font-sans">Teks pilihan jawaban (C s/d E opsional)</td>
+                                        <td class="py-2 pl-3 text-gray-400 font-sans">A: malloc(), B: free()</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 pr-3 font-bold text-white">Kunci_Jawaban</td>
+                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-sans font-bold text-[10px]">Wajib</span></td>
+                                        <td class="py-2 px-3 font-sans">Huruf kunci jawaban benar</td>
+                                        <td class="py-2 pl-3 text-emerald-400">A (atau "A, C" untuk jamak)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 pr-3 font-bold text-white">Pembahasan</td>
+                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-400 font-sans text-[10px]">Opsional</span></td>
+                                        <td class="py-2 px-3 font-sans">Penjelasan kunci untuk mahasiswa</td>
+                                        <td class="py-2 pl-3 text-gray-400 font-sans">malloc bertugas di heap...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Modal Action Footer --}}
+                <div class="pt-4 border-t border-[#1A2820] flex items-center justify-between gap-3">
+                    <button type="button" @click="showImportModal = false"
+                            class="px-5 py-2.5 rounded-xl border border-[#1A2820] hover:bg-gray-800 text-gray-300 text-xs sm:text-sm font-semibold transition-colors">
+                        Batal
+                    </button>
+
+                    <button type="submit" :disabled="!importFile || isSubmittingImport"
+                            class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 disabled:opacity-40 disabled:pointer-events-none text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                        <template x-if="!isSubmittingImport">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                <span>Mulai Import Soal Sekarang</span>
+                            </span>
+                        </template>
+                        <template x-if="isSubmittingImport">
+                            <span class="flex items-center gap-2">
+                                <svg class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                <span>Memproses & Menyimpan Soal...</span>
+                            </span>
+                        </template>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
 
 <script>
     function questionManager() {
         return {
             showModal: false,
+            showImportModal: false,
+            importFile: null,
+            importFileName: '',
+            importFileSize: '',
+            importFileExt: '',
+            isDraggingFile: false,
+            isSubmittingImport: false,
+            showGuideTable: false,
             isEdit: false,
             formAction: '{{ route('admin.quizzes.questions.store', $quiz) }}',
             formData: {
@@ -475,6 +733,47 @@
                 this.formData.option_image_previews[idx] = null;
                 this.formData.remove_option_images[idx] = true;
                 delete this.formData.existing_option_images[idx];
+            },
+            handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    this.setImportFile(file);
+                }
+            },
+            handleDrop(event) {
+                this.isDraggingFile = false;
+                const file = event.dataTransfer?.files[0];
+                if (file) {
+                    this.setImportFile(file);
+                    if (this.$refs.importFileInput && window.DataTransfer) {
+                        const dt = new DataTransfer();
+                        dt.items.add(file);
+                        this.$refs.importFileInput.files = dt.files;
+                    }
+                }
+            },
+            setImportFile(file) {
+                this.importFile = file;
+                this.importFileName = file.name;
+                const ext = file.name.split('.').pop() || '';
+                this.importFileExt = ext.toUpperCase();
+                
+                if (file.size < 1024) {
+                    this.importFileSize = file.size + ' B';
+                } else if (file.size < 1024 * 1024) {
+                    this.importFileSize = (file.size / 1024).toFixed(1) + ' KB';
+                } else {
+                    this.importFileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+                }
+            },
+            clearImportFile() {
+                this.importFile = null;
+                this.importFileName = '';
+                this.importFileSize = '';
+                this.importFileExt = '';
+                if (this.$refs.importFileInput) {
+                    this.$refs.importFileInput.value = '';
+                }
             }
         };
     }

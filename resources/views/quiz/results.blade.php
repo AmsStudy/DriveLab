@@ -10,6 +10,9 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <style>
         :root {
             --bg: #090D0B;
@@ -253,7 +256,7 @@
                             @endif
 
                             {{-- Question Text --}}
-                            <p class="text-sm sm:text-base font-bold text-white mb-4 leading-relaxed whitespace-pre-wrap">{{ $ans->question->question_text ?? 'Pertanyaan' }}</p>
+                            <div class="text-sm sm:text-base font-bold text-white mb-4 leading-relaxed">{!! App\Helpers\RichTextHelper::format($ans->question->question_text ?? 'Pertanyaan') !!}</div>
 
                             {{-- Options Grid --}}
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
@@ -282,7 +285,7 @@
                                                             </a>
                                                         </div>
                                                     @endif
-                                                    <span class="font-semibold text-emerald-100 block leading-snug">{{ $opt->option_text }}</span>
+                                                    <div class="font-semibold text-emerald-100 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
                                                 </div>
                                             </div>
                                             @if($isSelectedByStudent)
@@ -312,7 +315,7 @@
                                                             </a>
                                                         </div>
                                                     @endif
-                                                    <span class="font-semibold text-rose-200 line-through opacity-90 block leading-snug">{{ $opt->option_text }}</span>
+                                                    <div class="font-semibold text-rose-200 line-through opacity-90 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
                                                 </div>
                                             </div>
                                             <span class="text-[10px] bg-rose-600 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1">
@@ -334,7 +337,7 @@
                                                         </a>
                                                     </div>
                                                 @endif
-                                                <span class="font-normal block leading-snug">{{ $opt->option_text }}</span>
+                                                <div class="font-normal block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
                                             </div>
                                         </div>
                                     @endif
@@ -348,7 +351,7 @@
                                         <span class="text-sm">💡</span>
                                         <span class="uppercase tracking-wider text-[11px]">Penjelasan & Pembahasan:</span>
                                     </div>
-                                    <p class="text-gray-200 leading-relaxed pl-5 font-normal">{{ $ans->question->explanation }}</p>
+                                    <div class="text-gray-200 leading-relaxed pl-5 font-normal">{!! App\Helpers\RichTextHelper::format($ans->question->explanation) !!}</div>
                                 </div>
                             @endif
                         </div>

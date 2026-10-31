@@ -215,19 +215,30 @@
 
                     {{-- Card Footer Actions --}}
                     <div class="p-3 bg-[#090D0B] border-t border-[#1A2820] flex items-center justify-between gap-1.5">
-                        <div class="flex items-center gap-1.5">
+                        <div class="flex items-center gap-1.5 flex-wrap">
                             {{-- Button CMS Pertanyaan --}}
                             <a href="{{ route('admin.quizzes.questions', $quiz) }}"
-                               class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 text-xs font-semibold transition-colors">
+                               class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 text-xs font-semibold transition-colors">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 Bank Soal
                             </a>
 
+                            {{-- Button Live Monitor --}}
+                            <a href="{{ route('admin.quizzes.monitor', $quiz) }}"
+                               class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 text-emerald-400 text-xs font-semibold transition-colors"
+                               title="Pantau Mahasiswa Ujian Realtime">
+                                <span class="relative flex h-1.5 w-1.5">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                                </span>
+                                <span>Monitor</span>
+                            </a>
+
                             {{-- Button Hasil & Leaderboard --}}
                             <a href="{{ route('admin.quizzes.results', $quiz) }}"
-                               class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#142019] hover:bg-[#1A2B22] border border-[#1E3327] text-gray-300 hover:text-white text-xs font-medium transition-colors">
+                               class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#142019] hover:bg-[#1A2B22] border border-[#1E3327] text-gray-300 hover:text-white text-xs font-medium transition-colors">
                                 <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                                Leaderboard
+                                Hasil
                             </a>
                         </div>
 

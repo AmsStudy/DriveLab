@@ -8,9 +8,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <style>
         :root {
             --bg: #090D0B;
@@ -153,7 +156,7 @@
 
                 {{-- Question Card --}}
                 <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8 shadow-xl relative">
-                    <div class="flex items-center justify-between gap-3 mb-4">
+                    <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono"
                                   x-text="'Soal #' + currentQuestion.number"></span>
@@ -176,8 +179,22 @@
                             </template>
                         </div>
 
-                        <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20"
-                              x-text="'+' + currentQuestion.points + ' Poin'"></span>
+                        <div class="flex items-center gap-2">
+                            {{-- Tombol Ragu-ragu (Mark for Review) --}}
+                            <button type="button"
+                                    @click="toggleFlagQuestion(currentQuestion.id)"
+                                    class="px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 border shadow-sm cursor-pointer"
+                                    :class="isFlagged(currentQuestion.id) 
+                                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 ring-2 ring-amber-500/25 shadow-amber-500/20 animate-pulse' 
+                                        : 'bg-[#142019] text-gray-400 border-[#1E3327] hover:text-amber-300 hover:border-amber-500/40 hover:bg-amber-500/10'"
+                                    :title="isFlagged(currentQuestion.id) ? 'Klik untuk membatalkan tanda ragu-ragu' : 'Tandai soal ini sebagai ragu-ragu untuk ditinjau ulang'">
+                                <span x-text="isFlagged(currentQuestion.id) ? '🚩' : '🏳️'"></span>
+                                <span x-text="isFlagged(currentQuestion.id) ? 'Ragu-ragu' : 'Tandai Ragu'"></span>
+                            </button>
+
+                            <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20"
+                                  x-text="'+' + currentQuestion.points + ' Poin'"></span>
+                        </div>
                     </div>
 
                     {{-- Question Image (if uploaded) --}}
@@ -188,11 +205,12 @@
                         </div>
                     </template>
 
-                    <h1 class="text-lg sm:text-2xl font-bold text-white heading-font leading-relaxed whitespace-pre-wrap"
-                        x-text="currentQuestion.question_text"></h1>
+                    {{-- Question Text with Syntax Highlighting Support --}}
+                    <div class="text-lg sm:text-2xl font-bold text-white heading-font leading-relaxed"
+                         x-html="renderRichText(currentQuestion.question_text)"></div>
                 </div>
 
-                {{-- Options Grid (Quizizz Colorful Theme with Image Support) --}}
+                {{-- Options Grid (Quizizz Colorful Theme with Image & Rich Text Support) --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
                     <template x-for="(opt, optIdx) in currentQuestion.options" :key="opt.id">
                         <button type="button"
@@ -213,9 +231,9 @@
                                         <img :src="opt.image_url" alt="Gambar Opsi" class="max-h-32 w-auto object-contain rounded-lg">
                                     </div>
                                 </template>
-                                <div class="text-sm sm:text-base font-semibold leading-snug whitespace-pre-wrap"
+                                <div class="text-sm sm:text-base font-semibold leading-snug"
                                      :class="isSelected(currentQuestion.id, opt.id) ? 'text-white' : 'text-gray-200'"
-                                     x-text="opt.text">
+                                     x-html="renderRichText(opt.text)">
                                 </div>
                             </div>
 
@@ -254,6 +272,13 @@
                 <span class="hidden sm:inline">Daftar Soal</span>
                 <span class="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 text-xs font-mono font-bold"
                       x-text="answeredCount() + '/' + questions.length"></span>
+                <template x-if="flaggedCount() > 0">
+                    <span class="px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-xs font-mono font-bold flex items-center gap-1"
+                          title="Jumlah Soal Ragu-ragu">
+                        <span>🚩</span>
+                        <span x-text="flaggedCount()"></span>
+                    </span>
+                </template>
             </button>
 
             {{-- Next or Submit Button --}}
@@ -306,17 +331,25 @@
                 <template x-for="(q, idx) in questions" :key="q.id">
                     <button type="button"
                             @click="jumpToQuestion(idx)"
-                            class="h-11 rounded-xl text-xs font-bold font-mono flex flex-col items-center justify-center border transition-all"
-                            :class="idx === currentIndex ? 'border-emerald-400 bg-emerald-500/20 text-emerald-300 ring-2 ring-emerald-500/30' : (isQuestionAnswered(q.id) ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400' : 'bg-[#090D0B] border-[#1A2820] text-gray-400 hover:border-gray-600')">
+                            class="h-12 rounded-xl text-xs font-bold font-mono flex flex-col items-center justify-center border transition-all relative"
+                            :class="idx === currentIndex ? 'border-emerald-400 bg-emerald-500/25 text-emerald-300 ring-2 ring-emerald-500/30 font-extrabold' : (isFlagged(q.id) ? 'bg-amber-500/20 border-amber-500/60 text-amber-300' : (isQuestionAnswered(q.id) ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400' : 'bg-[#090D0B] border-[#1A2820] text-gray-400 hover:border-gray-600'))">
                         <span x-text="idx + 1"></span>
-                        <span class="text-[9px]" x-text="isQuestionAnswered(q.id) ? '✓' : ''"></span>
+                        <div class="flex items-center gap-0.5 text-[9px] mt-0.5 leading-none">
+                            <template x-if="isFlagged(q.id)">
+                                <span>🚩</span>
+                            </template>
+                            <template x-if="isQuestionAnswered(q.id)">
+                                <span class="text-emerald-400 font-bold">✓</span>
+                            </template>
+                        </div>
                     </button>
                 </template>
             </div>
 
-            <div class="mt-4 pt-3 border-t border-[#1A2820] flex items-center justify-between text-xs">
-                <div class="flex items-center gap-3 text-gray-400">
-                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Dijawab</span>
+            <div class="mt-4 pt-3 border-t border-[#1A2820] flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div class="flex items-center gap-3 text-gray-400 flex-wrap">
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Dijawab (<span x-text="answeredCount()"></span>)</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Ragu-ragu (<span x-text="flaggedCount()"></span>)</span>
                     <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-gray-700"></span> Belum</span>
                 </div>
                 <button type="button" @click="showDrawer = false"
@@ -529,8 +562,10 @@
                 remainingSeconds: {{ $timeRemaining !== null ? (int)$timeRemaining : 'null' }},
                 currentIndex: 0,
                 answers: {},
+                flaggedQuestions: [],
                 syncStatus: 'synced', // 'synced', 'saving', 'offline'
                 syncDebounceTimer: null,
+                heartbeatInterval: null,
                 tabSwitchCount: {{ (int)$attempt->tab_switch_count }},
                 allowOpenBook: {{ $quiz->allow_open_book ? 'true' : 'false' }},
                 isLocked: {{ $attempt->is_locked ? 'true' : 'false' }},
@@ -570,6 +605,11 @@
                     const localDraft = this.loadLocalCache();
                     this.answers = Object.assign({}, serverDraft, localDraft);
 
+                    // Initialize flagged questions
+                    if (Array.isArray(this.answers['__flagged'])) {
+                        this.flaggedQuestions = this.answers['__flagged'].map(String);
+                    }
+
                     // Check initial fullscreen state
                     this.isFullscreen = this.checkFullscreenState();
                     if (this.isFullscreen) {
@@ -593,6 +633,18 @@
                     if (this.penaltySeconds > 0 && !this.isLocked) {
                         this.initPenaltyCountdown();
                     }
+
+                    // Setup background heartbeat sync every 15 seconds so supervisor Live Monitor stays online
+                    this.heartbeatInterval = setInterval(() => {
+                        if (!this.isSubmitting && !this.isLocked) {
+                            this.triggerBackgroundSync();
+                        }
+                    }, 15000);
+
+                    // Initial code syntax highlighting pass
+                    this.$nextTick(() => {
+                        if (window.Prism) Prism.highlightAll();
+                    });
 
                     // Comprehensive vendor-prefixed fullscreen listeners
                     const onFsChange = () => {
@@ -695,6 +747,31 @@
                         .then(data => {
                             if (data.success) {
                                 this.syncStatus = 'synced';
+
+                                // Check if supervisor force submitted this attempt
+                                if (data.is_force_submitted || data.redirect) {
+                                    window.location.href = data.redirect || '{{ route('quiz.results', [$quiz->unique_token, $attempt->id]) }}';
+                                    return;
+                                }
+
+                                // Check if supervisor adjusted/added extra time
+                                if (data.time_remaining !== undefined && data.time_remaining !== null) {
+                                    const newTime = Math.max(0, Math.floor(Number(data.time_remaining)));
+                                    if (this.remainingSeconds !== null && Math.abs(this.remainingSeconds - newTime) > 60) {
+                                        this.remainingSeconds = newTime;
+                                        Swal.fire({
+                                            toast: true,
+                                            position: 'top-end',
+                                            icon: 'info',
+                                            title: 'Waktu ujian telah disesuaikan oleh pengawas.',
+                                            showConfirmButton: false,
+                                            timer: 3500,
+                                            background: '#0F1713',
+                                            color: '#34D399',
+                                            customClass: { popup: 'border border-emerald-500/40 rounded-xl' }
+                                        });
+                                    }
+                                }
                             } else {
                                 this.syncStatus = 'offline';
                             }
@@ -788,7 +865,6 @@
                     });
 
                     // 3. Heartbeat Focus Scanner:
-                    // Verifies document.hasFocus() so if student clicks into another app/window, it triggers
                     if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
                     this.focusCheckInterval = setInterval(() => {
                         if (!this.allowOpenBook && !this.isLocked && this.penaltySeconds === 0 && !this.isSubmitting && !this.isEnteringFullscreen && this.hasEnteredFullscreenOnce) {
@@ -907,7 +983,29 @@
                     return val === optionId;
                 },
 
+                toggleFlagQuestion(questionId) {
+                    const qIdStr = String(questionId);
+                    const idx = this.flaggedQuestions.indexOf(qIdStr);
+                    if (idx > -1) {
+                        this.flaggedQuestions.splice(idx, 1);
+                    } else {
+                        this.flaggedQuestions.push(qIdStr);
+                    }
+                    this.answers['__flagged'] = [...this.flaggedQuestions];
+                    this.saveLocalCache();
+                    this.triggerBackgroundSync();
+                },
+
+                isFlagged(questionId) {
+                    return this.flaggedQuestions.includes(String(questionId));
+                },
+
+                flaggedCount() {
+                    return this.flaggedQuestions.length;
+                },
+
                 isQuestionAnswered(questionId) {
+                    if (questionId === '__flagged') return false;
                     const val = this.answers[questionId];
                     if (Array.isArray(val)) {
                         return val.length > 0;
@@ -918,40 +1016,105 @@
                 nextQuestion() {
                     if (this.currentIndex < this.questions.length - 1) {
                         this.currentIndex++;
+                        this.$nextTick(() => { if (window.Prism) Prism.highlightAll(); });
                     }
                 },
 
                 prevQuestion() {
                     if (this.currentIndex > 0) {
                         this.currentIndex--;
+                        this.$nextTick(() => { if (window.Prism) Prism.highlightAll(); });
                     }
                 },
 
                 jumpToQuestion(index) {
                     this.currentIndex = index;
                     this.showDrawer = false;
+                    this.$nextTick(() => { if (window.Prism) Prism.highlightAll(); });
                 },
 
                 answeredCount() {
-                    return Object.keys(this.answers).filter(qId => this.isQuestionAnswered(qId)).length;
+                    return this.questions.filter(q => this.isQuestionAnswered(q.id)).length;
+                },
+
+                renderRichText(raw) {
+                    if (!raw) return '';
+                    const codeBlocks = [];
+                    let text = String(raw);
+
+                    // 1. Extract and protect code blocks ```lang ... ```
+                    text = text.replace(/```([a-zA-Z0-9_\-\+#]*)\r?\n?([\s\S]*?)```/g, (match, lang, code) => {
+                        const cleanLang = (lang || 'markup').trim().toLowerCase();
+                        const placeholder = `___CODE_BLOCK_${codeBlocks.length}___`;
+                        
+                        const escEl = document.createElement('div');
+                        escEl.textContent = code.trim();
+                        const escCode = escEl.innerHTML;
+
+                        codeBlocks.push(
+                            `<div class="my-3 rounded-xl overflow-hidden border border-[#1A2820] bg-[#070b09] text-left">` +
+                            `<div class="px-3 py-1 bg-[#101713] border-b border-[#1A2820] text-[10px] font-mono text-gray-400 uppercase tracking-wider flex items-center justify-between">` +
+                            `<span class="text-emerald-400 font-bold">${cleanLang || 'code'}</span>` +
+                            `<span class="text-gray-500 text-[9px]">Syntax Highlighted</span>` +
+                            `</div>` +
+                            `<pre class="language-${cleanLang} !bg-transparent !p-3 !m-0 text-xs sm:text-sm font-mono overflow-x-auto"><code class="language-${cleanLang}">${escCode}</code></pre>` +
+                            `</div>`
+                        );
+                        return placeholder;
+                    });
+
+                    // 2. Extract and protect inline code `...`
+                    const inlineBlocks = [];
+                    text = text.replace(/`([^`\n\r]+)`/g, (match, code) => {
+                        const placeholder = `___INLINE_CODE_${inlineBlocks.length}___`;
+                        const escEl = document.createElement('div');
+                        escEl.textContent = code;
+                        inlineBlocks.push(`<code class="px-1.5 py-0.5 rounded bg-[#16221B] border border-[#23382C] text-emerald-300 font-mono text-xs sm:text-sm">${escEl.innerHTML}</code>`);
+                        return placeholder;
+                    });
+
+                    // 3. Escape normal text
+                    const escapeEl = document.createElement('div');
+                    escapeEl.textContent = text;
+                    let safe = escapeEl.innerHTML;
+
+                    // 4. Convert single newlines to <br>
+                    safe = safe.replace(/\n/g, '<br>');
+
+                    // 5. Restore inline code
+                    inlineBlocks.forEach((html, i) => {
+                        safe = safe.replace(`___INLINE_CODE_${i}___`, html);
+                    });
+
+                    // 6. Restore code blocks
+                    codeBlocks.forEach((html, i) => {
+                        safe = safe.replace(`___CODE_BLOCK_${i}___`, html);
+                    });
+
+                    return safe;
                 },
 
                 confirmSubmit() {
                     const answered = this.answeredCount();
                     const total = this.questions.length;
                     const unanswered = total - answered;
+                    const flagged = this.flaggedCount();
 
                     let message = `Anda telah menjawab ${answered} dari ${total} pertanyaan.`;
-                    if (unanswered > 0) {
-                        message += ` Terdapat ${unanswered} pertanyaan yang belum dijawab. Yakin ingin mengumpulkan sekarang?`;
-                    } else {
-                        message += ` Seluruh pertanyaan telah terisi. Yakin ingin mengumpulkan?`;
+                    if (flagged > 0) {
+                        message += `\n⚠️ Anda masih menandai ${flagged} soal sebagai RAGU-RAGU.`;
                     }
+                    if (unanswered > 0) {
+                        message += `\n⚠️ Terdapat ${unanswered} pertanyaan yang belum dijawab.`;
+                    } else if (flagged === 0) {
+                        message += `\nSemua pertanyaan telah terisi.`;
+                    }
+                    message += `\n\nYakin ingin mengumpulkan ujian sekarang?`;
 
                     Swal.fire({
                         title: 'Kumpulkan Jawaban?',
                         text: message,
-                        icon: unanswered > 0 ? 'warning' : 'question',
+                        icon: (unanswered > 0 || flagged > 0) ? 'warning' : 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#10B981',
                         cancelButtonColor: '#1A2820',
@@ -976,6 +1139,7 @@
                     this.isSubmitting = true;
                     if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
                     if (this.fullscreenToleranceInterval) clearInterval(this.fullscreenToleranceInterval);
+                    if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
 
                     Swal.fire({
                         title: 'Mengirim Jawaban...',

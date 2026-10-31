@@ -29,6 +29,9 @@ class QuizAttempt extends Model
         'penalty_end_time',
         'violations_log',
         'draft_answers',
+        'extra_time_minutes',
+        'last_heartbeat_at',
+        'is_force_submitted',
     ];
 
     protected $casts = [
@@ -45,6 +48,9 @@ class QuizAttempt extends Model
         'penalty_end_time'      => 'datetime',
         'violations_log'        => 'array',
         'draft_answers'         => 'array',
+        'extra_time_minutes'    => 'integer',
+        'last_heartbeat_at'     => 'datetime',
+        'is_force_submitted'    => 'boolean',
     ];
 
     public function quiz(): BelongsTo
@@ -76,5 +82,44 @@ class QuizAttempt extends Model
         }
 
         return "{$seconds} detik";
+    }
+
+    public function isOnline(): bool
+    {
+        if ($this->isCompleted()) {
+            return false;
+        }
+        return $this->last_heartbeat_at && now()->diffInSeconds($this->last_heartbeat_at) < 65;
+    }
+
+    public function answeredQuestionsCount(): int
+    {
+        if ($this->isCompleted()) {
+            return $this->answers()->count();
+        }
+        $draft = $this->draft_answers ?? [];
+        unset($draft['__flagged']);
+        return count(array_filter($draft, fn($v) => !is_null($v) && $v !== '' && $v !== []));
+    }
+
+    public function flaggedQuestionsCount(): int
+    {
+        $draft = $this->draft_answers ?? [];
+        return isset($draft['__flagged']) && is_array($draft['__flagged']) ? count($draft['__flagged']) : 0;
+    }
+
+    public function timeRemainingSeconds(): ?int
+    {
+        if ($this->isCompleted()) {
+            return 0;
+        }
+        $quiz = $this->quiz;
+        if (!$quiz || $quiz->time_limit_minutes <= 0) {
+            return null; // Unlimited
+        }
+        $totalMinutes = $quiz->time_limit_minutes + ($this->extra_time_minutes ?? 0);
+        $elapsed = abs((int) now()->diffInSeconds($this->started_at));
+        $allowed = $totalMinutes * 60;
+        return max(0, $allowed - $elapsed);
     }
 }

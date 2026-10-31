@@ -254,9 +254,15 @@
                         const data = await res.json();
                         
                         this.loading = false;
+
+                        if (!res.ok) {
+                            alert(data.message || 'Terjadi kesalahan saat melacak tugas.');
+                            return;
+                        }
+                        
                         this.result = true;
                         
-                        if (data.data.length > 0) {
+                        if (data.data && data.data.length > 0) {
                             this.resultTitle = `Ditemukan ${data.data.length} tugas untuk NIM ${this.nim} (${data.data[0].nama}):`;
                             this.tasks = data.data;
                         } else {

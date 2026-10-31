@@ -73,7 +73,7 @@ class UserController extends Controller
             abort(403, 'Password akun ini tidak dapat direset.');
         }
 
-        $default = config('app.admin_default_password');
+        $default = config('app.admin_default_password') ?: 'labdrive123';
         $user->update(['password' => $default]);
 
         return back()->with(

@@ -74,8 +74,8 @@
         @endif
 
         {{-- Question Text --}}
-        <div class="text-sm font-semibold text-white mb-4 whitespace-pre-wrap leading-relaxed">
-            {{ $q->question_text }}
+        <div class="text-sm font-semibold text-white mb-4 leading-relaxed">
+            {!! App\Helpers\RichTextHelper::format($q->question_text) !!}
         </div>
 
         {{-- Options List --}}
@@ -95,7 +95,7 @@
                             </div>
                         @endif
                         @if(!empty($opt->option_text))
-                            <span class="text-xs font-medium block leading-relaxed">{{ $opt->option_text }}</span>
+                            <div class="text-xs font-medium block leading-relaxed">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
                         @endif
                     </div>
 
@@ -114,7 +114,7 @@
     @if($q->explanation)
         <div class="mt-3 p-3 rounded-xl bg-teal-500/5 border border-teal-500/20 text-teal-300 text-xs flex items-start gap-2">
             <span class="font-bold flex-shrink-0">💡 Pembahasan:</span>
-            <span class="text-gray-300 leading-relaxed">{{ $q->explanation }}</span>
+            <div class="text-gray-300 leading-relaxed">{!! App\Helpers\RichTextHelper::format($q->explanation) !!}</div>
         </div>
     @endif
 </div>

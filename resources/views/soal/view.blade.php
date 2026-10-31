@@ -1198,6 +1198,7 @@ document.getElementById('submission-form').addEventListener('submit', async func
 
         if (response.ok) {
             this.reset();
+            switchSubmissionType(currentType);
             if (dzEmpty) dzEmpty.style.display   = 'block';
             if (dzSuccess) dzSuccess.style.display = 'none';
             if (dropzone) dropzone.classList.remove('has-file');
