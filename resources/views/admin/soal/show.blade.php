@@ -379,23 +379,104 @@
                 {{-- Action Buttons --}}
                 <div class="flex items-center gap-2 flex-wrap">
                     @if(!$submissions->isEmpty())
-                        <a href="{{ route('admin.soal.download-submissions-zip', $soal) }}"
-                           class="px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-300 transition-colors flex items-center gap-1.5 border"
-                           style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);"
-                           onmouseover="this.style.background='rgba(16,185,129,.2)'"
-                           onmouseout="this.style.background='rgba(16,185,129,.12)'">
-                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                            Unduh Semua (ZIP)
+                        @if($soal->hasClasses())
+                            {{-- Dropdown Unduh ZIP per Kelas --}}
+                            <div class="relative inline-block text-left" x-data="{ open: false }">
+                                <button @click="open = !open" @click.away="open = false" type="button"
+                                        class="px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-300 transition-colors flex items-center gap-1.5 border cursor-pointer"
+                                        style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);"
+                                        onmouseover="this.style.background='rgba(16,185,129,.2)'"
+                                        onmouseout="this.style.background='rgba(16,185,129,.12)'">
+                                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    <span>Unduh ZIP</span>
+                                    <svg class="w-3.5 h-3.5 ml-0.5 text-emerald-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                                <div x-show="open" x-cloak
+                                     x-transition:enter="transition ease-out duration-100"
+                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-75"
+                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                     x-transition:leave-end="transform opacity-0 scale-95"
+                                     class="absolute right-0 mt-2 w-56 rounded-xl shadow-2xl py-1.5 z-30 border"
+                                     style="background:#0F1713;border-color:#1A2820;">
+                                    <div class="px-3 py-1.5 text-[10px] uppercase font-bold text-gray-500 tracking-wider">Unduh Berdasarkan Kelas</div>
+                                    <a href="{{ route('admin.soal.download-submissions-zip', $soal) }}"
+                                       class="flex items-center justify-between px-3.5 py-2 text-xs text-emerald-400 hover:bg-emerald-950/40 font-semibold">
+                                        <span>Unduh Semua Kelas</span>
+                                        <span class="text-[10px] text-gray-500 font-mono">{{ $submissions->count() }} file</span>
+                                    </a>
+                                    <div class="border-t my-1" style="border-color:#1A2820;"></div>
+                                    @foreach($soal->getClassesList() as $cls)
+                                        @php $cCount = $submissions->where('kelas', $cls)->count(); @endphp
+                                        <a href="{{ route('admin.soal.download-submissions-zip', [$soal, 'kelas' => $cls]) }}"
+                                           class="flex items-center justify-between px-3.5 py-2 text-xs text-gray-300 hover:text-white hover:bg-white/5">
+                                            <span>Kelas {{ $cls }}</span>
+                                            <span class="text-[10px] font-mono {{ $cCount > 0 ? 'text-emerald-400' : 'text-gray-600' }}">{{ $cCount }} tugas</span>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @else
+                            <a href="{{ route('admin.soal.download-submissions-zip', $soal) }}"
+                               class="px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-300 transition-colors flex items-center gap-1.5 border"
+                               style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);"
+                               onmouseover="this.style.background='rgba(16,185,129,.2)'"
+                               onmouseout="this.style.background='rgba(16,185,129,.12)'">
+                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                Unduh Semua (ZIP)
+                            </a>
+                        @endif
+                    @endif
+
+                    @if($soal->hasClasses() && !$submissions->isEmpty())
+                        {{-- Dropdown Export CSV per Kelas --}}
+                        <div class="relative inline-block text-left" x-data="{ open: false }">
+                            <button @click="open = !open" @click.away="open = false" type="button"
+                                    class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-200 transition-colors flex items-center gap-1.5 border cursor-pointer"
+                                    style="background:#090D0B;border-color:#1A2820;"
+                                    onmouseover="this.style.borderColor='rgba(16,185,129,.4)';this.style.color='#10B981'"
+                                    onmouseout="this.style.borderColor='#1A2820';this.style.color='#E5E7EB'">
+                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <span>Export CSV</span>
+                                <svg class="w-3.5 h-3.5 ml-0.5 text-gray-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            <div x-show="open" x-cloak
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 class="absolute right-0 mt-2 w-56 rounded-xl shadow-2xl py-1.5 z-30 border"
+                                 style="background:#0F1713;border-color:#1A2820;">
+                                <div class="px-3 py-1.5 text-[10px] uppercase font-bold text-gray-500 tracking-wider">Rekap Tugas CSV</div>
+                                <a href="{{ route('admin.soal.export-submissions', $soal) }}"
+                                   class="flex items-center justify-between px-3.5 py-2 text-xs text-emerald-400 hover:bg-emerald-950/40 font-semibold">
+                                    <span>Semua Kelas</span>
+                                    <span class="text-[10px] text-gray-500 font-mono">{{ $submissions->count() }}</span>
+                                </a>
+                                <div class="border-t my-1" style="border-color:#1A2820;"></div>
+                                @foreach($soal->getClassesList() as $cls)
+                                    @php $cCount = $submissions->where('kelas', $cls)->count(); @endphp
+                                    <a href="{{ route('admin.soal.export-submissions', [$soal, 'kelas' => $cls]) }}"
+                                       class="flex items-center justify-between px-3.5 py-2 text-xs text-gray-300 hover:text-white hover:bg-white/5">
+                                        <span>Kelas {{ $cls }}</span>
+                                        <span class="text-[10px] font-mono {{ $cCount > 0 ? 'text-emerald-400' : 'text-gray-600' }}">{{ $cCount }}</span>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @else
+                        <a href="{{ route('admin.soal.export-submissions', $soal) }}"
+                           class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-200 transition-colors flex items-center gap-1.5 border"
+                           style="background:#090D0B;border-color:#1A2820;"
+                           onmouseover="this.style.borderColor='rgba(16,185,129,.4)';this.style.color='#10B981'"
+                           onmouseout="this.style.borderColor='#1A2820';this.style.color='#E5E7EB'">
+                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Export Rekap (CSV)
                         </a>
                     @endif
-                    <a href="{{ route('admin.soal.export-submissions', $soal) }}"
-                       class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-200 transition-colors flex items-center gap-1.5 border"
-                       style="background:#090D0B;border-color:#1A2820;"
-                       onmouseover="this.style.borderColor='rgba(16,185,129,.4)';this.style.color='#10B981'"
-                       onmouseout="this.style.borderColor='#1A2820';this.style.color='#E5E7EB'">
-                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        Export Rekap (CSV)
-                    </a>
                 </div>
             </div>
 
@@ -403,12 +484,27 @@
             @if(!$submissions->isEmpty())
             <div class="px-5 md:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3"
                  style="background:rgba(9,13,11,.6);border-bottom:1px solid #1A2820;">
-                <div class="relative w-full sm:w-72">
-                    <input type="text" id="submissionSearchInput" onkeyup="filterSubmissions()"
-                           placeholder="Cari NIM atau Nama mahasiswa..."
-                           class="w-full border rounded-xl pl-9 pr-3.5 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
-                           style="background:#090D0B;border-color:#1A2820;">
-                    <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <div class="flex items-center gap-2.5 w-full sm:w-auto flex-1">
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" id="submissionSearchInput" onkeyup="filterSubmissions()"
+                               placeholder="Cari NIM atau Nama..."
+                               class="w-full border rounded-xl pl-9 pr-3.5 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                               style="background:#090D0B;border-color:#1A2820;">
+                        <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+
+                    @if($soal->hasClasses())
+                        <div class="relative flex-shrink-0">
+                            <select id="classFilterSelect" onchange="filterSubmissions()"
+                                    class="border text-gray-200 rounded-xl pl-3 pr-8 py-2 text-xs focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+                                    style="background-color:#090D0B;border-color:#1A2820;">
+                                <option value="all">Semua Kelas ({{ $submissions->count() }})</option>
+                                @foreach($soal->getClassesList() as $cls)
+                                    <option value="{{ $cls }}">Kelas {{ $cls }} ({{ $submissions->where('kelas', $cls)->count() }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Type Filter Pills --}}
@@ -448,6 +544,7 @@
                         <thead class="text-xs text-gray-400 uppercase tracking-wider" style="background:#090D0B;border-bottom:1px solid #1A2820;">
                             <tr>
                                 <th class="px-6 py-3.5 text-left font-semibold">Mahasiswa</th>
+                                <th class="px-4 py-3.5 text-left font-semibold">Kelas</th>
                                 <th class="px-4 py-3.5 text-left font-semibold">Tipe</th>
                                 <th class="px-4 py-3.5 text-left font-semibold">Berkas / Jawaban</th>
                                 <th class="px-4 py-3.5 text-left font-semibold">Waktu Pengumpulan</th>
@@ -456,7 +553,7 @@
                         </thead>
                         <tbody class="divide-y" style="border-color:#1A2820;" id="submissionsTableBody">
                             @foreach($submissions as $sub)
-                            <tr class="hover:bg-emerald-950/10 transition-colors submission-row" style="border-color:#1A2820;" data-type="{{ $sub->submission_type ?: 'file' }}">
+                            <tr class="hover:bg-emerald-950/10 transition-colors submission-row" style="border-color:#1A2820;" data-type="{{ $sub->submission_type ?: 'file' }}" data-kelas="{{ $sub->kelas ?? '' }}">
                                 {{-- Mahasiswa Identity --}}
                                 <td class="px-6 py-3.5">
                                     <div class="flex items-center gap-3">
@@ -469,6 +566,18 @@
                                             <p class="text-xs font-mono text-gray-500 sub-nim">{{ $sub->nim }}</p>
                                         </div>
                                     </div>
+                                </td>
+
+                                {{-- Kelas Badge --}}
+                                <td class="px-4 py-3.5 text-xs">
+                                    @if($sub->kelas)
+                                        <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold inline-block"
+                                              style="background:rgba(16,185,129,.12);color:#34D399;border:1px solid rgba(16,185,129,.25);">
+                                            Kelas {{ $sub->kelas }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-500 font-mono text-xs">-</span>
+                                    @endif
                                 </td>
 
                                 {{-- Submission Type Badge --}}
@@ -653,17 +762,21 @@ function setSubFilter(type) {
 function filterSubmissions() {
     const input = document.getElementById('submissionSearchInput');
     const query = input ? input.value.toLowerCase().trim() : '';
+    const classSelect = document.getElementById('classFilterSelect');
+    const selectedClass = classSelect ? classSelect.value : 'all';
     const rows = document.querySelectorAll('.submission-row');
 
     rows.forEach(row => {
         const type = row.getAttribute('data-type');
+        const kelas = row.getAttribute('data-kelas') || '';
         const nama = row.querySelector('.sub-nama').textContent.toLowerCase();
         const nim = row.querySelector('.sub-nim').textContent.toLowerCase();
 
         const matchesQuery = query === '' || nama.includes(query) || nim.includes(query);
         const matchesType = currentFilterType === 'all' || type === currentFilterType;
+        const matchesClass = selectedClass === 'all' || kelas === selectedClass;
 
-        if (matchesQuery && matchesType) {
+        if (matchesQuery && matchesType && matchesClass) {
             row.style.display = '';
         } else {
             row.style.display = 'none';

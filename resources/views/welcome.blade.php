@@ -828,6 +828,9 @@
                         <div class="task-row">
                             <p class="task-title" x-text="t.soal_title"></p>
                             <p class="task-meta">
+                                <template x-if="t.kelas">
+                                    <span class="badge-pill" style="background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3);" x-text="'Kelas ' + t.kelas"></span>
+                                </template>
                                 <span class="badge-pill"
                                       :class="t.submission_type === 'link' ? 'lnk' : (t.submission_type === 'text' ? 'txt' : '')"
                                       x-text="t.submission_type || 'file'"></span>

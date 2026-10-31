@@ -24,6 +24,7 @@ class Submission extends Model
         'soal_id',
         'nim',
         'nama',
+        'kelas',
         'submission_type',
         'link_url',
         'text_content',

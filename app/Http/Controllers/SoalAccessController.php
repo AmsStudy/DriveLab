@@ -284,6 +284,27 @@ class SoalAccessController extends Controller
             return response()->json(['message' => 'Sesi akses tidak valid. Silakan masukkan password soal terlebih dahulu.'], 403);
         }
 
+        if ($request->has('nim')) {
+            $request->merge(['nim' => trim($request->nim)]);
+        }
+        if ($request->has('nama')) {
+            $request->merge(['nama' => trim($request->nama)]);
+        }
+        if ($request->has('kelas')) {
+            $request->merge(['kelas' => strtoupper(trim($request->kelas))]);
+        }
+
+        // Validasi pemilihan kelas jika soal mewajibkan kelas
+        if ($soal->hasClasses()) {
+            $request->validate([
+                'kelas' => ['required', 'string', \Illuminate\Validation\Rule::in($soal->getClassesList())],
+            ], [
+                'kelas.required' => 'Silakan pilih kelas Anda terlebih dahulu.',
+                'kelas.in'       => 'Kelas yang dipilih tidak terdaftar untuk tugas ini.',
+            ]);
+        }
+        $kelas = $soal->hasClasses() ? $request->input('kelas') : ($request->input('kelas') ?: null);
+
         $submissionType = $request->input('submission_type', 'file');
         $allowedTypes   = $soal->submission_types ?: ['file'];
 
@@ -310,6 +331,7 @@ class SoalAccessController extends Controller
                 'soal_id'            => $soal->id,
                 'nim'                => $request->nim,
                 'nama'               => $request->nama,
+                'kelas'              => $kelas,
                 'submission_type'    => 'link',
                 'link_url'           => $request->link_url,
                 'text_content'       => null,
@@ -350,6 +372,7 @@ class SoalAccessController extends Controller
                 'soal_id'            => $soal->id,
                 'nim'                => $request->nim,
                 'nama'               => $request->nama,
+                'kelas'              => $kelas,
                 'submission_type'    => 'text',
                 'link_url'           => null,
                 'text_content'       => $request->text_content,
@@ -386,10 +409,11 @@ class SoalAccessController extends Controller
             return response()->json(['message' => $errorMsg], 422);
         }
 
-        // Nama file bersih — hapus karakter berbahaya dari NIM/Nama
-        $nimClean  = preg_replace('/[^a-zA-Z0-9\-]/', '_', $request->nim);
-        $namaClean = preg_replace('/[^a-zA-Z0-9\s\-]/', '_', $request->nama);
-        $fileName  = $nimClean . '_' . str_replace(' ', '_', $namaClean) . '_' . time() . '.' . $file->getClientOriginalExtension();
+        // Nama file bersih — sematkan prefix kelas jika ada
+        $kelasPrefix = $kelas ? (preg_replace('/[^a-zA-Z0-9\-_]/', '_', $kelas) . '_') : '';
+        $nimClean    = preg_replace('/[^a-zA-Z0-9\-]/', '_', $request->nim);
+        $namaClean   = preg_replace('/[^a-zA-Z0-9\s\-]/', '_', $request->nama);
+        $fileName    = $kelasPrefix . $nimClean . '_' . str_replace(' ', '_', $namaClean) . '_' . time() . '.' . $file->getClientOriginalExtension();
         $path = $file->storeAs('submissions/' . $soal->id, $fileName, 'private');
 
         $existing = Submission::where('soal_id', $soal->id)
@@ -406,6 +430,7 @@ class SoalAccessController extends Controller
             'soal_id'            => $soal->id,
             'nim'                => $request->nim,
             'nama'               => $request->nama,
+            'kelas'              => $kelas,
             'submission_type'    => 'file',
             'link_url'           => null,
             'text_content'       => null,
@@ -462,6 +487,7 @@ class SoalAccessController extends Controller
                 'id'              => $sub->id,
                 'soal_title'      => $sub->soal->title ?? 'Dokumen Dihapus',
                 'nama'            => $sub->nama,
+                'kelas'           => $sub->kelas,
                 'submission_type' => $sub->submission_type ?? 'file',
                 'file_name'       => $identifier,
                 'link_url'        => $sub->link_url,

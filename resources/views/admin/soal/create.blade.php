@@ -225,6 +225,16 @@
                         </div>
                     </div>
 
+                    {{-- Daftar Pilihan Kelas (Opsional) --}}
+                    <div>
+                        <label class="block text-xs text-gray-300 font-semibold mb-1">Daftar Pilihan Kelas (Opsional)</label>
+                        <input type="text" name="classes" value="{{ old('classes') }}"
+                               placeholder="Contoh: A1, A2, B1, B2 (Pisahkan dengan tanda koma)"
+                               class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500">
+                        <p class="text-[11px] text-gray-400 mt-1">Jika diisi, mahasiswa wajib memilih salah satu kelas saat mengumpulkan tugas. Anda juga dapat mengunduh arsip tugas berdasarkan kelasnya.</p>
+                        @error('classes') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
+                    </div>
+
                     {{-- Tipe Pengumpulan yang Diizinkan --}}
                     <div>
                         <label class="block text-xs text-gray-300 font-semibold mb-2">Metode Pengumpulan yang Diizinkan Mahasiswa <span class="text-red-400">*</span></label>

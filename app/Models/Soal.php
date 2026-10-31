@@ -38,6 +38,7 @@ class Soal extends Model
         'deadline_at',
         'submission_instructions',
         'allowed_extensions',
+        'classes',
     ];
 
     protected $casts = [
@@ -49,7 +50,18 @@ class Soal extends Model
         'submission_types' => 'array',
         'deadline_at'  => 'datetime',
         'allowed_extensions' => 'array',
+        'classes'      => 'array',
     ];
+
+    public function hasClasses(): bool
+    {
+        return !empty($this->classes) && is_array($this->classes) && count($this->classes) > 0;
+    }
+
+    public function getClassesList(): array
+    {
+        return is_array($this->classes) ? $this->classes : [];
+    }
 
     public function isSubmissionTypeAllowed(string $type): bool
     {

@@ -425,7 +425,8 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
 }
 
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-@media(max-width:580px){.form-grid{grid-template-columns:1fr}}
+.form-grid.has-classes{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+@media(max-width:580px){.form-grid,.form-grid.has-classes{grid-template-columns:1fr}}
 
 .field-group{display:flex;flex-direction:column;gap:7px}
 .field-label{
@@ -865,7 +866,7 @@ footer{
                     <form id="submission-form" autocomplete="off">
                         @csrf
 
-                        <div class="form-grid">
+                        <div class="form-grid {{ $soal->hasClasses() ? 'has-classes' : '' }}">
                             <div class="field-group">
                                 <label class="field-label">
                                     NIM Mahasiswa <span class="req">*</span>
@@ -894,6 +895,24 @@ footer{
                                     </svg>
                                 </div>
                             </div>
+                            @if($soal->hasClasses())
+                            <div class="field-group">
+                                <label class="field-label">
+                                    Kelas <span class="req">*</span>
+                                </label>
+                                <div class="field-wrap">
+                                    <select id="sub_kelas" name="kelas" required class="field-input" style="padding-left:38px;padding-right:24px;appearance:auto;cursor:pointer;">
+                                        <option value="" disabled selected>— Pilih Kelas —</option>
+                                        @foreach($soal->getClassesList() as $kelasOption)
+                                            <option value="{{ $kelasOption }}" style="background:#0F1713;color:#F9FAFB;">Kelas {{ $kelasOption }}</option>
+                                        @endforeach
+                                    </select>
+                                    <svg class="field-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            @endif
                         </div>
 
                         <input type="hidden" name="submission_type" id="sub_type" value="{{ $defaultSubType }}">
