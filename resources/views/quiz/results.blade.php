@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hasil Kuis: {{ $quiz->title }} &mdash; LabDrive</title>
+    <title>Hasil Kuis: {{ $quiz->title }} &mdash; IC-Labs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -376,7 +376,7 @@
     </main>
 
     <footer class="py-6 border-t border-[#1A2820] text-center text-xs text-gray-600 mt-auto">
-        &copy; {{ date('Y') }} LabDrive &bull; Platform Distribusi & Evaluasi Laboratorium
+        &copy; {{ date('Y') }} IC-Labs &bull; Platform Distribusi & Evaluasi Laboratorium
     </footer>
 
     {{-- Trigger Confetti Celebration --}}

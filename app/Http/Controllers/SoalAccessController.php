@@ -20,11 +20,18 @@ class SoalAccessController extends Controller
             return back()->with('error', 'Terlalu banyak percobaan pencarian kode. Coba lagi dalam ' . ceil($seconds) . ' detik.');
         }
 
+        if ($request->has('kode_unik')) {
+            $request->merge(['kode_unik' => trim($request->kode_unik)]);
+        }
+
         $request->validate([
             'kode_unik' => 'required|string|max:50'
         ]);
 
-        $soal = Soal::where('kode_unik', $request->kode_unik)->first();
+        $inputCode = trim($request->kode_unik);
+        $soal = Soal::where('kode_unik', $inputCode)
+            ->orWhere('kode_unik', strtoupper($inputCode))
+            ->first();
 
         if (!$soal) {
             RateLimiter::hit($codeThrottleKey, 60);
@@ -430,6 +437,10 @@ class SoalAccessController extends Controller
             return response()->json(['message' => 'Terlalu banyak permintaan pelacakan. Coba lagi dalam ' . ceil($seconds) . ' detik.'], 429);
         }
         RateLimiter::hit($rateLimitKey, 60);
+
+        if ($request->has('nim')) {
+            $request->merge(['nim' => trim($request->nim)]);
+        }
 
         $request->validate([
             'nim' => 'required|string|max:50|regex:/^[a-zA-Z0-9\-]+$/'

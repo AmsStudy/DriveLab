@@ -4,9 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'LabDrive') }}</title>
+    <title>{{ config('app.name', 'IC-Labs Repository') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@700;800;900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -104,13 +105,14 @@
     <div class="blob blob-2"></div>
 
     <div class="auth-container">
-        <a href="/" class="logo-wrap">
-            <div class="logo-icon">
-                <svg width="20" height="20" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
+        <a href="/" class="logo-wrap" style="gap:12px;text-decoration:none;">
+            <div style="width:44px;height:44px;border-radius:14px;background:rgba(16,185,129,0.08);border:1px solid rgba(52,211,153,0.25);display:flex;align-items:center;justify-content:center;padding:5px;box-shadow:0 0 20px rgba(16,185,129,0.15);">
+                <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs Logo" style="width:100%;height:100%;object-fit:contain;" draggable="false">
             </div>
-            <span class="logo-text">LabDrive</span>
+            <div style="display:flex;flex-direction:column;align-items:flex-start;">
+                <span style="font-family:'Orbitron',sans-serif;font-weight:800;font-size:18px;color:#fff;letter-spacing:1px;line-height:1;">IC-LABS</span>
+                <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:10px;color:#34D399;letter-spacing:2px;margin-top:3px;">REPOSITORY</span>
+            </div>
         </a>
 
         <div class="auth-card">

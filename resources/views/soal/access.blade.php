@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akses Dokumen — LabDrive</title>
+    <title>Akses Dokumen — IC-Labs Repository</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@700;800;900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,8 +16,6 @@
         .blob-2 { width: 400px; height: 400px; background: rgba(52,211,153,.06); bottom: -15%; right: -15%; }
         .wrap { position: relative; z-index: 10; width: 100%; max-width: 420px; }
         .logo-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 32px; text-decoration: none; }
-        .logo-icon { width: 52px; height: 52px; background: linear-gradient(135deg, #10B981, #0D9488); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(16,185,129,.3); }
-        .logo-text { font-weight: 800; font-size: 22px; color: #fff; letter-spacing: -.5px; }
         .card { background: #0F1713; border: 1px solid #1A2820; border-radius: 20px; padding: 24px; margin-bottom: 16px; }
         .soal-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(16,185,129,.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .badge-lifetime { font-size: 11px; background: rgba(16,185,129,.12); color: #34D399; padding: 3px 10px; border-radius: 50px; border: 1px solid rgba(16,185,129,.25); }
@@ -26,6 +25,19 @@
         .pwd-input { width: 100%; background: #090E0B; border: 1px solid #1A2820; color: #fff; font-size: 14px; font-family: 'Inter', sans-serif; padding: 13px 48px 13px 16px; border-radius: 12px; outline: none; transition: border-color .2s, box-shadow .2s; }
         .pwd-input:focus { border-color: #10B981; box-shadow: 0 0 0 3px rgba(16,185,129,.15); }
         .pwd-input.error { border-color: #EF4444; }
+        .pwd-input::-ms-reveal,
+        .pwd-input::-ms-clear {
+            display: none !important;
+        }
+        .pwd-input:-webkit-autofill,
+        .pwd-input:-webkit-autofill:hover,
+        .pwd-input:-webkit-autofill:focus,
+        .pwd-input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #090E0B inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+            caret-color: #ffffff !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
         .toggle-btn { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #6B7280; padding: 0; display: flex; transition: color .2s; }
         .toggle-btn:hover { color: #D1D5DB; }
         .error-msg { font-size: 12px; color: #FB7185; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
@@ -41,13 +53,14 @@
     <div class="blob blob-2"></div>
 
     <div class="wrap">
-        <a href="/" class="logo-wrap">
-            <div class="logo-icon">
-                <svg width="26" height="26" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
+        <a href="/" class="logo-wrap" style="gap:12px;text-decoration:none;">
+            <div style="width:48px;height:48px;border-radius:14px;background:rgba(16,185,129,0.08);border:1px solid rgba(52,211,153,0.25);display:flex;align-items:center;justify-content:center;padding:6px;box-shadow:0 0 20px rgba(16,185,129,0.15);">
+                <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs Logo" style="width:100%;height:100%;object-fit:contain;" draggable="false">
             </div>
-            <span class="logo-text">LabDrive</span>
+            <div style="display:flex;flex-direction:column;align-items:flex-start;">
+                <span style="font-family:'Orbitron',sans-serif;font-weight:800;font-size:20px;color:#fff;letter-spacing:1px;line-height:1;">IC-LABS</span>
+                <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:10px;color:#34D399;letter-spacing:2px;margin-top:4px;">REPOSITORY</span>
+            </div>
         </a>
 
         {{-- Soal Info Card --}}
@@ -121,7 +134,7 @@
             </div>
         @endif
 
-        <p class="footer-note">Powered by <span>LabDrive</span> — Platform Distribusi Dokumen Lab</p>
+        <p class="footer-note">Powered by <span>IC-Labs Repository</span> — Platform Distribusi Dokumen Lab</p>
     </div>
 
     <script>

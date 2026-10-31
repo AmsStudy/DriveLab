@@ -2,7 +2,7 @@
 
 @section('title', 'Dashboard')
 @section('page-title', 'Dashboard')
-@section('page-description', auth()->user()->isSuperAdmin() ? 'Ringkasan performa dan operasional sistem LabDrive' : 'Ringkasan dokumen soal dan pengumpulan tugas Anda')
+@section('page-description', auth()->user()->isSuperAdmin() ? 'Ringkasan performa dan operasional sistem IC-Labs Repository' : 'Ringkasan dokumen soal dan pengumpulan tugas Anda')
 
 @section('content')
 

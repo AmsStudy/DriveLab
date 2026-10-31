@@ -199,9 +199,7 @@ class QuizController extends Controller
         $quiz->show_leaderboard      = $request->boolean('show_leaderboard', false);
         $quiz->show_review           = $request->boolean('show_review', false);
         $quiz->allow_open_book       = $request->boolean('allow_open_book', false);
-        if ($request->filled('admin_unlock_password')) {
-            $quiz->admin_unlock_password = trim($request->admin_unlock_password);
-        }
+        $quiz->admin_unlock_password = $request->filled('admin_unlock_password') ? trim($request->admin_unlock_password) : null;
         $quiz->max_attempts          = $validated['max_attempts'] ?? 1;
         $quiz->is_active             = $request->boolean('is_active', false);
         $quiz->save();
@@ -427,13 +425,23 @@ class QuizController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        // Calculate analytics
-        $allCompleted = $quiz->attempts()->whereNotNull('completed_at')->get();
-        $totalParticipants = $allCompleted->count();
-        $highestScore = $allCompleted->max('score') ?? 0;
-        $lowestScore = $allCompleted->min('score') ?? 0;
-        $avgScore = $allCompleted->avg('score') ?? 0;
-        $avgDuration = $allCompleted->avg('duration_seconds') ?? 0;
+        // Calculate analytics efficiently via SQL aggregation (prevents OOM on mini server)
+        $analytics = $quiz->attempts()
+            ->whereNotNull('completed_at')
+            ->selectRaw('
+                COUNT(*) as total_participants,
+                MAX(score) as highest_score,
+                MIN(score) as lowest_score,
+                AVG(score) as avg_score,
+                AVG(duration_seconds) as avg_duration
+            ')
+            ->first();
+
+        $totalParticipants = (int) ($analytics->total_participants ?? 0);
+        $highestScore      = $totalParticipants > 0 ? (float) ($analytics->highest_score ?? 0) : 0;
+        $lowestScore       = $totalParticipants > 0 ? (float) ($analytics->lowest_score ?? 0) : 0;
+        $avgScore          = $totalParticipants > 0 ? round((float) ($analytics->avg_score ?? 0), 1) : 0;
+        $avgDuration       = $totalParticipants > 0 ? round((float) ($analytics->avg_duration ?? 0)) : 0;
 
         return view('admin.quizzes.results', compact(
             'quiz',

@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="LabDrive — Sistem Arsip Dokumen Laboratorium Digital">
-    <title>@yield('title', 'Dashboard') — LabDrive</title>
+    <meta name="description" content="IC-Labs Repository — Sistem Arsip Dokumen & Evaluasi Laboratorium Digital">
+    <title>@yield('title', 'Dashboard') — IC-Labs Repository</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@700;800;900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -37,14 +38,12 @@
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 flex flex-col" style="background:#0F1713; border-right:1px solid #1A2820;">
             {{-- Logo --}}
             <div class="flex items-center gap-3 px-5 py-4" style="border-bottom:1px solid #1A2820;">
-                <div class="logo-icon w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#10B981,#0D9488);">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                    </svg>
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 p-1" style="background:rgba(16,185,129,0.08); border:1px solid rgba(52,211,153,0.25); box-shadow:0 0 15px rgba(16,185,129,0.15);">
+                    <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs Logo" class="w-full h-full object-contain" draggable="false">
                 </div>
                 <div>
-                    <h1 class="text-white font-bold text-lg leading-none tracking-tight">LabDrive</h1>
-                    <p class="text-[11px] mt-0.5 font-medium" style="color:#4B8C6A;">Platform Distribusi Lab</p>
+                    <h1 class="text-white font-extrabold text-base leading-none tracking-wider" style="font-family:'Orbitron',sans-serif;">IC-LABS</h1>
+                    <p class="text-[10px] mt-1 font-semibold uppercase tracking-widest" style="font-family:'Chakra Petch',sans-serif; color:#34D399;">REPOSITORY</p>
                 </div>
             </div>
 
@@ -233,6 +232,41 @@
                     form.submit();
                 }
             });
+        };
+
+        window.showToast = function(message, icon = 'success') {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: icon,
+                title: message,
+                showConfirmButton: false,
+                timer: 2500,
+                background: '#0F1713',
+                color: '#f3f4f6',
+                customClass: {
+                    popup: 'border border-emerald-500/30 rounded-xl'
+                }
+            });
+        };
+
+        window.copyToClipboard = function(text, successMessage = 'Berhasil disalin!') {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    window.showToast(successMessage);
+                });
+            } else {
+                const input = document.createElement('textarea');
+                input.value = text;
+                input.style.position = 'fixed';
+                input.style.opacity = '0';
+                document.body.appendChild(input);
+                input.focus();
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                window.showToast(successMessage);
+            }
         };
 
         // Auto-dismiss flash after 5s

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $attachment->file_original_name }} — Preview Aman LabDrive</title>
+    <title>{{ $attachment->file_original_name }} — Preview Aman IC-Labs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -344,7 +344,7 @@
                     ctx.font = 'bold ' + Math.max(13, Math.floor(canvas.width / 42)) + 'px Inter, sans-serif';
                     ctx.fillStyle = 'rgba(16, 185, 129, 0.16)';
                     ctx.textAlign = 'center';
-                    ctx.fillText('LABDRIVE · {{ $soal->kode_unik }}', 0, 0);
+                    ctx.fillText('IC-LABS · {{ $soal->kode_unik }}', 0, 0);
 
                     // Baris 2: Status & Tanggal
                     ctx.font = '500 ' + Math.max(10, Math.floor(canvas.width / 58)) + 'px Inter, sans-serif';

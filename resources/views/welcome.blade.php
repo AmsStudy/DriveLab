@@ -23,12 +23,16 @@
             --text:     #D4E8DC;
         }
 
-        html, body {
-            height: 100%;
+        html {
+            min-height: 100%;
+        }
+        body {
+            min-height: 100vh;
             font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: var(--text);
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         /* ─────────────────── BACKGROUND ─────────────────── */
@@ -136,11 +140,16 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .modal-panel {
+            margin: auto;
             width: 100%;
             max-width: 410px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
             background: rgba(10, 22, 16, 0.88);
             backdrop-filter: blur(28px) saturate(180%);
             -webkit-backdrop-filter: blur(28px) saturate(180%);
@@ -644,6 +653,7 @@
             .stage { justify-content: flex-start; padding-top: 60px; }
             .glass-card { padding: 28px 20px 24px; border-radius: 20px; }
             .tab-btn { font-size: 10px; padding: 7px 6px; }
+            .modal-panel { padding: 24px 20px 20px; border-radius: 20px; }
         }
     </style>
 </head>
