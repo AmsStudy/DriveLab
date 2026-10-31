@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ $soal->title }} — IC-Labs Repository</title>
+<link rel="icon" type="image/png" href="{{ asset('images/iclabs-logo.png') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -566,11 +567,9 @@ footer{
 {{-- ─── TOP BAR ─── --}}
 <header class="topbar">
     <div class="topbar-left">
-        <div class="logo-icon">
-            <svg width="16" height="16" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-        </div>
+        <a href="/" class="logo-icon" style="padding:4px;text-decoration:none;" title="IC-Labs Repository">
+            <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs" style="width:100%;height:100%;object-fit:contain;" draggable="false">
+        </a>
         <div>
             <div class="topbar-title">{{ $soal->title }}</div>
             <div class="topbar-cat">
