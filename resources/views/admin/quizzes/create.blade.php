@@ -104,6 +104,19 @@
                            class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-600 font-mono">
                     <p class="text-[11px] text-gray-500 mt-1">Jika diisi, mahasiswa wajib memasukkan password ini setelah mengisi NIM & Nama agar soal terbuka.</p>
                 </div>
+
+                {{-- Daftar Pilihan Kelas (Opsional) --}}
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider flex items-center justify-between">
+                        <span>Daftar Pilihan Kelas (Opsional)</span>
+                        <span class="text-[10px] text-gray-400 font-normal">Pisahkan dengan koma</span>
+                    </label>
+                    <input type="text" name="classes" value="{{ old('classes') }}"
+                           placeholder="Contoh: A1, A2, B1, B2"
+                           class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-600">
+                    <p class="text-[11px] text-gray-500 mt-1">Jika diisi, mahasiswa wajib memilih salah satu kelas saat memulai kuis. Rekap nilai dan data peserta dapat difilter & diunduh per kelas.</p>
+                    @error('classes') <p class="text-xs text-red-400 mt-1">{{ $message }}</p> @enderror
+                </div>
             </div>
         </div>
 

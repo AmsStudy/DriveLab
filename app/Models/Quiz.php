@@ -33,6 +33,7 @@ class Quiz extends Model
         'allow_open_book',
         'admin_unlock_password',
         'max_attempts',
+        'classes',
     ];
 
     protected $casts = [
@@ -47,6 +48,7 @@ class Quiz extends Model
         'show_review'        => 'boolean',
         'allow_open_book'    => 'boolean',
         'max_attempts'       => 'integer',
+        'classes'            => 'array',
     ];
 
     protected static function booted()
@@ -128,5 +130,18 @@ class Quiz extends Model
     public function hasAccessPassword(): bool
     {
         return !empty($this->access_password);
+    }
+
+    public function hasClasses(): bool
+    {
+        return !empty($this->classes) && is_array($this->classes) && count($this->classes) > 0;
+    }
+
+    public function getClassesList(): array
+    {
+        if (!$this->hasClasses()) {
+            return [];
+        }
+        return array_values(array_filter(array_map('trim', $this->classes)));
     }
 }

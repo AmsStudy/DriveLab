@@ -13,6 +13,7 @@ use App\Services\QuizImportService;
 use App\Services\QuizScoringService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -101,6 +102,7 @@ class QuizController extends Controller
             'allow_open_book'    => 'nullable|boolean',
             'admin_unlock_password' => 'nullable|string|max:50',
             'max_attempts'       => 'nullable|integer|min:1|max:20',
+            'classes'            => 'nullable|string|max:500',
             'is_active'          => 'nullable|boolean',
         ], [
             'access_code.unique' => 'Kode akses kuis ini sudah digunakan oleh kuis lain. Silakan buat kode unik lain.',
@@ -129,6 +131,10 @@ class QuizController extends Controller
         $quiz->allow_open_book       = $request->boolean('allow_open_book', false);
         $quiz->admin_unlock_password = $request->filled('admin_unlock_password') ? trim($request->admin_unlock_password) : null;
         $quiz->max_attempts          = $validated['max_attempts'] ?? 1;
+        if (!empty($request->classes)) {
+            $classesArray = array_values(array_filter(array_map('trim', explode(',', $request->classes))));
+            $quiz->classes = !empty($classesArray) ? $classesArray : null;
+        }
         $quiz->is_active             = $request->boolean('is_active', true);
         $quiz->save();
 
@@ -176,6 +182,7 @@ class QuizController extends Controller
             'allow_open_book'    => 'nullable|boolean',
             'admin_unlock_password' => 'nullable|string|max:50',
             'max_attempts'       => 'nullable|integer|min:1|max:20',
+            'classes'            => 'nullable|string|max:500',
             'is_active'          => 'nullable|boolean',
         ], [
             'access_code.required' => 'Kode akses kuis tidak boleh kosong.',
@@ -201,6 +208,10 @@ class QuizController extends Controller
         $quiz->allow_open_book       = $request->boolean('allow_open_book', false);
         $quiz->admin_unlock_password = $request->filled('admin_unlock_password') ? trim($request->admin_unlock_password) : null;
         $quiz->max_attempts          = $validated['max_attempts'] ?? 1;
+        if ($request->has('classes')) {
+            $classesArray = !empty($request->classes) ? array_values(array_filter(array_map('trim', explode(',', $request->classes)))) : null;
+            $quiz->classes = $classesArray;
+        }
         $quiz->is_active             = $request->boolean('is_active', false);
         $quiz->save();
 
@@ -418,6 +429,10 @@ class QuizController extends Controller
             });
         }
 
+        if ($request->filled('kelas') && $request->kelas !== 'all') {
+            $query->where('kelas', $request->kelas);
+        }
+
         $attempts = $query->with(['answers.question.options', 'answers.selectedOption'])
             ->orderByDesc('is_locked')
             ->orderByDesc('score')
@@ -454,11 +469,15 @@ class QuizController extends Controller
         ));
     }
 
-    public function exportResultsCsv(Quiz $quiz): StreamedResponse
+    public function exportResultsCsv(Request $request, Quiz $quiz): StreamedResponse
     {
         $this->authorizeQuiz($quiz);
 
-        $filename = 'hasil_kuis_' . $quiz->slug . '_' . date('Ymd_His') . '.csv';
+        $selectedClass = $request->query('kelas');
+        $isFilteredByClass = !empty($selectedClass) && $selectedClass !== 'all';
+
+        $classSuffix = $isFilteredByClass ? '_kelas_' . Str::slug($selectedClass) : '';
+        $filename = 'hasil_kuis_' . $quiz->slug . $classSuffix . '_' . date('Ymd_His') . '.csv';
 
         $headers = [
             'Content-Type'        => 'text/csv; charset=UTF-8',
@@ -468,7 +487,7 @@ class QuizController extends Controller
             'Expires'             => '0',
         ];
 
-        return response()->stream(function () use ($quiz) {
+        return response()->stream(function () use ($quiz, $isFilteredByClass, $selectedClass) {
             $handle = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
@@ -478,6 +497,7 @@ class QuizController extends Controller
                 'Peringkat',
                 'NIM',
                 'Nama Mahasiswa',
+                'Kelas',
                 'Skor (0-100)',
                 'Poin Diperoleh',
                 'Total Poin Kuis',
@@ -489,8 +509,14 @@ class QuizController extends Controller
                 'Waktu Selesai',
             ]);
 
-            $attempts = $quiz->attempts()
-                ->whereNotNull('completed_at')
+            $attemptsQuery = $quiz->attempts()
+                ->whereNotNull('completed_at');
+
+            if ($isFilteredByClass) {
+                $attemptsQuery->where('kelas', $selectedClass);
+            }
+
+            $attempts = $attemptsQuery
                 ->orderByDesc('score')
                 ->orderBy('duration_seconds')
                 ->get();
@@ -501,6 +527,7 @@ class QuizController extends Controller
                     $rank++,
                     $this->sanitizeCsvField($att->nim),
                     $this->sanitizeCsvField($att->student_name),
+                    $this->sanitizeCsvField($att->kelas ?? '-'),
                     $att->score,
                     $att->total_points_earned,
                     $att->total_points_possible,
@@ -602,6 +629,7 @@ class QuizController extends Controller
                 'id'                     => $att->id,
                 'nim'                    => $att->nim,
                 'student_name'           => $att->student_name,
+                'kelas'                  => $att->kelas,
                 'is_completed'           => $isCompleted,
                 'is_online'              => $isOnline,
                 'is_locked'              => (bool) $att->is_locked,

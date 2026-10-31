@@ -12,6 +12,7 @@ use App\Services\QuizScoringService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class PublicQuizController extends Controller
 {
@@ -88,17 +89,27 @@ class PublicQuizController extends Controller
             }
         }
 
-        $validated = $request->validate([
+        $rules = [
             'nim'  => 'required|string|max:30|regex:/^[a-zA-Z0-9\-_.]+$/',
             'nama' => 'required|string|max:100',
-        ], [
+        ];
+        $messages = [
             'nim.required'  => 'NIM wajib diisi.',
             'nim.regex'     => 'NIM hanya boleh berisi huruf, angka, titik, atau strip.',
             'nama.required' => 'Nama lengkap wajib diisi.',
-        ]);
+        ];
+
+        if ($quiz->hasClasses()) {
+            $rules['kelas'] = ['required', 'string', Rule::in($quiz->getClassesList())];
+            $messages['kelas.required'] = 'Pilih kelas Anda terlebih dahulu.';
+            $messages['kelas.in']       = 'Kelas yang dipilih tidak valid.';
+        }
+
+        $validated = $request->validate($rules, $messages);
 
         $nim = trim($validated['nim']);
         $nama = trim($validated['nama']);
+        $kelas = $quiz->hasClasses() ? trim($validated['kelas']) : null;
 
         // Check if there's an ongoing uncompleted attempt for this NIM
         $ongoing = QuizAttempt::where('quiz_id', $quiz->id)
@@ -108,6 +119,9 @@ class PublicQuizController extends Controller
             ->first();
 
         if ($ongoing) {
+            if ($kelas && empty($ongoing->kelas)) {
+                $ongoing->update(['kelas' => $kelas]);
+            }
             // Check if ongoing has already expired based on time_limit_minutes + extra_time_minutes
             $totalAllowedMinutes = $quiz->time_limit_minutes + ($ongoing->extra_time_minutes ?? 0);
             if ($totalAllowedMinutes > 0) {
@@ -142,6 +156,7 @@ class PublicQuizController extends Controller
             'quiz_id'               => $quiz->id,
             'nim'                   => $nim,
             'student_name'          => $nama,
+            'kelas'                 => $kelas,
             'total_points_possible' => $totalPoints,
             'started_at'            => now(),
             'last_heartbeat_at'     => now(),

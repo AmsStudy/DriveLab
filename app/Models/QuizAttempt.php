@@ -15,6 +15,7 @@ class QuizAttempt extends Model
         'quiz_id',
         'nim',
         'student_name',
+        'kelas',
         'score',
         'total_points_earned',
         'total_points_possible',

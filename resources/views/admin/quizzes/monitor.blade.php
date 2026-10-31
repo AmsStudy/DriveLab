@@ -180,7 +180,12 @@
 
                     {{-- Student Name & NIM --}}
                     <div class="mb-4">
-                        <h4 class="text-sm font-bold text-white truncate" x-text="item.student_name"></h4>
+                        <div class="flex items-center justify-between gap-2">
+                            <h4 class="text-sm font-bold text-white truncate" x-text="item.student_name"></h4>
+                            <template x-if="item.kelas">
+                                <span class="px-2 py-0.5 rounded-md bg-[#142019] border border-[#1E3327] text-emerald-400 font-mono text-[10px] font-bold flex-shrink-0" x-text="'Kelas ' + item.kelas"></span>
+                            </template>
+                        </div>
                         <p class="text-xs font-mono text-gray-400 mt-0.5" x-text="item.nim"></p>
                     </div>
 
@@ -275,7 +280,12 @@
                         <template x-for="item in filteredCompleted" :key="item.id">
                             <tr class="hover:bg-[#142019]/40 transition-colors">
                                 <td class="px-5 py-3.5">
-                                    <div class="font-bold text-white" x-text="item.student_name"></div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="font-bold text-white" x-text="item.student_name"></div>
+                                        <template x-if="item.kelas">
+                                            <span class="px-1.5 py-0.5 rounded bg-[#142019] border border-[#1E3327] text-emerald-400 font-mono text-[10px] font-bold" x-text="'Kelas ' + item.kelas"></span>
+                                        </template>
+                                    </div>
                                     <div class="text-xs font-mono text-gray-400" x-text="item.nim"></div>
                                 </td>
                                 <td class="px-4 py-3.5 text-center font-bold font-mono text-base"

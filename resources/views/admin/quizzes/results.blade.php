@@ -38,11 +38,48 @@
             </a>
 
             @if($totalParticipants > 0)
-                <a href="{{ route('admin.quizzes.export-csv', $quiz) }}"
-                   class="px-4 py-2.5 rounded-xl bg-teal-500/15 hover:bg-teal-500/25 border border-teal-500/30 text-teal-300 text-sm font-semibold transition-all flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Export CSV
-                </a>
+                @if($quiz->hasClasses())
+                    {{-- Dropdown Export CSV per Kelas --}}
+                    <div class="relative inline-block text-left" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false" type="button"
+                                class="px-4 py-2.5 rounded-xl bg-teal-500/15 hover:bg-teal-500/25 border border-teal-500/30 text-teal-300 text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            <span>Export CSV</span>
+                            <svg class="w-3.5 h-3.5 ml-0.5 text-teal-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div x-show="open" x-cloak
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute right-0 mt-2 w-56 rounded-xl shadow-2xl py-1.5 z-30 border"
+                             style="background:#0F1713;border-color:#1A2820;">
+                            <div class="px-3.5 py-1.5 text-[10px] uppercase font-bold text-gray-500 tracking-wider">Rekap Hasil Kuis</div>
+                            <a href="{{ route('admin.quizzes.export-csv', $quiz) }}"
+                               class="flex items-center justify-between px-3.5 py-2 text-xs text-emerald-400 hover:bg-emerald-950/40 font-semibold">
+                                <span>Semua Kelas</span>
+                                <span class="text-[10px] text-gray-500 font-mono">{{ $totalParticipants }}</span>
+                            </a>
+                            <div class="border-t my-1" style="border-color:#1A2820;"></div>
+                            @foreach($quiz->getClassesList() as $cls)
+                                @php $cCount = $quiz->attempts()->whereNotNull('completed_at')->where('kelas', $cls)->count(); @endphp
+                                <a href="{{ route('admin.quizzes.export-csv', [$quiz, 'kelas' => $cls]) }}"
+                                   class="flex items-center justify-between px-3.5 py-2 text-xs text-gray-300 hover:text-white hover:bg-white/5">
+                                    <span>Kelas {{ $cls }}</span>
+                                    <span class="text-[10px] font-mono {{ $cCount > 0 ? 'text-emerald-400' : 'text-gray-600' }}">{{ $cCount }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <a href="{{ route('admin.quizzes.export-csv', $quiz) }}"
+                       class="px-4 py-2.5 rounded-xl bg-teal-500/15 hover:bg-teal-500/25 border border-teal-500/30 text-teal-300 text-sm font-semibold transition-all flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Export CSV
+                    </a>
+                @endif
 
                 <form method="POST" action="{{ route('admin.quizzes.reset-attempts', $quiz) }}"
                       onsubmit="confirmAction(event, 'Reset SEMUA riwayat pengerjaan mahasiswa untuk kuis ini? Tindakan ini tidak dapat dibatalkan.', 'Ya, Reset Semua', true)">
@@ -86,26 +123,41 @@
 
     {{-- Filter Search --}}
     <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-4">
-        <form method="GET" action="{{ route('admin.quizzes.results', $quiz) }}" class="flex items-center gap-3">
-            <div class="relative flex-1 max-w-md">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <form method="GET" action="{{ route('admin.quizzes.results', $quiz) }}" class="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 w-full sm:w-auto flex-1">
+                <div class="relative flex-1 max-w-md">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                    <input type="text" name="search" value="{{ request('search') }}"
+                           placeholder="Cari NIM atau Nama Mahasiswa..."
+                           class="w-full pl-9 pr-3 py-2 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-200 placeholder-gray-500">
                 </div>
-                <input type="text" name="search" value="{{ request('search') }}"
-                       placeholder="Cari NIM atau Nama Mahasiswa..."
-                       class="w-full pl-9 pr-3 py-2 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-200 placeholder-gray-500">
+
+                @if($quiz->hasClasses())
+                    <div class="relative flex-shrink-0">
+                        <select name="kelas" onchange="this.form.submit()"
+                                class="px-3.5 py-2 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 rounded-xl text-xs text-gray-200 cursor-pointer">
+                            <option value="all" {{ request('kelas') === 'all' || !request('kelas') ? 'selected' : '' }}>Semua Kelas ({{ $totalParticipants }})</option>
+                            @foreach($quiz->getClassesList() as $cls)
+                                @php $clsCount = $quiz->attempts()->whereNotNull('completed_at')->where('kelas', $cls)->count(); @endphp
+                                <option value="{{ $cls }}" {{ request('kelas') === $cls ? 'selected' : '' }}>Kelas {{ $cls }} ({{ $clsCount }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+
+                <button type="submit"
+                        class="px-4 py-2 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 rounded-xl text-sm font-semibold transition-colors cursor-pointer">
+                    Cari
+                </button>
+
+                @if(request('search') || (request('kelas') && request('kelas') !== 'all'))
+                    <a href="{{ route('admin.quizzes.results', $quiz) }}" class="text-xs text-gray-400 hover:text-emerald-400 transition-colors">
+                        Reset
+                    </a>
+                @endif
             </div>
-
-            <button type="submit"
-                    class="px-4 py-2 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 rounded-xl text-sm font-semibold transition-colors">
-                Cari
-            </button>
-
-            @if(request('search'))
-                <a href="{{ route('admin.quizzes.results', $quiz) }}" class="text-xs text-gray-400 hover:text-emerald-400 transition-colors">
-                    Reset
-                </a>
-            @endif
         </form>
     </div>
 
@@ -126,6 +178,9 @@
                         <tr>
                             <th class="px-5 py-3.5 text-center">Rank</th>
                             <th class="px-5 py-3.5">Mahasiswa</th>
+                            @if($quiz->hasClasses())
+                                <th class="px-4 py-3.5 text-center">Kelas</th>
+                            @endif
                             <th class="px-5 py-3.5 text-center">Nilai (0-100)</th>
                             <th class="px-5 py-3.5 text-center">Akurasi</th>
                             <th class="px-5 py-3.5 text-center">Durasi</th>
@@ -161,6 +216,19 @@
                                     <div class="font-semibold text-white">{{ $att->student_name }}</div>
                                     <div class="text-xs font-mono text-gray-400">{{ $att->nim }}</div>
                                 </td>
+
+                                @if($quiz->hasClasses())
+                                    <td class="px-4 py-4 text-center text-xs">
+                                        @if($att->kelas)
+                                            <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold inline-block"
+                                                  style="background:rgba(16,185,129,.12);color:#34D399;border:1px solid rgba(16,185,129,.25);">
+                                                Kelas {{ $att->kelas }}
+                                            </span>
+                                        @else
+                                            <span class="text-gray-500 font-mono text-xs">-</span>
+                                        @endif
+                                    </td>
+                                @endif
 
                                 {{-- Score --}}
                                 <td class="px-5 py-4 text-center">

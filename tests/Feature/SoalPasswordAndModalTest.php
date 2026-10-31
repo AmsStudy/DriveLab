@@ -99,3 +99,4 @@ class SoalPasswordAndModalTest extends TestCase
         $verifyResponse->assertRedirect(route('soal.view', $soal->unique_token));
     }
 }
+

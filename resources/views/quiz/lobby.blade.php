@@ -266,6 +266,25 @@
                                 @enderror
                             </div>
 
+                            {{-- Pilihan Kelas Mahasiswa --}}
+                            @if($quiz->hasClasses())
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
+                                        Pilih Kelas <span class="text-emerald-400">*</span>
+                                    </label>
+                                    <select name="kelas" required
+                                            class="w-full px-4 py-3 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 cursor-pointer">
+                                        <option value="" disabled {{ old('kelas') ? '' : 'selected' }}>— Pilih Kelas Anda —</option>
+                                        @foreach($quiz->getClassesList() as $cls)
+                                            <option value="{{ $cls }}" {{ old('kelas') == $cls ? 'selected' : '' }}>Kelas {{ $cls }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('kelas')
+                                        <p class="text-xs text-red-400 mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            @endif
+
                             {{-- Password Akses Soal (jika kuis dilindungi password) --}}
                             @if($hasPassword)
                                 <div>
