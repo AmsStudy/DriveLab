@@ -234,7 +234,7 @@
             position: relative;
             display: flex;
             align-items: center;
-            background: rgba(0, 0, 0, 0.45);
+            background: #060c09;
             border: 1px solid rgba(255, 255, 255, 0.09);
             border-radius: 12px;
             overflow: hidden;
@@ -250,14 +250,15 @@
             color: var(--muted);
             display: flex; align-items: center;
             flex-shrink: 0;
+            background: #060c09;
         }
 
         .modal-input {
             flex: 1;
-            background: transparent;
+            background: #060c09 !important;
             border: none;
             outline: none;
-            color: #fff;
+            color: #ffffff !important;
             font-size: 13.5px;
             font-family: 'Inter', sans-serif;
             padding: 12px 0;
@@ -267,13 +268,50 @@
             font-size: 13px;
         }
 
+        /* ── Sembunyikan Simbol Mata Bawaan Browser (Edge / Windows Chromium) ── */
+        .modal-input::-ms-reveal,
+        .modal-input::-ms-clear,
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* ── Hilangkan Warna Biru/Abu-abu Autofill Browser (Chrome / Edge / Brave / Safari / Firefox) ── */
+        .modal-input:-webkit-autofill,
+        .modal-input:-webkit-autofill:hover,
+        .modal-input:-webkit-autofill:focus,
+        .modal-input:-webkit-autofill:active,
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #060c09 inset !important;
+            box-shadow: 0 0 0 1000px #060c09 inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+            color: #ffffff !important;
+            caret-color: #ffffff !important;
+            transition: background-color 999999s ease-in-out 0s !important;
+        }
+
+        .modal-input:autofill,
+        input:autofill {
+            background-color: #060c09 !important;
+            filter: none !important;
+            color: #ffffff !important;
+        }
+
         .modal-pwd-toggle {
-            background: none; border: none;
+            background: #060c09;
+            border: none;
             padding: 0 14px;
             color: var(--muted);
             cursor: pointer;
             display: flex; align-items: center;
             transition: color 0.2s;
+            height: 100%;
         }
         .modal-pwd-toggle:hover { color: var(--text); }
 
@@ -905,7 +943,7 @@
                             required
                             autocomplete="current-password"
                         >
-                        <button type="button" class="modal-pwd-toggle" @click="showPassword = !showPassword" aria-label="Lihat password">
+                        <button type="button" class="modal-pwd-toggle" @click="showPassword = !showPassword" aria-label="Lihat password" tabindex="-1">
                             <svg x-show="!showPassword" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
