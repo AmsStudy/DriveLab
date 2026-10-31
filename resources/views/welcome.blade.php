@@ -3,372 +3,520 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabDrive — Platform Distribusi Soal & Modul</title>
+    <title>LabDrive</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         :root {
             --bg:      #090D0B;
+            --surface: #0C1410;
             --card:    #0F1713;
-            --border:  #1A2820;
+            --border:  #162118;
+            --border2: #1E2D25;
             --emerald: #10B981;
             --emerald2:#059669;
             --mint:    #34D399;
             --teal:    #0D9488;
-            --muted:   #6B7280;
-            --text:    #E5E7EB;
+            --sky:     #38BDF8;
+            --muted:   #5A6B62;
+            --muted2:  #8FA898;
+            --text:    #E2EBE6;
         }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
-        /* Glow blobs */
-        .blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
-        .blob-1 { width: 500px; height: 500px; background: rgba(16,185,129,.09); top: -10%; left: -10%; }
-        .blob-2 { width: 600px; height: 600px; background: rgba(52,211,153,.06); bottom: -20%; right: -15%; }
+        html, body {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+        }
 
-        /* Nav */
-        nav { position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--border); background: rgba(9,13,11,.85); backdrop-filter: blur(16px); }
-        .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; }
-        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--emerald), var(--teal)); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 10px rgba(16,185,129,.25); }
-        .logo-text { font-weight: 800; font-size: 20px; color: #fff; letter-spacing: -.5px; }
-        .nav-links { display: flex; align-items: center; gap: 12px; }
-        .btn-ghost { color: var(--muted); font-size: 14px; font-weight: 500; text-decoration: none; padding: 8px 16px; border-radius: 8px; transition: color .2s; }
-        .btn-ghost:hover { color: #fff; }
-        .btn-emerald { background: linear-gradient(135deg, var(--emerald), var(--teal)); color: #fff; font-size: 14px; font-weight: 600; text-decoration: none; padding: 9px 20px; border-radius: 10px; transition: all .2s; box-shadow: 0 2px 10px rgba(16,185,129,.2); }
-        .btn-emerald:hover { opacity: .92; box-shadow: 0 0 20px rgba(16,185,129,.4); }
+        /* ── Background ── */
+        .bg-wrap {
+            position: fixed; inset: 0; z-index: 0; overflow: hidden;
+        }
+        .bg-noise {
+            position: absolute; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            opacity: 0.4;
+        }
+        .bg-glow-1 {
+            position: absolute;
+            width: 700px; height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16,185,129,.07) 0%, transparent 70%);
+            top: -200px; left: -200px;
+            animation: drift1 18s ease-in-out infinite alternate;
+        }
+        .bg-glow-2 {
+            position: absolute;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(13,148,136,.06) 0%, transparent 70%);
+            bottom: -150px; right: -100px;
+            animation: drift2 22s ease-in-out infinite alternate;
+        }
+        .bg-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(16,185,129,.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(16,185,129,.025) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+        }
+        @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(60px, 40px) scale(1.1); } }
+        @keyframes drift2 { from { transform: translate(0,0) scale(1.05); } to { transform: translate(-50px, -30px) scale(0.95); } }
 
-        /* Hero */
-        .hero { position: relative; z-index: 10; padding: 80px 24px 64px; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.25); color: #34D399; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 50px; margin-bottom: 28px; }
-        .badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--emerald); animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.95)} }
-        h1 { font-size: clamp(2.6rem, 5vw, 4.5rem); font-weight: 800; color: #fff; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 20px; }
-        h1 span { background: linear-gradient(135deg, var(--emerald), #38BDF8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .subtitle { font-size: 17px; color: var(--muted); max-width: 520px; line-height: 1.75; margin-bottom: 40px; }
+        /* ── Layout ── */
+        .gateway {
+            position: relative; z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
 
-        /* Search bar */
-        .search-wrap { max-width: 520px; margin-bottom: 20px; }
-        .search-label { font-size: 11px; font-weight: 600; color: var(--emerald); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
-        .search-box { display: flex; background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color .2s, box-shadow .2s; }
-        .search-box:focus-within { border-color: var(--emerald); box-shadow: 0 0 0 3px rgba(16,185,129,.15); }
-        .search-icon { display: flex; align-items: center; padding: 0 16px; color: var(--muted); flex-shrink: 0; }
-        .search-input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 14px; font-family: 'Inter', sans-serif; padding: 14px 0; }
-        .search-input::placeholder { color: #4B5563; }
-        .search-btn { background: var(--emerald); color: #fff; font-size: 13px; font-weight: 700; border: none; cursor: pointer; padding: 14px 24px; font-family: 'Inter', sans-serif; transition: background .2s; flex-shrink: 0; }
-        .search-btn:hover { background: var(--emerald2); }
-        .err-text { font-size: 12px; color: #FB7185; margin-top: 8px; padding-left: 4px; }
-        .succ-text { font-size: 12px; color: #34D399; margin-top: 8px; padding-left: 4px; }
-        .divider { display: flex; align-items: center; gap: 12px; max-width: 520px; margin: 16px 0; }
-        .divider-line { flex: 1; height: 1px; background: var(--border); }
-        .divider-text { font-size: 11px; color: #374151; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; }
-        .link-secondary { font-size: 13px; color: var(--muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: color .2s; }
-        .link-secondary:hover { color: #fff; }
+        /* ── Admin corner link ── */
+        .corner-link {
+            position: fixed; top: 24px; right: 28px;
+            font-size: 12px; font-weight: 500;
+            color: var(--muted);
+            text-decoration: none;
+            display: flex; align-items: center; gap: 6px;
+            letter-spacing: .02em;
+            transition: color .2s;
+            z-index: 20;
+        }
+        .corner-link:hover { color: var(--muted2); }
+        .corner-link svg { opacity: .6; }
 
-        /* Features */
-        .section { position: relative; z-index: 10; padding: 72px 24px; }
-        .section-inner { max-width: 1200px; margin: 0 auto; }
-        .section-label { font-size: 11px; font-weight: 700; color: var(--emerald); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 12px; }
-        .section-title { font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 800; color: #fff; letter-spacing: -.5px; margin-bottom: 48px; }
-        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 28px; transition: border-color .25s, transform .25s; }
-        .card:hover { border-color: rgba(16,185,129,.35); transform: translateY(-3px); }
-        .card-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
-        .card-icon.emerald { background: rgba(16,185,129,.12); }
-        .card-icon.mint { background: rgba(52,211,153,.12); }
-        .card-icon.teal { background: rgba(13,148,136,.12); }
-        .card-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 10px; }
-        .card-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+        /* ── Card ── */
+        .gate-card {
+            width: 100%;
+            max-width: 420px;
+        }
 
-        /* Steps */
-        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0; }
-        .step { padding: 32px; border-right: 1px solid var(--border); }
-        .step:last-child { border-right: none; }
-        .step-num { font-size: 48px; font-weight: 800; background: linear-gradient(135deg, var(--emerald), #38BDF8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 16px; }
-        .step-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 8px; }
-        .step-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+        /* ── Wordmark ── */
+        .wordmark {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 36px;
+        }
+        .wordmark-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, var(--emerald), var(--teal));
+            border-radius: 11px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(16,185,129,.22), 0 2px 8px rgba(0,0,0,.4);
+            flex-shrink: 0;
+        }
+        .wordmark-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 22px;
+            color: #fff;
+            letter-spacing: -.3px;
+        }
 
-        /* CTA */
-        .cta { background: linear-gradient(135deg, rgba(16,185,129,.08), rgba(13,148,136,.08)); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-        .cta-inner { max-width: 1200px; margin: 0 auto; padding: 80px 24px; text-align: center; }
-        .cta h2 { font-size: clamp(1.8rem, 3vw, 2.8rem); font-weight: 800; color: #fff; margin-bottom: 14px; letter-spacing: -.5px; }
-        .cta p { font-size: 15px; color: var(--muted); max-width: 400px; margin: 0 auto 32px; line-height: 1.7; }
+        /* ── Tabs ── */
+        .tabs {
+            display: flex; gap: 0;
+            margin-bottom: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 4px;
+        }
+        .tab-btn {
+            flex: 1;
+            background: none; border: none;
+            padding: 8px 12px;
+            border-radius: 9px;
+            font-size: 12px; font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all .2s;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+        .tab-btn.active-doc  { background: rgba(16,185,129,.15); color: var(--mint); }
+        .tab-btn.active-quiz { background: rgba(56,189,248,.12); color: var(--sky); }
+        .tab-btn.active-lacak { background: rgba(52,211,153,.1); color: var(--mint); }
+        .tab-btn:not([class*="active"]):hover { color: var(--muted2); }
 
-        /* Footer */
-        footer { margin-top: auto; border-top: 1px solid var(--border); padding: 24px; z-index: 10; }
-        .footer-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-        .footer-links { display: flex; gap: 20px; }
-        .footer-link { font-size: 13px; color: var(--muted); text-decoration: none; transition: color .2s; }
-        .footer-link:hover { color: #fff; }
+        /* ── Input group ── */
+        .input-group {
+            display: flex;
+            background: var(--card);
+            border: 1px solid var(--border2);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .input-group:focus-within {
+            border-color: var(--emerald);
+            box-shadow: 0 0 0 3px rgba(16,185,129,.1), 0 4px 16px rgba(0,0,0,.3);
+        }
+        .input-group.quiz-focus:focus-within {
+            border-color: var(--sky);
+            box-shadow: 0 0 0 3px rgba(56,189,248,.1), 0 4px 16px rgba(0,0,0,.3);
+        }
+        .input-icon {
+            display: flex; align-items: center;
+            padding: 0 15px;
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+        .main-input {
+            flex: 1;
+            background: transparent; border: none; outline: none;
+            color: #fff;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            padding: 15px 0;
+            letter-spacing: .01em;
+        }
+        .main-input::placeholder { color: #2D3D34; font-size: 14px; }
+        .submit-btn {
+            border: none; cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px; font-weight: 700;
+            padding: 0 22px;
+            flex-shrink: 0;
+            transition: opacity .2s, filter .15s;
+            letter-spacing: .05em;
+        }
+        .submit-btn:hover { opacity: .88; filter: brightness(1.1); }
+        .submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+        .btn-green  { background: linear-gradient(135deg, var(--emerald), var(--teal)); color: #fff; }
+        .btn-blue   { background: linear-gradient(135deg, #0284c7, #06b6d4); color: #fff; }
+
+        /* ── Feedback ── */
+        .feedback {
+            font-size: 12px;
+            margin-top: 10px;
+            padding-left: 2px;
+            min-height: 18px;
+            transition: opacity .2s;
+        }
+        .feedback.err  { color: #FC8181; }
+        .feedback.ok   { color: var(--mint); }
+
+        /* ── Separator ── */
+        .sep {
+            display: flex; align-items: center; gap: 10px;
+            margin: 22px 0 0;
+        }
+        .sep-line { flex: 1; height: 1px; background: var(--border); }
+        .sep-label {
+            font-size: 10px; font-weight: 600;
+            color: #253328;
+            text-transform: uppercase; letter-spacing: .1em;
+        }
+
+        /* ── Track result ── */
+        .track-result {
+            margin-top: 14px;
+            background: var(--card);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
+            padding: 14px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .track-result::-webkit-scrollbar { width: 4px; }
+        .track-result::-webkit-scrollbar-track { background: transparent; }
+        .track-result::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+        .track-title {
+            font-size: 12px; font-weight: 600;
+            color: var(--muted2);
+            margin-bottom: 10px;
+        }
+        .task-item {
+            background: rgba(255,255,255,.025);
+            border: 1px solid rgba(255,255,255,.05);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+        }
+        .task-item:last-child { margin-bottom: 0; }
+        .task-name  { font-size: 13px; font-weight: 500; color: var(--mint); margin-bottom: 3px; }
+        .task-file  { font-size: 11px; color: var(--muted2); }
+        .task-date  { font-size: 10px; color: var(--muted); margin-top: 2px; }
+        .badge-type {
+            display: inline-block;
+            font-size: 9px; font-weight: 700; font-family: monospace;
+            padding: 1px 5px;
+            border-radius: 4px;
+            border: 1px solid rgba(16,185,129,.3);
+            background: rgba(16,185,129,.1);
+            color: var(--mint);
+            letter-spacing: .05em;
+            margin-right: 4px;
+            text-transform: uppercase;
+        }
+        .badge-type.link { border-color: rgba(13,148,136,.4); background: rgba(13,148,136,.12); color: #5eead4; }
+        .badge-type.text { border-color: rgba(251,191,36,.3); background: rgba(251,191,36,.08); color: #fbbf24; }
+
+        /* ── Footer tagline ── */
+        .tagline {
+            margin-top: 32px;
+            font-size: 11px;
+            color: #253328;
+            letter-spacing: .05em;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        /* ── Mobile ── */
+        @media (max-width: 480px) {
+            .gateway { padding: 16px; justify-content: center; }
+            html, body { overflow: auto; }
+            .tab-btn { font-size: 10px; padding: 7px 6px; }
+        }
     </style>
 </head>
 <body>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
 
-    <!-- NAV -->
-    <nav>
-        <div class="nav-inner">
-            <a href="/" class="logo">
-                <div class="logo-icon">
-                    <svg width="18" height="18" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+    {{-- Background --}}
+    <div class="bg-wrap" aria-hidden="true">
+        <div class="bg-glow-1"></div>
+        <div class="bg-glow-2"></div>
+        <div class="bg-grid"></div>
+        <div class="bg-noise"></div>
+    </div>
+
+    {{-- Corner admin link --}}
+    @auth
+        <a href="{{ route('admin.dashboard') }}" class="corner-link">
+            Dashboard
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </a>
+    @else
+        <a href="{{ route('login') }}" class="corner-link">
+            Portal Admin
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </a>
+    @endauth
+
+    {{-- Main gateway --}}
+    <main class="gateway">
+        <div class="gate-card" x-data="gateway()">
+
+            {{-- Wordmark --}}
+            <div class="wordmark">
+                <div class="wordmark-icon">
+                    <svg width="18" height="18" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
                 </div>
-                <span class="logo-text">LabDrive</span>
-            </a>
-            <div class="nav-links">
-                @auth
-                    <a href="{{ route('admin.dashboard') }}" class="btn-emerald">Dashboard →</a>
-                @else
-                    <a href="{{ route('login') }}" class="btn-emerald">Masuk Portal</a>
-                @endauth
-            </div>
-        </div>
-    </nav>
-
-    <!-- HERO -->
-    <section class="hero">
-        <div class="badge">
-            <span class="badge-dot"></span>
-            Platform Distribusi Soal & Modul Laboratorium
-        </div>
-        <h1>Akses Dokumen Lab<br>Lebih <span>Aman & Cepat</span></h1>
-        <p class="subtitle">Sistem terenkripsi untuk mendistribusikan soal ujian dan modul praktikum. Dilindungi kode unik, password, dan jadwal akses otomatis.</p>
-
-        <div class="search-wrap" x-data="{ tab: 'akses' }">
-            <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
-                <button @click="tab = 'akses'" :style="tab === 'akses' ? 'color: var(--emerald); border-bottom: 2px solid var(--emerald);' : 'color: var(--muted); border-bottom: 2px solid transparent;'" style="background: none; border: none; font-size: 13px; font-weight: 700; padding-bottom: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.2s;">
-                    Akses Dokumen
-                </button>
-                <button @click="tab = 'kuis'" :style="tab === 'kuis' ? 'color: #38BDF8; border-bottom: 2px solid #38BDF8;' : 'color: var(--muted); border-bottom: 2px solid transparent;'" style="background: none; border: none; font-size: 13px; font-weight: 700; padding-bottom: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.2s;">
-                    ⚡ Kuis Interaktif
-                </button>
-                <button @click="tab = 'lacak'" :style="tab === 'lacak' ? 'color: var(--mint); border-bottom: 2px solid var(--mint);' : 'color: var(--muted); border-bottom: 2px solid transparent;'" style="background: none; border: none; font-size: 13px; font-weight: 700; padding-bottom: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.2s;">
-                    Lacak Tugas
-                </button>
+                <span class="wordmark-name">LabDrive</span>
             </div>
 
-            <!-- Tab: Akses Dokumen -->
-            <form action="{{ route('soal.accessByCode') }}" method="POST" x-show="tab === 'akses'" x-transition>
-                @csrf
-                <div class="search-box">
-                    <div class="search-icon">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-                    </div>
-                    <input type="text" name="kode_unik" class="search-input" placeholder="Contoh: AMSSOAL-AB123" required autocomplete="off">
-                    <button type="submit" class="search-btn">AKSES →</button>
-                </div>
-                @if(session('error'))
-                    <p class="err-text">✗ {{ session('error') }}</p>
-                @endif
-                @if(session('success'))
-                    <p class="succ-text">✓ {{ session('success') }}</p>
-                @endif
-            </form>
+            {{-- Tabs --}}
+            <div class="tabs" role="tablist">
+                <button
+                    class="tab-btn"
+                    :class="{ 'active-doc': tab === 'akses' }"
+                    @click="tab = 'akses'"
+                    role="tab"
+                    :aria-selected="tab === 'akses'"
+                >Dokumen</button>
+                <button
+                    class="tab-btn"
+                    :class="{ 'active-quiz': tab === 'kuis' }"
+                    @click="tab = 'kuis'"
+                    role="tab"
+                    :aria-selected="tab === 'kuis'"
+                >Kuis</button>
+                <button
+                    class="tab-btn"
+                    :class="{ 'active-lacak': tab === 'lacak' }"
+                    @click="tab = 'lacak'"
+                    role="tab"
+                    :aria-selected="tab === 'lacak'"
+                >Lacak Tugas</button>
+            </div>
 
-            <!-- Tab: Gabung Kuis -->
-            <form action="{{ route('quiz.join') }}" method="POST" x-show="tab === 'kuis'" x-transition style="display: none;">
-                @csrf
-                <div class="search-box" style="border-color: rgba(56, 189, 248, 0.4);">
-                    <div class="search-icon" style="color: #38BDF8;">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    </div>
-                    <input type="text" name="access_code" class="search-input" placeholder="Kode Kuis, cth: LAB-ABC12" required autocomplete="off" style="text-transform: uppercase;">
-                    <button type="submit" class="search-btn" style="background: linear-gradient(135deg, #0284c7, #06b6d4);">GABUNG →</button>
-                </div>
-                @if(session('quiz_error'))
-                    <p class="err-text">✗ {{ session('quiz_error') }}</p>
-                @endif
-            </form>
-
-            <!-- Tab: Lacak Tugas -->
-            <div x-show="tab === 'lacak'" x-transition style="display: none;" x-data="lacakTugas()">
-                <form @submit.prevent="submitLacak">
-                    <div class="search-box" style="border-color: rgba(52,211,153,0.35);">
-                        <div class="search-icon" style="color: var(--mint);">
-                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            {{-- Panel: Akses Dokumen --}}
+            <div x-show="tab === 'akses'" x-transition.opacity role="tabpanel">
+                <form action="{{ route('soal.accessByCode') }}" method="POST" @submit="submitting = true">
+                    @csrf
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                            </svg>
                         </div>
-                        <input type="text" x-model="nim" class="search-input" placeholder="Masukkan NIM Anda" required autocomplete="off">
-                        <button type="submit" class="search-btn" style="background: linear-gradient(135deg, var(--emerald), var(--teal));" :disabled="loading">
-                            <span x-show="!loading">CARI →</span>
-                            <span x-show="loading">Mencari...</span>
+                        <input
+                            type="text"
+                            name="kode_unik"
+                            class="main-input"
+                            placeholder="Masukkan kode akses soal"
+                            required
+                            autocomplete="off"
+                            autofocus
+                        >
+                        <button type="submit" class="submit-btn btn-green" :disabled="submitting">
+                            <span x-show="!submitting">Akses</span>
+                            <span x-show="submitting">...</span>
+                        </button>
+                    </div>
+                </form>
+                @if(session('error'))
+                    <p class="feedback err">{{ session('error') }}</p>
+                @elseif(session('success'))
+                    <p class="feedback ok">{{ session('success') }}</p>
+                @else
+                    <div class="feedback"></div>
+                @endif
+            </div>
+
+            {{-- Panel: Gabung Kuis --}}
+            <div x-show="tab === 'kuis'" x-transition.opacity role="tabpanel" style="display:none">
+                <form action="{{ route('quiz.join') }}" method="POST" @submit="submitting = true">
+                    @csrf
+                    <div class="input-group quiz-focus">
+                        <div class="input-icon" style="color:var(--sky)">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <input
+                            type="text"
+                            name="access_code"
+                            class="main-input"
+                            placeholder="Masukkan kode kuis"
+                            required
+                            autocomplete="off"
+                            style="text-transform:uppercase"
+                        >
+                        <button type="submit" class="submit-btn btn-blue" :disabled="submitting">
+                            <span x-show="!submitting">Masuk</span>
+                            <span x-show="submitting">...</span>
+                        </button>
+                    </div>
+                </form>
+                @if(session('quiz_error'))
+                    <p class="feedback err">{{ session('quiz_error') }}</p>
+                @else
+                    <div class="feedback"></div>
+                @endif
+            </div>
+
+            {{-- Panel: Lacak Tugas --}}
+            <div x-show="tab === 'lacak'" x-transition.opacity role="tabpanel" style="display:none" x-data="lacakTugas()">
+                <form @submit.prevent="submitLacak">
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <input
+                            type="text"
+                            x-model="nim"
+                            class="main-input"
+                            placeholder="Masukkan NIM"
+                            autocomplete="off"
+                        >
+                        <button type="submit" class="submit-btn btn-green" :disabled="loading">
+                            <span x-show="!loading">Cari</span>
+                            <span x-show="loading">...</span>
                         </button>
                     </div>
                 </form>
 
-                <!-- Hasil Lacak -->
-                <div x-show="result" class="mt-4 p-4 rounded-xl" style="background: var(--card); border: 1px solid var(--border);" x-transition>
-                    <p class="text-sm font-semibold text-white mb-3" x-text="resultTitle"></p>
-                    <div class="flex flex-col gap-3">
-                        <template x-for="item in tasks" :key="item.id">
-                            <div class="p-3 rounded-lg" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
-                                <div class="flex justify-between items-start mb-1">
-                                    <p class="text-sm font-medium text-emerald-400" x-text="item.soal_title"></p>
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded border"
-                                              :class="item.submission_type === 'link' ? 'bg-teal-500/20 text-teal-300 border-teal-500/30' : (item.submission_type === 'text' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30')"
-                                              x-text="item.submission_type || 'file'"></span>
-                                        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">Diterima</span>
-                                    </div>
-                                </div>
+                {{-- Error --}}
+                <p class="feedback err" x-show="errorMsg" x-text="errorMsg"></p>
+
+                {{-- Result --}}
+                <div class="track-result" x-show="result" x-transition.opacity>
+                    <p class="track-title" x-text="resultTitle"></p>
+                    <template x-for="item in tasks" :key="item.id">
+                        <div class="task-item">
+                            <p class="task-name" x-text="item.soal_title"></p>
+                            <p class="task-file">
+                                <span class="badge-type" :class="item.submission_type === 'link' ? 'link' : (item.submission_type === 'text' ? 'text' : '')" x-text="item.submission_type || 'file'"></span>
                                 <template x-if="item.submission_type === 'link'">
-                                    <a :href="item.link_url" target="_blank" rel="noopener noreferrer" class="text-xs text-teal-400 hover:underline truncate block mb-1" x-text="item.file_name"></a>
+                                    <a :href="item.link_url" target="_blank" rel="noopener" style="color:var(--sky);text-decoration:none;" x-text="item.file_name"></a>
                                 </template>
                                 <template x-if="item.submission_type !== 'link'">
-                                    <p class="text-xs text-gray-300 truncate mb-1" x-text="item.file_name"></p>
+                                    <span x-text="item.file_name"></span>
                                 </template>
-                                <p class="text-[11px] text-gray-500" x-text="'Dikumpulkan: ' + item.created_at"></p>
-                            </div>
-                        </template>
-                    </div>
+                            </p>
+                            <p class="task-date" x-text="'Dikumpulkan: ' + item.created_at"></p>
+                        </div>
+                    </template>
                 </div>
             </div>
-        </div>
 
-        <div class="divider">
-            <div class="divider-line"></div>
-            <span class="divider-text">LabDrive Portal Khusus</span>
-            <div class="divider-line"></div>
+            {{-- Bottom separator --}}
+            <div class="sep">
+                <div class="sep-line"></div>
+                <span class="sep-label">Internal Platform</span>
+                <div class="sep-line"></div>
+            </div>
+
+            {{-- Tagline --}}
+            <p class="tagline">Sistem Distribusi Soal &amp; Modul Laboratorium</p>
+
         </div>
-        <a href="{{ route('login') }}" class="link-secondary">
-            Masuk sebagai Admin/Asisten
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-        </a>
-    </section>
+    </main>
 
     <script>
         document.addEventListener('alpine:init', () => {
+
+            Alpine.data('gateway', () => ({
+                tab: 'akses',
+                submitting: false,
+            }));
+
             Alpine.data('lacakTugas', () => ({
                 nim: '',
                 loading: false,
                 result: false,
                 resultTitle: '',
+                errorMsg: '',
                 tasks: [],
+
                 async submitLacak() {
-                    if (!this.nim) return;
-                    this.loading = true;
-                    this.result = false;
-                    
+                    if (!this.nim.trim()) return;
+                    this.loading  = true;
+                    this.result   = false;
+                    this.errorMsg = '';
+
                     try {
-                        const res = await fetch(`{{ route('soal.trackTask') }}?nim=${encodeURIComponent(this.nim)}`);
+                        const res  = await fetch(`{{ route('soal.trackTask') }}?nim=${encodeURIComponent(this.nim)}`);
                         const data = await res.json();
-                        
                         this.loading = false;
 
                         if (!res.ok) {
-                            alert(data.message || 'Terjadi kesalahan saat melacak tugas.');
+                            this.errorMsg = data.message || 'Terjadi kesalahan saat melacak tugas.';
                             return;
                         }
-                        
+
                         this.result = true;
-                        
                         if (data.data && data.data.length > 0) {
-                            this.resultTitle = `Ditemukan ${data.data.length} tugas untuk NIM ${this.nim} (${data.data[0].nama}):`;
+                            this.resultTitle = `${data.data.length} tugas ditemukan — ${data.data[0].nama}`;
                             this.tasks = data.data;
                         } else {
-                            this.resultTitle = `Belum ada tugas yang dikumpulkan dengan NIM ${this.nim}.`;
+                            this.resultTitle = `Belum ada tugas yang dikumpulkan untuk NIM ${this.nim}.`;
                             this.tasks = [];
                         }
                     } catch (e) {
-                        this.loading = false;
-                        alert('Terjadi kesalahan koneksi.');
+                        this.loading  = false;
+                        this.errorMsg = 'Gagal terhubung ke server.';
                     }
                 }
             }));
         });
     </script>
 
-    <!-- FEATURES -->
-    <section class="section" style="border-top: 1px solid var(--border);">
-        <div class="section-inner">
-            <p class="section-label">Fitur Unggulan</p>
-            <h2 class="section-title">Kenapa pilih LabDrive?</h2>
-            <div class="cards">
-                <div class="card">
-                    <div class="card-icon emerald">
-                        <svg width="22" height="22" fill="none" stroke="#10B981" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                    </div>
-                    <p class="card-title">Enkripsi Akses</p>
-                    <p class="card-desc">Setiap dokumen dilindungi kode unik dan password khusus. File tidak bisa diakses langsung tanpa otentikasi.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon mint">
-                        <svg width="22" height="22" fill="none" stroke="#34D399" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                    </div>
-                    <p class="card-title">Kontrol Hak Unduh</p>
-                    <p class="card-desc">Admin bisa mengizinkan atau memblokir fitur unduh kapan saja. Perubahan langsung terasa tanpa refresh manual.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon teal">
-                        <svg width="22" height="22" fill="none" stroke="#0D9488" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <p class="card-title">Jadwal & Auto-Refresh</p>
-                    <p class="card-desc">Atur waktu aktif dan kedaluwarsa. Jika waktu habis, halaman mahasiswa otomatis ter-refresh dan akses ditutup.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- HOW IT WORKS -->
-    <section class="section" style="border-top:1px solid var(--border); padding-top:64px; padding-bottom:64px;">
-        <div class="section-inner">
-            <p class="section-label">Cara Kerja</p>
-            <h2 class="section-title" style="margin-bottom:0;">Empat langkah mudah</h2>
-            <div style="border:1px solid var(--border); border-radius:20px; overflow:hidden; margin-top:40px;">
-                <div class="steps">
-                    <div class="step">
-                        <div class="step-num">01</div>
-                        <p class="step-title">Admin Upload</p>
-                        <p class="step-desc">Upload soal/modul, tentukan password & jadwal akses.</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-num">02</div>
-                        <p class="step-title">Kode Dibagikan</p>
-                        <p class="step-desc">Bagikan kode unik & password ke mahasiswa.</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-num">03</div>
-                        <p class="step-title">Mahasiswa Akses</p>
-                        <p class="step-desc">Input kode di halaman ini, masukkan password.</p>
-                    </div>
-                    <div class="step" style="border-right:none;">
-                        <div class="step-num">04</div>
-                        <p class="step-title">Dokumen Terbuka</p>
-                        <p class="step-desc">Dokumen tampil sesuai izin yang ditetapkan admin.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="cta">
-        <div class="cta-inner">
-            <p class="section-label" style="margin-bottom:16px;">Sistem Tertutup</p>
-            <h2>Portal Khusus<br>Internal Laboratorium.</h2>
-            <p>Akses ke dashboard pengelola dokumen dibatasi hanya untuk Asisten dan Laboran yang terdaftar.</p>
-            <a href="{{ route('login') }}" class="btn-emerald" style="font-size:15px; padding:12px 32px; border-radius:12px;">Masuk Sekarang →</a>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer>
-        <div class="footer-inner">
-            <a href="/" class="logo">
-                <div class="logo-icon" style="width:28px;height:28px;border-radius:8px;">
-                    <svg width="14" height="14" fill="none" stroke="#fff" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                </div>
-                <span style="font-weight:700;font-size:15px;color:#fff;">LabDrive</span>
-            </a>
-            <p style="font-size:12px;color:#374151;">© {{ date('Y') }} Platform Distribusi Dokumen Laboratorium</p>
-            <div class="footer-links">
-                @auth
-                    <a href="{{ route('admin.dashboard') }}" class="footer-link">Dashboard</a>
-                @else
-                    <a href="{{ route('login') }}" class="footer-link">Masuk Portal</a>
-                @endauth
-            </div>
-        </div>
-    </footer>
 </body>
 </html>
