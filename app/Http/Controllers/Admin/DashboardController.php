@@ -55,7 +55,7 @@ class DashboardController extends Controller
             $top_soals = Soal::with('category', 'admin')
                 ->withCount('submissions')
                 ->orderByDesc('access_count')
-                ->take(5)
+                ->take(20)
                 ->get();
 
             $recent_activities = Activity::latest()->take(6)->get();
@@ -99,7 +99,7 @@ class DashboardController extends Controller
             ->with('category')
             ->withCount('submissions')
             ->orderByDesc('access_count')
-            ->take(5)
+            ->take(20)
             ->get();
 
         return view('admin.dashboard', compact('stats', 'recent_submissions', 'recent_quiz_attempts', 'top_soals'));

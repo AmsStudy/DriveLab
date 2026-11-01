@@ -507,20 +507,20 @@
             @if($top_soals->isEmpty())
                 <div class="py-10 text-center text-gray-500 text-xs">Belum ada dokumen yang dibuat.</div>
             @else
-                <div class="divide-y divide-gray-800/60 overflow-y-auto max-h-[220px]" style="scrollbar-width: thin;">
+                <div class="divide-y divide-gray-800/60 overflow-y-auto max-h-[205px]" style="scrollbar-width: thin;">
                     @foreach($top_soals as $topSoal)
-                    <div class="p-4 hover:bg-gray-800/30 transition-colors">
+                    <div class="p-3.5 hover:bg-gray-800/30 transition-colors">
                         <div class="flex items-start justify-between gap-3 mb-1">
-                            <a href="{{ route('admin.soal.show', $topSoal) }}" class="text-xs font-semibold text-gray-200 hover:text-emerald-400 transition-colors line-clamp-1">
+                            <a href="{{ route('admin.soal.show', $topSoal) }}" class="text-xs font-semibold text-gray-200 hover:text-emerald-400 transition-colors line-clamp-1" title="{{ $topSoal->title }}">
                                 {{ $topSoal->title }}
                             </a>
                             <span class="text-xs font-bold text-blue-400 flex-shrink-0 bg-blue-500/10 px-2 py-0.5 rounded-md border border-blue-500/20">
                                 {{ number_format($topSoal->access_count) }}×
                             </span>
                         </div>
-                        <div class="flex items-center justify-between text-[11px] text-gray-500 mt-2">
-                            <span>{{ $topSoal->category->name ?? 'Tanpa Kategori' }}</span>
-                            <span class="text-teal-400 font-medium">{{ $topSoal->submissions_count }} tugas terkumpul</span>
+                        <div class="flex items-center justify-between text-[11px] text-gray-500 mt-1.5">
+                            <span class="truncate max-w-[130px]">{{ $topSoal->category->name ?? 'Tanpa Kategori' }}</span>
+                            <span class="text-teal-400 font-medium flex-shrink-0">{{ $topSoal->submissions_count }} tugas terkumpul</span>
                         </div>
                     </div>
                     @endforeach
@@ -539,11 +539,11 @@
                     Aktivitas Sistem Terakhir
                 </h3>
             </div>
-            <div class="divide-y divide-gray-800/60 p-2">
+            <div class="divide-y divide-gray-800/60 p-2 overflow-y-auto max-h-[190px]" style="scrollbar-width: thin;">
                 @foreach($recent_activities as $act)
-                <div class="px-3 py-2 text-xs">
-                    <p class="text-gray-300">{{ $act->description }}</p>
-                    <p class="text-[10px] text-gray-500 mt-0.5">{{ $act->created_at->diffForHumans() }}</p>
+                <div class="px-3 py-2 text-xs hover:bg-gray-800/20 rounded-lg transition-colors">
+                    <p class="text-gray-300 leading-snug">{{ $act->description }}</p>
+                    <p class="text-[10px] text-gray-500 mt-1">{{ $act->created_at->diffForHumans() }}</p>
                 </div>
                 @endforeach
             </div>
