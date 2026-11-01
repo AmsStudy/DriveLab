@@ -443,6 +443,17 @@
                             </div>
 
                             <div class="space-y-5">
+                                {{-- Empty state if attempt has no recorded answers --}}
+                                <template x-if="!selectedAttempt.answers || selectedAttempt.answers.length === 0">
+                                    <div class="py-10 px-4 text-center text-gray-500 bg-[#090D0B] border border-[#1A2820] rounded-2xl">
+                                        <div class="w-10 h-10 mx-auto mb-2 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        </div>
+                                        <p class="text-xs font-semibold text-gray-300">Belum ada rincian butir soal yang tersimpan untuk sesi pengerjaan ini.</p>
+                                        <p class="text-[11px] text-gray-500 mt-1">Sesi pengerjaan dicatat dengan skor akhir tanpa rekaman butir lembar jawaban.</p>
+                                    </div>
+                                </template>
+
                                 <template x-for="(ans, idx) in (selectedAttempt.answers || [])" :key="ans.id || idx">
                                     <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 shadow-sm transition-all"
                                          :class="ans.is_correct ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-rose-500'">

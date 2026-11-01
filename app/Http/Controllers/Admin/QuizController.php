@@ -443,6 +443,60 @@ class QuizController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        // Ensure review answers exist for all attempts (fallback synthesis for legacy/draft-only attempts)
+        $quiz->loadMissing('questions.options');
+        foreach ($attempts as $att) {
+            if ($att->answers->isEmpty() && $quiz->questions->isNotEmpty()) {
+                $syntheticAnswers = collect();
+                $drafts = is_array($att->draft_answers) ? $att->draft_answers : [];
+                unset($drafts['__flagged']);
+
+                foreach ($quiz->questions as $idx => $q) {
+                    $userAns = $drafts[$q->id] ?? ($drafts[$idx + 1] ?? null);
+                    $selectedIds = [];
+                    $selectedId = null;
+                    if (is_array($userAns)) {
+                        $selectedIds = array_values(array_map('intval', $userAns));
+                        $selectedId = $selectedIds[0] ?? null;
+                    } elseif ($userAns) {
+                        $selectedId = (int)$userAns;
+                        $selectedIds = [$selectedId];
+                    }
+
+                    $isCorrect = false;
+                    $pointsEarned = 0;
+                    if ($q->isMultiSelect()) {
+                        $correctOptionIds = $q->options->where('is_correct', true)->pluck('id')->values()->all();
+                        $correctSelected = array_intersect($selectedIds, $correctOptionIds);
+                        $wrongSelected = array_diff($selectedIds, $correctOptionIds);
+                        if (count($wrongSelected) === 0 && count($correctSelected) === count($correctOptionIds) && count($correctOptionIds) > 0) {
+                            $isCorrect = true;
+                            $pointsEarned = $q->points;
+                        }
+                    } else {
+                        $selectedOpt = $q->options->firstWhere('id', (int)$selectedId);
+                        if ($selectedOpt && $selectedOpt->is_correct) {
+                            $isCorrect = true;
+                            $pointsEarned = $q->points;
+                        }
+                    }
+
+                    $mockAns = new \App\Models\QuizAttemptAnswer([
+                        'quiz_attempt_id'     => $att->id,
+                        'quiz_question_id'    => $q->id,
+                        'selected_option_id'  => $selectedId,
+                        'selected_option_ids' => $selectedIds,
+                        'is_correct'          => $isCorrect,
+                        'points_earned'       => $pointsEarned,
+                    ]);
+                    $mockAns->id = 'fallback_' . $q->id;
+                    $mockAns->setRelation('question', $q);
+                    $syntheticAnswers->push($mockAns);
+                }
+                $att->setRelation('answers', $syntheticAnswers);
+            }
+        }
+
         // Calculate analytics efficiently via SQL aggregation (prevents OOM on mini server & MySQL 1140 ONLY_FULL_GROUP_BY error)
         $analytics = QuizAttempt::where('quiz_id', $quiz->id)
             ->whereNotNull('completed_at')

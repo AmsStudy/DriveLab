@@ -87,10 +87,15 @@ class QuizScoringService
                     $totalPointsEarned += $points;
                 }
 
+                $validSelectedOptionId = null;
+                if ($selectedOptionId && $q->options->contains('id', (int)$selectedOptionId)) {
+                    $validSelectedOptionId = (int)$selectedOptionId;
+                }
+
                 QuizAttemptAnswer::create([
                     'quiz_attempt_id'     => $attempt->id,
                     'quiz_question_id'    => $q->id,
-                    'selected_option_id'  => $selectedOptionId,
+                    'selected_option_id'  => $validSelectedOptionId,
                     'selected_option_ids' => $selectedOptionIds,
                     'is_correct'          => $isCorrect,
                     'points_earned'       => $points,
