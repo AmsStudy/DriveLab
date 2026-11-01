@@ -316,7 +316,7 @@
                     Belum ada file atau tautan terlampir.
                 </div>
             @else
-                <div class="space-y-2.5">
+                <div class="space-y-2.5 max-h-[365px] overflow-y-auto pr-1">
                     @foreach($soal->attachments as $attachment)
                         @if($attachment->isLink())
                             <div class="flex items-center justify-between p-3 rounded-xl border transition-colors group"
@@ -550,9 +550,9 @@
                     <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Ketika mahasiswa mengirimkan file, link, atau teks jawaban, data mereka akan otomatis ditampilkan di sini.</p>
                 </div>
             @else
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto overflow-y-auto max-h-[660px]">
                     <table class="w-full text-sm" id="submissionsTable">
-                        <thead class="text-xs text-gray-400 uppercase tracking-wider" style="background:#090D0B;border-bottom:1px solid #1A2820;">
+                        <thead class="text-xs text-gray-400 uppercase tracking-wider sticky top-0 z-10 shadow-sm" style="background:#090D0B;border-bottom:1px solid #1A2820;">
                             <tr>
                                 <th class="px-6 py-3.5 text-left font-semibold">Mahasiswa</th>
                                 <th class="px-4 py-3.5 text-left font-semibold">Kelas</th>
