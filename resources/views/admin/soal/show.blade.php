@@ -584,7 +584,7 @@
                                     @if($sub->kelas)
                                         <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold inline-block"
                                               style="background:rgba(16,185,129,.12);color:#34D399;border:1px solid rgba(16,185,129,.25);">
-                                            Kelas {{ $sub->kelas }}
+                                            {{ preg_replace('/^kelas\s+/i', '', trim($sub->kelas)) }}
                                         </span>
                                     @else
                                         <span class="text-gray-500 font-mono text-xs">-</span>

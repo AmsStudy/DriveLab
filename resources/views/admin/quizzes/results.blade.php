@@ -222,7 +222,7 @@
                                         @if($att->kelas)
                                             <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold inline-block"
                                                   style="background:rgba(16,185,129,.12);color:#34D399;border:1px solid rgba(16,185,129,.25);">
-                                                Kelas {{ $att->kelas }}
+                                                {{ preg_replace('/^kelas\s+/i', '', trim($att->kelas)) }}
                                             </span>
                                         @else
                                             <span class="text-gray-500 font-mono text-xs">-</span>
