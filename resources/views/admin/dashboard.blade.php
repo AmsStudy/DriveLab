@@ -254,7 +254,7 @@
                     <p class="text-xs text-gray-600 mt-1">Pengumpulan mahasiswa akan otomatis tampil di sini saat mereka mengirimkan tugas.</p>
                 </div>
             @else
-                <div class="overflow-x-auto overflow-y-auto max-h-[220px]" style="scrollbar-width: thin;">
+                <div class="overflow-x-auto overflow-y-auto max-h-[220px]" style="max-height: 220px; overflow-y: auto; scrollbar-width: thin;">
                     <table class="w-full text-sm min-w-[560px]">
                         <thead class="text-xs text-gray-500 uppercase tracking-wider sticky top-0 z-10 bg-[#0F1713]" style="border-bottom:1px solid #1A2820;">
                             <tr>
@@ -345,7 +345,7 @@
                     <p class="text-xs text-gray-600 mt-1">Hasil pengerjaan kuis akan otomatis dicatat di sini begitu mahasiswa menuntaskan ujian.</p>
                 </div>
             @else
-                <div class="overflow-x-auto overflow-y-auto max-h-[220px]" style="scrollbar-width: thin;">
+                <div class="overflow-x-auto overflow-y-auto max-h-[220px]" style="max-height: 220px; overflow-y: auto; scrollbar-width: thin;">
                     <table class="w-full text-sm min-w-[560px]">
                         <thead class="text-xs text-gray-500 uppercase tracking-wider sticky top-0 z-10 bg-[#0F1713]" style="border-bottom:1px solid #1A2820;">
                             <tr>
@@ -507,7 +507,7 @@
             @if($top_soals->isEmpty())
                 <div class="py-10 text-center text-gray-500 text-xs">Belum ada dokumen yang dibuat.</div>
             @else
-                <div class="divide-y divide-gray-800/60 overflow-y-auto max-h-[205px]" style="scrollbar-width: thin;">
+                <div class="divide-y divide-gray-800/60 overflow-y-auto max-h-[205px]" style="max-height: 205px; overflow-y: auto; scrollbar-width: thin;">
                     @foreach($top_soals as $topSoal)
                     <div class="p-3.5 hover:bg-gray-800/30 transition-colors">
                         <div class="flex items-start justify-between gap-3 mb-1">
@@ -539,7 +539,7 @@
                     Aktivitas Sistem Terakhir
                 </h3>
             </div>
-            <div class="divide-y divide-gray-800/60 p-2 overflow-y-auto max-h-[190px]" style="scrollbar-width: thin;">
+            <div class="divide-y divide-gray-800/60 p-2 overflow-y-auto max-h-[190px]" style="max-height: 190px; overflow-y: auto; scrollbar-width: thin;">
                 @foreach($recent_activities as $act)
                 <div class="px-3 py-2 text-xs hover:bg-gray-800/20 rounded-lg transition-colors">
                     <p class="text-gray-300 leading-snug">{{ $act->description }}</p>
