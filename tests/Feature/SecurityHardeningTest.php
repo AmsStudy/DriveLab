@@ -175,4 +175,12 @@ class SecurityHardeningTest extends TestCase
         $this->assertStringContainsString("'=cmd", $content);
         $this->assertStringContainsString("'@SUM(1,2)", $content);
     }
+
+    public function test_csrf_refresh_endpoint_returns_json_token(): void
+    {
+        $response = $this->getJson(route('csrf.refresh'));
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['csrf_token']);
+        $this->assertNotEmpty($response->json('csrf_token'));
+    }
 }

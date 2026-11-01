@@ -1791,10 +1791,11 @@ document.getElementById('submission-form').addEventListener('submit', async func
     subAlert.style.display = 'none';
 
     try {
+        const activeCsrfToken = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
         const response = await fetch('{{ route('soal.submitTask', ['token' => $soal->unique_token]) }}', {
             method: 'POST',
             headers: { 
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-CSRF-TOKEN': activeCsrfToken,
                 'Accept': 'application/json'
             },
             body: formData,
@@ -1806,6 +1807,16 @@ document.getElementById('submission-form').addEventListener('submit', async func
             result = JSON.parse(text);
         } catch {
             showAlert('error', 'Server error: ' + text.substring(0, 120));
+            setLoading(false);
+            return;
+        }
+
+        if (response.status === 419) {
+            if (result && result.csrf_token) {
+                const tokenInput = document.querySelector('input[name="_token"]');
+                if (tokenInput) tokenInput.value = result.csrf_token;
+            }
+            showAlert('error', 'Sesi pengiriman sempat terputus karena padatnya akses bersamaan. Token keamanan telah disegarkan, silakan tekan tombol Kirim Tugas sekali lagi.');
             setLoading(false);
             return;
         }
@@ -1834,6 +1845,19 @@ document.getElementById('submission-form').addEventListener('submit', async func
 
     setLoading(false);
 });
+
+// Auto refresh CSRF token periodically while viewing task
+setInterval(() => {
+    fetch('{{ route('csrf.refresh') }}')
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.csrf_token) {
+                const tokenInput = document.querySelector('input[name="_token"]');
+                if (tokenInput) tokenInput.value = data.csrf_token;
+            }
+        })
+        .catch(() => {});
+}, 5 * 60 * 1000);
 
 @endif
 </script>

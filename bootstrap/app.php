@@ -23,5 +23,16 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+            if ($request->expectsJson() || $request->isXmlHttpRequest()) {
+                return response()->json([
+                    'message'    => 'Sesi halaman kedaluwarsa karena padatnya akses bersamaan. Token keamanan telah disegarkan.',
+                    'csrf_token' => csrf_token(),
+                ], 419);
+            }
+
+            return redirect()->back()
+                ->withInput($request->except(['password', '_token']))
+                ->with('warning', 'Sesi halaman Anda sempat terputus/kedaluwarsa karena padatnya akses bersamaan di jaringan lab. Keamanan telah disegarkan otomatis, silakan ulangi kembali.');
+        });
     })->create();

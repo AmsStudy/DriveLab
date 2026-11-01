@@ -15,6 +15,10 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::get('/csrf-refresh', function () {
+    return response()->json(['csrf_token' => csrf_token()]);
+})->name('csrf.refresh');
+
 Route::post('/akses-kode', [SoalAccessController::class, 'accessByCode'])->name('soal.accessByCode');
 
 // Akses Soal (Mahasiswa) — tanpa login

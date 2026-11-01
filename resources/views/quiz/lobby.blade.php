@@ -610,20 +610,46 @@
                 overlay.style.pointerEvents = 'none';
             }
         };
-                box.classList.remove('scale-100');
-                box.classList.add('scale-90');
-                setTimeout(() => {
-                    overlay.classList.add('hidden');
-                    overlay.classList.add('pointer-events-none');
-                    overlay.style.display = 'none';
-                }, 300);
-            }
-        };
 
         window.addEventListener('pageshow', function() {
             window.hideLoading();
         });
+
+        // Auto refresh CSRF token periodically while waiting in lobby
+        setInterval(() => {
+            fetch('{{ route('csrf.refresh') }}')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.csrf_token) {
+                        const tokenInput = document.querySelector('input[name="_token"]');
+                        if (tokenInput) tokenInput.value = data.csrf_token;
+                    }
+                })
+                .catch(() => {});
+        }, 5 * 60 * 1000);
     </script>
+
+    @if(session('warning'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian Sesi',
+                text: @json(session('warning')),
+                background: '#0F1713',
+                color: '#F3F4F6',
+                backdrop: 'rgba(9, 13, 11, 0.75)',
+                confirmButtonText: 'Mengerti',
+                customClass: {
+                    popup: 'cyber-swal-popup cyber-swal-warning',
+                    title: 'cyber-swal-title',
+                    htmlContainer: 'cyber-swal-text',
+                    confirmButton: 'cyber-swal-btn cyber-swal-btn-warning'
+                }
+            });
+        });
+    </script>
+    @endif
 
     @if(session('error'))
     <script>

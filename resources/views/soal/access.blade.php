@@ -63,6 +63,14 @@
             </div>
         </a>
 
+        {{-- Flash Warning (Misal: Auto recovery sesi expired) --}}
+        @if(session('warning'))
+            <div style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:14px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#FCD34D;display:flex;align-items:center;gap:10px;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <span>{{ session('warning') }}</span>
+            </div>
+        @endif
+
         {{-- Soal Info Card --}}
         <div class="card">
             <div style="display:flex;align-items:flex-start;gap:14px;">
@@ -142,6 +150,33 @@
             const input = document.getElementById('password');
             input.type = input.type === 'password' ? 'text' : 'password';
         }
+
+        // Anti double-click & CSRF Keep-alive
+        const accessForm = document.getElementById('access-form');
+        if (accessForm) {
+            accessForm.addEventListener('submit', function() {
+                const btn = this.querySelector('button[type="submit"]');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.7';
+                    btn.style.pointerEvents = 'none';
+                    btn.textContent = 'Memverifikasi...';
+                }
+            });
+        }
+
+        // Auto refresh CSRF token every 5 minutes if page is kept idle
+        setInterval(() => {
+            fetch('{{ route('csrf.refresh') }}')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.csrf_token) {
+                        const tokenInput = document.querySelector('input[name="_token"]');
+                        if (tokenInput) tokenInput.value = data.csrf_token;
+                    }
+                })
+                .catch(() => {});
+        }, 5 * 60 * 1000);
     </script>
 </body>
 </html>

@@ -743,7 +743,18 @@
                             },
                             body: JSON.stringify({ answers: this.answers })
                         })
-                        .then(res => res.json())
+                        .then(res => {
+                            if (res.status === 419) {
+                                return res.json().then(data => {
+                                    if (data && data.csrf_token) {
+                                        const meta = document.querySelector('meta[name="csrf-token"]');
+                                        if (meta) meta.content = data.csrf_token;
+                                    }
+                                    return { success: false, expired: true };
+                                });
+                            }
+                            return res.json();
+                        })
                         .then(data => {
                             if (data.success) {
                                 this.syncStatus = 'synced';
@@ -1161,7 +1172,18 @@
                         },
                         body: JSON.stringify({ answers: this.answers })
                     })
-                    .then(res => res.json())
+                    .then(res => {
+                        if (res.status === 419) {
+                            return res.json().then(data => {
+                                if (data && data.csrf_token) {
+                                    const meta = document.querySelector('meta[name="csrf-token"]');
+                                    if (meta) meta.content = data.csrf_token;
+                                }
+                                throw new Error('Sesi keamanan sempat terputus karena padatnya koneksi server. Token telah diperbarui otomatis, silakan klik tombol Kirim Jawaban sekali lagi.');
+                            });
+                        }
+                        return res.json();
+                    })
                     .then(data => {
                         try {
                             localStorage.removeItem('cbt_quiz_{{ $attempt->id }}_answers');
@@ -1174,15 +1196,16 @@
                             window.location.reload();
                         }
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         this.isSubmitting = false;
                         Swal.fire({
                             icon: 'error',
-                            title: 'Gagal Mengirim',
-                            text: 'Terjadi gangguan koneksi internet. Silakan coba lagi.',
+                            title: 'Pemberitahuan Sistem',
+                            text: (err && err.message) ? err.message : 'Terjadi gangguan koneksi internet. Silakan coba lagi.',
                             background: '#0F1713',
                             color: '#f3f4f6'
                         });
+                    });
                     });
                 },
 
