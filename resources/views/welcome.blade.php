@@ -1088,6 +1088,26 @@
                 }
             }));
         });
+
+        // Auto refresh CSRF token periodically (setiap 5 menit) & saat tab kembali aktif
+        function refreshWelcomeCsrf() {
+            fetch('{{ route('csrf.refresh') }}')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.csrf_token) {
+                        document.querySelectorAll('input[name="_token"]').forEach(el => el.value = data.csrf_token);
+                    }
+                })
+                .catch(() => {});
+        }
+
+        setInterval(refreshWelcomeCsrf, 5 * 60 * 1000);
+
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                refreshWelcomeCsrf();
+            }
+        });
     </script>
 
     {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}

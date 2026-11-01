@@ -1297,6 +1297,18 @@ footer{
                         </div>
                     </div>
 
+                    {{-- Banner Notifikasi Status Pengumpulan Tugas Sebelumnya --}}
+                    <div id="existing-submission-banner" class="instr-box" style="display:none;margin-bottom:16px;border-color:rgba(16,185,129,0.35);background:rgba(16,185,129,0.08);">
+                        <svg style="color:#34D399;flex-shrink:0;width:20px;height:20px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <div>
+                            <strong style="color:#34D399;">Data Tugas Sebelumnya Ditemukan</strong>
+                            <div id="existing-submission-info" style="color:#D1D5DB;font-size:12px;margin-top:2px;"></div>
+                            <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">Kirimkan kembali form di bawah ini jika ingin mengganti/memperbarui versi tugas Anda.</div>
+                        </div>
+                    </div>
+
                     <form id="submission-form" autocomplete="off">
                         @csrf
 
@@ -1610,19 +1622,108 @@ function showAlert(type, msg) {
 }
 
 function setFileSelected(file) {
+    const sizeStr = file.size > (1024 * 1024)
+        ? (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+        : (file.size / 1024).toFixed(0) + ' KB';
+
     if (file.size > 10 * 1024 * 1024) {
-        showAlert('error', 'Ukuran file melebihi batas maksimal 10 MB!');
+        showAlert('error', `Ukuran file melebihi batas maksimal 10 MB! (Ukuran file terpilih: ${sizeStr})`);
         if (fileInput) fileInput.value = '';
         return;
     }
     if (dzEmpty) dzEmpty.style.display   = 'none';
     if (dzSuccess) dzSuccess.style.display = 'flex';
-    if (dzFilename) dzFilename.textContent  = file.name;
+    if (dzFilename) dzFilename.textContent  = `${file.name} (${sizeStr})`;
     if (dropzone) {
         dropzone.classList.add('has-file');
         dropzone.classList.remove('dragover');
     }
 }
+
+// ─── Real-time Submission Check & Auto-Remember ───
+let checkNimTimeout = null;
+function checkExistingSubmission(nim) {
+    if (!nim || nim.length < 3) {
+        const banner = document.getElementById('existing-submission-banner');
+        if (banner) banner.style.display = 'none';
+        btnLabel.textContent = 'Kirim Tugas Sekarang';
+        return;
+    }
+
+    const checkUrl = '{{ route('soal.checkSubmission', ['token' => $soal->slug ?: $soal->unique_token]) }}?nim=' + encodeURIComponent(nim);
+    fetch(checkUrl, {
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        const banner = document.getElementById('existing-submission-banner');
+        const info = document.getElementById('existing-submission-info');
+        if (data && data.has_submitted) {
+            if (banner) banner.style.display = 'flex';
+            if (info) {
+                const subTipe = data.submission_type === 'link' ? 'Tautan' : (data.submission_type === 'text' ? 'Jawaban Teks' : 'Berkas File');
+                info.textContent = `Tercatat atas nama ${data.nama}${data.kelas ? ' (Kelas ' + data.kelas + ')' : ''}, dikumpulkan pada ${data.submitted_at}. (${subTipe}: ${data.identifier})`;
+            }
+            const namaEl = document.getElementById('sub_nama');
+            if (namaEl && !namaEl.value) {
+                namaEl.value = data.nama;
+                localStorage.setItem('labsoal_student_nama', data.nama);
+            }
+            btnLabel.textContent = 'Perbarui Tugas Sekarang';
+        } else {
+            if (banner) banner.style.display = 'none';
+            btnLabel.textContent = 'Kirim Tugas Sekarang';
+        }
+    })
+    .catch(() => {});
+}
+
+// Inisialisasi Auto-Fill Identitas dari localStorage
+document.addEventListener('DOMContentLoaded', function() {
+    const storedNim = localStorage.getItem('labsoal_student_nim');
+    const storedNama = localStorage.getItem('labsoal_student_nama');
+    const storedKelas = localStorage.getItem('labsoal_student_kelas');
+
+    const nimInput = document.getElementById('sub_nim');
+    const namaInput = document.getElementById('sub_nama');
+    const kelasInput = document.getElementById('sub_kelas');
+
+    if (nimInput) {
+        if (!nimInput.value && storedNim) nimInput.value = storedNim;
+        nimInput.addEventListener('input', function() {
+            const val = this.value.trim();
+            localStorage.setItem('labsoal_student_nim', val);
+            clearTimeout(checkNimTimeout);
+            checkNimTimeout = setTimeout(() => checkExistingSubmission(val), 400);
+        });
+        nimInput.addEventListener('change', function() {
+            const val = this.value.trim();
+            localStorage.setItem('labsoal_student_nim', val);
+            checkExistingSubmission(val);
+        });
+        if (nimInput.value) {
+            checkExistingSubmission(nimInput.value.trim());
+        }
+    }
+
+    if (namaInput) {
+        if (!namaInput.value && storedNama) namaInput.value = storedNama;
+        namaInput.addEventListener('input', function() {
+            localStorage.setItem('labsoal_student_nama', this.value.trim());
+        });
+    }
+
+    if (kelasInput && storedKelas) {
+        if (!kelasInput.value) {
+            kelasInput.value = storedKelas;
+            const classBtnSpan = document.querySelector('.custom-cyber-btn span');
+            if (classBtnSpan) classBtnSpan.textContent = 'Kelas ' + storedKelas;
+        }
+        kelasInput.addEventListener('change', function() {
+            localStorage.setItem('labsoal_student_kelas', this.value.trim());
+        });
+    }
+});
 
 function setLoading(loading) {
     subBtn.disabled = loading;
@@ -1744,14 +1845,32 @@ document.getElementById('submission-form').addEventListener('submit', async func
         }
 
         if (response.ok) {
-            this.reset();
+            // Simpan identitas mahasiswa agar tidak perlu ketik ulang
+            const nimVal = document.getElementById('sub_nim')?.value.trim();
+            const namaVal = document.getElementById('sub_nama')?.value.trim();
+            const kelasVal = document.getElementById('sub_kelas')?.value.trim();
+            if (nimVal) localStorage.setItem('labsoal_student_nim', nimVal);
+            if (namaVal) localStorage.setItem('labsoal_student_nama', namaVal);
+            if (kelasVal) localStorage.setItem('labsoal_student_kelas', kelasVal);
+
+            // Bersihkan hanya input materi tugas (file/link/text), pertahankan identitas
+            if (fileInput) fileInput.value = '';
+            const linkEl = document.getElementById('sub_link');
+            if (linkEl) linkEl.value = '';
+            const textEl = document.getElementById('sub_text');
+            if (textEl) textEl.value = '';
+
             switchSubmissionType(currentType);
             if (dzEmpty) dzEmpty.style.display   = 'block';
             if (dzSuccess) dzSuccess.style.display = 'none';
             if (dropzone) dropzone.classList.remove('has-file');
+
             showAlert('success', result.message || 'Tugas berhasil dikirim!');
-            if (result.is_update) {
-                btnLabel.textContent = 'Perbarui Tugas';
+            btnLabel.textContent = 'Perbarui Tugas Sekarang';
+
+            // Segarkan status pengumpulan secara langsung
+            if (nimVal) {
+                checkExistingSubmission(nimVal);
             }
         } else {
             let errorMsg = result.message || result.error || 'Terjadi kesalahan saat mengunggah.';

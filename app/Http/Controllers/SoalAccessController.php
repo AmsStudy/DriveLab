@@ -493,6 +493,39 @@ class SoalAccessController extends Controller
         return response()->json(['message' => $message, 'is_update' => $isUpdate]);
     }
 
+    public function checkSubmission(Request $request, string $token)
+    {
+        $soal = $this->findSoalByIdentifier($token);
+        if (!$this->hasAuthorizedAccess($soal)) {
+            return response()->json(['has_submitted' => false], 403);
+        }
+
+        $nim = trim((string) $request->query('nim', ''));
+        if (!$nim) {
+            return response()->json(['has_submitted' => false]);
+        }
+
+        $existing = Submission::where('soal_id', $soal->id)->where('nim', $nim)->first();
+        if (!$existing) {
+            return response()->json(['has_submitted' => false]);
+        }
+
+        $identifier = match ($existing->submission_type) {
+            'link' => $existing->link_url,
+            'text' => \Illuminate\Support\Str::limit($existing->text_content, 35),
+            default => $existing->file_original_name,
+        };
+
+        return response()->json([
+            'has_submitted'   => true,
+            'nama'            => $existing->nama,
+            'kelas'           => $existing->kelas,
+            'submission_type' => $existing->submission_type,
+            'identifier'      => $identifier,
+            'submitted_at'    => $existing->updated_at ? $existing->updated_at->format('d M Y, H:i') : $existing->created_at->format('d M Y, H:i'),
+        ]);
+    }
+
     public function trackTask(Request $request)
     {
         // Rate limiting: maks 15 permintaan pelacakan per menit per IP

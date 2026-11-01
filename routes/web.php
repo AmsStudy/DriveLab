@@ -23,6 +23,7 @@ Route::post('/akses-kode', [SoalAccessController::class, 'accessByCode'])->name(
 
 // Akses Soal (Mahasiswa) — tanpa login
 Route::get('/soal/trackTask', [SoalAccessController::class, 'trackTask'])->name('soal.trackTask');
+Route::get('/soal/{token}/check-submission', [SoalAccessController::class, 'checkSubmission'])->name('soal.checkSubmission');
 Route::post('/soal/{token}/submitTask', [SoalAccessController::class, 'submitTask'])->name('soal.submitTask');
 
 Route::prefix('soal')->name('soal.')->group(function () {

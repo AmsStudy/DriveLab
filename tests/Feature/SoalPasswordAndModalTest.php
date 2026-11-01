@@ -273,5 +273,50 @@ class SoalPasswordAndModalTest extends TestCase
         $showRes->assertOk();
         $showRes->assertSee(route('soal.access', 'pemrograman-web-lanjut'));
     }
+
+    public function test_check_submission_endpoint_returns_submission_status_correctly(): void
+    {
+        $soal = Soal::create([
+            'title'                 => 'Tugas Sistem Operasi',
+            'user_id'               => $this->admin->id,
+            'kode_unik'             => 'SO-001',
+            'password'              => bcrypt('secret123'),
+            'plain_password'        => 'secret123',
+            'access_type'           => 'lifetime',
+            'is_submission_enabled' => true,
+        ]);
+
+        // Belum terverifikasi sesi password -> 403
+        $unauthRes = $this->get(route('soal.checkSubmission', ['token' => $soal->slug, 'nim' => '13020230001']));
+        $unauthRes->assertStatus(403);
+
+        // Verifikasi sesi password
+        $this->withSession(["soal_access_id_{$soal->id}" => true]);
+
+        // Belum ada data pengumpulan
+        $notFoundRes = $this->get(route('soal.checkSubmission', ['token' => $soal->slug, 'nim' => '13020230001']));
+        $notFoundRes->assertOk()
+            ->assertJson(['has_submitted' => false]);
+
+        // Buat submission
+        \App\Models\Submission::create([
+            'soal_id'            => $soal->id,
+            'nim'                => '13020230001',
+            'nama'               => 'Budi Santoso',
+            'kelas'              => 'A1',
+            'submission_type'    => 'link',
+            'link_url'           => 'https://github.com/budi/os-assignment',
+        ]);
+
+        // Cek kembali dengan NIM yang sudah ada
+        $foundRes = $this->get(route('soal.checkSubmission', ['token' => $soal->slug, 'nim' => '13020230001']));
+        $foundRes->assertOk()
+            ->assertJson([
+                'has_submitted'   => true,
+                'nama'            => 'Budi Santoso',
+                'kelas'           => 'A1',
+                'submission_type' => 'link',
+            ]);
+    }
 }
 

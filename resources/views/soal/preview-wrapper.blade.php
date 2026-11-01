@@ -490,7 +490,11 @@
             }
         });
 
-        // ─── Polling Status Akses ───
+        // ─── Polling Status Akses & CSRF Keepalive ───
+        setInterval(() => {
+            fetch('{{ route('csrf.refresh') }}').catch(() => {});
+        }, 5 * 60 * 1000);
+
         @if(!isset($isAdminPreview) || !$isAdminPreview)
         setInterval(() => {
             fetch('{{ route("soal.status", $soal->slug ?: $soal->unique_token) }}')

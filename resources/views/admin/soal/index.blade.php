@@ -1328,18 +1328,44 @@ function handleModalFilesSelected(input) {
     }
 
     if (input.files.length > 15) {
-        alert('Maksimal hanya 15 file yang dapat diunggah sekaligus.');
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Batas Berkas Terlampaui',
+                text: 'Maksimal hanya 15 file yang dapat diunggah sekaligus.',
+                background: '#0F1713',
+                color: '#F3F4F6',
+                customClass: { popup: 'cyber-swal-popup cyber-swal-error' }
+            });
+        } else {
+            alert('Maksimal hanya 15 file yang dapat diunggah sekaligus.');
+        }
         input.value = '';
         container.classList.add('hidden');
         return;
     }
 
-    let hasLarge = false;
+    let largeFiles = [];
     Array.from(input.files).forEach(f => {
-        if (f.size > 5 * 1024 * 1024) hasLarge = true;
+        if (f.size > 5 * 1024 * 1024) {
+            const mb = (f.size / (1024 * 1024)).toFixed(2);
+            largeFiles.push(`${f.name} (${mb} MB)`);
+        }
     });
-    if (hasLarge) {
-        alert('Satu atau lebih file melebihi batas 5MB!');
+    if (largeFiles.length > 0) {
+        const msg = 'File berikut melebihi batas 5 MB:\n' + largeFiles.join('\n');
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Ukuran File Terlalu Besar',
+                text: 'Maksimal ukuran tiap berkas adalah 5 MB. File melebihi batas: ' + largeFiles.join(', '),
+                background: '#0F1713',
+                color: '#F3F4F6',
+                customClass: { popup: 'cyber-swal-popup cyber-swal-error' }
+            });
+        } else {
+            alert(msg);
+        }
         input.value = '';
         container.classList.add('hidden');
         return;
