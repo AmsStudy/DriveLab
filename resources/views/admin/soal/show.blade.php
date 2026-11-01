@@ -1286,7 +1286,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-@if($errors->any())
+@if(session('open_edit_modal') || $errors->any())
 document.addEventListener('DOMContentLoaded', function() {
     openEditModal();
 });

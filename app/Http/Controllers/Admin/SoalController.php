@@ -179,8 +179,7 @@ class SoalController extends Controller
     public function edit(Soal $soal)
     {
         $this->authorizeAccess($soal);
-        $categories = Category::all();
-        return view('admin.soal.edit', compact('soal', 'categories'));
+        return redirect()->route('admin.soal.show', $soal)->with('open_edit_modal', true);
     }
 
     public function update(Request $request, Soal $soal)
@@ -330,6 +329,11 @@ class SoalController extends Controller
                     ]);
                 }
             }
+        }
+
+        if ($request->input('redirect_to') === 'index') {
+            return redirect()->route('admin.soal.index')
+                ->with('success', 'Dokumen soal berhasil diperbarui!');
         }
 
         return redirect()->route('admin.soal.show', $soal)

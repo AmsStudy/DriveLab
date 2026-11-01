@@ -98,5 +98,75 @@ class SoalPasswordAndModalTest extends TestCase
 
         $verifyResponse->assertRedirect(route('soal.view', $soal->unique_token));
     }
+
+    public function test_admin_edit_route_redirects_to_show_with_open_edit_modal(): void
+    {
+        $soal = Soal::create([
+            'title'          => 'Alpro Modul 4',
+            'kode_unik'      => 'ALPRO-4',
+            'unique_token'   => 'token-alpro4-sample',
+            'password'       => bcrypt('AksesPass4'),
+            'plain_password' => 'AksesPass4',
+            'user_id'        => $this->admin->id,
+            'access_type'    => 'lifetime',
+            'is_active'      => true,
+            'is_downloadable'=> true,
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.soal.edit', $soal));
+        $response->assertRedirect(route('admin.soal.show', $soal));
+        $response->assertSessionHas('open_edit_modal', true);
+    }
+
+    public function test_admin_updating_soal_with_redirect_to_index(): void
+    {
+        $soal = Soal::create([
+            'title'          => 'Alpro Modul 5',
+            'kode_unik'      => 'ALPRO-5',
+            'unique_token'   => 'token-alpro5-sample',
+            'password'       => bcrypt('AksesPass5'),
+            'plain_password' => 'AksesPass5',
+            'user_id'        => $this->admin->id,
+            'access_type'    => 'lifetime',
+            'is_active'      => true,
+            'is_downloadable'=> true,
+        ]);
+
+        $response = $this->actingAs($this->admin)->put(route('admin.soal.update', $soal), [
+            'redirect_to'    => 'index',
+            'title'          => 'Alpro Modul 5 Terupdate',
+            'kode_unik'      => 'ALPRO-5',
+            'access_type'    => 'lifetime',
+            'is_active'      => '1',
+            'is_downloadable'=> '1',
+        ]);
+
+        $response->assertRedirect(route('admin.soal.index'));
+        $response->assertSessionHas('success');
+
+        $soal->refresh();
+        $this->assertEquals('Alpro Modul 5 Terupdate', $soal->title);
+    }
+
+    public function test_admin_soal_index_renders_edit_modal_popup_and_trigger(): void
+    {
+        $soal = Soal::create([
+            'title'          => 'Alpro Modul 6',
+            'kode_unik'      => 'ALPRO-6',
+            'unique_token'   => 'token-alpro6-sample',
+            'password'       => bcrypt('AksesPass6'),
+            'plain_password' => 'AksesPass6',
+            'user_id'        => $this->admin->id,
+            'access_type'    => 'lifetime',
+            'is_active'      => true,
+            'is_downloadable'=> true,
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.soal.index'));
+        $response->assertOk();
+        $response->assertSee('id="editModal"', false);
+        $response->assertSee('openEditModalForSoal(' . $soal->id . ')', false);
+        $response->assertSee('modal-edit-soal-form', false);
+    }
 }
 
