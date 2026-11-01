@@ -385,9 +385,23 @@
                 display: inline-flex !important;
             }
         }
+
+        /* ─── Bulletproof Pinned/Sticky Top Navbar (Always in Front on Scroll) ─── */
+        html,
+        body {
+            overflow-x: clip !important;
+        }
+
+        #top-navbar,
+        header.admin-header {
+            position: -webkit-sticky !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 40 !important;
+        }
     </style>
 </head>
-<body class="text-gray-100 min-h-screen overflow-x-hidden" style="background:#090D0B; font-family:'Inter',sans-serif;">
+<body class="text-gray-100 min-h-screen" style="background:#090D0B; font-family:'Inter',sans-serif; overflow-x:clip;">
 
     {{-- Mobile Sidebar Backdrop --}}
     <div id="mobile-sidebar-backdrop"
@@ -512,7 +526,9 @@
         {{-- Main Content --}}
         <main id="main-content-wrapper" class="flex-1 flex flex-col min-h-screen min-w-0 transition-all duration-300">
             {{-- Top Header --}}
-            <header class="px-4 sm:px-6 py-3.5 sticky top-0 z-30 flex items-center" style="background:rgba(9,13,11,.95);backdrop-filter:blur(16px);border-bottom:1px solid #1A2820; height: 65px;">
+            <header id="top-navbar"
+                    class="admin-header px-4 sm:px-6 py-3.5 sticky top-0 z-40 flex items-center"
+                    style="position:-webkit-sticky; position:sticky; top:0; z-index:40; background:rgba(9,13,11,.95); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-bottom:1px solid #1A2820; height:65px;">
                 <div class="flex items-center justify-between gap-3 w-full">
                     <div class="flex items-center gap-3 sm:gap-4 min-w-0">
                         {{-- Master Cyber Hamburger Toggle Button --}}
