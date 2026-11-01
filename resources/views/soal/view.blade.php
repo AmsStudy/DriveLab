@@ -1344,12 +1344,25 @@ footer{
                             @if($soal->hasClasses())
                             <div class="field-group" x-data="{
                                 open: false,
-                                selected: '',
+                                selected: (function() {
+                                    try {
+                                        const sk = localStorage.getItem('labsoal_student_kelas');
+                                        return (sk && @js($soal->getClassesList()).includes(sk)) ? sk : '';
+                                    } catch(e) { return ''; }
+                                })(),
                                 selectedLabel: '— Pilih Kelas Anda —',
+                                init() {
+                                    if (this.selected) {
+                                        this.selectedLabel = 'Kelas ' + this.selected;
+                                        const hiddenEl = document.getElementById('sub_kelas');
+                                        if (hiddenEl) hiddenEl.value = this.selected;
+                                    }
+                                },
                                 selectClass(val, label) {
                                     this.selected = val;
                                     this.selectedLabel = label;
                                     this.open = false;
+                                    try { localStorage.setItem('labsoal_student_kelas', val); } catch(e) {}
                                     const hiddenEl = document.getElementById('sub_kelas');
                                     if (hiddenEl) {
                                         hiddenEl.value = val;
@@ -1713,11 +1726,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if (kelasInput && storedKelas) {
-        if (!kelasInput.value) {
+    if (kelasInput) {
+        if (!kelasInput.value && storedKelas) {
             kelasInput.value = storedKelas;
-            const classBtnSpan = document.querySelector('.custom-cyber-btn span');
-            if (classBtnSpan) classBtnSpan.textContent = 'Kelas ' + storedKelas;
         }
         kelasInput.addEventListener('change', function() {
             localStorage.setItem('labsoal_student_kelas', this.value.trim());

@@ -293,7 +293,7 @@
                                 <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
                                     Nomor Induk Mahasiswa (NIM) <span class="text-emerald-400">*</span>
                                 </label>
-                                <input type="text" name="nim" value="{{ old('nim') }}" required autocomplete="off"
+                                <input type="text" id="lobby_nim" name="nim" value="{{ old('nim') }}" required autocomplete="off"
                                        placeholder="Contoh: 220101004"
                                        class="w-full px-4 py-3 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-600 font-mono">
                                 @error('nim')
@@ -305,7 +305,7 @@
                                 <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
                                     Nama Lengkap Mahasiswa <span class="text-emerald-400">*</span>
                                 </label>
-                                <input type="text" name="nama" value="{{ old('nama') }}" required autocomplete="off"
+                                <input type="text" id="lobby_nama" name="nama" value="{{ old('nama') }}" required autocomplete="off"
                                        placeholder="Contoh: Ahmad Fauzan"
                                        class="w-full px-4 py-3 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-600">
                                 @error('nama')
@@ -317,12 +317,27 @@
                             @if($quiz->hasClasses())
                                 <div x-data="{
                                     open: false,
-                                    selected: '{{ old('kelas', '') }}',
-                                    selectedLabel: '{{ old('kelas') ? 'Kelas ' . old('kelas') : '— Pilih Kelas Anda —' }}',
+                                    selected: (function() {
+                                        const oldVal = @js(old('kelas', ''));
+                                        if (oldVal) return oldVal;
+                                        try {
+                                            const sk = localStorage.getItem('labsoal_student_kelas');
+                                            return (sk && @js($quiz->getClassesList()).includes(sk)) ? sk : '';
+                                        } catch(e) { return ''; }
+                                    })(),
+                                    selectedLabel: '— Pilih Kelas Anda —',
+                                    init() {
+                                        if (this.selected) {
+                                            this.selectedLabel = 'Kelas ' + this.selected;
+                                            const selEl = document.getElementById('lobby_kelas_select');
+                                            if (selEl) selEl.value = this.selected;
+                                        }
+                                    },
                                     selectClass(val, label) {
                                         this.selected = val;
                                         this.selectedLabel = label;
                                         this.open = false;
+                                        try { localStorage.setItem('labsoal_student_kelas', val); } catch(e) {}
                                         const selEl = document.getElementById('lobby_kelas_select');
                                         if (selEl) {
                                             selEl.value = val;
@@ -496,6 +511,31 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // Auto-fill and auto-save student identity with localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const storedNim = localStorage.getItem('labsoal_student_nim');
+            const storedNama = localStorage.getItem('labsoal_student_nama');
+
+            const nimInput = document.getElementById('lobby_nim');
+            const namaInput = document.getElementById('lobby_nama');
+
+            if (nimInput) {
+                if (!nimInput.value && storedNim) nimInput.value = storedNim;
+                nimInput.addEventListener('input', function() {
+                    localStorage.setItem('labsoal_student_nim', this.value.trim());
+                });
+                nimInput.addEventListener('change', function() {
+                    localStorage.setItem('labsoal_student_nim', this.value.trim());
+                });
+            }
+
+            if (namaInput) {
+                if (!namaInput.value && storedNama) namaInput.value = storedNama;
+                namaInput.addEventListener('input', function() {
+                    localStorage.setItem('labsoal_student_nama', this.value.trim());
+                });
+            }
+        });
 
         // Auto refresh CSRF token periodically while waiting in lobby
         setInterval(() => {
