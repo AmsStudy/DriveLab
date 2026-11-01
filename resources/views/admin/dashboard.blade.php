@@ -254,9 +254,9 @@
                     <p class="text-xs text-gray-600 mt-1">Pengumpulan mahasiswa akan otomatis tampil di sini saat mereka mengirimkan tugas.</p>
                 </div>
             @else
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto overflow-y-auto max-h-[220px]" style="scrollbar-width: thin;">
                     <table class="w-full text-sm min-w-[560px]">
-                        <thead class="text-xs text-gray-500 uppercase tracking-wider" style="border-bottom:1px solid #1A2820;background:rgba(255,255,255,.01);">
+                        <thead class="text-xs text-gray-500 uppercase tracking-wider sticky top-0 z-10 bg-[#0F1713]" style="border-bottom:1px solid #1A2820;">
                             <tr>
                                 <th class="px-6 py-3 text-left">Mahasiswa</th>
                                 <th class="px-4 py-3 text-left">Dokumen Soal</th>
@@ -345,9 +345,9 @@
                     <p class="text-xs text-gray-600 mt-1">Hasil pengerjaan kuis akan otomatis dicatat di sini begitu mahasiswa menuntaskan ujian.</p>
                 </div>
             @else
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto overflow-y-auto max-h-[220px]" style="scrollbar-width: thin;">
                     <table class="w-full text-sm min-w-[560px]">
-                        <thead class="text-xs text-gray-500 uppercase tracking-wider" style="border-bottom:1px solid #1A2820;background:rgba(255,255,255,.01);">
+                        <thead class="text-xs text-gray-500 uppercase tracking-wider sticky top-0 z-10 bg-[#0F1713]" style="border-bottom:1px solid #1A2820;">
                             <tr>
                                 <th class="px-6 py-3 text-left">Mahasiswa</th>
                                 <th class="px-4 py-3 text-left">Kuis</th>
@@ -507,7 +507,7 @@
             @if($top_soals->isEmpty())
                 <div class="py-10 text-center text-gray-500 text-xs">Belum ada dokumen yang dibuat.</div>
             @else
-                <div class="divide-y divide-gray-800/60">
+                <div class="divide-y divide-gray-800/60 overflow-y-auto max-h-[220px]" style="scrollbar-width: thin;">
                     @foreach($top_soals as $topSoal)
                     <div class="p-4 hover:bg-gray-800/30 transition-colors">
                         <div class="flex items-start justify-between gap-3 mb-1">

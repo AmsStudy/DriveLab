@@ -43,13 +43,13 @@ class DashboardController extends Controller
 
             $recent_submissions = Submission::with('soal.category')
                 ->latest()
-                ->take(8)
+                ->take(20)
                 ->get();
 
             $recent_quiz_attempts = QuizAttempt::with('quiz')
                 ->whereNotNull('completed_at')
                 ->latest('completed_at')
-                ->take(6)
+                ->take(20)
                 ->get();
 
             $top_soals = Soal::with('category', 'admin')
@@ -85,14 +85,14 @@ class DashboardController extends Controller
         $recent_submissions = Submission::whereIn('soal_id', $soalIds)
             ->with('soal.category')
             ->latest()
-            ->take(8)
+            ->take(20)
             ->get();
 
         $recent_quiz_attempts = QuizAttempt::whereIn('quiz_id', $quizIds)
             ->with('quiz')
             ->whereNotNull('completed_at')
             ->latest('completed_at')
-            ->take(6)
+            ->take(20)
             ->get();
 
         $top_soals = Soal::where('user_id', $user->id)
