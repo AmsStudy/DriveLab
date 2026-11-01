@@ -543,11 +543,38 @@
 
                     <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                         @yield('header-actions')
-                        <div class="hidden md:flex items-center gap-2 text-xs text-gray-400 px-3 py-1.5 rounded-lg border whitespace-nowrap" style="background:rgba(15,23,19,.8);border-color:#1A2820;">
-                            <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                            {{ now()->isoFormat('D MMM YYYY') }}
+
+                        @php
+                            $tzAbbr = match(config('app.timezone')) {
+                                'Asia/Jakarta' => 'WIB',
+                                'Asia/Makassar' => 'WITA',
+                                'Asia/Jayapura' => 'WIT',
+                                default => 'WITA'
+                            };
+                        @endphp
+                        {{-- Real-Time Cyber Clock & Date Widget --}}
+                        <div id="realtime-clock-widget"
+                             class="flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 rounded-xl border border-[#1A2820] bg-[#0F1713]/90 text-xs shadow-sm hover:border-emerald-500/40 transition-colors whitespace-nowrap select-none group/clock"
+                             title="Waktu Real-time Server ({{ config('app.timezone') }})">
+                            {{-- Pulsing Live Green Status Dot --}}
+                            <span class="relative flex h-2 w-2 flex-shrink-0">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            </span>
+
+                            {{-- Live Date (Responsively hidden on extra small mobile) --}}
+                            <span id="live-date-display" class="hidden sm:inline-block text-gray-400 font-medium tracking-wide">
+                                {{ now()->isoFormat('ddd, D MMM YYYY') }}
+                            </span>
+
+                            {{-- Subtle Divider --}}
+                            <span class="hidden sm:inline-block text-gray-600 font-bold">&bull;</span>
+
+                            {{-- Live Running Clock --}}
+                            <div class="flex items-center gap-1 font-mono font-bold text-emerald-400 tracking-wider">
+                                <span id="live-time-display">{{ now()->format('H:i:s') }}</span>
+                                <span class="text-[10px] text-emerald-500/80 font-sans font-semibold">{{ $tzAbbr }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1051,6 +1078,66 @@
             document.documentElement.classList.remove('sidebar-collapsed');
         }
     });
+
+    // ── Real-Time Cyber Clock Synchronizer ──
+    (function initRealtimeClock() {
+        const serverEpochMs = {{ now()->getTimestampMs() }};
+        const clientStartMs = Date.now();
+        const serverOffsetMs = serverEpochMs - clientStartMs;
+        const targetTimezone = "{{ config('app.timezone', 'Asia/Makassar') }}";
+
+        let timeFormatter;
+        let dateFormatter;
+        try {
+            timeFormatter = new Intl.DateTimeFormat('id-ID', {
+                timeZone: targetTimezone,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            dateFormatter = new Intl.DateTimeFormat('id-ID', {
+                timeZone: targetTimezone,
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        } catch (e) {}
+
+        function updateClock() {
+            const now = new Date(Date.now() + serverOffsetMs);
+            const timeEl = document.getElementById('live-time-display');
+            const dateEl = document.getElementById('live-date-display');
+
+            if (timeEl) {
+                if (timeFormatter) {
+                    try {
+                        timeEl.textContent = timeFormatter.format(now).replace(/\./g, ':');
+                    } catch (e) {
+                        const h = String(now.getHours()).padStart(2, '0');
+                        const m = String(now.getMinutes()).padStart(2, '0');
+                        const s = String(now.getSeconds()).padStart(2, '0');
+                        timeEl.textContent = `${h}:${m}:${s}`;
+                    }
+                } else {
+                    const h = String(now.getHours()).padStart(2, '0');
+                    const m = String(now.getMinutes()).padStart(2, '0');
+                    const s = String(now.getSeconds()).padStart(2, '0');
+                    timeEl.textContent = `${h}:${m}:${s}`;
+                }
+            }
+
+            if (dateEl && dateFormatter) {
+                try {
+                    dateEl.textContent = dateFormatter.format(now);
+                } catch (e) {}
+            }
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    })();
     </script>
     @stack('scripts')
 </body>
