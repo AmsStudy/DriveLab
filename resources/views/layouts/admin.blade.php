@@ -552,9 +552,9 @@
                                 default => 'WITA'
                             };
                         @endphp
-                        {{-- Real-Time Cyber Clock & Date Widget --}}
+                        {{-- Real-Time Cyber Clock & Date Widget (Stacked Minimalist) --}}
                         <div id="realtime-clock-widget"
-                             class="flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 rounded-xl border border-[#1A2820] bg-[#0F1713]/90 text-xs shadow-sm hover:border-emerald-500/40 transition-colors whitespace-nowrap select-none group/clock"
+                             class="flex items-center gap-2.5 px-3 py-1 rounded-xl border border-[#1A2820] bg-[#0F1713]/80 hover:border-emerald-500/35 transition-colors whitespace-nowrap select-none"
                              title="Waktu Real-time Server ({{ config('app.timezone') }})">
                             {{-- Pulsing Live Green Status Dot --}}
                             <span class="relative flex h-2 w-2 flex-shrink-0">
@@ -562,18 +562,15 @@
                                 <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                             </span>
 
-                            {{-- Live Date (Responsively hidden on extra small mobile) --}}
-                            <span id="live-date-display" class="hidden sm:inline-block text-gray-400 font-medium tracking-wide">
-                                {{ now()->isoFormat('ddd, D MMM YYYY') }}
-                            </span>
-
-                            {{-- Subtle Divider --}}
-                            <span class="hidden sm:inline-block text-gray-600 font-bold">&bull;</span>
-
-                            {{-- Live Running Clock --}}
-                            <div class="flex items-center gap-1 font-mono font-bold text-emerald-400 tracking-wider">
-                                <span id="live-time-display">{{ now()->format('H:i:s') }}</span>
-                                <span class="text-[10px] text-emerald-500/80 font-sans font-semibold">{{ $tzAbbr }}</span>
+                            {{-- Stack: Jam di Atas, Tanggal di Bawah --}}
+                            <div class="flex flex-col text-left leading-none">
+                                <div class="flex items-center gap-1 font-mono font-bold text-xs sm:text-[13px] text-emerald-400 tracking-wider">
+                                    <span id="live-time-display">{{ now()->format('H:i:s') }}</span>
+                                    <span class="text-[9px] font-sans font-semibold text-emerald-500/70">{{ $tzAbbr }}</span>
+                                </div>
+                                <span id="live-date-display" class="text-[10px] text-gray-400 font-medium mt-1 tracking-normal">
+                                    {{ now()->isoFormat('ddd, D MMM YYYY') }}
+                                </span>
                             </div>
                         </div>
                     </div>
