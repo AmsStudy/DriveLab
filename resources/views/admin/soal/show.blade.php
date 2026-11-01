@@ -412,11 +412,10 @@
                                      x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
                                      class="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl py-2 z-50 border backdrop-blur-md"
                                      style="background:rgba(15,23,19,0.98);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
-                                    <div class="px-4 py-1.5 text-[10px] uppercase font-bold text-gray-500 tracking-wider">Unduh Berdasarkan Kelas</div>
                                     <a href="{{ route('admin.soal.download-submissions-zip', $soal) }}"
                                        class="flex items-center justify-between px-4 py-2 text-xs text-emerald-400 hover:bg-emerald-500/10 font-semibold transition-colors">
-                                        <span>Unduh Semua Kelas</span>
-                                        <span class="text-[10px] text-gray-500 font-mono">{{ $submissions->count() }} file</span>
+                                        <span>Semua Kelas</span>
+                                        <span class="text-[10px] font-mono {{ $submissions->count() > 0 ? 'text-emerald-400' : 'text-gray-600' }}">{{ $submissions->count() }}</span>
                                     </a>
                                     <div class="border-t my-1.5" style="border-color:#1A2820;"></div>
                                     @foreach($soal->getClassesList() as $cls)
@@ -424,7 +423,7 @@
                                         <a href="{{ route('admin.soal.download-submissions-zip', [$soal, 'kelas' => $cls]) }}"
                                            class="flex items-center justify-between px-4 py-2 text-xs text-gray-300 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors">
                                             <span>Kelas {{ $cls }}</span>
-                                            <span class="text-[10px] font-mono {{ $cCount > 0 ? 'text-emerald-400' : 'text-gray-600' }}">{{ $cCount }} tugas</span>
+                                            <span class="text-[10px] font-mono {{ $cCount > 0 ? 'text-emerald-400' : 'text-gray-600' }}">{{ $cCount }}</span>
                                         </a>
                                     @endforeach
                                 </div>
@@ -462,11 +461,10 @@
                                  x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
                                  class="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl py-2 z-50 border backdrop-blur-md"
                                  style="background:rgba(15,23,19,0.98);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
-                                <div class="px-4 py-1.5 text-[10px] uppercase font-bold text-gray-500 tracking-wider">Rekap Tugas CSV</div>
                                 <a href="{{ route('admin.soal.export-submissions', $soal) }}"
                                    class="flex items-center justify-between px-4 py-2 text-xs text-emerald-400 hover:bg-emerald-500/10 font-semibold transition-colors">
                                     <span>Semua Kelas</span>
-                                    <span class="text-[10px] text-gray-500 font-mono">{{ $submissions->count() }}</span>
+                                    <span class="text-[10px] font-mono {{ $submissions->count() > 0 ? 'text-emerald-400' : 'text-gray-600' }}">{{ $submissions->count() }}</span>
                                 </a>
                                 <div class="border-t my-1.5" style="border-color:#1A2820;"></div>
                                 @foreach($soal->getClassesList() as $cls)
