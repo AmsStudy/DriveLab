@@ -41,7 +41,33 @@ class SoalAccessController extends Controller
 
         RateLimiter::clear($codeThrottleKey);
 
-        return redirect()->route('soal.access', ['token' => $soal->unique_token]);
+        return redirect()->route('soal.access', ['token' => $soal->slug ?: $soal->unique_token]);
+    }
+
+    /**
+     * Cari soal berdasarkan slug atau unique_token.
+     */
+    private function findSoalByIdentifier(string $identifier, array $with = []): Soal
+    {
+        $query = Soal::query();
+        if (!empty($with)) {
+            $query->with($with);
+        }
+        return $query->where('slug', $identifier)
+            ->orWhere('unique_token', $identifier)
+            ->firstOrFail();
+    }
+
+    /**
+     * Cek apakah sesi saat ini memiliki izin akses ke soal.
+     */
+    private function hasAuthorizedAccess(Soal $soal): bool
+    {
+        return (bool) (
+            session("soal_access_{$soal->unique_token}")
+            || ($soal->slug && session("soal_access_{$soal->slug}"))
+            || session("soal_access_id_{$soal->id}")
+        );
     }
 
     /**
@@ -49,7 +75,7 @@ class SoalAccessController extends Controller
      */
     public function show(string $token)
     {
-        $soal = Soal::where('unique_token', $token)->firstOrFail();
+        $soal = $this->findSoalByIdentifier($token);
 
         return view('soal.access', compact('soal'));
     }
@@ -61,7 +87,7 @@ class SoalAccessController extends Controller
     {
         $request->validate(['password' => 'required|string']);
 
-        $soal = Soal::with('category', 'admin')->where('unique_token', $token)->firstOrFail();
+        $soal = $this->findSoalByIdentifier($token, ['category', 'admin']);
 
         // Kunci rate limit berbasis kombinasi ID soal dan sesi browser klien (terisolasi per komputer lab, anti-lockout massal)
         $clientIdentifier = $this->getClientRateLimitIdentifier($request);
@@ -101,9 +127,13 @@ class SoalAccessController extends Controller
         $soal->increment('access_count');
 
         // Simpan token akses di session agar tidak perlu input password lagi
-        session(["soal_access_{$soal->unique_token}" => true]);
+        session([
+            "soal_access_{$soal->unique_token}" => true,
+            "soal_access_{$soal->slug}"        => true,
+            "soal_access_id_{$soal->id}"       => true,
+        ]);
 
-        return redirect()->route('soal.view', $token);
+        return redirect()->route('soal.view', ['token' => $token]);
     }
 
     /**
@@ -111,21 +141,25 @@ class SoalAccessController extends Controller
      */
     public function view(Request $request, string $token)
     {
-        $soal = Soal::with(['category', 'admin', 'attachments'])->where('unique_token', $token)->firstOrFail();
+        $soal = $this->findSoalByIdentifier($token, ['category', 'admin', 'attachments']);
 
         $isAdminPreview = $this->isAuthorizedAdminPreview($request, $soal);
 
         if (!$isAdminPreview) {
             // Cek session akses
-            if (!session("soal_access_{$soal->unique_token}")) {
-                return redirect()->route('soal.access', $token);
+            if (!$this->hasAuthorizedAccess($soal)) {
+                return redirect()->route('soal.access', ['token' => $token]);
             }
 
             // Cek masih bisa diakses
             $status = $soal->access_status;
             if ($status !== 'active') {
-                session()->forget("soal_access_{$soal->unique_token}");
-                return redirect()->route('soal.access', $token)->withErrors([
+                session()->forget([
+                    "soal_access_{$soal->unique_token}",
+                    "soal_access_{$soal->slug}",
+                    "soal_access_id_{$soal->id}",
+                ]);
+                return redirect()->route('soal.access', ['token' => $token])->withErrors([
                     'password' => 'Akses soal ini sudah berakhir.',
                 ]);
             }
@@ -139,13 +173,13 @@ class SoalAccessController extends Controller
 
     public function previewWrapper(Request $request, string $token, $attachmentId)
     {
-        $soal = Soal::where('unique_token', $token)->firstOrFail();
+        $soal = $this->findSoalByIdentifier($token);
         $attachment = $soal->attachments()->findOrFail($attachmentId);
 
         $isAdminPreview = $this->isAuthorizedAdminPreview($request, $soal);
 
         if (!$isAdminPreview) {
-            if (!session("soal_access_{$soal->unique_token}")) abort(403, 'Akses tidak diizinkan.');
+            if (!$this->hasAuthorizedAccess($soal)) abort(403, 'Akses tidak diizinkan.');
             if ($soal->access_status !== 'active') abort(403, 'Waktu akses soal ini sudah berakhir.');
         }
 
@@ -159,13 +193,13 @@ class SoalAccessController extends Controller
      */
     public function previewFile(Request $request, string $token, $attachmentId)
     {
-        $soal = Soal::where('unique_token', $token)->firstOrFail();
+        $soal = $this->findSoalByIdentifier($token);
         $attachment = $soal->attachments()->findOrFail($attachmentId);
 
         $isAdminPreview = $this->isAuthorizedAdminPreview($request, $soal);
 
         if (!$isAdminPreview) {
-            if (!session("soal_access_{$soal->unique_token}")) {
+            if (!$this->hasAuthorizedAccess($soal)) {
                 abort(403, 'Akses tidak diizinkan.');
             }
 
@@ -184,7 +218,7 @@ class SoalAccessController extends Controller
                 // 1. Tangani jika dibuka langsung via address bar atau tab baru
                 if ($secFetchDest === 'document' || $secFetchMode === 'navigate') {
                     return redirect()->route('soal.preview_wrapper', [
-                        'token'      => $token,
+                        'token'      => $soal->slug ?: $soal->unique_token,
                         'attachment' => $attachmentId,
                     ]);
                 }
@@ -215,7 +249,7 @@ class SoalAccessController extends Controller
 
     public function downloadFile(Request $request, string $token, $attachmentId)
     {
-        $soal = Soal::where('unique_token', $token)->firstOrFail();
+        $soal = $this->findSoalByIdentifier($token);
         $attachment = $soal->attachments()->findOrFail($attachmentId);
 
         if (!$attachment->isFile() || empty($attachment->file_path)) {
@@ -225,7 +259,7 @@ class SoalAccessController extends Controller
         $isAdminPreview = $this->isAuthorizedAdminPreview($request, $soal);
 
         if (!$isAdminPreview) {
-            if (!session("soal_access_{$soal->unique_token}")) {
+            if (!$this->hasAuthorizedAccess($soal)) {
                 abort(403, 'Akses tidak diizinkan.');
             }
 
@@ -245,7 +279,7 @@ class SoalAccessController extends Controller
 
     public function status(string $token)
     {
-        $soal = Soal::where('unique_token', $token)->first();
+        $soal = Soal::where('slug', $token)->orWhere('unique_token', $token)->first();
         if (!$soal) {
             return response()->json(['access_status' => 'deleted']);
         }
@@ -265,7 +299,7 @@ class SoalAccessController extends Controller
         }
         RateLimiter::hit($rateLimitKey, 60);
 
-        $soal = Soal::where('unique_token', $token)->firstOrFail();
+        $soal = $this->findSoalByIdentifier($token);
 
         // Cek fitur submission aktif
         if (!$soal->is_submission_enabled) {
@@ -286,7 +320,7 @@ class SoalAccessController extends Controller
             return response()->json(['message' => 'Pengumpulan tugas tidak tersedia dalam mode preview admin.'], 403);
         }
 
-        if (!session("soal_access_{$soal->unique_token}")) {
+        if (!$this->hasAuthorizedAccess($soal)) {
             return response()->json(['message' => 'Sesi akses tidak valid. Silakan masukkan password soal terlebih dahulu.'], 403);
         }
 

@@ -5,7 +5,7 @@
 
 @section('header-actions')
 <div class="flex items-center gap-2">
-    <a href="{{ route('soal.access', $soal->unique_token) }}" target="_blank" rel="noopener noreferrer"
+    <a href="{{ route('soal.access', $soal->slug ?: $soal->unique_token) }}" target="_blank" rel="noopener noreferrer"
        class="px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-300 hover:text-white transition-all flex items-center gap-1.5 border"
        style="background:#0F1713;border-color:#1A2820;"
        onmouseover="this.style.borderColor='rgba(16,185,129,.4)'"
@@ -222,14 +222,14 @@
                 <div class="p-3.5 rounded-xl border" style="background:#090D0B;border-color:#1A2820;">
                     <div class="flex items-center justify-between text-gray-400 mb-1.5">
                         <span class="text-[11px] font-medium text-gray-400">Tautan Akses Mahasiswa</span>
-                        <button type="button" onclick="copyText('{{ route('soal.access', $soal->unique_token) }}', 'Tautan akses berhasil disalin!')"
+                        <button type="button" onclick="copyText('{{ route('soal.access', $soal->slug ?: $soal->unique_token) }}', 'Tautan akses berhasil disalin!')"
                                 class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                             Salin
                         </button>
                     </div>
                     <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-gray-300 font-mono text-[11px]" style="background:#0F1713;border-color:#1A2820;">
-                        <span class="truncate flex-1 select-all text-gray-300">{{ route('soal.access', $soal->unique_token) }}</span>
+                        <span class="truncate flex-1 select-all text-gray-300">{{ route('soal.access', $soal->slug ?: $soal->unique_token) }}</span>
                     </div>
                 </div>
 

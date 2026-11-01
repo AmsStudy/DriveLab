@@ -252,7 +252,7 @@
     {{-- Top Toolbar --}}
     <div class="viewer-topbar">
         <div class="topbar-left">
-            <button onclick="window.close(); if(!window.closed){ location.href='{{ route('soal.view', $soal->unique_token) }}'; }" class="btn-back">
+            <button onclick="window.close(); if(!window.closed){ location.href='{{ route('soal.view', $soal->slug ?: $soal->unique_token) }}'; }" class="btn-back">
                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
                 Tutup
             </button>
@@ -294,7 +294,7 @@
 
     @php
         $ext = strtolower($attachment->file_type ?? pathinfo($attachment->file_original_name, PATHINFO_EXTENSION));
-        $rawUrl = route('soal.file', ['token' => $soal->unique_token, 'attachment' => $attachment->id]);
+        $rawUrl = route('soal.file', ['token' => $soal->slug ?: $soal->unique_token, 'attachment' => $attachment->id]);
         if($isAdminPreview) $rawUrl .= '?admin_preview=1';
     @endphp
 
@@ -483,7 +483,7 @@
         // ─── Polling Status Akses ───
         @if(!isset($isAdminPreview) || !$isAdminPreview)
         setInterval(() => {
-            fetch('{{ route("soal.status", $soal->unique_token) }}')
+            fetch('{{ route("soal.status", $soal->slug ?: $soal->unique_token) }}')
                 .then(r => r.json())
                 .then(data => {
                     if (data.access_status !== 'active') {

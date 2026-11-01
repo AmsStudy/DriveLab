@@ -1200,11 +1200,11 @@ footer{
                     $canDownload   = $attachment->canDownload();
 
                     $previewUrl = route('soal.preview_wrapper', [
-                        'token'      => $soal->unique_token,
+                        'token'      => $soal->slug ?: $soal->unique_token,
                         'attachment' => $attachment->id,
                     ]);
                     $downloadUrl = route('soal.download', [
-                        'token'      => $soal->unique_token,
+                        'token'      => $soal->slug ?: $soal->unique_token,
                         'attachment' => $attachment->id,
                     ]);
 
@@ -1627,7 +1627,7 @@ document.addEventListener('keydown', e => {
 // ─── Polling: reload if admin changes access/download status ───
 @if(!isset($isAdminPreview) || !$isAdminPreview)
 setInterval(() => {
-    fetch('{{ route('soal.status', $soal->unique_token) }}')
+    fetch('{{ route('soal.status', $soal->slug ?: $soal->unique_token) }}')
         .then(r => r.json())
         .then(data => {
             if (data.access_status !== 'active') {
@@ -1792,7 +1792,7 @@ document.getElementById('submission-form').addEventListener('submit', async func
 
     try {
         const activeCsrfToken = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
-        const response = await fetch('{{ route('soal.submitTask', ['token' => $soal->unique_token]) }}', {
+        const response = await fetch('{{ route('soal.submitTask', ['token' => $soal->slug ?: $soal->unique_token]) }}', {
             method: 'POST',
             headers: { 
                 'X-CSRF-TOKEN': activeCsrfToken,

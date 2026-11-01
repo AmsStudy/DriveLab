@@ -168,5 +168,110 @@ class SoalPasswordAndModalTest extends TestCase
         $response->assertSee('openEditModalForSoal(' . $soal->id . ')', false);
         $response->assertSee('modal-edit-soal-form', false);
     }
+
+    public function test_soal_creates_slug_from_title_and_handles_collisions(): void
+    {
+        $soal1 = Soal::create([
+            'title'          => 'Struktur Data Modul 1',
+            'kode_unik'      => 'SD-01',
+            'password'       => bcrypt('pass123'),
+            'plain_password' => 'pass123',
+            'user_id'        => $this->admin->id,
+            'access_type'    => 'lifetime',
+            'is_active'      => true,
+            'is_downloadable'=> true,
+        ]);
+
+        $this->assertEquals('struktur-data-modul-1', $soal1->slug);
+
+        $soal2 = Soal::create([
+            'title'          => 'Struktur Data Modul 1',
+            'kode_unik'      => 'SD-02',
+            'password'       => bcrypt('pass123'),
+            'plain_password' => 'pass123',
+            'user_id'        => $this->admin->id,
+            'access_type'    => 'lifetime',
+            'is_active'      => true,
+            'is_downloadable'=> true,
+        ]);
+
+        $this->assertEquals('struktur-data-modul-1-1', $soal2->slug);
+    }
+
+    public function test_student_accesses_soal_via_title_slug_and_password_gate_is_strictly_enforced(): void
+    {
+        $soal = Soal::create([
+            'title'          => 'Ujian Praktikum Jaringan Komputer',
+            'kode_unik'      => 'JARKOM-01',
+            'password'       => bcrypt('RahasiaLab99'),
+            'plain_password' => 'RahasiaLab99',
+            'user_id'        => $this->admin->id,
+            'access_type'    => 'lifetime',
+            'is_active'      => true,
+            'is_downloadable'=> true,
+            'content_text'   => 'Petunjuk Praktikum: Konfigurasikan VLAN dan OSPF.',
+        ]);
+
+        $this->assertEquals('ujian-praktikum-jaringan-komputer', $soal->slug);
+
+        // 1. Mengakses path berbasis judul langsung membuka halaman login/password gate
+        $accessRes = $this->get(route('soal.access', $soal->slug));
+        $accessRes->assertOk();
+        $accessRes->assertSee('Password');
+        $accessRes->assertDontSee('Petunjuk Praktikum: Konfigurasikan VLAN dan OSPF.');
+
+        // 2. Mengakses langsung ke /view tanpa input password ditolak dan dilempar kembali ke password gate
+        $directViewRes = $this->get(route('soal.view', $soal->slug));
+        $directViewRes->assertRedirect(route('soal.access', $soal->slug));
+
+        // 3. Password salah ditolak
+        $wrongPassRes = $this->post(route('soal.verify', $soal->slug), [
+            'password' => 'SalahPassword',
+        ]);
+        $wrongPassRes->assertSessionHasErrors('password');
+
+        // 4. Password benar memberi izin sesi dan mengarahkan ke /view
+        $correctPassRes = $this->post(route('soal.verify', $soal->slug), [
+            'password' => 'RahasiaLab99',
+        ]);
+        $correctPassRes->assertRedirect(route('soal.view', $soal->slug));
+
+        // 5. Setelah verifikasi berhasil, halaman konten /view dapat dibuka
+        $viewRes = $this->get(route('soal.view', $soal->slug));
+        $viewRes->assertOk();
+        $viewRes->assertSee('Petunjuk Praktikum: Konfigurasikan VLAN dan OSPF.');
+
+        // 6. Akses lewat kode unik di welcome page juga diarahkan ke path berbasis slug judul
+        $codeRes = $this->post(route('soal.accessByCode'), [
+            'kode_unik' => 'JARKOM-01',
+        ]);
+        $codeRes->assertRedirect(route('soal.access', $soal->slug));
+    }
+
+    public function test_admin_soal_views_render_title_slug_in_copy_and_preview_links(): void
+    {
+        $soal = Soal::create([
+            'title'          => 'Pemrograman Web Lanjut',
+            'kode_unik'      => 'PWL-01',
+            'password'       => bcrypt('pwd123'),
+            'plain_password' => 'pwd123',
+            'user_id'        => $this->admin->id,
+            'access_type'    => 'lifetime',
+            'is_active'      => true,
+            'is_downloadable'=> true,
+        ]);
+
+        $this->assertEquals('pemrograman-web-lanjut', $soal->slug);
+
+        // Di index dokumen
+        $indexRes = $this->actingAs($this->admin)->get(route('admin.soal.index'));
+        $indexRes->assertOk();
+        $indexRes->assertSee(route('soal.access', 'pemrograman-web-lanjut'));
+
+        // Di show dokumen
+        $showRes = $this->actingAs($this->admin)->get(route('admin.soal.show', $soal));
+        $showRes->assertOk();
+        $showRes->assertSee(route('soal.access', 'pemrograman-web-lanjut'));
+    }
 }
 

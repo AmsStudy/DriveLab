@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -16,6 +17,7 @@ class Soal extends Model
 
     protected $fillable = [
         'title',
+        'slug',
         'description',
         'content_text',
         'unique_token',
@@ -53,6 +55,46 @@ class Soal extends Model
         'allowed_extensions' => 'array',
         'classes'      => 'array',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function (Soal $soal) {
+            if (empty($soal->slug)) {
+                $soal->slug = static::generateUniqueSlug($soal->title ?? '');
+            }
+
+            if (empty($soal->unique_token)) {
+                do {
+                    $token = Str::random(6);
+                } while (static::where('unique_token', $token)->exists());
+                $soal->unique_token = $token;
+            }
+        });
+    }
+
+    public static function generateUniqueSlug(string $title, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($title) ?: 'dokumen-' . Str::lower(Str::random(5));
+        
+        $reserved = ['tracktask', 'submittask', 'create', 'edit', 'status', 'view', 'file', 'download', 'preview-wrapper'];
+        if (in_array(strtolower($base), $reserved, true)) {
+            $base = "{$base}-dokumen";
+        }
+
+        $slug = $base;
+        $counter = 1;
+        while (static::where('slug', $slug)->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $slug = "{$base}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    public function getSlugOrTokenAttribute(): string
+    {
+        return $this->slug ?: $this->unique_token;
+    }
 
     public function hasClasses(): bool
     {

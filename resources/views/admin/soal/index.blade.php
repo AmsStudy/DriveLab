@@ -181,7 +181,7 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center justify-end gap-1">
                                 {{-- Copy Link --}}
-                                <button onclick="copyLink('{{ route('soal.access', $soal->unique_token) }}')"
+                                <button onclick="copyLink('{{ route('soal.access', $soal->slug ?: $soal->unique_token) }}')"
                                         id="copy-link-{{ $soal->id }}"
                                         title="Salin Link"
                                         class="p-2 rounded-lg text-gray-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors">

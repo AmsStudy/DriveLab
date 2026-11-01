@@ -117,7 +117,7 @@
         @else
             {{-- Password Form --}}
             <div class="card">
-                <form method="POST" action="{{ route('soal.verify', $soal->unique_token) }}" id="access-form">
+                <form method="POST" action="{{ route('soal.verify', $soal->slug ?: $soal->unique_token) }}" id="access-form">
                     @csrf
                     <label for="password">Password</label>
                     <div class="pwd-wrap">

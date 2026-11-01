@@ -38,9 +38,20 @@ class PublicQuizController extends Controller
         return redirect()->route('quiz.lobby', ['token' => $quiz->unique_token]);
     }
 
+    private function findQuizByIdentifier(string $identifier, array $with = []): Quiz
+    {
+        $query = Quiz::query();
+        if (!empty($with)) {
+            $query->with($with);
+        }
+        return $query->where('slug', $identifier)
+            ->orWhere('unique_token', $identifier)
+            ->firstOrFail();
+    }
+
     public function lobby(string $token)
     {
-        $quiz = Quiz::where('unique_token', $token)->with('soal')->firstOrFail();
+        $quiz = $this->findQuizByIdentifier($token, ['soal']);
 
         $questionsCount = $quiz->questions()->count();
         $totalPoints = $quiz->questions()->sum('points');
@@ -65,7 +76,7 @@ class PublicQuizController extends Controller
 
     public function start(Request $request, string $token)
     {
-        $quiz = Quiz::where('unique_token', $token)->firstOrFail();
+        $quiz = $this->findQuizByIdentifier($token);
 
         if (!$quiz->is_active) {
             return back()->with('error', 'Kuis saat ini tidak aktif atau telah ditutup.');
@@ -169,7 +180,7 @@ class PublicQuizController extends Controller
 
     public function play(string $token, QuizAttempt $attempt)
     {
-        $quiz = Quiz::where('unique_token', $token)->firstOrFail();
+        $quiz = $this->findQuizByIdentifier($token);
         $this->validateAttemptAccess($quiz, $attempt);
 
         if ($attempt->isCompleted()) {
@@ -247,7 +258,7 @@ class PublicQuizController extends Controller
 
     public function recordTabSwitch(Request $request, string $token, QuizAttempt $attempt)
     {
-        $quiz = Quiz::where('unique_token', $token)->firstOrFail();
+        $quiz = $this->findQuizByIdentifier($token);
         $this->validateAttemptAccess($quiz, $attempt);
 
         if ($attempt->isCompleted()) {
@@ -317,7 +328,7 @@ class PublicQuizController extends Controller
 
     public function unlockWithPassword(Request $request, string $token, QuizAttempt $attempt)
     {
-        $quiz = Quiz::where('unique_token', $token)->with('user')->firstOrFail();
+        $quiz = $this->findQuizByIdentifier($token, ['user']);
         $this->validateAttemptAccess($quiz, $attempt);
 
         $request->validate([
@@ -378,7 +389,7 @@ class PublicQuizController extends Controller
 
     public function autosave(Request $request, string $token, QuizAttempt $attempt)
     {
-        $quiz = Quiz::where('unique_token', $token)->firstOrFail();
+        $quiz = $this->findQuizByIdentifier($token);
         $this->validateAttemptAccess($quiz, $attempt);
 
         if ($attempt->isCompleted() || $attempt->is_force_submitted) {
@@ -417,7 +428,7 @@ class PublicQuizController extends Controller
 
     public function submit(Request $request, string $token, QuizAttempt $attempt)
     {
-        $quiz = Quiz::where('unique_token', $token)->firstOrFail();
+        $quiz = $this->findQuizByIdentifier($token);
         $this->validateAttemptAccess($quiz, $attempt);
 
         if ($attempt->isCompleted()) {
@@ -454,7 +465,7 @@ class PublicQuizController extends Controller
 
     public function results(string $token, QuizAttempt $attempt)
     {
-        $quiz = Quiz::where('unique_token', $token)->with('soal')->firstOrFail();
+        $quiz = $this->findQuizByIdentifier($token, ['soal']);
         $this->validateAttemptAccess($quiz, $attempt);
 
         if (!$attempt->isCompleted()) {

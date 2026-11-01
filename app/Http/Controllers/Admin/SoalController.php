@@ -109,6 +109,7 @@ class SoalController extends Controller
 
         $soal = Soal::create([
             'title'               => $validated['title'],
+            'slug'                => Soal::generateUniqueSlug($validated['title']),
             'description'         => $validated['description'] ?? null,
             'content_text'        => $validated['content_text'] ?? null,
             'kode_unik'           => $validated['kode_unik'],
@@ -243,6 +244,9 @@ class SoalController extends Controller
 
         $data = [
             'title'        => $validated['title'],
+            'slug'         => ($soal->title !== $validated['title'] || empty($soal->slug))
+                                ? Soal::generateUniqueSlug($validated['title'], $soal->id)
+                                : $soal->slug,
             'description'  => $validated['description'] ?? null,
             'content_text' => $validated['content_text'] ?? null,
             'kode_unik'    => $validated['kode_unik'],
