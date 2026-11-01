@@ -907,87 +907,6 @@ footer{
   position:relative;z-index:1;
 }
 
-/* ─── Ultra-Reliable Pure Cyber Orbit Spinner ("Wah", Centered & Futuristik) ─── */
-@keyframes cyberSpinRingCW {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-@keyframes cyberSpinRingCCW {
-  0% { transform: rotate(360deg); }
-  100% { transform: rotate(0deg); }
-}
-@keyframes cyberCoreBreathing {
-  0% { transform: scale(0.8); opacity: 0.75; box-shadow: 0 0 10px #10B981; }
-  100% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 24px #34D399, 0 0 40px rgba(16,185,129,0.85); }
-}
-
-.pure-cyber-loader {
-  position: relative;
-  width: 90px;
-  height: 90px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.pure-cyber-loader .spinner-ring-1 {
-  position: absolute;
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  border: 4px solid rgba(16, 185, 129, 0.15);
-  border-top: 4px solid #10B981;
-  border-right: 4px solid #34D399;
-  box-shadow: 0 0 22px rgba(16, 185, 129, 0.6), inset 0 0 12px rgba(16, 185, 129, 0.25);
-  animation: cyberSpinRingCW 1.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-.pure-cyber-loader .spinner-dot {
-  position: absolute;
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  animation: cyberSpinRingCW 1.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-.pure-cyber-loader .spinner-dot::before {
-  content: '';
-  position: absolute;
-  top: -5px;
-  left: calc(50% - 5px);
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #FFFFFF;
-  box-shadow: 0 0 14px #34D399, 0 0 6px #10B981;
-}
-.pure-cyber-loader .spinner-ring-2 {
-  position: absolute;
-  width: 66px;
-  height: 66px;
-  border-radius: 50%;
-  border: 3px dashed #0D9488;
-  box-shadow: 0 0 16px rgba(13, 148, 136, 0.45);
-  animation: cyberSpinRingCCW 2.2s linear infinite;
-}
-.pure-cyber-loader .spinner-ring-3 {
-  position: absolute;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 3px solid transparent;
-  border-bottom: 3px solid #6EE7B7;
-  border-left: 3px solid #10B981;
-  box-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
-  animation: cyberSpinRingCW 0.85s ease-in-out infinite;
-}
-.pure-cyber-loader .spinner-core {
-  position: relative;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #34D399 0%, #10B981 60%, #0D9488 100%);
-  box-shadow: 0 0 18px #10B981, 0 0 30px rgba(16, 185, 129, 0.8);
-  animation: cyberCoreBreathing 1.2s ease-in-out infinite alternate;
-}
-
 /* ─── SweetAlert2 Cyber Theme ─── */
 .cyber-swal-popup {
   background: rgba(15, 23, 19, 0.96) !important;
@@ -1712,7 +1631,10 @@ function setLoading(loading) {
         const arrow = document.getElementById('btn-arrow');
         if (arrow) arrow.outerHTML = '<div class="spinner" id="btn-arrow"></div>';
         if (window.showLoading) {
-            window.showLoading();
+            window.showLoading(
+                'MENGIRIM TUGAS...',
+                'Mengunggah berkas aman dan memverifikasi data ke server...'
+            );
         }
     } else {
         btnLabel.textContent = 'Kirim Tugas Sekarang';
@@ -1862,52 +1784,10 @@ setInterval(() => {
 @endif
 </script>
 
-{{-- ─── PURE CYBER LOADING SPINNER (100% CENTERED & MINIMALIST) ─── --}}
-<div id="cyberLoadingOverlay" style="position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;margin:0;padding:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(5,9,7,0.8);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);" aria-live="assertive" role="alert">
-    <div style="position:relative;display:flex;align-items:center;justify-content:center;margin:auto;" id="cyberLoadingBox">
-        
-        {{-- Ambient Radial Glow Aura in Center --}}
-        <div style="position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(16,185,129,0.18);filter:blur(36px);pointer-events:none;"></div>
+    {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}
+    @include('components.cyber-loading')
 
-        {{-- Multi-Ring Cyber Orbit Spinner --}}
-        <div class="pure-cyber-loader">
-            <div class="spinner-ring-1"></div>
-            <div class="spinner-dot"></div>
-            <div class="spinner-ring-2"></div>
-            <div class="spinner-ring-3"></div>
-            <div class="spinner-core"></div>
-        </div>
-
-    </div>
-</div>
-
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-window.showLoading = function() {
-    const overlay = document.getElementById('cyberLoadingOverlay');
-    if (overlay) {
-        overlay.style.display = 'flex';
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'auto';
-    }
-};
-
-window.hideLoading = function() {
-    const overlay = document.getElementById('cyberLoadingOverlay');
-    if (overlay) {
-        overlay.style.display = 'none';
-        overlay.style.opacity = '0';
-        overlay.style.pointerEvents = 'none';
-    }
-};
-</script>
-            overlay.classList.add('hidden');
-            overlay.classList.add('pointer-events-none');
-            overlay.style.display = 'none';
-        }, 300);
-    }
-};
-</script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

@@ -517,52 +517,12 @@
         </main>
     </div>
 
-    {{-- ─── PURE CYBER LOADING SPINNER (100% CENTERED & MINIMALIST) ─── --}}
-    <div id="cyberLoadingOverlay" style="position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;margin:0;padding:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(5,9,7,0.8);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);" aria-live="assertive" role="alert">
-        <div style="position:relative;display:flex;align-items:center;justify-content:center;margin:auto;" id="cyberLoadingBox">
-            
-            {{-- Ambient Radial Glow Aura in Center --}}
-            <div style="position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(16,185,129,0.18);filter:blur(36px);pointer-events:none;"></div>
-
-            {{-- Multi-Ring Cyber Orbit Spinner --}}
-            <div class="pure-cyber-loader">
-                <div class="spinner-ring-1"></div>
-                <div class="spinner-dot"></div>
-                <div class="spinner-ring-2"></div>
-                <div class="spinner-ring-3"></div>
-                <div class="spinner-core"></div>
-            </div>
-
-        </div>
-    </div>
+    {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}
+    @include('components.cyber-loading')
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Cyber Loading Controls (Centered & Pure Spinner Only)
-        window.showLoading = function() {
-            const overlay = document.getElementById('cyberLoadingOverlay');
-            if (overlay) {
-                overlay.style.display = 'flex';
-                overlay.style.opacity = '1';
-                overlay.style.pointerEvents = 'auto';
-            }
-        };
-
-        window.hideLoading = function() {
-            const overlay = document.getElementById('cyberLoadingOverlay');
-            if (overlay) {
-                overlay.style.display = 'none';
-                overlay.style.opacity = '0';
-                overlay.style.pointerEvents = 'none';
-            }
-        };
-
-        // Auto-dismiss loading if user uses browser back/forward buttons (BFcache)
-        window.addEventListener('pageshow', function() {
-            window.hideLoading();
-        });
-
         // Global Confirmation Dialog with Cyber Styling & Loading Animation
         window.confirmAction = function(event, message, confirmText = 'Ya', isDanger = false, customTitle = null) {
             event.preventDefault();
@@ -588,7 +548,10 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.showLoading();
+                    window.showLoading(
+                        isDanger ? 'MEMPROSES TINDAKAN...' : 'MENYIMPAN PERUBAHAN...',
+                        'Mohon tunggu sebentar, sistem sedang memproses data...'
+                    );
                     form.submit();
                 }
             });
@@ -631,7 +594,7 @@
             }
         };
 
-        // Automatically show pure centered loading spinner when any standard form is submitted
+        // Automatically show cyber loading spinner when any standard form is submitted
         document.addEventListener('submit', function(e) {
             const form = e.target;
             if (form.getAttribute('data-no-loading') !== null || form.classList.contains('no-loading')) {
@@ -643,16 +606,23 @@
 
             setTimeout(() => {
                 if (!e.defaultPrevented) {
-                    window.showLoading();
+                    window.showLoading(
+                        'MENYIMPAN DATA...',
+                        'Sedang memproses dan menyimpan perubahan data ke server...'
+                    );
                 }
             }, 10);
         });
 
-        // Automatically show pure loading for ZIP download links
+        // Automatically show cyber loading for ZIP download and CSV export links
         document.addEventListener('click', function(e) {
-            const link = e.target.closest('a[href*="download-submissions-zip"]');
+            const link = e.target.closest('a[href*="download-submissions-zip"], a[href*="export-submissions"], a[href*="export-csv"]');
             if (link) {
-                window.showLoading();
+                const isZip = link.href.includes('download-submissions-zip');
+                window.showLoading(
+                    isZip ? 'MENYIAPKAN ARSIP ZIP...' : 'MENGEKSPOR DATA REKAP...',
+                    isZip ? 'Sedang mengompresi dan menyiapkan berkas tugas mahasiswa...' : 'Sedang menyusun dan mengunduh berkas rekap data...'
+                );
                 setTimeout(() => {
                     window.hideLoading();
                 }, 4000);

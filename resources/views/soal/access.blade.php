@@ -160,6 +160,9 @@
         const accessForm = document.getElementById('access-form');
         if (accessForm) {
             accessForm.addEventListener('submit', function() {
+                if (window.showLoading) {
+                    window.showLoading('MEMVERIFIKASI KUNCI...', 'Mengecek otorisasi akses ke dokumen...');
+                }
                 const btn = this.querySelector('button[type="submit"]');
                 if (btn) {
                     btn.disabled = true;
@@ -183,5 +186,8 @@
                 .catch(() => {});
         }, 5 * 60 * 1000);
     </script>
+
+    {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}
+    @include('components.cyber-loading')
 </body>
 </html>

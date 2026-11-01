@@ -1152,16 +1152,9 @@
                     if (this.fullscreenToleranceInterval) clearInterval(this.fullscreenToleranceInterval);
                     if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
 
-                    Swal.fire({
-                        title: 'Mengirim Jawaban...',
-                        text: 'Sistem sedang menghitung skor Anda.',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        },
-                        background: '#0F1713',
-                        color: '#f3f4f6'
-                    });
+                    if (window.showLoading) {
+                        window.showLoading('MENGIRIM JAWABAN...', 'Sistem sedang menghitung akurasi dan skor evaluasi...');
+                    }
 
                     fetch('{{ route('quiz.submit', [$quiz->unique_token, $attempt->id]) }}', {
                         method: 'POST',
@@ -1198,6 +1191,7 @@
                     })
                     .catch((err) => {
                         this.isSubmitting = false;
+                        if (window.hideLoading) window.hideLoading();
                         Swal.fire({
                             icon: 'error',
                             title: 'Pemberitahuan Sistem',
@@ -1205,7 +1199,6 @@
                             background: '#0F1713',
                             color: '#f3f4f6'
                         });
-                    });
                     });
                 },
 
@@ -1300,5 +1293,8 @@
             }
         });
     </script>
+
+    {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}
+    @include('components.cyber-loading')
 </body>
 </html>

@@ -127,5 +127,26 @@
 
         <p class="footer-note">© {{ date('Y') }} Platform Distribusi Dokumen Laboratorium</p>
     </div>
+
+    {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}
+    @include('components.cyber-loading')
+
+    <script>
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.getAttribute('data-no-loading') !== null || form.classList.contains('no-loading')) {
+                return;
+            }
+            if (form.checkValidity && !form.checkValidity()) {
+                return;
+            }
+
+            setTimeout(() => {
+                if (!e.defaultPrevented && window.showLoading) {
+                    window.showLoading('MEMPROSES AKUN...', 'Sedang memproses dan memverifikasi kredensial...');
+                }
+            }, 10);
+        });
+    </script>
 </body>
 </html>

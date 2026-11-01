@@ -743,7 +743,7 @@
 
             {{-- ── Panel: Dokumen ── --}}
             <div x-show="tab === 'akses'" x-transition.opacity role="tabpanel">
-                <form action="{{ route('soal.accessByCode') }}" method="POST" @submit="busy = true">
+                <form action="{{ route('soal.accessByCode') }}" method="POST" @submit="if($el.checkValidity()){ busy = true; window.showLoading && window.showLoading('MEMVERIFIKASI KODE...', 'Mengecek ketersediaan dokumen...'); }">
                     @csrf
                     <div class="input-wrap">
                         <div class="inp-icon">
@@ -781,7 +781,7 @@
 
             {{-- ── Panel: Kuis ── --}}
             <div x-show="tab === 'kuis'" x-transition.opacity role="tabpanel" style="display:none">
-                <form action="{{ route('quiz.join') }}" method="POST" @submit="busy = true">
+                <form action="{{ route('quiz.join') }}" method="POST" @submit="if($el.checkValidity()){ busy = true; window.showLoading && window.showLoading('MENGHUBUNGKAN KUIS...', 'Menyiapkan ruang kuis interaktif...'); }">
                     @csrf
                     <div class="input-wrap sky-focus">
                         <div class="inp-icon" style="color:var(--sky)">
@@ -931,7 +931,7 @@
             @endif
 
             {{-- Form --}}
-            <form method="POST" action="{{ route('login') }}" @submit="loginBusy = true">
+            <form method="POST" action="{{ route('login') }}" @submit="if($el.checkValidity()){ loginBusy = true; window.showLoading && window.showLoading('AUTENTIKASI ADMIN...', 'Memverifikasi akun dan kredensial...'); }">
                 @csrf
 
                 {{-- Email --}}
@@ -1090,5 +1090,7 @@
         });
     </script>
 
+    {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}
+    @include('components.cyber-loading')
 </body>
 </html>
