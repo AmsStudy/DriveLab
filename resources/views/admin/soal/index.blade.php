@@ -111,35 +111,74 @@
                 </thead>
                 <tbody class="divide-y divide-gray-800/60">
                     @foreach($soals as $soal)
+                    @php
+                        $accessCode = $soal->kode_unik ?: $soal->unique_token;
+                    @endphp
                     <tr class="hover:bg-gray-800/30 transition-colors">
                         <td class="px-6 py-4">
-                            <div class="flex items-start gap-3">
-                                {{-- File Type Icon --}}
-                                <div class="w-9 h-9 rounded-lg bg-gray-800 flex items-center justify-center flex-shrink-0 mt-0.5 border border-gray-700/50">
-                                    @if($soal->attachments->count() > 0)
-                                        <span class="text-emerald-400 text-[10px] font-bold font-mono">{{ $soal->attachments->count() }} ITEM</span>
-                                    @elseif($soal->content_text)
-                                        <span class="text-amber-400 text-[10px] font-bold font-mono">TEKS</span>
-                                    @else
-                                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                        </svg>
-                                    @endif
-                                </div>
-                                <div class="min-w-0">
-                                    <div class="flex items-center gap-2">
-                                        <a href="{{ route('admin.soal.show', $soal) }}" class="font-medium text-gray-100 hover:text-emerald-400 transition-colors truncate block max-w-xs">{{ $soal->title }}</a>
-                                        <button type="button"
-                                                onclick="copyToClipboard('{{ $soal->kode_unik }}', 'Kode Dokumen ({{ $soal->kode_unik }}) disalin!')"
-                                                title="Klik untuk salin kode akses dokumen"
-                                                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#142019] border border-[#1E3327] hover:border-emerald-500/50 text-emerald-300 font-mono text-[10px] font-semibold transition-all flex-shrink-0">
-                                            <span>{{ $soal->kode_unik }}</span>
-                                            <svg class="w-3 h-3 text-gray-400 hover:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                        </button>
+                            <div class="flex items-start gap-3.5">
+                                {{-- Kotak Ikon Dokumen & Floating Badge Jumlah Berkas --}}
+                                @if($soal->attachments->count() > 0)
+                                    <div class="relative flex-shrink-0 mt-0.5">
+                                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 shadow-sm transition-transform hover:scale-105"
+                                             title="{{ $soal->attachments->count() }} Lampiran Berkas">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                        </div>
+                                        <span class="absolute -top-1.5 -right-1.5 px-1.5 h-4 min-w-[18px] rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-[#070D09] text-[10px] font-mono font-black flex items-center justify-center shadow-md shadow-emerald-500/40 border border-[#0F1713]"
+                                              title="{{ $soal->attachments->count() }} File Lampiran">
+                                            {{ $soal->attachments->count() }}
+                                        </span>
                                     </div>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        @if(auth()->user()->isSuperAdmin())
-                                            <span class="text-xs text-gray-500">{{ $soal->admin->name }}</span>
+                                @elseif($soal->content_text)
+                                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 shadow-sm flex-shrink-0 mt-0.5"
+                                         title="Materi / Soal Teks Langsung">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h7"/>
+                                        </svg>
+                                    </div>
+                                @else
+                                    <div class="w-10 h-10 rounded-xl bg-gray-800/80 border border-gray-700/50 flex items-center justify-center text-gray-500 flex-shrink-0 mt-0.5">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                    </div>
+                                @endif
+
+                                <div class="min-w-0 flex-1">
+                                    {{-- Baris 1: Nama Dokumen --}}
+                                    <a href="{{ route('admin.soal.show', $soal) }}"
+                                       class="font-semibold text-sm text-gray-100 hover:text-emerald-400 transition-colors truncate block max-w-sm sm:max-w-md leading-snug"
+                                       title="{{ $soal->title }}">
+                                        {{ $soal->title }}
+                                    </a>
+
+                                    {{-- Baris 2: Kode Akses & Metadata di Bawah Nama Dokumen --}}
+                                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                        <button type="button"
+                                                onclick="copyToClipboard('{{ $accessCode }}', 'Kode akses ({{ $accessCode }}) berhasil disalin!')"
+                                                title="Klik untuk menyalin kode akses mahasiswa"
+                                                class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-[#142019] hover:bg-[#1A2E22] border border-[#1E3327] hover:border-emerald-500/40 text-emerald-400 font-mono text-[11px] font-semibold transition-all group/code cursor-pointer shadow-sm">
+                                            <span class="text-gray-500 text-[10px] font-sans font-normal uppercase tracking-wider">Kode:</span>
+                                            <span class="text-emerald-300 font-bold group-hover/code:text-emerald-200">{{ $accessCode }}</span>
+                                            <svg class="w-3.5 h-3.5 text-gray-500 group-hover/code:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                            </svg>
+                                        </button>
+
+                                        @if($soal->hasPassword())
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20" title="Dokumen dilindungi password">
+                                                <svg class="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                                <span>Password</span>
+                                            </span>
+                                        @endif
+
+                                        @if(auth()->user()->isSuperAdmin() && $soal->admin)
+                                            <span class="text-[11px] text-gray-500 flex items-center gap-1">
+                                                <span class="text-gray-600">&bull;</span>
+                                                <span>{{ $soal->admin->name }}</span>
+                                            </span>
                                         @endif
                                     </div>
                                 </div>

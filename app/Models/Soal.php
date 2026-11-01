@@ -146,6 +146,14 @@ class Soal extends Model
     }
 
     /**
+     * Cek apakah soal ini diproteksi password.
+     */
+    public function hasPassword(): bool
+    {
+        return !empty($this->password);
+    }
+
+    /**
      * Cek apakah soal ini bisa diakses saat ini.
      */
     public function isAccessible(): bool
