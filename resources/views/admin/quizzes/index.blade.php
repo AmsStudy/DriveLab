@@ -115,13 +115,13 @@
             </div>
 
             <div class="flex items-center gap-2">
-                <a href="{{ route('admin.quizzes.create') }}"
-                   class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20 whitespace-nowrap">
+                <button type="button" onclick="openCreateQuizModal()"
+                   class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20 whitespace-nowrap cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Buat Kuis Baru
-                </a>
+                </button>
             </div>
         </form>
     </div>
@@ -136,10 +136,10 @@
             </div>
             <h3 class="text-base font-bold text-white mb-1">Belum Ada Kuis</h3>
             <p class="text-xs text-gray-400 max-w-sm mx-auto mb-6">Buat kuis interaktif tipe Quizizz untuk menguji pemahaman mahasiswa sebelum atau setelah praktikum.</p>
-            <a href="{{ route('admin.quizzes.create') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold hover:opacity-95 transition-all">
+            <button type="button" onclick="openCreateQuizModal()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold hover:opacity-95 transition-all cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Buat Kuis Sekarang
-            </a>
+            </button>
         </div>
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -251,12 +251,13 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                             </button>
 
-                            {{-- Edit Quiz Settings --}}
-                            <a href="{{ route('admin.quizzes.edit', $quiz) }}"
-                               title="Edit Pengaturan Kuis"
-                               class="p-1.5 rounded-lg text-gray-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors">
+                            {{-- Edit Quiz Settings (Pop-up Modal) --}}
+                            <button type="button"
+                                    onclick="openEditQuizModal({{ $quiz->id }})"
+                                    title="Edit Pengaturan Kuis"
+                                    class="p-1.5 rounded-lg text-gray-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors cursor-pointer">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            </a>
+                            </button>
 
                             {{-- Delete Quiz --}}
                             <form method="POST" action="{{ route('admin.quizzes.destroy', $quiz) }}" class="inline"
@@ -280,6 +281,859 @@
     @endif
 
 </div>
+
+{{-- ─── Pop Up Modal: Buat Kuis Baru ─── --}}
+<div id="createQuizModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden">
+    {{-- Backdrop --}}
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="closeCreateQuizModal()"></div>
+
+    {{-- Modal Card --}}
+    <div class="relative bg-[#0F1713] border border-[#1A2820] rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl z-10 overflow-hidden">
+        {{-- Modal Header --}}
+        <div class="flex items-center justify-between px-6 py-4 border-b border-[#1A2820] bg-[#0F1713] flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold text-white leading-tight">Buat Kuis Baru</h2>
+                    <p class="text-xs text-gray-400">Atur parameter kuis interaktif tipe Quizizz untuk mahasiswa</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeCreateQuizModal()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition-colors" title="Tutup Modal (Esc)">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Form --}}
+        <form method="POST" action="{{ route('admin.quizzes.store') }}" id="createQuizForm" class="flex flex-col flex-1 min-h-0">
+            @csrf
+
+            {{-- Modal Body (Scrollable form content) --}}
+            <div class="overflow-y-auto px-6 py-6 space-y-6 flex-1">
+                @if($errors->any() && old('_method') !== 'PUT')
+                    <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm">
+                        <p class="font-bold mb-1">Terdapat kesalahan pengisian formulir:</p>
+                        <ul class="list-disc pl-5 space-y-0.5">
+                            @foreach($errors->all() as $err)
+                                <li>{{ $err }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                {{-- Section 1: Informasi Kuis --}}
+                <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center gap-2.5 pb-3 border-b border-[#1A2820]">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Informasi Dasar Kuis</h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        {{-- Judul --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Judul Kuis <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text" name="title" value="{{ old('_method') !== 'PUT' ? old('title') : '' }}" required
+                                   placeholder="Contoh: Kuis Pre-Test Modul 3: Struktur Data & Pointer"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-500">
+                        </div>
+
+                        {{-- Custom Kode Akses Kuis --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider flex items-center justify-between">
+                                <span>Kode Akses Kuis (Custom Kode)</span>
+                                <span class="text-[10px] text-gray-400 font-normal">Opsional &bull; Digunakan mahasiswa untuk bergabung</span>
+                            </label>
+                            <input type="text" name="access_code" value="{{ old('_method') !== 'PUT' ? old('access_code') : '' }}"
+                                   maxlength="20"
+                                   placeholder="Contoh: ALGO-01 atau MODUL2 (Kosongkan untuk acak otomatis: LAB-XXXXX)"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-emerald-400 placeholder-gray-600 font-mono font-bold uppercase tracking-wider">
+                            <p class="text-[11px] text-gray-500 mt-1">Kode unik yang dibagikan ke mahasiswa. Huruf besar, angka, dan strip (maks. 20 karakter). Kosongkan jika ingin digenerate acak otomatis.</p>
+                        </div>
+
+                        {{-- Deskripsi --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Deskripsi / Petunjuk Mahasiswa
+                            </label>
+                            <textarea name="description" rows="3"
+                                      placeholder="Tuliskan petunjuk kuis, materi yang diuji, atau instruksi pengerjaan..."
+                                      class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-500">{{ old('_method') !== 'PUT' ? old('description') : '' }}</textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {{-- Tautkan ke Dokumen Soal --}}
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                    Tautkan ke Dokumen Soal Praktikum (Opsional)
+                                </label>
+                                <select name="soal_id"
+                                        class="cyber-select w-full pl-4 pr-10 py-2.5 text-sm cursor-pointer">
+                                    <option value="">-- Tidak Ditautkan (Kuis Mandiri) --</option>
+                                    @foreach($soals as $s)
+                                        <option value="{{ $s->id }}" {{ (old('_method') !== 'PUT' && old('soal_id') == $s->id) ? 'selected' : '' }}>
+                                            {{ $s->title }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Password Akses Mahasiswa --}}
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                    Password Akses Soal (Opsional)
+                                </label>
+                                <input type="text" name="access_password" value="{{ old('_method') !== 'PUT' ? old('access_password') : '' }}"
+                                       placeholder="Kosongkan jika mahasiswa bebas akses tanpa password"
+                                       class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-600 font-mono">
+                            </div>
+                        </div>
+
+                        {{-- Daftar Pilihan Kelas --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider flex items-center justify-between">
+                                <span>Daftar Pilihan Kelas (Opsional)</span>
+                                <span class="text-[10px] text-gray-400 font-normal">Pisahkan dengan koma</span>
+                            </label>
+                            <input type="text" name="classes" value="{{ old('_method') !== 'PUT' ? old('classes') : '' }}"
+                                   placeholder="Contoh: A1, A2, B1, B2"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-600">
+                            <p class="text-[11px] text-gray-500 mt-1">Jika diisi, mahasiswa wajib memilih salah satu kelas saat memulai kuis. Rekap nilai dan data peserta dapat difilter & diunduh per kelas.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Section 2: Jadwal & Waktu Akses --}}
+                <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center gap-2.5 pb-3 border-b border-[#1A2820]">
+                        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                        <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider">Jadwal Akses & Batas Waktu</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Jadwal Mulai Akses (Opsional)
+                            </label>
+                            <input type="datetime-local" name="starts_at" value="{{ old('_method') !== 'PUT' ? old('starts_at') : '' }}"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Batas Akhir Akses (Opsional)
+                            </label>
+                            <input type="datetime-local" name="ends_at" value="{{ old('_method') !== 'PUT' ? old('ends_at') : '' }}"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Durasi Pengerjaan (Menit)
+                            </label>
+                            <input type="number" name="time_limit_minutes" value="{{ old('_method') !== 'PUT' ? old('time_limit_minutes', 15) : 15 }}" min="0" max="300"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                            <p class="text-[11px] text-gray-500 mt-1">Isi 0 jika tanpa durasi pengerjaan.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Timer Per Soal (Detik)
+                            </label>
+                            <input type="number" name="time_per_question" value="{{ old('_method') !== 'PUT' ? old('time_per_question', 0) : 0 }}" min="0" max="300"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                            <p class="text-[11px] text-gray-500 mt-1">Gaya Quizizz per soal. Isi 0 untuk nonaktif.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Maksimal Percobaan (Per NIM)
+                            </label>
+                            <input type="number" name="max_attempts" value="{{ old('_method') !== 'PUT' ? old('max_attempts', 1) : 1 }}" min="1" max="20" required
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Section 3: Fitur Interaktif & Tampilan Hasil --}}
+                <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center gap-2.5 pb-3 border-b border-[#1A2820]">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Fitur Interaktif & Tampilan Hasil</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
+                            <input type="checkbox" name="shuffle_questions" value="1" {{ (old('_method') !== 'PUT' && old('shuffle_questions', '1')) ? 'checked' : 'checked' }}
+                                   class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                            <div>
+                                <span class="text-xs font-bold text-white block">Acak Urutan Soal (Shuffle)</span>
+                                <span class="text-[11px] text-gray-400">Setiap mahasiswa menerima urutan soal yang berbeda.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
+                            <input type="checkbox" name="shuffle_options" value="1" {{ (old('_method') !== 'PUT' && old('shuffle_options', '1')) ? 'checked' : 'checked' }}
+                                   class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                            <div>
+                                <span class="text-xs font-bold text-white block">Acak Pilihan Jawaban</span>
+                                <span class="text-[11px] text-gray-400">Urutan pilihan A, B, C, D diacak secara otomatis.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
+                            <input type="checkbox" name="show_leaderboard" value="1" {{ (old('_method') !== 'PUT' && old('show_leaderboard', '1')) ? 'checked' : 'checked' }}
+                                   class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                            <div>
+                                <span class="text-xs font-bold text-white block">Tampilkan Leaderboard</span>
+                                <span class="text-[11px] text-gray-400">Mahasiswa dapat melihat peringkat mereka setelah selesai.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
+                            <input type="checkbox" name="show_review" value="1" {{ (old('_method') !== 'PUT' && old('show_review', '1')) ? 'checked' : 'checked' }}
+                                   class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                            <div>
+                                <span class="text-xs font-bold text-white block">Tampilkan Pembahasan Soal</span>
+                                <span class="text-[11px] text-gray-400">Mahasiswa dapat meninjau pembahasan jawaban yang tepat.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors md:col-span-2">
+                            <input type="checkbox" name="is_active" value="1" {{ (old('_method') !== 'PUT' && old('is_active', '1')) ? 'checked' : 'checked' }}
+                                   class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                            <div>
+                                <span class="text-xs font-bold text-emerald-400 block">Aktifkan Kuis Langsung</span>
+                                <span class="text-[11px] text-gray-400">Jika dicentang, kuis langsung dapat diakses mahasiswa menggunakan kode akses.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                {{-- Section 4: Keamanan Ujian & Anti-Cheat --}}
+                <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center gap-2.5 pb-3 border-b border-[#1A2820]">
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                        <h3 class="text-xs font-bold text-rose-400 uppercase tracking-wider">Keamanan Ujian & Mode Pengawasan</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                        {{-- Mode 1: Ujian Ketat --}}
+                        <label class="relative flex items-start gap-3 p-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 cursor-pointer transition-all" id="create_mode_strict_label">
+                            <input type="radio" name="allow_open_book" value="0" checked onchange="toggleCreateOpenBook(this.value)"
+                                   class="mt-1 text-emerald-500 focus:ring-emerald-500 bg-gray-900 border-gray-700">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-white">Mode Ujian Ketat (Anti-Cheat)</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Default</span>
+                                </div>
+                                <p class="text-[11px] text-gray-400 mt-1">
+                                    Mahasiswa dilarang berpindah tab. 1x switch: beku 60s, 2x switch: beku 90s, 3x: terkunci total.
+                                </p>
+                            </div>
+                        </label>
+
+                        {{-- Mode 2: Bisa Lihat Modul --}}
+                        <label class="relative flex items-start gap-3 p-4 rounded-xl border border-[#1A2820] bg-[#0F1713] cursor-pointer transition-all" id="create_mode_open_label">
+                            <input type="radio" name="allow_open_book" value="1" onchange="toggleCreateOpenBook(this.value)"
+                                   class="mt-1 text-sky-500 focus:ring-sky-500 bg-gray-900 border-gray-700">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-white">Bisa Lihat Modul (Open Book)</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">Bebas Akses</span>
+                                </div>
+                                <p class="text-[11px] text-gray-400 mt-1">
+                                    Mahasiswa bebas berpindah tab untuk mempelajari modul tanpa penalti freeze.
+                                </p>
+                            </div>
+                        </label>
+                    </div>
+
+                    {{-- Password Buka Kunci Darurat --}}
+                    <div id="create_unlock_pw_wrapper" class="pt-3 border-t border-[#1A2820]">
+                        <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                            Password Khusus Buka Kunci Ujian (Opsional)
+                        </label>
+                        <input type="text" name="admin_unlock_password" value="{{ old('_method') !== 'PUT' ? old('admin_unlock_password') : '' }}"
+                               placeholder="Contoh: PENG4W45#2026 (Kosongkan jika ingin pakai password akun)"
+                               class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-rose-500 focus:ring-1 focus:ring-rose-500 rounded-xl text-sm text-gray-100 placeholder-gray-600 font-mono">
+                        <p class="text-[11px] text-gray-500 mt-1">
+                            Digunakan membuka kuis mahasiswa yang terkunci jika melanggar Strike 3. Jika kosong, gunakan password akun Anda.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            {{-- Modal Footer --}}
+            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#1A2820] bg-[#0F1713] flex-shrink-0">
+                <button type="button" onclick="closeCreateQuizModal()"
+                        class="px-5 py-2.5 rounded-xl border border-[#1A2820] hover:bg-gray-800 text-gray-300 text-sm font-medium transition-colors">
+                    Batal
+                </button>
+                <button type="submit"
+                        class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                    <span>Simpan & Lanjut Buat Soal</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ─── Pop Up Modal: Edit Pengaturan Kuis ─── --}}
+<div id="editQuizModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden">
+    {{-- Backdrop --}}
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="closeEditQuizModal()"></div>
+
+    {{-- Modal Card --}}
+    <div class="relative bg-[#0F1713] border border-[#1A2820] rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl z-10 overflow-hidden">
+        {{-- Modal Header --}}
+        <div class="flex items-center justify-between px-6 py-4 border-b border-[#1A2820] bg-[#0F1713] flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold text-white leading-tight">Pengaturan Kuis</h2>
+                    <p class="text-xs text-gray-400">Perbarui parameter kuis interaktif tanpa meninggalkan halaman</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <a id="edit_modal_bank_soal_btn" href="#"
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 text-xs font-semibold transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    Bank Soal
+                </a>
+                <button type="button" onclick="closeEditQuizModal()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition-colors" title="Tutup Modal (Esc)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        {{-- Form --}}
+        <form method="POST" action="" id="editQuizForm" class="flex flex-col flex-1 min-h-0">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="quiz_id" id="edit_quiz_id" value="{{ old('quiz_id') }}">
+
+            {{-- Modal Body (Scrollable form content) --}}
+            <div class="overflow-y-auto px-6 py-6 space-y-6 flex-1">
+                @if($errors->any() && old('_method') === 'PUT')
+                    <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm">
+                        <p class="font-bold mb-1">Terdapat kesalahan pengisian formulir:</p>
+                        <ul class="list-disc pl-5 space-y-0.5">
+                            @foreach($errors->all() as $err)
+                                <li>{{ $err }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                {{-- Quick Access Bar inside Modal --}}
+                <div class="bg-[#090D0B] border border-[#1A2820] rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-400 font-semibold uppercase tracking-wider">Kode Akses:</span>
+                        <span id="edit_modal_access_code_pill" class="px-2.5 py-0.5 rounded-lg bg-[#142019] border border-[#1E3327] text-emerald-300 font-mono font-bold"></span>
+                        <button type="button" onclick="copyCurrentEditCode()" class="p-1 text-gray-400 hover:text-emerald-400 transition-colors" title="Salin Kode">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        </button>
+                    </div>
+
+                    <div>
+                        <button type="button" onclick="copyCurrentEditLobbyLink()"
+                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#142019] border border-[#1E3327] hover:border-emerald-500/40 text-gray-300 hover:text-white transition-colors">
+                            <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                            <span>Salin Link Mahasiswa</span>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Section 1: Informasi Kuis --}}
+                <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center gap-2.5 pb-3 border-b border-[#1A2820]">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Informasi Dasar Kuis</h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        {{-- Judul --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Judul Kuis <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text" name="title" id="edit_quiz_title" required
+                                   placeholder="Contoh: Kuis Pre-Test Modul 3: Struktur Data & Pointer"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-500">
+                        </div>
+
+                        {{-- Custom Kode Akses Kuis --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider flex items-center justify-between">
+                                <span>Kode Akses Kuis (Custom Kode) <span class="text-red-400">*</span></span>
+                                <span class="text-[10px] text-gray-400 font-normal">Digunakan mahasiswa untuk bergabung</span>
+                            </label>
+                            <input type="text" name="access_code" id="edit_quiz_access_code" required
+                                   maxlength="20"
+                                   placeholder="Contoh: ALGO-01 atau MODUL2"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-emerald-400 placeholder-gray-600 font-mono font-bold uppercase tracking-wider">
+                            <p class="text-[11px] text-gray-500 mt-1">Kode unik kuis. Huruf besar, angka, dan strip (maks. 20 karakter).</p>
+                        </div>
+
+                        {{-- Deskripsi --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Deskripsi / Petunjuk Mahasiswa
+                            </label>
+                            <textarea name="description" id="edit_quiz_description" rows="3"
+                                      placeholder="Tuliskan petunjuk kuis, materi yang diuji, atau instruksi pengerjaan..."
+                                      class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-500"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {{-- Tautkan ke Dokumen Soal --}}
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                    Tautkan ke Dokumen Soal Praktikum (Opsional)
+                                </label>
+                                <select name="soal_id" id="edit_quiz_soal_id"
+                                        class="cyber-select w-full pl-4 pr-10 py-2.5 text-sm cursor-pointer">
+                                    <option value="">-- Tidak Ditautkan (Kuis Mandiri) --</option>
+                                    @foreach($soals as $s)
+                                        <option value="{{ $s->id }}">{{ $s->title }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Password Akses Mahasiswa --}}
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                    Password Akses Soal (Opsional)
+                                </label>
+                                <input type="text" name="access_password" id="edit_quiz_access_password"
+                                       placeholder="Kosongkan jika mahasiswa bebas akses tanpa password"
+                                       class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-600 font-mono">
+                            </div>
+                        </div>
+
+                        {{-- Daftar Pilihan Kelas --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider flex items-center justify-between">
+                                <span>Daftar Pilihan Kelas (Opsional)</span>
+                                <span class="text-[10px] text-gray-400 font-normal">Pisahkan dengan koma</span>
+                            </label>
+                            <input type="text" name="classes" id="edit_quiz_classes"
+                                   placeholder="Contoh: A1, A2, B1, B2"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-600">
+                            <p class="text-[11px] text-gray-500 mt-1">Jika diisi, mahasiswa wajib memilih salah satu kelas saat memulai kuis. Rekap nilai dan data peserta dapat difilter & diunduh per kelas.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Section 2: Jadwal & Waktu Akses --}}
+                <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center gap-2.5 pb-3 border-b border-[#1A2820]">
+                        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                        <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider">Jadwal Akses & Batas Waktu</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Jadwal Mulai Akses (Opsional)
+                            </label>
+                            <input type="datetime-local" name="starts_at" id="edit_quiz_starts_at"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Batas Akhir Akses (Opsional)
+                            </label>
+                            <input type="datetime-local" name="ends_at" id="edit_quiz_ends_at"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Durasi Pengerjaan (Menit)
+                            </label>
+                            <input type="number" name="time_limit_minutes" id="edit_quiz_time_limit_minutes" min="0" max="300"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                            <p class="text-[11px] text-gray-500 mt-1">Isi 0 jika tanpa durasi pengerjaan.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Timer Per Soal (Detik)
+                            </label>
+                            <input type="number" name="time_per_question" id="edit_quiz_time_per_question" min="0" max="300"
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                            <p class="text-[11px] text-gray-500 mt-1">Gaya Quizizz per soal. Isi 0 untuk nonaktif.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                                Maksimal Percobaan (Per NIM)
+                            </label>
+                            <input type="number" name="max_attempts" id="edit_quiz_max_attempts" min="1" max="20" required
+                                   class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100">
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Section 3: Fitur Interaktif & Tampilan Hasil --}}
+                <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center gap-2.5 pb-3 border-b border-[#1A2820]">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Fitur Interaktif & Tampilan Hasil</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
+                            <input type="checkbox" name="shuffle_questions" id="edit_quiz_shuffle_questions" value="1"
+                                   class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                            <div>
+                                <span class="text-xs font-bold text-white block">Acak Urutan Soal (Shuffle)</span>
+                                <span class="text-[11px] text-gray-400">Setiap mahasiswa menerima urutan soal yang berbeda.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
+                            <input type="checkbox" name="shuffle_options" id="edit_quiz_shuffle_options" value="1"
+                                   class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                            <div>
+                                <span class="text-xs font-bold text-white block">Acak Pilihan Jawaban</span>
+                                <span class="text-[11px] text-gray-400">Urutan pilihan A, B, C, D diacak secara otomatis.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
+                            <input type="checkbox" name="show_leaderboard" id="edit_quiz_show_leaderboard" value="1"
+                                   class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                            <div>
+                                <span class="text-xs font-bold text-white block">Tampilkan Leaderboard</span>
+                                <span class="text-[11px] text-gray-400">Mahasiswa dapat melihat peringkat mereka setelah selesai.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
+                            <input type="checkbox" name="show_review" id="edit_quiz_show_review" value="1"
+                                   class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                            <div>
+                                <span class="text-xs font-bold text-white block">Tampilkan Pembahasan Soal</span>
+                                <span class="text-[11px] text-gray-400">Mahasiswa dapat meninjau pembahasan jawaban yang tepat.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors md:col-span-2">
+                            <input type="checkbox" name="is_active" id="edit_quiz_is_active" value="1"
+                                   class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                            <div>
+                                <span class="text-xs font-bold text-emerald-400 block">Aktifkan Kuis</span>
+                                <span class="text-[11px] text-gray-400">Jika dicentang, kuis aktif dan dapat diakses mahasiswa menggunakan kode akses.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                {{-- Section 4: Keamanan Ujian & Anti-Cheat --}}
+                <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center gap-2.5 pb-3 border-b border-[#1A2820]">
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                        <h3 class="text-xs font-bold text-rose-400 uppercase tracking-wider">Keamanan Ujian & Mode Pengawasan</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                        {{-- Mode 1: Ujian Ketat --}}
+                        <label class="relative flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all" id="edit_mode_strict_label">
+                            <input type="radio" name="allow_open_book" id="edit_allow_open_book_0" value="0" onchange="toggleEditOpenBook(this.value)"
+                                   class="mt-1 text-emerald-500 focus:ring-emerald-500 bg-gray-900 border-gray-700">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-white">Mode Ujian Ketat (Anti-Cheat)</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Default</span>
+                                </div>
+                                <p class="text-[11px] text-gray-400 mt-1">
+                                    Mahasiswa dilarang berpindah tab. 1x switch: beku 60s, 2x switch: beku 90s, 3x: terkunci total.
+                                </p>
+                            </div>
+                        </label>
+
+                        {{-- Mode 2: Bisa Lihat Modul --}}
+                        <label class="relative flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all" id="edit_mode_open_label">
+                            <input type="radio" name="allow_open_book" id="edit_allow_open_book_1" value="1" onchange="toggleEditOpenBook(this.value)"
+                                   class="mt-1 text-sky-500 focus:ring-sky-500 bg-gray-900 border-gray-700">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-white">Bisa Lihat Modul (Open Book)</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">Bebas Akses</span>
+                                </div>
+                                <p class="text-[11px] text-gray-400 mt-1">
+                                    Mahasiswa bebas berpindah tab untuk mempelajari modul tanpa penalti freeze.
+                                </p>
+                            </div>
+                        </label>
+                    </div>
+
+                    {{-- Password Buka Kunci Darurat --}}
+                    <div id="edit_unlock_pw_wrapper" class="pt-3 border-t border-[#1A2820]">
+                        <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
+                            Password Khusus Buka Kunci Ujian (Opsional)
+                        </label>
+                        <input type="text" name="admin_unlock_password" id="edit_quiz_admin_unlock_password"
+                               placeholder="Contoh: PENG4W45#2026 (Kosongkan jika ingin pakai password akun)"
+                               class="w-full px-4 py-2.5 bg-[#0F1713] border border-[#1A2820] focus:border-rose-500 focus:ring-1 focus:ring-rose-500 rounded-xl text-sm text-gray-100 placeholder-gray-600 font-mono">
+                        <p class="text-[11px] text-gray-500 mt-1">
+                            Digunakan membuka kuis mahasiswa yang terkunci jika melanggar Strike 3. Jika kosong, gunakan password akun Anda.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            {{-- Modal Footer --}}
+            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#1A2820] bg-[#0F1713] flex-shrink-0">
+                <button type="button" onclick="closeEditQuizModal()"
+                        class="px-5 py-2.5 rounded-xl border border-[#1A2820] hover:bg-gray-800 text-gray-300 text-sm font-medium transition-colors">
+                    Batal
+                </button>
+                <button type="submit"
+                        class="bg-gradient-to-r from-amber-500 to-emerald-600 hover:from-amber-600 hover:to-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <span>Simpan Pengaturan Kuis</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@php
+    $quizzesForJs = $quizzes->getCollection();
+    if (isset($extraEditQuiz) && $extraEditQuiz) {
+        $quizzesForJs = $quizzesForJs->push($extraEditQuiz);
+    }
+    $quizzesMap = [];
+    foreach ($quizzesForJs as $q) {
+        $quizzesMap[$q->id] = [
+            'id' => $q->id,
+            'title' => $q->title,
+            'access_code' => $q->access_code,
+            'description' => $q->description ?? '',
+            'soal_id' => (string)($q->soal_id ?? ''),
+            'access_password' => $q->access_password ?? '',
+            'starts_at' => $q->starts_at ? $q->starts_at->format('Y-m-d\TH:i') : '',
+            'ends_at' => $q->ends_at ? $q->ends_at->format('Y-m-d\TH:i') : '',
+            'time_limit_minutes' => $q->time_limit_minutes ?? 0,
+            'time_per_question' => $q->time_per_question ?? 0,
+            'max_attempts' => $q->max_attempts ?? 1,
+            'shuffle_questions' => (bool)$q->shuffle_questions,
+            'shuffle_options' => (bool)$q->shuffle_options,
+            'show_leaderboard' => (bool)$q->show_leaderboard,
+            'show_review' => (bool)$q->show_review,
+            'allow_open_book' => (string)($q->allow_open_book ? '1' : '0'),
+            'admin_unlock_password' => $q->admin_unlock_password ?? '',
+            'classes' => is_array($q->classes) ? implode(', ', $q->classes) : ($q->classes ?? ''),
+            'is_active' => (bool)$q->is_active,
+            'update_url' => route('admin.quizzes.update', $q),
+            'bank_soal_url' => route('admin.quizzes.questions', $q),
+            'lobby_url' => route('quiz.lobby', $q->unique_token),
+        ];
+    }
+@endphp
+
+@push('scripts')
+<script>
+    window.quizzesData = @json($quizzesMap);
+    let currentEditQuiz = null;
+
+    function openCreateQuizModal() {
+        const modal = document.getElementById('createQuizModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            setTimeout(() => {
+                const titleInput = modal.querySelector('input[name="title"]');
+                if (titleInput) titleInput.focus();
+            }, 100);
+        }
+    }
+
+    function closeCreateQuizModal() {
+        const modal = document.getElementById('createQuizModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    }
+
+    function toggleCreateOpenBook(val) {
+        const wrapper = document.getElementById('create_unlock_pw_wrapper');
+        const strictLabel = document.getElementById('create_mode_strict_label');
+        const openLabel = document.getElementById('create_mode_open_label');
+        if (val === '1') {
+            if (wrapper) wrapper.classList.add('hidden');
+            if (openLabel) {
+                openLabel.className = 'relative flex items-start gap-3 p-4 rounded-xl border border-sky-500/40 bg-sky-500/10 cursor-pointer transition-all';
+            }
+            if (strictLabel) {
+                strictLabel.className = 'relative flex items-start gap-3 p-4 rounded-xl border border-[#1A2820] bg-[#0F1713] cursor-pointer transition-all';
+            }
+        } else {
+            if (wrapper) wrapper.classList.remove('hidden');
+            if (strictLabel) {
+                strictLabel.className = 'relative flex items-start gap-3 p-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 cursor-pointer transition-all';
+            }
+            if (openLabel) {
+                openLabel.className = 'relative flex items-start gap-3 p-4 rounded-xl border border-[#1A2820] bg-[#0F1713] cursor-pointer transition-all';
+            }
+        }
+    }
+
+    function openEditQuizModal(quizId) {
+        const quiz = window.quizzesData ? window.quizzesData[quizId] : null;
+        if (!quiz) {
+            console.error('Quiz not found for ID:', quizId);
+            return;
+        }
+
+        currentEditQuiz = quiz;
+        const form = document.getElementById('editQuizForm');
+        if (!form) return;
+
+        form.action = quiz.update_url;
+        document.getElementById('edit_quiz_id').value = quiz.id;
+        document.getElementById('edit_quiz_title').value = quiz.title;
+        document.getElementById('edit_quiz_access_code').value = quiz.access_code;
+        document.getElementById('edit_quiz_description').value = quiz.description;
+
+        const soalSelect = document.getElementById('edit_quiz_soal_id');
+        if (soalSelect) {
+            soalSelect.value = quiz.soal_id || '';
+            soalSelect.dispatchEvent(new Event('change'));
+        }
+
+        document.getElementById('edit_quiz_access_password').value = quiz.access_password;
+        document.getElementById('edit_quiz_classes').value = quiz.classes;
+        document.getElementById('edit_quiz_starts_at').value = quiz.starts_at;
+        document.getElementById('edit_quiz_ends_at').value = quiz.ends_at;
+        document.getElementById('edit_quiz_time_limit_minutes').value = quiz.time_limit_minutes;
+        document.getElementById('edit_quiz_time_per_question').value = quiz.time_per_question;
+        document.getElementById('edit_quiz_max_attempts').value = quiz.max_attempts;
+
+        document.getElementById('edit_quiz_shuffle_questions').checked = quiz.shuffle_questions;
+        document.getElementById('edit_quiz_shuffle_options').checked = quiz.shuffle_options;
+        document.getElementById('edit_quiz_show_leaderboard').checked = quiz.show_leaderboard;
+        document.getElementById('edit_quiz_show_review').checked = quiz.show_review;
+        document.getElementById('edit_quiz_is_active').checked = quiz.is_active;
+
+        const rad0 = document.getElementById('edit_allow_open_book_0');
+        const rad1 = document.getElementById('edit_allow_open_book_1');
+        if (quiz.allow_open_book === '1') {
+            if (rad1) rad1.checked = true;
+            toggleEditOpenBook('1');
+        } else {
+            if (rad0) rad0.checked = true;
+            toggleEditOpenBook('0');
+        }
+
+        document.getElementById('edit_quiz_admin_unlock_password').value = quiz.admin_unlock_password;
+
+        // Quick Bar
+        const codePill = document.getElementById('edit_modal_access_code_pill');
+        if (codePill) codePill.textContent = quiz.access_code;
+
+        const bankBtn = document.getElementById('edit_modal_bank_soal_btn');
+        if (bankBtn) bankBtn.href = quiz.bank_soal_url;
+
+        const modal = document.getElementById('editQuizModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+    }
+
+    function closeEditQuizModal() {
+        const modal = document.getElementById('editQuizModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    }
+
+    function toggleEditOpenBook(val) {
+        const wrapper = document.getElementById('edit_unlock_pw_wrapper');
+        const strictLabel = document.getElementById('edit_mode_strict_label');
+        const openLabel = document.getElementById('edit_mode_open_label');
+        if (val === '1') {
+            if (wrapper) wrapper.classList.add('hidden');
+            if (openLabel) {
+                openLabel.className = 'relative flex items-start gap-3 p-4 rounded-xl border border-sky-500/40 bg-sky-500/10 cursor-pointer transition-all';
+            }
+            if (strictLabel) {
+                strictLabel.className = 'relative flex items-start gap-3 p-4 rounded-xl border border-[#1A2820] bg-[#0F1713] cursor-pointer transition-all';
+            }
+        } else {
+            if (wrapper) wrapper.classList.remove('hidden');
+            if (strictLabel) {
+                strictLabel.className = 'relative flex items-start gap-3 p-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 cursor-pointer transition-all';
+            }
+            if (openLabel) {
+                openLabel.className = 'relative flex items-start gap-3 p-4 rounded-xl border border-[#1A2820] bg-[#0F1713] cursor-pointer transition-all';
+            }
+        }
+    }
+
+    function copyCurrentEditCode() {
+        if (currentEditQuiz && currentEditQuiz.access_code) {
+            copyToClipboard(currentEditQuiz.access_code, 'Kode Kuis berhasil disalin!');
+        }
+    }
+
+    function copyCurrentEditLobbyLink() {
+        if (currentEditQuiz && currentEditQuiz.lobby_url) {
+            copyToClipboard(currentEditQuiz.lobby_url, 'Link kuis mahasiswa berhasil disalin!');
+        }
+    }
+
+    // Escape listener for modals
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const createModal = document.getElementById('createQuizModal');
+            if (createModal && !createModal.classList.contains('hidden')) {
+                closeCreateQuizModal();
+            }
+            const editModal = document.getElementById('editQuizModal');
+            if (editModal && !editModal.classList.contains('hidden')) {
+                closeEditQuizModal();
+            }
+        }
+    });
+
+    // Auto-reopen on validation errors / redirects
+    document.addEventListener('DOMContentLoaded', () => {
+        @if(session('open_create_modal') || ($errors->any() && old('_method') !== 'PUT'))
+            openCreateQuizModal();
+        @elseif(session('edit_quiz_id') || ($errors->any() && old('_method') === 'PUT'))
+            openEditQuizModal({{ (int)(session('edit_quiz_id') ?? old('quiz_id')) }});
+        @endif
+    });
+</script>
+@endpush
 
 {{-- Clipboard helper --}}
 <script>

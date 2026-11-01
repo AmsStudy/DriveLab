@@ -742,4 +742,88 @@ class QuizFeatureTest extends TestCase
         ]);
         $invalidRes->assertSessionHasErrors('access_code');
     }
+
+    public function test_quiz_create_and_edit_routes_redirect_to_index_with_modal_triggers(): void
+    {
+        // 1. GET /admin/quizzes/create should redirect to index with open_create_modal
+        $createRes = $this->actingAs($this->admin)->get(route('admin.quizzes.create'));
+        $createRes->assertRedirect(route('admin.quizzes.index'));
+        $createRes->assertSessionHas('open_create_modal', true);
+
+        // 2. Create sample quiz
+        $quiz = Quiz::create([
+            'user_id'     => $this->admin->id,
+            'title'       => 'Kuis Jaringan Komputer',
+            'access_code' => 'NET-101',
+            'is_active'   => true,
+        ]);
+
+        // 3. GET /admin/quizzes/{quiz}/edit should redirect to index with edit_quiz_id
+        $editRes = $this->actingAs($this->admin)->get(route('admin.quizzes.edit', $quiz));
+        $editRes->assertRedirect(route('admin.quizzes.index'));
+        $editRes->assertSessionHas('edit_quiz_id', $quiz->id);
+
+        // 4. Index view contains create and edit modal popups
+        $indexRes = $this->actingAs($this->admin)->get(route('admin.quizzes.index'));
+        $indexRes->assertStatus(200);
+        $indexRes->assertSee('id="createQuizModal"', false);
+        $indexRes->assertSee('id="editQuizModal"', false);
+        $indexRes->assertSee('openCreateQuizModal()', false);
+        $indexRes->assertSee('openEditQuizModal(' . $quiz->id . ')', false);
+    }
+
+    public function test_quiz_results_page_renders_hero_score_card_and_student_answer_review_modal(): void
+    {
+        $quiz = Quiz::create([
+            'user_id'     => $this->admin->id,
+            'title'       => 'Pre-Test Modul 2: Algoritma & Pointer',
+            'access_code' => 'ALGO-PTR',
+            'is_active'   => true,
+        ]);
+
+        $question = $quiz->questions()->create([
+            'question_text' => 'Berapakah ukuran pointer pada arsitektur 64-bit?',
+            'question_type' => 'multiple_choice',
+            'points'        => 10,
+            'order_num'     => 1,
+            'explanation'   => 'Arsitektur 64-bit memiliki alamat memori sepanjang 8 bytes.',
+        ]);
+
+        $opt1 = $question->options()->create(['option_text' => '8 bytes', 'is_correct' => true, 'order_num' => 1]);
+        $opt2 = $question->options()->create(['option_text' => '4 bytes', 'is_correct' => false, 'order_num' => 2]);
+
+        $attempt = QuizAttempt::create([
+            'quiz_id'               => $quiz->id,
+            'nim'                   => '22010101',
+            'student_name'          => 'Budi Santoso',
+            'score'                 => 100.0,
+            'total_points_earned'   => 10,
+            'total_points_possible' => 10,
+            'correct_answers_count' => 1,
+            'wrong_answers_count'   => 0,
+            'duration_seconds'      => 123,
+            'tab_switch_count'      => 0,
+            'completed_at'          => now(),
+        ]);
+
+        $attempt->answers()->create([
+            'quiz_question_id'   => $question->id,
+            'selected_option_id' => $opt1->id,
+            'is_correct'         => true,
+            'points_earned'      => 10,
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.quizzes.results', $quiz));
+        $response->assertStatus(200);
+
+        // Verify Hero Card & Answer Sheet elements are present in the view
+        $response->assertSee('Pengerjaan Kuis Selesai');
+        $response->assertSee('Skor Akhir');
+        $response->assertSee('Jawaban Benar');
+        $response->assertSee('Jawaban Salah');
+        $response->assertSee('Waktu Selesai');
+        $response->assertSee('Pengawas Anti-Cheat');
+        $response->assertSee('Lembar Jawaban', false);
+        $response->assertSee('viewAttemptDetail', false);
+    }
 }

@@ -28,11 +28,17 @@ class QuizQuestion extends Model
 
     protected $appends = [
         'image_url',
+        'formatted_text',
     ];
 
     public function getImageUrlAttribute(): ?string
     {
         return $this->image_path ? asset('storage/' . $this->image_path) : null;
+    }
+
+    public function getFormattedTextAttribute(): string
+    {
+        return \App\Helpers\RichTextHelper::format($this->question_text);
     }
 
     public function isMultiSelect(): bool

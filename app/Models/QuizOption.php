@@ -25,11 +25,17 @@ class QuizOption extends Model
 
     protected $appends = [
         'image_url',
+        'formatted_text',
     ];
 
     public function getImageUrlAttribute(): ?string
     {
         return $this->image_path ? asset('storage/' . $this->image_path) : null;
+    }
+
+    public function getFormattedTextAttribute(): string
+    {
+        return \App\Helpers\RichTextHelper::format($this->option_text);
     }
 
     public function question(): BelongsTo

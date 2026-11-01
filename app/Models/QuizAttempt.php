@@ -54,6 +54,15 @@ class QuizAttempt extends Model
         'is_force_submitted'    => 'boolean',
     ];
 
+    protected $appends = [
+        'formatted_duration',
+    ];
+
+    public function getFormattedDurationAttribute(): string
+    {
+        return $this->formattedDuration();
+    }
+
     public function quiz(): BelongsTo
     {
         return $this->belongsTo(Quiz::class);

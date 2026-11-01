@@ -62,21 +62,26 @@ class QuizController extends Controller
 
         $soals = $user->isSuperAdmin() ? Soal::select('id', 'title')->get() : Soal::where('user_id', $user->id)->select('id', 'title')->get();
 
+        $editQuizId = session('edit_quiz_id') ?? old('quiz_id');
+        $extraEditQuiz = null;
+        if ($editQuizId && !$quizzes->contains('id', (int)$editQuizId)) {
+            $extraEditQuiz = Quiz::find($editQuizId);
+        }
+
         return view('admin.quizzes.index', compact(
             'quizzes',
             'totalQuizzes',
             'totalQuestions',
             'totalAttempts',
             'avgScore',
-            'soals'
+            'soals',
+            'extraEditQuiz'
         ));
     }
 
     public function create()
     {
-        $user = auth()->user();
-        $soals = $user->isSuperAdmin() ? Soal::select('id', 'title')->get() : Soal::where('user_id', $user->id)->select('id', 'title')->get();
-        return view('admin.quizzes.create', compact('soals'));
+        return redirect()->route('admin.quizzes.index')->with('open_create_modal', true);
     }
 
     public function store(Request $request)
@@ -145,9 +150,7 @@ class QuizController extends Controller
     public function edit(Quiz $quiz)
     {
         $this->authorizeQuiz($quiz);
-        $user = auth()->user();
-        $soals = $user->isSuperAdmin() ? Soal::select('id', 'title')->get() : Soal::where('user_id', $user->id)->select('id', 'title')->get();
-        return view('admin.quizzes.edit', compact('quiz', 'soals'));
+        return redirect()->route('admin.quizzes.index')->with('edit_quiz_id', $quiz->id);
     }
 
     public function update(Request $request, Quiz $quiz)
