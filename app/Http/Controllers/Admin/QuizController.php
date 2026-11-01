@@ -443,8 +443,8 @@ class QuizController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        // Calculate analytics efficiently via SQL aggregation (prevents OOM on mini server)
-        $analytics = $quiz->attempts()
+        // Calculate analytics efficiently via SQL aggregation (prevents OOM on mini server & MySQL 1140 ONLY_FULL_GROUP_BY error)
+        $analytics = QuizAttempt::where('quiz_id', $quiz->id)
             ->whereNotNull('completed_at')
             ->selectRaw('
                 COUNT(*) as total_participants,

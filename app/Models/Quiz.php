@@ -98,7 +98,7 @@ class Quiz extends Model
 
     public function attempts(): HasMany
     {
-        return $this->hasMany(QuizAttempt::class)->latest('started_at');
+        return $this->hasMany(QuizAttempt::class);
     }
 
     public function totalPoints(): int
