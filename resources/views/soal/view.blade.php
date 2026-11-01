@@ -6,7 +6,8 @@
 <title>{{ $soal->title }} — IC-Labs Repository</title>
 <link rel="icon" type="image/png" href="{{ asset('images/iclabs-logo.png') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Chakra+Petch:wght@500;600;700&family=Syne:wght@500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -53,38 +54,187 @@ body::before{
 /* ─── HEADER ─── */
 .topbar{
   position:sticky;top:0;z-index:100;
-  background:rgba(9,13,11,0.85);
+  background:rgba(9,13,11,0.92);
   backdrop-filter:blur(24px);
-  border-bottom:1px solid var(--border);
+  -webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid #1A2820;
   padding:0 24px;
-  height:62px;
+  height:66px;
   display:flex;align-items:center;justify-content:space-between;
 }
 
-.topbar-left{display:flex;align-items:center;gap:14px}
+.topbar-left{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  min-width:0;
+}
 
-.logo-icon{
-  width:36px;height:36px;border-radius:10px;
-  background:linear-gradient(135deg,var(--emerald),var(--violet));
-  display:flex;align-items:center;justify-content:center;
+.topbar-brand-link{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-decoration:none;
   flex-shrink:0;
-  box-shadow:0 0 20px rgba(16,185,129,0.3);
-  position:relative;
+  transition:all 0.25s ease;
 }
-.logo-icon::after{
-  content:'';position:absolute;inset:-1px;border-radius:11px;
-  background:linear-gradient(135deg,var(--emerald),var(--violet));
-  z-index:-1;opacity:0.4;filter:blur(8px);
+.topbar-brand-link:hover{
+  opacity:0.95;
+  transform:translateY(-1px);
 }
 
-.topbar-title{
-  font-family:'Syne',sans-serif;
-  font-size:14px;font-weight:600;color:var(--text1);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px;
+.brand-logo-box{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  background:rgba(16,185,129,0.08);
+  border:1px solid rgba(52,211,153,0.28);
+  box-shadow:0 0 16px rgba(16,185,129,0.15);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:5px;
+  flex-shrink:0;
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.topbar-cat{
-  font-size:11px;color:var(--emerald);font-weight:500;
-  display:flex;align-items:center;gap:4px;margin-top:2px;
+.topbar-brand-link:hover .brand-logo-box{
+  border-color:rgba(52,211,153,0.55);
+  background:rgba(16,185,129,0.14);
+  box-shadow:0 0 24px rgba(16,185,129,0.3);
+  transform:scale(1.02);
+}
+
+.brand-logo-img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.brand-text-block{
+  display:flex;
+  flex-direction:column;
+  line-height:1;
+}
+
+.brand-name{
+  font-family:'Orbitron',sans-serif;
+  font-size:15px;
+  font-weight:800;
+  color:#FFFFFF;
+  letter-spacing:1.2px;
+}
+
+.brand-tag{
+  font-family:'Chakra Petch',sans-serif;
+  font-size:9.5px;
+  font-weight:700;
+  color:#34D399;
+  letter-spacing:2px;
+  margin-top:3px;
+  text-transform:uppercase;
+}
+
+.topbar-divider{
+  width:1px;
+  height:28px;
+  background:#1A2820;
+  flex-shrink:0;
+}
+
+.topbar-doc-info{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-width:0;
+}
+
+.topbar-title-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+
+.topbar-doc-title{
+  font-family:'Syne',sans-serif;
+  font-size:15px;
+  font-weight:700;
+  color:#F3F4F6;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:320px;
+  letter-spacing:-0.01em;
+  margin:0;
+}
+
+.topbar-meta-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:4px;
+  flex-wrap:wrap;
+}
+
+.category-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:2px 8px;
+  border-radius:6px;
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:0.02em;
+  line-height:1.3;
+}
+
+.category-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.schedule-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:2px 8px;
+  border-radius:6px;
+  font-size:10.5px;
+  font-weight:500;
+  color:#FBBF24;
+  background:rgba(245,158,11,0.1);
+  border:1px solid rgba(245,158,11,0.25);
+  line-height:1.3;
+}
+
+@media (max-width: 768px){
+  .topbar-doc-title{
+    max-width:200px;
+    font-size:13.5px;
+  }
+  .brand-tag{
+    display:none;
+  }
+}
+
+@media (max-width: 540px){
+  .topbar{
+    padding:0 16px;
+  }
+  .topbar-left{
+    gap:10px;
+  }
+  .brand-text-block{
+    display:none;
+  }
+  .topbar-divider{
+    display:none;
+  }
+  .topbar-doc-title{
+    max-width:150px;
+  }
 }
 
 .badge-active{
@@ -94,6 +244,7 @@ body::before{
   border:1px solid rgba(34,197,94,0.2);
   padding:5px 12px;border-radius:100px;
   letter-spacing:0.02em;
+  flex-shrink:0;
 }
 .badge-dot{
   width:6px;height:6px;border-radius:50%;
@@ -908,18 +1059,42 @@ footer{
 {{-- ─── TOP BAR ─── --}}
 <header class="topbar">
     <div class="topbar-left">
-        <a href="/" class="logo-icon" style="padding:4px;text-decoration:none;" title="IC-Labs Repository">
-            <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs" style="width:100%;height:100%;object-fit:contain;" draggable="false">
+        {{-- Platform Brand --}}
+        <a href="{{ route('home') }}" class="topbar-brand-link" title="Beranda IC-Labs Repository">
+            <div class="brand-logo-box">
+                <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs Logo" class="brand-logo-img" draggable="false">
+            </div>
+            <div class="brand-text-block">
+                <span class="brand-name">IC-LABS</span>
+                <span class="brand-tag">REPOSITORY</span>
+            </div>
         </a>
-        <div>
-            <div class="topbar-title">{{ $soal->title }}</div>
-            <div class="topbar-cat">
-                <svg width="10" height="10" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+
+        {{-- Cyber Divider --}}
+        <div class="topbar-divider" aria-hidden="true"></div>
+
+        {{-- Document Title & Category Metadata --}}
+        <div class="topbar-doc-info">
+            <div class="topbar-title-row">
+                <h1 class="topbar-doc-title" title="{{ $soal->title }}">{{ $soal->title }}</h1>
+            </div>
+            <div class="topbar-meta-row">
                 @if($soal->category)
-                    <span style="color:{{ $soal->category->color }}">{{ $soal->category->name }}</span>
+                    <span class="category-pill" style="background:{{ $soal->category->color }}18;color:{{ $soal->category->color }};border:1px solid {{ $soal->category->color }}40;">
+                        <span class="category-dot" style="background:{{ $soal->category->color }};box-shadow:0 0 6px {{ $soal->category->color }};"></span>
+                        {{ $soal->category->name }}
+                    </span>
+                @else
+                    <span class="category-pill" style="background:rgba(16,185,129,0.12);color:#34D399;border:1px solid rgba(16,185,129,0.25);">
+                        <span class="category-dot" style="background:#10B981;box-shadow:0 0 6px #10B981;"></span>
+                        Dokumen Soal
+                    </span>
                 @endif
                 @if($soal->access_type === 'scheduled' && $soal->active_until)
-                    <span style="color:var(--amber)">· Berakhir {{ $soal->active_until->format('d M Y, H:i') }}</span>
+                    <span class="schedule-pill">
+                        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Berakhir {{ $soal->active_until->format('d M Y, H:i') }}
+                    </span>
                 @endif
             </div>
         </div>
