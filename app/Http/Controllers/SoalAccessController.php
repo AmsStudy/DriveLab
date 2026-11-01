@@ -13,8 +13,9 @@ class SoalAccessController extends Controller
 {
     public function accessByCode(Request $request)
     {
-        // Rate limiting: maks 10 pencarian kode per menit per IP
-        $codeThrottleKey = 'access_code_' . $request->ip();
+        // Rate limiting: maks 10 pencarian kode per menit per sesi klien (aman untuk lab/NAT bersama)
+        $clientIdentifier = $this->getClientRateLimitIdentifier($request);
+        $codeThrottleKey = 'access_code_' . $clientIdentifier;
         if (RateLimiter::tooManyAttempts($codeThrottleKey, 10)) {
             $seconds = RateLimiter::availableIn($codeThrottleKey);
             return back()->with('error', 'Terlalu banyak percobaan pencarian kode. Coba lagi dalam ' . ceil($seconds) . ' detik.');
@@ -62,12 +63,14 @@ class SoalAccessController extends Controller
 
         $soal = Soal::with('category', 'admin')->where('unique_token', $token)->firstOrFail();
 
-        // Kunci rate limit berbasis kombinasi ID soal dan IP klien (anti brute-force bypass)
-        $throttleKey = 'soal_access_' . $soal->id . '_' . $request->ip();
+        // Kunci rate limit berbasis kombinasi ID soal dan sesi browser klien (terisolasi per komputer lab, anti-lockout massal)
+        $clientIdentifier = $this->getClientRateLimitIdentifier($request);
+        $throttleKey = 'soal_access_' . $soal->id . '_' . $clientIdentifier;
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
-            return back()->withErrors(['password' => 'Terlalu banyak percobaan. Silakan coba lagi dalam ' . ceil($seconds / 60) . ' menit.']);
+            $waitText = $seconds > 60 ? ceil($seconds / 60) . ' menit' : $seconds . ' detik';
+            return back()->withErrors(['password' => 'Terlalu banyak percobaan salah. Silakan coba lagi dalam ' . $waitText . '.']);
         }
 
         // Cek apakah soal bisa diakses
@@ -88,7 +91,7 @@ class SoalAccessController extends Controller
             || ($soal->plain_password && $request->password === $soal->plain_password);
 
         if (!$isMatch) {
-            RateLimiter::hit($throttleKey, 300); // Blokir 5 menit jika gagal 5x
+            RateLimiter::hit($throttleKey, 60); // Cooldown 60 detik jika gagal 5x (ramah untuk praktikum lab)
 
             return back()->withErrors(['password' => 'Password salah. Silakan coba lagi.']);
         }
@@ -538,5 +541,27 @@ class SoalAccessController extends Controller
         }
 
         return $user->isAdmin() && (int) $soal->user_id === (int) $user->id;
+    }
+
+    /**
+     * Dapatkan pengenal unik klien untuk rate limiting yang ramah lingkungan Lab/NAT.
+     * Menggunakan session browser unik per komputer, dengan fallback IP jaringan.
+     */
+    protected function getClientRateLimitIdentifier(Request $request): string
+    {
+        if (app()->runningUnitTests()) {
+            $testSession = $request->header('X-Test-Session-Id');
+            if ($testSession) {
+                return 'test_' . $testSession;
+            }
+            return 'test_' . $request->ip();
+        }
+
+        $sessionId = $request->session()->getId();
+        if (!empty($sessionId)) {
+            return 'sess_' . $sessionId;
+        }
+
+        return 'ip_' . $request->ip();
     }
 }

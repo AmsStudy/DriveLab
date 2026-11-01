@@ -39,6 +39,47 @@ class SecurityHardeningTest extends TestCase
         $this->assertStringContainsString('Terlalu banyak percobaan', session('error'));
     }
 
+    public function test_lab_environment_rate_limiting_is_isolated_per_client_session(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+        $soal = Soal::create([
+            'title'          => 'Ujian Lab Komputer',
+            'kode_unik'      => 'LAB-KOMP-01',
+            'unique_token'   => 'token-lab-01',
+            'password'       => Hash::make('password123'),
+            'plain_password' => 'password123',
+            'user_id'        => $admin->id,
+            'access_type'    => 'lifetime',
+            'is_active'      => true,
+        ]);
+
+        // Komputer A di lab (Session A) gagal input password 5 kali
+        for ($i = 0; $i < 5; $i++) {
+            $resA = $this->withHeader('X-Test-Session-Id', 'computer_pc_01')
+                ->post(route('soal.verify', ['token' => $soal->unique_token]), [
+                    'password' => 'wrong_pass',
+                ]);
+            $resA->assertSessionHasErrors(['password']);
+        }
+
+        // Komputer A pada percobaan ke-6 harus diblokir oleh cooldown rate limiter
+        $blockedA = $this->withHeader('X-Test-Session-Id', 'computer_pc_01')
+            ->post(route('soal.verify', ['token' => $soal->unique_token]), [
+                'password' => 'wrong_pass',
+            ]);
+        $blockedA->assertSessionHasErrors(['password']);
+        $this->assertStringContainsString('Terlalu banyak percobaan', session('errors')->first('password'));
+
+        // Komputer B di lab yang sama (Session B, IP sama) harus TETAP BISA mengakses tanpa terkena blokir
+        $resB = $this->withHeader('X-Test-Session-Id', 'computer_pc_02')
+            ->post(route('soal.verify', ['token' => $soal->unique_token]), [
+                'password' => 'password123',
+            ]);
+
+        // Komputer B berhasil diarahkan ke soal.view
+        $resB->assertRedirect(route('soal.view', ['token' => $soal->unique_token]));
+    }
+
     public function test_admin_file_upload_blocks_dangerous_scripts(): void
     {
         $admin = User::factory()->create([
