@@ -39,7 +39,7 @@
 </div>
 
 {{-- ─── TOP DOCUMENT SUMMARY BANNER ─── --}}
-<div class="rounded-2xl p-6 mb-6 shadow-xl relative overflow-hidden"
+<div class="rounded-2xl p-4 sm:p-6 mb-6 shadow-xl relative overflow-hidden"
      style="background:radial-gradient(circle at top right, rgba(16,185,129,0.06), transparent 55%), #0F1713; border:1px solid #1A2820;">
     <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6" style="border-bottom:1px solid #1A2820;">
         <div class="min-w-0 flex-1">
@@ -91,7 +91,7 @@
     </div>
 
     {{-- KPI Highlights (Clean Metric Cards) --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 pt-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5 pt-5">
         {{-- Stat 1: Total Kunjungan --}}
         <div class="p-3.5 rounded-xl border flex items-start gap-3" style="background:#090D0B;border-color:#1A2820;">
             <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(16,185,129,.12);color:#10B981;">
@@ -551,7 +551,7 @@
                 </div>
             @else
                 <div class="overflow-x-auto overflow-y-auto max-h-[660px]">
-                    <table class="w-full text-sm" id="submissionsTable">
+                    <table class="w-full text-sm min-w-[620px]" id="submissionsTable">
                         <thead class="text-xs text-gray-400 uppercase tracking-wider sticky top-0 z-10 shadow-sm" style="background:#090D0B;border-bottom:1px solid #1A2820;">
                             <tr>
                                 <th class="px-6 py-3.5 text-left font-semibold">Mahasiswa</th>

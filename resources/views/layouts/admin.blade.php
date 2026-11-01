@@ -279,22 +279,51 @@
         .cyber-dropdown-menu::-webkit-scrollbar { width: 4px; }
         .cyber-dropdown-menu::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.35); border-radius: 4px; }
         .cyber-dropdown-menu::-webkit-scrollbar-thumb:hover { background: #10B981; }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="text-gray-100 min-h-screen" style="background:#090D0B; font-family:'Inter',sans-serif;">
+<body class="text-gray-100 min-h-screen" style="background:#090D0B; font-family:'Inter',sans-serif;" x-data="{ mobileSidebarOpen: false }">
 
-    {{-- Sidebar --}}
-    <div class="flex min-h-screen">
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 flex flex-col" style="background:#0F1713; border-right:1px solid #1A2820;">
-            {{-- Logo --}}
-            <div class="flex items-center gap-3 px-5 py-4" style="border-bottom:1px solid #1A2820;">
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 p-1" style="background:rgba(16,185,129,0.08); border:1px solid rgba(52,211,153,0.25); box-shadow:0 0 15px rgba(16,185,129,0.15);">
-                    <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs Logo" class="w-full h-full object-contain" draggable="false">
+    {{-- Mobile Sidebar Backdrop --}}
+    <div x-show="mobileSidebarOpen"
+         @click="mobileSidebarOpen = false"
+         x-cloak
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm lg:hidden">
+    </div>
+
+    {{-- Sidebar Shell --}}
+    <div class="flex min-h-screen relative">
+        <aside id="sidebar"
+               class="fixed inset-y-0 left-0 z-50 w-64 flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0"
+               :class="mobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'"
+               style="background:#0F1713; border-right:1px solid #1A2820;">
+            {{-- Logo & Mobile Close --}}
+            <div class="flex items-center justify-between px-5 py-4" style="border-bottom:1px solid #1A2820;">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 p-1" style="background:rgba(16,185,129,0.08); border:1px solid rgba(52,211,153,0.25); box-shadow:0 0 15px rgba(16,185,129,0.15);">
+                        <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs Logo" class="w-full h-full object-contain" draggable="false">
+                    </div>
+                    <div>
+                        <h1 class="text-white font-extrabold text-base leading-none tracking-wider" style="font-family:'Orbitron',sans-serif;">IC-LABS</h1>
+                        <p class="text-[10px] mt-1 font-semibold uppercase tracking-widest" style="font-family:'Chakra Petch',sans-serif; color:#34D399;">REPOSITORY</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-white font-extrabold text-base leading-none tracking-wider" style="font-family:'Orbitron',sans-serif;">IC-LABS</h1>
-                    <p class="text-[10px] mt-1 font-semibold uppercase tracking-widest" style="font-family:'Chakra Petch',sans-serif; color:#34D399;">REPOSITORY</p>
-                </div>
+
+                {{-- Mobile Close Button --}}
+                <button type="button"
+                        @click="mobileSidebarOpen = false"
+                        class="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+                        title="Tutup Menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
 
             {{-- User Info --}}
@@ -382,19 +411,33 @@
         </aside>
 
         {{-- Main Content --}}
-        <main class="flex-1 ml-64 flex flex-col min-h-screen">
+        <main class="flex-1 ml-0 lg:ml-64 flex flex-col min-h-screen min-w-0 transition-all duration-300">
             {{-- Top Header --}}
-            <header class="px-6 py-3.5 sticky top-0 z-40" style="background:rgba(9,13,11,.95);backdrop-filter:blur(16px);border-bottom:1px solid #1A2820;">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-base font-bold text-white leading-none">@yield('page-title', 'Dashboard')</h2>
-                        @hasSection('page-description')
-                            <p class="text-xs text-gray-500 mt-0.5">@yield('page-description')</p>
-                        @endif
+            <header class="px-4 sm:px-6 py-3.5 sticky top-0 z-30" style="background:rgba(9,13,11,.95);backdrop-filter:blur(16px);border-bottom:1px solid #1A2820;">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        {{-- Mobile Menu Hamburger Button --}}
+                        <button type="button"
+                                @click="mobileSidebarOpen = true"
+                                class="lg:hidden p-2 -ml-1 rounded-xl text-gray-400 hover:text-white hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/20 transition-all flex-shrink-0"
+                                aria-label="Buka Menu Navigasi"
+                                title="Buka Menu">
+                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </button>
+
+                        <div class="min-w-0">
+                            <h2 class="text-base sm:text-lg font-bold text-white leading-tight truncate">@yield('page-title', 'Dashboard')</h2>
+                            @hasSection('page-description')
+                                <p class="text-xs text-gray-400 mt-0.5 truncate hidden sm:block">@yield('page-description')</p>
+                            @endif
+                        </div>
                     </div>
-                    <div class="flex items-center gap-3">
+
+                    <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                         @yield('header-actions')
-                        <div class="flex items-center gap-2 text-xs text-gray-500 px-3 py-1.5 rounded-lg border" style="background:rgba(15,23,19,.8);border-color:#1A2820;">
+                        <div class="hidden md:flex items-center gap-2 text-xs text-gray-400 px-3 py-1.5 rounded-lg border whitespace-nowrap" style="background:rgba(15,23,19,.8);border-color:#1A2820;">
                             <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
@@ -407,7 +450,7 @@
             {{-- Flash messages are handled dynamically via modern SweetAlert2 popups below --}}
 
             {{-- Page Content --}}
-            <div class="p-6 flex-1">
+            <div class="p-4 sm:p-6 flex-1 min-w-0">
                 @yield('content')
             </div>
         </main>

@@ -46,6 +46,11 @@
         .inactive-card { background: rgba(239,68,68,.06); border: 1px solid rgba(239,68,68,.2); border-radius: 20px; padding: 28px; text-align: center; }
         .footer-note { margin-top: 20px; text-align: center; font-size: 12px; color: #374151; }
         .footer-note span { color: #10B981; }
+        @media (max-width: 480px) {
+            body { padding: 16px 12px !important; }
+            .card { padding: 18px 16px !important; border-radius: 16px !important; }
+            .logo-wrap { margin-bottom: 24px !important; }
+        }
     </style>
 </head>
 <body>

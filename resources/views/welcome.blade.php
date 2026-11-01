@@ -100,12 +100,29 @@
         /* ─────────────────── LAYOUT ─────────────────── */
         .stage {
             position: relative; z-index: 10;
-            height: 100vh;
+            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            padding: 24px 16px;
+        }
+
+        @media (max-width: 480px) {
+            .stage {
+                padding: 16px 12px;
+            }
+            .glass-card {
+                padding: 28px 18px 22px !important;
+                border-radius: 20px !important;
+            }
+            .admin-link {
+                top: 12px !important;
+                right: 12px !important;
+                font-size: 10px !important;
+                padding: 4px 9px !important;
+            }
         }
 
         /* ─────────────────── CORNER ADMIN ─────────────────── */

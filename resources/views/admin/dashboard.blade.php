@@ -7,10 +7,10 @@
 @section('content')
 
 {{-- ─── STATS CARDS ─── --}}
-<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-8">
 
     {{-- Total Dokumen --}}
-    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-emerald-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
+    <div class="rounded-2xl p-4 sm:p-5 relative overflow-hidden transition-all duration-200 hover:border-emerald-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Dokumen</span>
             <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(16,185,129,.12);">
@@ -24,7 +24,7 @@
     </div>
 
     {{-- Dokumen Aktif --}}
-    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-emerald-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
+    <div class="rounded-2xl p-4 sm:p-5 relative overflow-hidden transition-all duration-200 hover:border-emerald-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-semibold text-emerald-400/80 uppercase tracking-wider">Aktif</span>
             <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(16,185,129,.12);">
@@ -38,7 +38,7 @@
     </div>
 
     {{-- Total Kunjungan / Views --}}
-    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-blue-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
+    <div class="rounded-2xl p-4 sm:p-5 relative overflow-hidden transition-all duration-200 hover:border-blue-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-semibold text-blue-400/80 uppercase tracking-wider">Kunjungan</span>
             <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(59,130,246,.12);">
@@ -53,7 +53,7 @@
     </div>
 
     {{-- Total Tugas Masuk --}}
-    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-teal-500/30 group" style="background:#0F1713;border:1px solid rgba(13,148,136,.2);">
+    <div class="rounded-2xl p-4 sm:p-5 relative overflow-hidden transition-all duration-200 hover:border-teal-500/30 group" style="background:#0F1713;border:1px solid rgba(13,148,136,.2);">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-semibold text-teal-400/80 uppercase tracking-wider">Tugas</span>
             <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(13,148,136,.12);">
@@ -67,7 +67,7 @@
     </div>
 
     {{-- Tugas Hari Ini --}}
-    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-teal-500/30 group" style="background:#0F1713;border:1px solid rgba(13,148,136,.2);">
+    <div class="rounded-2xl p-4 sm:p-5 relative overflow-hidden transition-all duration-200 hover:border-teal-500/30 group" style="background:#0F1713;border:1px solid rgba(13,148,136,.2);">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-semibold text-teal-400/80 uppercase tracking-wider">Hari Ini</span>
             <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(13,148,136,.12);">
@@ -81,7 +81,7 @@
     </div>
 
     {{-- Total Lampiran & Link --}}
-    <div class="rounded-2xl p-5 relative overflow-hidden transition-all duration-200 hover:border-amber-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
+    <div class="rounded-2xl p-4 sm:p-5 relative overflow-hidden transition-all duration-200 hover:border-amber-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-semibold text-amber-400/80 uppercase tracking-wider">Lampiran</span>
             <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(245,158,11,.12);">
@@ -182,7 +182,7 @@
                 </div>
             @else
                 <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
+                    <table class="w-full text-sm min-w-[560px]">
                         <thead class="text-xs text-gray-500 uppercase tracking-wider" style="border-bottom:1px solid #1A2820;background:rgba(255,255,255,.01);">
                             <tr>
                                 <th class="px-6 py-3 text-left">Mahasiswa</th>

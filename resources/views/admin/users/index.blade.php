@@ -6,9 +6,9 @@
 @section('content')
 
 {{-- Filter & Action --}}
-<div class="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-5">
-    <form method="GET" class="flex flex-wrap items-center gap-2.5 sm:gap-3">
-        <div class="relative w-48 sm:w-56 md:w-60 flex-shrink-0">
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+    <form method="GET" class="flex flex-wrap items-center gap-2.5 sm:gap-3 flex-1">
+        <div class="relative w-full sm:w-56 md:w-60 flex-shrink-0">
             <svg class="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
@@ -37,7 +37,7 @@
     </form>
 
     <button type="button" onclick="document.getElementById('create-modal').classList.remove('hidden')"
-            class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md shadow-emerald-500/20 whitespace-nowrap flex-shrink-0"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md shadow-emerald-500/20 whitespace-nowrap flex-shrink-0"
             style="background:linear-gradient(135deg,#10B981,#0D9488);"
             onmouseover="this.style.boxShadow='0 6px 18px rgba(16,185,129,.35)'"
             onmouseout="this.style.boxShadow='0 4px 12px rgba(16,185,129,.2)'">
@@ -46,22 +46,23 @@
     </button>
 </div>
 
-<div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl overflow-hidden">
+<div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl overflow-hidden shadow-xl">
     @if($admins->isEmpty())
         <div class="py-16 text-center text-gray-500 text-sm">Tidak ada admin yang ditemukan.</div>
     @else
-        <table class="w-full text-sm">
-            <thead class="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider">
-                <tr>
-                    <th class="px-6 py-3 text-left">Admin</th>
-                    <th class="px-4 py-3 text-left">Institusi</th>
-                    <th class="px-4 py-3 text-center">Dokumen</th>
-                    <th class="px-4 py-3 text-left">Status</th>
-                    <th class="px-4 py-3 text-left">Daftar</th>
-                    <th class="px-6 py-3 text-right">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-800/60">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[640px]">
+                <thead class="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-6 py-3 text-left">Admin</th>
+                        <th class="px-4 py-3 text-left">Institusi</th>
+                        <th class="px-4 py-3 text-center">Dokumen</th>
+                        <th class="px-4 py-3 text-left">Status</th>
+                        <th class="px-4 py-3 text-left">Daftar</th>
+                        <th class="px-6 py-3 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800/60">
                 @foreach($admins as $admin)
                 <tr class="hover:bg-gray-800/30 transition-colors">
                     <td class="px-6 py-4">
@@ -135,6 +136,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
         @if($admins->hasPages())
             <div class="px-6 py-4 border-t border-gray-800">{{ $admins->links() }}</div>
         @endif

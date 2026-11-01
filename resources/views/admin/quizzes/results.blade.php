@@ -95,7 +95,7 @@
     </div>
 
     {{-- Stats KPI Summary --}}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {{-- Total Peserta --}}
         <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-4">
             <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Peserta Selesai</span>
@@ -173,7 +173,7 @@
             </div>
         @else
             <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left">
+                <table class="w-full text-sm text-left min-w-[760px]">
                     <thead class="border-b border-[#1A2820] text-xs text-gray-400 uppercase tracking-wider bg-[#090D0B]">
                         <tr>
                             <th class="px-5 py-3.5 text-center">Rank</th>

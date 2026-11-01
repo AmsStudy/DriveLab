@@ -7,10 +7,10 @@
 @section('content')
 
 {{-- Action Toolbar: Search, Filters, and Tambah Dokumen on the same line --}}
-<div class="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-6">
-    <form method="GET" id="filter-form" class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+    <form method="GET" id="filter-form" class="flex flex-wrap items-center gap-2.5 sm:gap-3 flex-1">
         {{-- Search Input (Compact, not too long, so space beside it is filled) --}}
-        <div class="relative w-48 sm:w-56 md:w-60 flex-shrink-0">
+        <div class="relative w-full sm:w-56 md:w-60 flex-shrink-0">
             <svg class="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
@@ -57,7 +57,7 @@
 
     {{-- Tambah Dokumen (Opens Pop Up Modal) --}}
     <button type="button" onclick="openCreateModal()" id="add-soal-btn"
-       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md shadow-emerald-500/20 whitespace-nowrap flex-shrink-0 cursor-pointer"
+       class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all shadow-md shadow-emerald-500/20 whitespace-nowrap flex-shrink-0 cursor-pointer"
        style="background:linear-gradient(135deg,#10B981,#0D9488);"
        onmouseover="this.style.boxShadow='0 6px 18px rgba(16,185,129,.35)'"
        onmouseout="this.style.boxShadow='0 4px 12px rgba(16,185,129,.2)'">
@@ -83,7 +83,7 @@
         </div>
     @else
         <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+            <table class="w-full text-sm min-w-[700px]">
                 <thead>
                     <tr class="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wider">
                         <th class="px-6 py-3 text-left">Dokumen</th>
