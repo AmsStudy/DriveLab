@@ -42,6 +42,11 @@
             padding: 36px 32px;
             box-shadow: 0 25px 60px rgba(0,0,0,.5);
         }
+        @media (max-width: 480px) {
+            body { padding: 16px 12px !important; }
+            .auth-card { padding: 28px 18px 24px !important; border-radius: 16px !important; }
+            .logo-wrap { margin-bottom: 24px !important; }
+        }
         .auth-card h2 { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 4px; }
         .auth-card p { font-size: 13px; color: #6B7280; margin-bottom: 28px; }
 

@@ -116,6 +116,16 @@
         }
         .badge-secure svg { width: 12px; height: 12px; }
 
+        @media (max-width: 640px) {
+            .file-title { max-width: 120px !important; font-size: 12px !important; }
+            .badge-secure span { display: none !important; }
+            .badge-secure { padding: 4px 6px !important; }
+            .zoom-text { min-width: 34px !important; font-size: 10px !important; padding: 0 4px !important; }
+            .zoom-btn { width: 24px !important; height: 24px !important; font-size: 12px !important; }
+            .btn-back { padding: 5px 8px !important; font-size: 11px !important; }
+            .viewer-topbar { padding: 0 10px !important; }
+        }
+
         .zoom-controls {
             display: flex;
             align-items: center;
@@ -271,7 +281,7 @@
 
             <div class="badge-secure">
                 <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
-                Mode Terproteksi
+                <span>Mode Terproteksi</span>
             </div>
         </div>
     </div>
