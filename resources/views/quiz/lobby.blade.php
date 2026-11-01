@@ -539,7 +539,7 @@
 
         // Auto refresh CSRF token periodically while waiting in lobby
         setInterval(() => {
-            fetch('{{ route('csrf.refresh') }}')
+            fetch('{{ Route::has('csrf.refresh') ? route('csrf.refresh') : url('/csrf-refresh') }}')
                 .then(r => r.json())
                 .then(data => {
                     if (data && data.csrf_token) {

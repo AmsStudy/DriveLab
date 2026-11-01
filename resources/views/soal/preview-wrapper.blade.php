@@ -492,7 +492,7 @@
 
         // ─── Polling Status Akses & CSRF Keepalive ───
         setInterval(() => {
-            fetch('{{ route('csrf.refresh') }}').catch(() => {});
+            fetch('{{ Route::has('csrf.refresh') ? route('csrf.refresh') : url('/csrf-refresh') }}').catch(() => {});
         }, 5 * 60 * 1000);
 
         @if(!isset($isAdminPreview) || !$isAdminPreview)

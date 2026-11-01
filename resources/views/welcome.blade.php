@@ -1091,7 +1091,7 @@
 
         // Auto refresh CSRF token periodically (setiap 5 menit) & saat tab kembali aktif
         function refreshWelcomeCsrf() {
-            fetch('{{ route('csrf.refresh') }}')
+            fetch('{{ Route::has('csrf.refresh') ? route('csrf.refresh') : url('/csrf-refresh') }}')
                 .then(r => r.json())
                 .then(data => {
                     if (data && data.csrf_token) {

@@ -175,7 +175,7 @@
 
         // Auto refresh CSRF token every 5 minutes if page is kept idle
         setInterval(() => {
-            fetch('{{ route('csrf.refresh') }}')
+            fetch('{{ Route::has('csrf.refresh') ? route('csrf.refresh') : url('/csrf-refresh') }}')
                 .then(r => r.json())
                 .then(data => {
                     if (data && data.csrf_token) {
