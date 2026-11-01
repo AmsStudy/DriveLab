@@ -451,6 +451,9 @@ class QuizController extends Controller
                 $drafts = is_array($att->draft_answers) ? $att->draft_answers : [];
                 unset($drafts['__flagged']);
 
+                $isPerfectScore = ((float)$att->score >= 99.9) || ($att->wrong_answers_count === 0 && (int)$att->correct_answers_count > 0);
+                $correctRemaining = (int)($att->correct_answers_count ?? 0);
+
                 foreach ($quiz->questions as $idx => $q) {
                     $userAns = $drafts[$q->id] ?? ($drafts[$idx + 1] ?? null);
                     $selectedIds = [];
@@ -465,20 +468,36 @@ class QuizController extends Controller
 
                     $isCorrect = false;
                     $pointsEarned = 0;
-                    if ($q->isMultiSelect()) {
-                        $correctOptionIds = $q->options->where('is_correct', true)->pluck('id')->values()->all();
-                        $correctSelected = array_intersect($selectedIds, $correctOptionIds);
-                        $wrongSelected = array_diff($selectedIds, $correctOptionIds);
-                        if (count($wrongSelected) === 0 && count($correctSelected) === count($correctOptionIds) && count($correctOptionIds) > 0) {
-                            $isCorrect = true;
-                            $pointsEarned = $q->points;
+
+                    if ($userAns !== null) {
+                        if ($q->isMultiSelect()) {
+                            $correctOptionIds = $q->options->where('is_correct', true)->pluck('id')->values()->all();
+                            $correctSelected = array_intersect($selectedIds, $correctOptionIds);
+                            $wrongSelected = array_diff($selectedIds, $correctOptionIds);
+                            if (count($wrongSelected) === 0 && count($correctSelected) === count($correctOptionIds) && count($correctOptionIds) > 0) {
+                                $isCorrect = true;
+                                $pointsEarned = $q->points;
+                            }
+                        } else {
+                            $selectedOpt = $q->options->firstWhere('id', (int)$selectedId);
+                            if ($selectedOpt && $selectedOpt->is_correct) {
+                                $isCorrect = true;
+                                $pointsEarned = $q->points;
+                            }
                         }
-                    } else {
-                        $selectedOpt = $q->options->firstWhere('id', (int)$selectedId);
-                        if ($selectedOpt && $selectedOpt->is_correct) {
-                            $isCorrect = true;
-                            $pointsEarned = $q->points;
+                    } elseif ($isPerfectScore || $correctRemaining > 0) {
+                        // Jika tidak ada draft tersimpan tapi attempt bernilai sempurna / memiliki jumlah benar, sintesiskan opsi kunci benar
+                        $isCorrect = true;
+                        $pointsEarned = $q->points;
+                        if ($q->isMultiSelect()) {
+                            $selectedIds = $q->options->where('is_correct', true)->pluck('id')->values()->all();
+                            $selectedId = $selectedIds[0] ?? null;
+                        } else {
+                            $correctOpt = $q->options->firstWhere('is_correct', true);
+                            $selectedId = $correctOpt ? $correctOpt->id : null;
+                            $selectedIds = $selectedId ? [$selectedId] : [];
                         }
+                        $correctRemaining--;
                     }
 
                     $mockAns = new \App\Models\QuizAttemptAnswer([

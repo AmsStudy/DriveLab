@@ -327,267 +327,320 @@
         @endif
     </div>
 
-    {{-- Detail Attempt Modal (Pop-up Lembar Jawaban Mahasiswa) --}}
-    <div x-show="showDetailModal"
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
-         style="display: none;">
+    {{-- Detail Attempt Modal (Pop-up Lembar Jawaban Mahasiswa - Teleported to body for 100% full-screen blur coverage) --}}
+    <template x-teleport="body">
+        <div x-show="showDetailModal"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+             style="display: none; z-index: 99999;"
+             @keydown.escape.window="showDetailModal = false">
 
-        <div @click.away="showDetailModal = false"
-             class="bg-[#0F1713] border border-[#1A2820] rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden relative">
-            
-            {{-- Modal Header Bar --}}
-            <div class="px-6 py-4 border-b border-[#1A2820] bg-[#090D0B]/80 backdrop-blur-md flex items-center justify-between flex-shrink-0 z-10">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-white leading-tight">Lembar Jawaban & Evaluasi Mahasiswa</h3>
-                        <p class="text-xs text-gray-400" x-text="selectedAttempt ? selectedAttempt.student_name + ' (' + selectedAttempt.nim + ')' : ''"></p>
-                    </div>
-                </div>
-                <button type="button" @click="showDetailModal = false" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition-colors" title="Tutup Modal (Esc)">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
-
-            {{-- Modal Scrollable Content --}}
-            <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-                <template x-if="selectedAttempt">
-                    <div class="space-y-6">
-
-                        {{-- ─── 1. HERO SCORE CELEBRATION CARD (Exact match to user reference image) ─── --}}
-                        <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8 text-center relative overflow-hidden shadow-2xl">
-                            <div class="absolute -right-20 -top-20 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                            <div class="absolute -left-20 -bottom-20 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 mb-3">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                <span>Pengerjaan Kuis Selesai</span>
-                            </div>
-
-                            <h1 class="text-xl sm:text-2xl font-bold text-white heading-font mb-1">
-                                {{ $quiz->title }}
-                            </h1>
-                            <p class="text-xs text-gray-400 mb-6">
-                                Mahasiswa: <strong class="text-white" x-text="selectedAttempt.student_name"></strong>
-                                (<span x-text="selectedAttempt.nim"></span>)
-                                <template x-if="selectedAttempt.kelas">
-                                    <span class="ml-2 px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" x-text="'Kelas ' + selectedAttempt.kelas"></span>
-                                </template>
-                            </p>
-
-                            {{-- Score Big Ring --}}
-                            <div class="inline-flex flex-col items-center justify-center w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-gradient-to-tr from-[#131E17] to-[#1A2D23] border-4 border-emerald-500/50 shadow-2xl shadow-emerald-500/20 mb-4">
-                                <span class="text-3xl sm:text-5xl font-extrabold text-white heading-font tracking-tight font-mono"
-                                      x-text="parseFloat(selectedAttempt.score).toFixed(1)">
-                                </span>
-                                <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest mt-0.5">Skor Akhir</span>
-                            </div>
-
-                            {{-- Grade Feedback Message --}}
-                            <div class="max-w-md mx-auto mb-6 text-sm font-bold">
-                                <template x-if="selectedAttempt.score >= 85">
-                                    <p class="text-emerald-300">🏆 Luar Biasa! Mahasiswa menunjukkan penguasaan materi praktikum yang sangat baik.</p>
-                                </template>
-                                <template x-if="selectedAttempt.score >= 70 && selectedAttempt.score < 85">
-                                    <p class="text-teal-300">🎉 Bagus Sekali! Nilai Anda di atas standar kompetensi praktikum.</p>
-                                </template>
-                                <template x-if="selectedAttempt.score >= 50 && selectedAttempt.score < 70">
-                                    <p class="text-amber-300">👍 Cukup Bagus! Mahasiswa telah memahami sebagian besar konsep materi.</p>
-                                </template>
-                                <template x-if="selectedAttempt.score < 50">
-                                    <p class="text-rose-300">📚 Tetap Semangat! Mahasiswa disarankan mempelajari kembali materi sebelum praktikum berikutnya.</p>
-                                </template>
-                            </div>
-
-                            {{-- 4 Metrics Breakdown Cards --}}
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto pt-4 border-t border-[#1A2820]">
-                                <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820] text-center">
-                                    <span class="text-[10px] text-gray-400 uppercase font-semibold block">Jawaban Benar</span>
-                                    <span class="text-base font-bold text-emerald-400 mt-0.5 block" x-text="selectedAttempt.correct_answers_count + ' Soal'"></span>
-                                </div>
-                                <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820] text-center">
-                                    <span class="text-[10px] text-gray-400 uppercase font-semibold block">Jawaban Salah</span>
-                                    <span class="text-base font-bold text-rose-400 mt-0.5 block" x-text="selectedAttempt.wrong_answers_count + ' Soal'"></span>
-                                </div>
-                                <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820] text-center">
-                                    <span class="text-[10px] text-gray-400 uppercase font-semibold block">Waktu Selesai</span>
-                                    <span class="text-base font-bold text-sky-400 mt-0.5 block" x-text="selectedAttempt.formatted_duration || formatDuration(selectedAttempt.duration_seconds)"></span>
-                                </div>
-                                <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820] text-center">
-                                    <span class="text-[10px] text-gray-400 uppercase font-semibold block">Pengawas Anti-Cheat</span>
-                                    <span class="text-base font-bold mt-0.5 block"
-                                          :class="selectedAttempt.tab_switch_count === 0 ? 'text-emerald-400' : 'text-amber-400'"
-                                          x-text="selectedAttempt.tab_switch_count === 0 ? '0 Switch 🛡️' : selectedAttempt.tab_switch_count + 'x Switch'"></span>
-                                </div>
-                            </div>
+            <div @click.away="showDetailModal = false"
+                 class="bg-[#0F1713] border border-[#1A2820] rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden relative">
+                
+                {{-- Modal Header Bar --}}
+                <div class="px-6 py-4 border-b border-[#1A2820] bg-[#090D0B]/80 backdrop-blur-md flex items-center justify-between flex-shrink-0 z-10">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white leading-tight">Lembar Jawaban & Evaluasi Mahasiswa</h3>
+                            <p class="text-xs text-gray-400" x-text="selectedAttempt ? selectedAttempt.student_name + ' (' + selectedAttempt.nim + ')' : ''"></p>
+                        </div>
+                    </div>
+                    <button type="button" @click="showDetailModal = false" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition-colors" title="Tutup Modal (Esc)">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
 
-                        {{-- ─── 2. REVIEW ANSWERS & EXPLANATIONS SECTION (No Leaderboard) ─── --}}
-                        <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8 space-y-5">
-                            <div class="flex items-center gap-3 pb-3 border-b border-[#1A2820]">
-                                <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 text-lg">
-                                    💡
+                {{-- Modal Scrollable Content --}}
+                <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+                    <template x-if="selectedAttempt">
+                        <div class="space-y-6">
+
+                            {{-- ─── 1. HERO SCORE CELEBRATION CARD ─── --}}
+                            <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8 text-center relative overflow-hidden shadow-2xl">
+                                <div class="absolute -right-20 -top-20 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                                <div class="absolute -left-20 -bottom-20 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 mb-3">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    <span>Pengerjaan Kuis Selesai</span>
                                 </div>
-                                <div>
-                                    <h2 class="text-base font-bold text-white heading-font">Lembar Jawaban & Pembahasan Kuis</h2>
-                                    <p class="text-xs text-gray-400">Tinjau evaluasi butir soal, pilihan jawaban mahasiswa, kunci jawaban yang tepat, dan catatan instruktur</p>
+
+                                <h1 class="text-xl sm:text-2xl font-bold text-white heading-font mb-1">
+                                    {{ $quiz->title }}
+                                </h1>
+                                <p class="text-xs text-gray-400 mb-6">
+                                    Mahasiswa: <strong class="text-white" x-text="selectedAttempt.student_name"></strong>
+                                    (<span x-text="selectedAttempt.nim"></span>)
+                                    <template x-if="selectedAttempt.kelas">
+                                        <span class="ml-2 px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" x-text="'Kelas ' + selectedAttempt.kelas"></span>
+                                    </template>
+                                </p>
+
+                                {{-- Score Big Ring --}}
+                                <div class="inline-flex flex-col items-center justify-center w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-gradient-to-tr from-[#131E17] to-[#1A2D23] border-4 border-emerald-500/50 shadow-2xl shadow-emerald-500/20 mb-4">
+                                    <span class="text-3xl sm:text-5xl font-extrabold text-white heading-font tracking-tight font-mono"
+                                          x-text="parseFloat(selectedAttempt.score).toFixed(1)">
+                                    </span>
+                                    <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest mt-0.5">Skor Akhir</span>
+                                </div>
+
+                                {{-- Grade Feedback Message --}}
+                                <div class="max-w-md mx-auto mb-6 text-sm font-bold">
+                                    <template x-if="selectedAttempt.score >= 85">
+                                        <p class="text-emerald-300">🏆 Luar Biasa! Mahasiswa menunjukkan penguasaan materi praktikum yang sangat baik.</p>
+                                    </template>
+                                    <template x-if="selectedAttempt.score >= 70 && selectedAttempt.score < 85">
+                                        <p class="text-teal-300">🎉 Bagus Sekali! Nilai Anda di atas standar kompetensi praktikum.</p>
+                                    </template>
+                                    <template x-if="selectedAttempt.score >= 50 && selectedAttempt.score < 70">
+                                        <p class="text-amber-300">👍 Cukup Bagus! Mahasiswa telah memahami sebagian besar konsep materi.</p>
+                                    </template>
+                                    <template x-if="selectedAttempt.score < 50">
+                                        <p class="text-rose-300">📚 Tetap Semangat! Mahasiswa disarankan mempelajari kembali materi sebelum praktikum berikutnya.</p>
+                                    </template>
+                                </div>
+
+                                {{-- 4 Metrics Breakdown Cards --}}
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto pt-4 border-t border-[#1A2820]">
+                                    <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820] text-center">
+                                        <span class="text-[10px] text-gray-400 uppercase font-semibold block">Jawaban Benar</span>
+                                        <span class="text-base font-bold text-emerald-400 mt-0.5 block" x-text="selectedAttempt.correct_answers_count + ' Soal'"></span>
+                                    </div>
+                                    <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820] text-center">
+                                        <span class="text-[10px] text-gray-400 uppercase font-semibold block">Jawaban Salah</span>
+                                        <span class="text-base font-bold text-rose-400 mt-0.5 block" x-text="selectedAttempt.wrong_answers_count + ' Soal'"></span>
+                                    </div>
+                                    <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820] text-center">
+                                        <span class="text-[10px] text-gray-400 uppercase font-semibold block">Waktu Selesai</span>
+                                        <span class="text-base font-bold text-sky-400 mt-0.5 block" x-text="selectedAttempt.formatted_duration || formatDuration(selectedAttempt.duration_seconds)"></span>
+                                    </div>
+                                    <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820] text-center">
+                                        <span class="text-[10px] text-gray-400 uppercase font-semibold block">Pengawas Anti-Cheat</span>
+                                        <span class="text-base font-bold mt-0.5 block"
+                                              :class="selectedAttempt.tab_switch_count === 0 ? 'text-emerald-400' : 'text-amber-400'"
+                                              x-text="selectedAttempt.tab_switch_count === 0 ? '0 Switch 🛡️' : selectedAttempt.tab_switch_count + 'x Switch'"></span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="space-y-5">
-                                {{-- Empty state if attempt has no recorded answers --}}
-                                <template x-if="!selectedAttempt.answers || selectedAttempt.answers.length === 0">
-                                    <div class="py-10 px-4 text-center text-gray-500 bg-[#090D0B] border border-[#1A2820] rounded-2xl">
-                                        <div class="w-10 h-10 mx-auto mb-2 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        </div>
-                                        <p class="text-xs font-semibold text-gray-300">Belum ada rincian butir soal yang tersimpan untuk sesi pengerjaan ini.</p>
-                                        <p class="text-[11px] text-gray-500 mt-1">Sesi pengerjaan dicatat dengan skor akhir tanpa rekaman butir lembar jawaban.</p>
+                            {{-- ─── 2. REVIEW ANSWERS & EXPLANATIONS SECTION ─── --}}
+                            <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8 space-y-5">
+                                <div class="flex items-center gap-3 pb-3 border-b border-[#1A2820]">
+                                    <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 text-lg">
+                                        💡
                                     </div>
-                                </template>
+                                    <div>
+                                        <h2 class="text-base font-bold text-white heading-font">Lembar Jawaban & Pembahasan Kuis</h2>
+                                        <p class="text-xs text-gray-400">Tinjau evaluasi butir soal, pilihan jawaban mahasiswa, kunci jawaban yang tepat, dan catatan instruktur</p>
+                                    </div>
+                                </div>
 
-                                <template x-for="(ans, idx) in (selectedAttempt.answers || [])" :key="ans.id || idx">
-                                    <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 shadow-sm transition-all"
-                                         :class="ans.is_correct ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-rose-500'">
-
-                                        {{-- Header Pertanyaan --}}
-                                        <div class="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-[#16221B] flex-wrap">
-                                            <div class="flex items-center gap-2">
-                                                <span class="font-mono text-xs font-bold text-gray-300 bg-[#142019] border border-[#1E3327] px-2.5 py-1 rounded-lg"
-                                                      x-text="'Soal #' + (idx + 1)"></span>
-                                                <span class="text-xs text-gray-400 font-medium"
-                                                      x-text="(ans.is_correct ? '+' + ans.points_earned : '0') + ' / ' + (ans.question ? ans.question.points : 0) + ' Poin'"></span>
-                                                <template x-if="ans.question && ans.question.question_type === 'multi_select'">
-                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                                                        Pilihan Jamak
-                                                    </span>
-                                                </template>
+                                <div class="space-y-5">
+                                    {{-- Empty state if attempt has no recorded answers --}}
+                                    <template x-if="!selectedAttempt.answers || selectedAttempt.answers.length === 0">
+                                        <div class="py-10 px-4 text-center text-gray-500 bg-[#090D0B] border border-[#1A2820] rounded-2xl">
+                                            <div class="w-10 h-10 mx-auto mb-2 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                             </div>
-
-                                            <div>
-                                                <template x-if="ans.is_correct">
-                                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                        Jawaban Benar
-                                                    </span>
-                                                </template>
-                                                <template x-if="!ans.is_correct">
-                                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
-                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                        Jawaban Salah
-                                                    </span>
-                                                </template>
-                                            </div>
+                                            <p class="text-xs font-semibold text-gray-300">Belum ada rincian butir soal yang tersimpan untuk sesi pengerjaan ini.</p>
+                                            <p class="text-[11px] text-gray-500 mt-1">Sesi pengerjaan dicatat dengan skor akhir tanpa rekaman butir lembar jawaban.</p>
                                         </div>
+                                    </template>
 
-                                        {{-- Gambar Soal (Jika ada) --}}
-                                        <template x-if="ans.question && ans.question.image_url">
-                                            <div class="mb-3 rounded-2xl overflow-hidden border border-[#1A2820] bg-black/40 max-h-72 flex items-center justify-center p-2">
-                                                <a :href="ans.question.image_url" target="_blank">
-                                                    <img :src="ans.question.image_url" alt="Gambar Soal" class="max-h-64 w-auto object-contain rounded-xl">
-                                                </a>
+                                    <template x-for="(ans, idx) in (selectedAttempt.answers || [])" :key="ans.id || idx">
+                                        <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 shadow-sm transition-all"
+                                             :class="ans.is_correct ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-rose-500'">
+
+                                            {{-- Header Pertanyaan --}}
+                                            <div class="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-[#16221B] flex-wrap">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-mono text-xs font-bold text-gray-300 bg-[#142019] border border-[#1E3327] px-2.5 py-1 rounded-lg"
+                                                          x-text="'Soal #' + (idx + 1)"></span>
+                                                    <span class="text-xs text-gray-400 font-medium"
+                                                          x-text="(ans.is_correct ? '+' + ans.points_earned : '0') + ' / ' + (ans.question ? ans.question.points : 0) + ' Poin'"></span>
+                                                    <template x-if="ans.question && ans.question.question_type === 'multi_select'">
+                                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                                            Pilihan Jamak
+                                                        </span>
+                                                    </template>
+                                                </div>
+
+                                                <div>
+                                                    <template x-if="ans.is_correct">
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                            Jawaban Benar
+                                                        </span>
+                                                    </template>
+                                                    <template x-if="!ans.is_correct">
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                            Jawaban Salah
+                                                        </span>
+                                                    </template>
+                                                </div>
                                             </div>
-                                        </template>
 
-                                        {{-- Teks Pertanyaan --}}
-                                        <div class="text-sm sm:text-base font-bold text-white mb-4 leading-relaxed"
-                                             x-html="ans.question ? (ans.question.formatted_text || ans.question.question_text) : 'Pertanyaan'"></div>
+                                            {{-- Gambar Soal (Jika ada) --}}
+                                            <template x-if="ans.question && ans.question.image_url">
+                                                <div class="mb-3 rounded-2xl overflow-hidden border border-[#1A2820] bg-black/40 max-h-72 flex items-center justify-center p-2">
+                                                    <a :href="ans.question.image_url" target="_blank">
+                                                        <img :src="ans.question.image_url" alt="Gambar Soal" class="max-h-64 w-auto object-contain rounded-xl">
+                                                    </a>
+                                                </div>
+                                            </template>
 
-                                        {{-- Options Grid --}}
-                                        <template x-if="ans.question && ans.question.options && ans.question.options.length > 0">
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                                                <template x-for="(opt, optIdx) in ans.question.options" :key="opt.id || optIdx">
-                                                    <div class="p-3 rounded-xl border flex items-start justify-between gap-2 shadow-sm transition-all"
-                                                         :class="opt.is_correct
-                                                            ? 'border-2 border-emerald-500/60 bg-[#0E2018] text-white'
-                                                            : (isOptSelected(ans, opt.id)
-                                                                ? 'border-2 border-rose-500/60 bg-[#221013] text-white'
-                                                                : 'border border-[#1A2820] bg-[#090D0B]/60 text-gray-400')">
-                                                        
-                                                        <div class="flex items-start gap-2.5 min-w-0 flex-1">
-                                                            <span class="w-6 h-6 rounded-lg font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5"
-                                                                  :class="opt.is_correct
-                                                                    ? 'bg-emerald-500 text-white'
-                                                                    : (isOptSelected(ans, opt.id)
-                                                                        ? 'bg-rose-500 text-white'
-                                                                        : 'bg-[#142019] text-gray-400')"
-                                                                  x-text="['A','B','C','D','E','F'][optIdx] || (optIdx + 1)"></span>
+                                            {{-- Teks Pertanyaan --}}
+                                            <div class="text-sm sm:text-base font-bold text-white mb-4 leading-relaxed"
+                                                 x-html="ans.question ? (ans.question.formatted_text || ans.question.question_text) : 'Pertanyaan'"></div>
 
-                                                            <div class="min-w-0 flex-1">
-                                                                <template x-if="opt.image_url">
-                                                                    <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
-                                                                        <a :href="opt.image_url" target="_blank">
-                                                                            <img :src="opt.image_url" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
-                                                                        </a>
-                                                                    </div>
+                                            {{-- ─── BOX PERBANDINGAN: JAWABAN MAHASISWA VS KUNCI BENAR ─── --}}
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 p-3.5 rounded-2xl bg-[#090D0B] border border-[#16221B]">
+                                                {{-- Versi Mahasiswa --}}
+                                                <div class="p-3 rounded-xl border transition-all"
+                                                     :class="ans.is_correct
+                                                        ? 'bg-emerald-500/10 border-emerald-500/30'
+                                                        : (hasStudentAnswer(ans) ? 'bg-rose-500/10 border-rose-500/30' : 'bg-gray-800/20 border-[#1A2820]')">
+                                                    <div class="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+                                                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+                                                            <span>👤</span> Jawaban Mahasiswa (Versi Dia)
+                                                        </span>
+                                                        <template x-if="ans.is_correct">
+                                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                                Benar
+                                                            </span>
+                                                        </template>
+                                                        <template x-if="!ans.is_correct && hasStudentAnswer(ans)">
+                                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                Salah
+                                                            </span>
+                                                        </template>
+                                                        <template x-if="!hasStudentAnswer(ans)">
+                                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                                                Tidak Dijawab
+                                                            </span>
+                                                        </template>
+                                                    </div>
+                                                    <div class="text-xs font-semibold leading-relaxed"
+                                                         :class="ans.is_correct ? 'text-emerald-100' : (hasStudentAnswer(ans) ? 'text-rose-100' : 'text-gray-400')"
+                                                         x-html="getStudentAnswerText(ans)"></div>
+                                                </div>
+
+                                                {{-- Versi Kunci Benar --}}
+                                                <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 transition-all">
+                                                    <div class="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+                                                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                                                            <span>🔑</span> Kunci Jawaban (Versi Benar)
+                                                        </span>
+                                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                            Kunci Tepat
+                                                        </span>
+                                                    </div>
+                                                    <div class="text-xs font-semibold text-emerald-100 leading-relaxed"
+                                                         x-html="getCorrectAnswerText(ans)"></div>
+                                                </div>
+                                            </div>
+
+                                            {{-- Options Grid --}}
+                                            <template x-if="ans.question && ans.question.options && ans.question.options.length > 0">
+                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                                                    <template x-for="(opt, optIdx) in ans.question.options" :key="opt.id || optIdx">
+                                                        <div class="p-3 rounded-xl border flex items-start justify-between gap-2 shadow-sm transition-all"
+                                                             :class="opt.is_correct
+                                                                ? 'border-2 border-emerald-500/60 bg-[#0E2018] text-white'
+                                                                : (isOptSelected(ans, opt.id)
+                                                                    ? 'border-2 border-rose-500/60 bg-[#221013] text-white'
+                                                                    : 'border border-[#1A2820] bg-[#090D0B]/60 text-gray-400')">
+                                                            
+                                                            <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                                                                <span class="w-6 h-6 rounded-lg font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5"
+                                                                      :class="opt.is_correct
+                                                                        ? 'bg-emerald-500 text-white'
+                                                                        : (isOptSelected(ans, opt.id)
+                                                                            ? 'bg-rose-500 text-white'
+                                                                            : 'bg-[#142019] text-gray-400')"
+                                                                      x-text="['A','B','C','D','E','F'][optIdx] || (optIdx + 1)"></span>
+
+                                                                <div class="min-w-0 flex-1">
+                                                                    <template x-if="opt.image_url">
+                                                                        <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
+                                                                            <a :href="opt.image_url" target="_blank">
+                                                                                <img :src="opt.image_url" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
+                                                                            </a>
+                                                                        </div>
+                                                                    </template>
+                                                                    <div class="font-semibold block leading-snug"
+                                                                         :class="opt.is_correct ? 'text-emerald-100' : (isOptSelected(ans, opt.id) ? 'text-rose-100' : 'text-gray-300')"
+                                                                         x-html="opt.formatted_text || opt.option_text"></div>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- Selection Status Badges --}}
+                                                            <div class="shrink-0 flex items-center">
+                                                                <template x-if="opt.is_correct && isOptSelected(ans, opt.id)">
+                                                                    <span class="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm">
+                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                                        Pilihan Mahasiswa
+                                                                    </span>
                                                                 </template>
-                                                                <div class="font-semibold block leading-snug"
-                                                                     :class="opt.is_correct ? 'text-emerald-100' : (isOptSelected(ans, opt.id) ? 'text-rose-100' : 'text-gray-300')"
-                                                                     x-html="opt.formatted_text || opt.option_text"></div>
+                                                                <template x-if="opt.is_correct && !isOptSelected(ans, opt.id)">
+                                                                    <span class="text-[10px] bg-emerald-600/90 text-white font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                                        Kunci Benar
+                                                                    </span>
+                                                                </template>
+                                                                <template x-if="!opt.is_correct && isOptSelected(ans, opt.id)">
+                                                                    <span class="text-[10px] bg-rose-500 text-white font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm">
+                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                        Pilihan Mahasiswa
+                                                                    </span>
+                                                                </template>
                                                             </div>
                                                         </div>
+                                                    </template>
+                                                </div>
+                                            </template>
 
-                                                        {{-- Selection Status Badges --}}
-                                                        <div class="shrink-0 flex items-center">
-                                                            <template x-if="opt.is_correct && isOptSelected(ans, opt.id)">
-                                                                <span class="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm">
-                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                                    Pilihan Mahasiswa
-                                                                </span>
-                                                            </template>
-                                                            <template x-if="opt.is_correct && !isOptSelected(ans, opt.id)">
-                                                                <span class="text-[10px] bg-emerald-600/90 text-white font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
-                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                                    Kunci Benar
-                                                                </span>
-                                                            </template>
-                                                            <template x-if="!opt.is_correct && isOptSelected(ans, opt.id)">
-                                                                <span class="text-[10px] bg-rose-500 text-white font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm">
-                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                                    Pilihan Mahasiswa
-                                                                </span>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                </template>
-                                            </div>
-                                        </template>
-
-                                        {{-- Catatan Pembahasan --}}
-                                        <template x-if="ans.question && ans.question.explanation">
-                                            <div class="mt-4 p-3 rounded-xl bg-teal-500/5 border border-teal-500/20 text-xs text-teal-300">
-                                                <span class="font-bold flex items-center gap-1.5 mb-1 text-teal-400">
-                                                    <span>💡</span> Pembahasan:
-                                                </span>
-                                                <div x-text="ans.question.explanation" class="leading-relaxed text-gray-300"></div>
-                                            </div>
-                                        </template>
-                                    </div>
-                                </template>
+                                            {{-- Catatan Pembahasan --}}
+                                            <template x-if="ans.question && ans.question.explanation">
+                                                <div class="mt-4 p-3 rounded-xl bg-teal-500/5 border border-teal-500/20 text-xs text-teal-300">
+                                                    <span class="font-bold flex items-center gap-1.5 mb-1 text-teal-400">
+                                                        <span>💡</span> Pembahasan:
+                                                    </span>
+                                                    <div x-text="ans.question.explanation" class="leading-relaxed text-gray-300"></div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
+
                         </div>
+                    </template>
+                </div>
 
-                    </div>
-                </template>
-            </div>
-
-            {{-- Modal Footer --}}
-            <div class="px-6 py-4 border-t border-[#1A2820] bg-[#090D0B]/80 backdrop-blur-md flex justify-end flex-shrink-0">
-                <button type="button" @click="showDetailModal = false"
-                        class="px-5 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold transition-colors">
-                    Tutup Lembar Jawaban
-                </button>
+                {{-- Modal Footer --}}
+                <div class="px-6 py-4 border-t border-[#1A2820] bg-[#090D0B]/80 backdrop-blur-md flex justify-end flex-shrink-0">
+                    <button type="button" @click="showDetailModal = false"
+                            class="px-5 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold transition-colors">
+                        Tutup Lembar Jawaban
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+    </template>
 
 </div>
 
@@ -600,6 +653,11 @@
         return {
             showDetailModal: false,
             selectedAttempt: null,
+            init() {
+                this.$watch('showDetailModal', (isOpen) => {
+                    document.body.style.overflow = isOpen ? 'hidden' : '';
+                });
+            },
             viewAttemptDetail(attempt) {
                 this.selectedAttempt = attempt;
                 this.showDetailModal = true;
@@ -617,6 +675,57 @@
                     return ans.selected_option_ids.map(Number).includes(targetId);
                 }
                 return false;
+            },
+            hasStudentAnswer(ans) {
+                if (!ans) return false;
+                if (ans.selected_option_id) return true;
+                if (Array.isArray(ans.selected_option_ids) && ans.selected_option_ids.length > 0) return true;
+                return false;
+            },
+            getStudentAnswerText(ans) {
+                if (!ans || !ans.question || !Array.isArray(ans.question.options)) {
+                    return '<span class="italic text-gray-500">Tidak ada jawaban tercatat</span>';
+                }
+                const letters = ['A','B','C','D','E','F'];
+
+                // Pilihan jamak (multi select)
+                if (Array.isArray(ans.selected_option_ids) && ans.selected_option_ids.length > 0) {
+                    const selected = ans.question.options.filter(opt => ans.selected_option_ids.map(Number).includes(Number(opt.id)));
+                    if (selected.length === 0) {
+                        return '<span class="italic text-gray-500">Tidak ada opsi terpilih</span>';
+                    }
+                    return selected.map(opt => {
+                        const idx = ans.question.options.findIndex(o => Number(o.id) === Number(opt.id));
+                        const letter = letters[idx] || (idx + 1);
+                        return `<span class="inline-block mr-1"><strong>[${letter}]</strong> ${opt.option_text}</span>`;
+                    }).join('<br>');
+                }
+
+                // Pilihan tunggal / Benar-Salah
+                if (ans.selected_option_id) {
+                    const idx = ans.question.options.findIndex(o => Number(o.id) === Number(ans.selected_option_id));
+                    const opt = ans.question.options[idx];
+                    if (opt) {
+                        const letter = letters[idx] || (idx + 1);
+                        return `<strong>[${letter}]</strong> ${opt.option_text}`;
+                    }
+                }
+
+                return '<span class="italic text-gray-500">Tidak menjawab butir soal ini</span>';
+            },
+            getCorrectAnswerText(ans) {
+                if (!ans || !ans.question || !Array.isArray(ans.question.options)) return '-';
+                const letters = ['A','B','C','D','E','F'];
+                const correctOpts = ans.question.options.filter(o => o.is_correct);
+                if (correctOpts.length === 0) {
+                    return '<span class="italic text-gray-500">Kunci jawaban belum disetel</span>';
+                }
+
+                return correctOpts.map(opt => {
+                    const idx = ans.question.options.findIndex(o => Number(o.id) === Number(opt.id));
+                    const letter = letters[idx] || (idx + 1);
+                    return `<span class="inline-block mr-1"><strong>[${letter}]</strong> ${opt.option_text}</span>`;
+                }).join('<br>');
             },
             formatDuration(sec) {
                 if (!sec) return '-';
