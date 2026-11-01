@@ -295,17 +295,17 @@
             --sidebar-width: 16rem; /* 256px */
         }
 
-        /* Pulsing indicator on hamburger when sidebar is collapsed on desktop */
-        html.sidebar-collapsed .sidebar-toggle-indicator,
-        body.sidebar-collapsed .sidebar-toggle-indicator {
-            display: block !important;
+        /* Subtle highlight on hamburger when sidebar is collapsed on desktop */
+        html.sidebar-collapsed #sidebar-toggle-btn,
+        body.sidebar-collapsed #sidebar-toggle-btn {
+            background-color: rgba(16, 185, 129, 0.12) !important;
+            border-color: rgba(16, 185, 129, 0.45) !important;
+            color: #10B981 !important;
+            box-shadow: 0 0 16px rgba(16, 185, 129, 0.22) !important;
         }
-        @keyframes pulseIndicator {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.45; transform: scale(1.3); }
-        }
-        .sidebar-toggle-indicator {
-            animation: pulseIndicator 2s ease-in-out infinite;
+        html.sidebar-collapsed #sidebar-toggle-btn .hamburger-bar,
+        body.sidebar-collapsed #sidebar-toggle-btn .hamburger-bar {
+            background-color: #34D399 !important;
         }
 
         /* Desktop Mode (>= 1024px / lg) */
@@ -348,7 +348,7 @@
                 display: inline-flex !important;
             }
             #sidebar-close-btn {
-                display: inline-flex !important;
+                display: none !important;
             }
         }
 
@@ -402,29 +402,24 @@
                class="fixed inset-y-0 left-0 flex flex-col"
                style="background:#0F1713; border-right:1px solid #1A2820;">
             {{-- Logo & Mobile Close --}}
-            <div class="flex items-center justify-between px-5 py-4" style="border-bottom:1px solid #1A2820;">
-                <div class="flex items-center gap-3">
+            <div class="flex items-center justify-between px-5 py-3.5" style="border-bottom:1px solid #1A2820; height: 65px;">
+                <div class="flex items-center gap-3 min-w-0">
                     <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 p-1" style="background:rgba(16,185,129,0.08); border:1px solid rgba(52,211,153,0.25); box-shadow:0 0 15px rgba(16,185,129,0.15);">
                         <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs Logo" class="w-full h-full object-contain" draggable="false">
                     </div>
-                    <div>
-                        <h1 class="text-white font-extrabold text-base leading-none tracking-wider" style="font-family:'Orbitron',sans-serif;">IC-LABS</h1>
-                        <p class="text-[10px] mt-1 font-semibold uppercase tracking-widest" style="font-family:'Chakra Petch',sans-serif; color:#34D399;">REPOSITORY</p>
+                    <div class="min-w-0">
+                        <h1 class="text-white font-extrabold text-base leading-none tracking-wider truncate" style="font-family:'Orbitron',sans-serif;">IC-LABS</h1>
+                        <p class="text-[10px] mt-1 font-semibold uppercase tracking-widest truncate" style="font-family:'Chakra Petch',sans-serif; color:#34D399;">REPOSITORY</p>
                     </div>
                 </div>
 
-                {{-- Sidebar Collapse / Close Button --}}
+                {{-- Mobile Close Drawer Button (Only shown on mobile / tablet drawer) --}}
                 <button type="button"
                         id="sidebar-close-btn"
-                        onclick="toggleSidebar(false)"
-                        class="p-2 rounded-xl text-gray-400 hover:text-white bg-gray-800/60 hover:bg-emerald-500/20 hover:text-emerald-300 border border-gray-700/60 hover:border-emerald-500/40 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
-                        title="Sembunyikan Sidebar (Ctrl+B)">
-                    {{-- Desktop Icon: Collapse Chevron Left --}}
-                    <svg class="w-5 h-5 hidden lg:block transition-transform duration-200 group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
-                    </svg>
-                    {{-- Mobile Icon: Close X Mark --}}
-                    <svg class="w-5 h-5 lg:hidden transition-transform duration-200 group-hover:rotate-90 hover:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                        onclick="toggleMobileSidebar(false)"
+                        class="p-2 rounded-xl text-gray-400 hover:text-white bg-gray-800/60 hover:bg-rose-500/20 hover:text-rose-400 border border-gray-700/60 hover:border-rose-500/40 transition-all flex items-center justify-center cursor-pointer lg:hidden flex-shrink-0"
+                        title="Tutup Menu (Esc)">
+                    <svg class="w-5 h-5 transition-transform duration-200 hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
@@ -517,23 +512,27 @@
         {{-- Main Content --}}
         <main id="main-content-wrapper" class="flex-1 flex flex-col min-h-screen min-w-0 transition-all duration-300">
             {{-- Top Header --}}
-            <header class="px-4 sm:px-6 py-3.5 sticky top-0 z-30" style="background:rgba(9,13,11,.95);backdrop-filter:blur(16px);border-bottom:1px solid #1A2820;">
-                <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                        {{-- Universal Sidebar Hamburger Toggle Button (Desktop & Mobile) --}}
+            <header class="px-4 sm:px-6 py-3.5 sticky top-0 z-30 flex items-center" style="background:rgba(9,13,11,.95);backdrop-filter:blur(16px);border-bottom:1px solid #1A2820; height: 65px;">
+                <div class="flex items-center justify-between gap-3 w-full">
+                    <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                        {{-- Master Cyber Hamburger Toggle Button --}}
                         <button type="button"
                                 id="sidebar-toggle-btn"
                                 onclick="toggleSidebar()"
-                                class="relative inline-flex items-center justify-center gap-2 p-2 sm:px-3 sm:py-2 rounded-xl text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 hover:border-emerald-500/40 active:scale-95 transition-all flex-shrink-0 cursor-pointer shadow-sm shadow-emerald-500/10 group focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
-                                aria-label="Toggle Menu Navigasi"
+                                class="w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 hover:text-emerald-400 bg-[#0F1713] hover:bg-[#142019] border border-[#1A2820] hover:border-emerald-500/40 active:scale-95 transition-all flex-shrink-0 cursor-pointer shadow-sm hover:shadow-[0_0_16px_rgba(16,185,129,0.18)] group focus:outline-none focus:border-emerald-500/50"
+                                aria-label="Buka atau Tutup Menu Navigasi"
                                 title="Buka / Tutup Sidebar (Ctrl+B)">
-                            <svg class="w-5 h-5 text-emerald-400 transition-transform duration-300 group-hover:scale-105" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-                            </svg>
-                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-300 hidden sm:inline select-none" style="font-family:'Chakra Petch',sans-serif;">Menu</span>
-                            <span class="sidebar-toggle-indicator absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#090D0B] hidden shadow-sm shadow-emerald-400/80"></span>
+                            <div class="w-5 h-3.5 flex flex-col justify-between items-center">
+                                <span class="hamburger-bar block h-[2px] w-5 rounded-full bg-gray-400 group-hover:bg-emerald-400 transition-colors duration-200"></span>
+                                <span class="hamburger-bar block h-[2px] w-3.5 group-hover:w-5 self-start rounded-full bg-gray-400 group-hover:bg-emerald-400 transition-all duration-200"></span>
+                                <span class="hamburger-bar block h-[2px] w-5 rounded-full bg-gray-400 group-hover:bg-emerald-400 transition-colors duration-200"></span>
+                            </div>
                         </button>
 
+                        {{-- Subtle Cyber Vertical Separator --}}
+                        <div class="h-6 w-px bg-[#1A2820] flex-shrink-0"></div>
+
+                        {{-- Page Title & Description --}}
                         <div class="min-w-0">
                             <h2 class="text-base sm:text-lg font-bold text-white leading-tight truncate">@yield('page-title', 'Dashboard')</h2>
                             @hasSection('page-description')
