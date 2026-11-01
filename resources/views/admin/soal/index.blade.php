@@ -168,10 +168,54 @@
                                         </button>
 
                                         @if($soal->hasPassword())
-                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20" title="Dokumen dilindungi password">
-                                                <svg class="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                                <span>Password</span>
-                                            </span>
+                                            @php
+                                                $plainPwd = $soal->plain_password ?? '';
+                                            @endphp
+                                            <div class="inline-flex items-center">
+                                                {{-- Tombol Gembok Kompak (Hanya Ikon Saja) --}}
+                                                <button type="button"
+                                                        id="pwd-badge-closed-{{ $soal->id }}"
+                                                        onclick="toggleDocPassword({{ $soal->id }}, '{{ addslashes($plainPwd) }}', '{{ addslashes($soal->title) }}')"
+                                                        title="Klik untuk melihat password dokumen"
+                                                        class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 hover:border-amber-500/50 text-amber-400 hover:text-amber-300 transition-all cursor-pointer shadow-sm active:scale-95 group/lock">
+                                                    <svg class="w-3.5 h-3.5 text-amber-400 group-hover/lock:text-amber-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                                    </svg>
+                                                </button>
+
+                                                {{-- Chip Password Terbuka (Muncul saat tombol gembok ditekan) --}}
+                                                <div id="pwd-badge-open-{{ $soal->id }}"
+                                                     class="hidden inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-semibold transition-all shadow-sm">
+                                                    <button type="button"
+                                                            onclick="toggleDocPassword({{ $soal->id }})"
+                                                            title="Sembunyikan password"
+                                                            class="text-amber-400 hover:text-amber-200 cursor-pointer flex-shrink-0 transition-colors">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+                                                        </svg>
+                                                    </button>
+                                                    <span class="text-amber-400/80 text-[10px] font-sans font-normal uppercase tracking-wider">Pass:</span>
+                                                    <span class="select-all font-bold tracking-wider text-amber-200">{{ $plainPwd ?: '••••••••' }}</span>
+                                                    @if($plainPwd)
+                                                    <button type="button"
+                                                            onclick="copyToClipboard('{{ addslashes($plainPwd) }}', 'Password dokumen berhasil disalin!')"
+                                                            title="Salin password"
+                                                            class="text-amber-400/80 hover:text-amber-200 cursor-pointer transition-colors flex-shrink-0">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                        </svg>
+                                                    </button>
+                                                    @endif
+                                                    <button type="button"
+                                                            onclick="toggleDocPassword({{ $soal->id }})"
+                                                            title="Tutup password"
+                                                            class="text-amber-400/60 hover:text-amber-200 ml-0.5 cursor-pointer flex-shrink-0 transition-colors">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         @endif
 
                                         @if(auth()->user()->isSuperAdmin() && $soal->admin)
@@ -1008,6 +1052,49 @@ function copyLink(url) {
             alert('Tautan berhasil disalin!');
         }
     });
+}
+
+function toggleDocPassword(id, pwd = '', title = '') {
+    const closedBtn = document.getElementById(`pwd-badge-closed-${id}`);
+    const openBadge = document.getElementById(`pwd-badge-open-${id}`);
+
+    if (!pwd && (!openBadge || openBadge.classList.contains('hidden'))) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'info',
+                title: 'Password Terenkripsi',
+                html: `<p class="text-sm text-gray-300">Dokumen <strong class="text-amber-400">${title || 'ini'}</strong> dilindungi password yang tersimpan dengan enkripsi.</p><p class="text-xs text-gray-400 mt-2">Anda dapat memperbarui password melalui menu Edit Dokumen.</p>`,
+                background: '#0D1512',
+                color: '#f3f4f6',
+                confirmButtonColor: '#10b981',
+                confirmButtonText: 'Edit Dokumen',
+                showCancelButton: true,
+                cancelButtonText: 'Tutup',
+                cancelButtonColor: '#374151',
+                customClass: {
+                    popup: 'border border-[#1E3327] rounded-2xl shadow-2xl'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    openEditModalForSoal(id);
+                }
+            });
+        } else {
+            alert('Password tersimpan secara terenkripsi. Silakan edit dokumen untuk mengatur ulang password.');
+        }
+        return;
+    }
+
+    if (closedBtn && openBadge) {
+        const isOpening = openBadge.classList.contains('hidden');
+        if (isOpening) {
+            closedBtn.classList.add('hidden');
+            openBadge.classList.remove('hidden');
+        } else {
+            openBadge.classList.add('hidden');
+            closedBtn.classList.remove('hidden');
+        }
+    }
 }
 
 function openCreateModal() {

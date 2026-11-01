@@ -169,6 +169,28 @@ class SoalPasswordAndModalTest extends TestCase
         $response->assertSee('modal-edit-soal-form', false);
     }
 
+    public function test_admin_soal_index_renders_compact_lock_button_and_password_reveal_elements(): void
+    {
+        $soal = Soal::create([
+            'title'          => 'Dokumen Uji Gembok',
+            'kode_unik'      => 'GEMBOK-01',
+            'unique_token'   => 'token-gembok-01',
+            'password'       => bcrypt('rahasia_gembok_123'),
+            'plain_password' => 'rahasia_gembok_123',
+            'user_id'        => $this->admin->id,
+            'access_type'    => 'lifetime',
+            'is_active'      => true,
+            'is_downloadable'=> true,
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.soal.index'));
+        $response->assertOk();
+        $response->assertSee('pwd-badge-closed-' . $soal->id, false);
+        $response->assertSee('pwd-badge-open-' . $soal->id, false);
+        $response->assertSee('toggleDocPassword(' . $soal->id, false);
+        $response->assertSee('rahasia_gembok_123', false);
+    }
+
     public function test_soal_creates_slug_from_title_and_handles_collisions(): void
     {
         $soal1 = Soal::create([
