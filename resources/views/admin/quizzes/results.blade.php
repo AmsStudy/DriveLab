@@ -7,7 +7,7 @@
 <div x-data="resultsManager()" class="space-y-6">
 
     {{-- Top Header & Navigation --}}
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-30">
         <div class="flex items-center gap-3">
             <a href="{{ route('admin.quizzes.index') }}"
                class="p-2 rounded-xl bg-[#0F1713] border border-[#1A2820] text-gray-400 hover:text-emerald-400 hover:border-emerald-500/40 transition-all">
@@ -54,8 +54,8 @@
                              x-transition:leave="transition ease-in duration-100"
                              x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
                              x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
-                             class="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl py-2 z-30 border backdrop-blur-md"
-                             style="background:rgba(15,23,19,0.96);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
+                             class="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl py-2 z-50 border backdrop-blur-md"
+                             style="background:rgba(15,23,19,0.98);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
                             <div class="px-4 py-1.5 text-[10px] uppercase font-bold text-gray-500 tracking-wider">Rekap Hasil Kuis</div>
                             <a href="{{ route('admin.quizzes.export-csv', $quiz) }}"
                                class="flex items-center justify-between px-4 py-2 text-xs text-emerald-400 hover:bg-emerald-500/10 font-semibold transition-colors">

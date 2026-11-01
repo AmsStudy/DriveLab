@@ -374,10 +374,10 @@
 
     {{-- RIGHT COLUMN: RIWAYAT PENGUMPULAN TUGAS (2 Cols) --}}
     <div class="lg:col-span-2">
-        <div class="rounded-2xl overflow-hidden shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
+        <div class="rounded-2xl shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
 
             {{-- Header Pengumpulan Tugas --}}
-            <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4" style="border-bottom:1px solid #1A2820;">
+            <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-30" style="border-bottom:1px solid #1A2820;">
                 <div>
                     <h2 class="text-base font-bold text-white flex items-center gap-2.5">
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(13,148,136,.15);color:#2DD4BF;">
@@ -410,8 +410,8 @@
                                      x-transition:leave="transition ease-in duration-100"
                                      x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
                                      x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
-                                     class="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl py-2 z-30 border backdrop-blur-md"
-                                     style="background:rgba(15,23,19,0.96);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
+                                     class="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl py-2 z-50 border backdrop-blur-md"
+                                     style="background:rgba(15,23,19,0.98);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
                                     <div class="px-4 py-1.5 text-[10px] uppercase font-bold text-gray-500 tracking-wider">Unduh Berdasarkan Kelas</div>
                                     <a href="{{ route('admin.soal.download-submissions-zip', $soal) }}"
                                        class="flex items-center justify-between px-4 py-2 text-xs text-emerald-400 hover:bg-emerald-500/10 font-semibold transition-colors">
@@ -460,8 +460,8 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
                                  x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
-                                 class="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl py-2 z-30 border backdrop-blur-md"
-                                 style="background:rgba(15,23,19,0.96);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
+                                 class="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl py-2 z-50 border backdrop-blur-md"
+                                 style="background:rgba(15,23,19,0.98);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
                                 <div class="px-4 py-1.5 text-[10px] uppercase font-bold text-gray-500 tracking-wider">Rekap Tugas CSV</div>
                                 <a href="{{ route('admin.soal.export-submissions', $soal) }}"
                                    class="flex items-center justify-between px-4 py-2 text-xs text-emerald-400 hover:bg-emerald-500/10 font-semibold transition-colors">
@@ -494,7 +494,7 @@
 
             {{-- Filter & Search Bar --}}
             @if(!$submissions->isEmpty())
-            <div class="px-5 md:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3"
+            <div class="px-5 md:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 relative z-10"
                  style="background:rgba(9,13,11,.6);border-bottom:1px solid #1A2820;">
                 <div class="flex items-center gap-2.5 w-full sm:w-auto flex-1">
                     <div class="relative w-full sm:w-64">
@@ -550,7 +550,7 @@
                     <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Ketika mahasiswa mengirimkan file, link, atau teks jawaban, data mereka akan otomatis ditampilkan di sini.</p>
                 </div>
             @else
-                <div class="overflow-x-auto overflow-y-auto max-h-[660px]">
+                <div class="overflow-x-auto overflow-y-auto max-h-[660px] rounded-b-2xl relative z-0">
                     <table class="w-full text-sm min-w-[620px]" id="submissionsTable">
                         <thead class="text-xs text-gray-400 uppercase tracking-wider sticky top-0 z-10 shadow-sm" style="background:#090D0B;border-bottom:1px solid #1A2820;">
                             <tr>
