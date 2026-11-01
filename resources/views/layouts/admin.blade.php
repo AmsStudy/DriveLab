@@ -9,6 +9,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@700;800;900&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            try {
+                if (localStorage.getItem('labsoal_sidebar_collapsed') === 'true' && window.innerWidth >= 1024) {
+                    document.documentElement.classList.add('sidebar-collapsed');
+                }
+            } catch(e) {}
+        })();
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -286,6 +295,19 @@
             --sidebar-width: 16rem; /* 256px */
         }
 
+        /* Pulsing indicator on hamburger when sidebar is collapsed on desktop */
+        html.sidebar-collapsed .sidebar-toggle-indicator,
+        body.sidebar-collapsed .sidebar-toggle-indicator {
+            display: block !important;
+        }
+        @keyframes pulseIndicator {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.45; transform: scale(1.3); }
+        }
+        .sidebar-toggle-indicator {
+            animation: pulseIndicator 2s ease-in-out infinite;
+        }
+
         /* Desktop Mode (>= 1024px / lg) */
         @media (min-width: 1024px) {
             #sidebar {
@@ -294,24 +316,39 @@
                 bottom: 0 !important;
                 left: 0 !important;
                 width: var(--sidebar-width) !important;
-                transform: translateX(0) !important;
+                transform: translateX(0);
                 z-index: 40 !important;
                 display: flex !important;
+                box-shadow: none !important;
+                transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease !important;
+                will-change: transform;
+            }
+            html.sidebar-collapsed #sidebar,
+            body.sidebar-collapsed #sidebar {
+                transform: translateX(-100%) !important;
                 box-shadow: none !important;
             }
             #main-content-wrapper {
                 margin-left: var(--sidebar-width) !important;
                 width: calc(100% - var(--sidebar-width)) !important;
                 min-width: 0 !important;
+                transition: margin-left 0.32s cubic-bezier(0.16, 1, 0.3, 1), width 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                will-change: margin-left, width;
+            }
+            html.sidebar-collapsed #main-content-wrapper,
+            body.sidebar-collapsed #main-content-wrapper {
+                margin-left: 0 !important;
+                width: 100% !important;
             }
             #mobile-sidebar-backdrop {
                 display: none !important;
             }
-            #mobile-hamburger-btn {
-                display: none !important;
+            #mobile-hamburger-btn,
+            #sidebar-toggle-btn {
+                display: inline-flex !important;
             }
             #sidebar-close-btn {
-                display: none !important;
+                display: inline-flex !important;
             }
         }
 
@@ -325,8 +362,9 @@
                 width: min(280px, 86vw) !important;
                 z-index: 60 !important;
                 transform: translateX(-100%) !important;
-                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
+                transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease !important;
                 box-shadow: none !important;
+                will-change: transform;
             }
             body.mobile-sidebar-open #sidebar,
             #sidebar.open {
@@ -337,8 +375,10 @@
                 margin-left: 0 !important;
                 width: 100% !important;
                 min-width: 0 !important;
+                transition: none !important;
             }
-            #mobile-hamburger-btn {
+            #mobile-hamburger-btn,
+            #sidebar-toggle-btn {
                 display: inline-flex !important;
             }
             #sidebar-close-btn {
@@ -347,7 +387,7 @@
         }
     </style>
 </head>
-<body class="text-gray-100 min-h-screen" style="background:#090D0B; font-family:'Inter',sans-serif;">
+<body class="text-gray-100 min-h-screen overflow-x-hidden" style="background:#090D0B; font-family:'Inter',sans-serif;">
 
     {{-- Mobile Sidebar Backdrop --}}
     <div id="mobile-sidebar-backdrop"
@@ -373,13 +413,18 @@
                     </div>
                 </div>
 
-                {{-- Mobile Close Button --}}
+                {{-- Sidebar Collapse / Close Button --}}
                 <button type="button"
                         id="sidebar-close-btn"
-                        onclick="toggleMobileSidebar(false)"
-                        class="p-2 rounded-xl text-gray-400 hover:text-white bg-gray-800/60 hover:bg-red-500/20 hover:text-red-400 border border-gray-700/60 hover:border-red-500/40 transition-all flex items-center justify-center cursor-pointer"
-                        title="Tutup Menu (Esc)">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                        onclick="toggleSidebar(false)"
+                        class="p-2 rounded-xl text-gray-400 hover:text-white bg-gray-800/60 hover:bg-emerald-500/20 hover:text-emerald-300 border border-gray-700/60 hover:border-emerald-500/40 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
+                        title="Sembunyikan Sidebar (Ctrl+B)">
+                    {{-- Desktop Icon: Collapse Chevron Left --}}
+                    <svg class="w-5 h-5 hidden lg:block transition-transform duration-200 group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                    </svg>
+                    {{-- Mobile Icon: Close X Mark --}}
+                    <svg class="w-5 h-5 lg:hidden transition-transform duration-200 group-hover:rotate-90 hover:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
@@ -475,17 +520,18 @@
             <header class="px-4 sm:px-6 py-3.5 sticky top-0 z-30" style="background:rgba(9,13,11,.95);backdrop-filter:blur(16px);border-bottom:1px solid #1A2820;">
                 <div class="flex items-center justify-between gap-3">
                     <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                        {{-- Mobile Menu Hamburger Button --}}
+                        {{-- Universal Sidebar Hamburger Toggle Button (Desktop & Mobile) --}}
                         <button type="button"
-                                id="mobile-hamburger-btn"
-                                onclick="toggleMobileSidebar(true)"
-                                class="inline-flex items-center justify-center gap-2 p-2 sm:px-3 sm:py-2 rounded-xl text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 hover:border-emerald-500/40 transition-all flex-shrink-0 cursor-pointer shadow-sm shadow-emerald-500/10"
-                                aria-label="Buka Menu Navigasi"
-                                title="Buka Menu Navigasi">
-                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                                id="sidebar-toggle-btn"
+                                onclick="toggleSidebar()"
+                                class="relative inline-flex items-center justify-center gap-2 p-2 sm:px-3 sm:py-2 rounded-xl text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 hover:border-emerald-500/40 active:scale-95 transition-all flex-shrink-0 cursor-pointer shadow-sm shadow-emerald-500/10 group focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                                aria-label="Toggle Menu Navigasi"
+                                title="Buka / Tutup Sidebar (Ctrl+B)">
+                            <svg class="w-5 h-5 text-emerald-400 transition-transform duration-300 group-hover:scale-105" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
                             </svg>
-                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-300 hidden sm:inline" style="font-family:'Chakra Petch',sans-serif;">Menu</span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-300 hidden sm:inline select-none" style="font-family:'Chakra Petch',sans-serif;">Menu</span>
+                            <span class="sidebar-toggle-indicator absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#090D0B] hidden shadow-sm shadow-emerald-400/80"></span>
                         </button>
 
                         <div class="min-w-0">
@@ -909,7 +955,36 @@
     });
     window.initCyberSelects = initCyberSelects;
 
-    // ── Ultra-Reliable Mobile Sidebar Drawer Controls ──
+    // ── Universal Responsive Sidebar Controls (Desktop Collapsible + Mobile Drawer) ──
+    window.toggleSidebar = function(forceState = null) {
+        if (window.innerWidth >= 1024) {
+            // Desktop Mode: Toggle Collapsed state
+            const isCurrentlyCollapsed = document.body.classList.contains('sidebar-collapsed') ||
+                                         document.documentElement.classList.contains('sidebar-collapsed');
+            const shouldCollapse = forceState !== null ? !forceState : !isCurrentlyCollapsed;
+
+            if (shouldCollapse) {
+                document.body.classList.add('sidebar-collapsed');
+                document.documentElement.classList.add('sidebar-collapsed');
+                try { localStorage.setItem('labsoal_sidebar_collapsed', 'true'); } catch(e) {}
+            } else {
+                document.body.classList.remove('sidebar-collapsed');
+                document.documentElement.classList.remove('sidebar-collapsed');
+                try { localStorage.setItem('labsoal_sidebar_collapsed', 'false'); } catch(e) {}
+            }
+
+            const toggleBtn = document.getElementById('sidebar-toggle-btn');
+            if (toggleBtn) {
+                toggleBtn.setAttribute('title', shouldCollapse ? 'Tampilkan Sidebar (Ctrl+B)' : 'Sembunyikan Sidebar (Ctrl+B)');
+            }
+        } else {
+            // Mobile Mode: Toggle Mobile Drawer
+            const isOpen = document.body.classList.contains('mobile-sidebar-open');
+            const shouldOpen = forceState !== null ? forceState : !isOpen;
+            window.toggleMobileSidebar(shouldOpen);
+        }
+    };
+
     window.toggleMobileSidebar = function(open) {
         const sidebar = document.getElementById('sidebar');
         const backdrop = document.getElementById('mobile-sidebar-backdrop');
@@ -933,22 +1008,48 @@
                 if (!document.body.classList.contains('mobile-sidebar-open')) {
                     backdrop.style.display = 'none';
                 }
-            }, 300);
+            }, 320);
             document.body.style.overflow = '';
         }
     };
 
-    // Close mobile drawer on Escape key
+    // Keyboard Shortcuts: Ctrl + B / Cmd + B to toggle, Escape to close mobile drawer
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && document.body.classList.contains('mobile-sidebar-open')) {
-            toggleMobileSidebar(false);
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B')) {
+            e.preventDefault();
+            window.toggleSidebar();
+        } else if (e.key === 'Escape' && document.body.classList.contains('mobile-sidebar-open')) {
+            window.toggleMobileSidebar(false);
         }
     });
 
-    // Reset when resizing window to desktop (>= 1024px)
+    // Sync state on initial page load
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            if (localStorage.getItem('labsoal_sidebar_collapsed') === 'true' && window.innerWidth >= 1024) {
+                document.body.classList.add('sidebar-collapsed');
+                document.documentElement.classList.add('sidebar-collapsed');
+                const toggleBtn = document.getElementById('sidebar-toggle-btn');
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('title', 'Tampilkan Sidebar (Ctrl+B)');
+                }
+            }
+        } catch(e) {}
+    });
+
+    // Reset when resizing window across breakpoints
     window.addEventListener('resize', function() {
-        if (window.innerWidth >= 1024 && document.body.classList.contains('mobile-sidebar-open')) {
-            toggleMobileSidebar(false);
+        if (window.innerWidth >= 1024) {
+            if (document.body.classList.contains('mobile-sidebar-open')) {
+                window.toggleMobileSidebar(false);
+            }
+            if (localStorage.getItem('labsoal_sidebar_collapsed') === 'true') {
+                document.body.classList.add('sidebar-collapsed');
+                document.documentElement.classList.add('sidebar-collapsed');
+            }
+        } else {
+            document.body.classList.remove('sidebar-collapsed');
+            document.documentElement.classList.remove('sidebar-collapsed');
         }
     });
     </script>
