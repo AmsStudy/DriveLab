@@ -280,28 +280,86 @@
         .cyber-dropdown-menu::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.35); border-radius: 4px; }
         .cyber-dropdown-menu::-webkit-scrollbar-thumb:hover { background: #10B981; }
         [x-cloak] { display: none !important; }
+
+        /* ─── Admin Responsive Shell & Sidebar (Strict, Bulletproof Desktop & Mobile) ─── */
+        :root {
+            --sidebar-width: 16rem; /* 256px */
+        }
+
+        /* Desktop Mode (>= 1024px / lg) */
+        @media (min-width: 1024px) {
+            #sidebar {
+                position: fixed !important;
+                top: 0 !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                width: var(--sidebar-width) !important;
+                transform: translateX(0) !important;
+                z-index: 40 !important;
+                display: flex !important;
+                box-shadow: none !important;
+            }
+            #main-content-wrapper {
+                margin-left: var(--sidebar-width) !important;
+                width: calc(100% - var(--sidebar-width)) !important;
+                min-width: 0 !important;
+            }
+            #mobile-sidebar-backdrop {
+                display: none !important;
+            }
+            #mobile-hamburger-btn {
+                display: none !important;
+            }
+            #sidebar-close-btn {
+                display: none !important;
+            }
+        }
+
+        /* Tablet & Mobile Mode (< 1024px) */
+        @media (max-width: 1023.98px) {
+            #sidebar {
+                position: fixed !important;
+                top: 0 !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                width: min(280px, 86vw) !important;
+                z-index: 60 !important;
+                transform: translateX(-100%) !important;
+                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
+                box-shadow: none !important;
+            }
+            body.mobile-sidebar-open #sidebar,
+            #sidebar.open {
+                transform: translateX(0) !important;
+                box-shadow: 0 0 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(16, 185, 129, 0.25) !important;
+            }
+            #main-content-wrapper {
+                margin-left: 0 !important;
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+            #mobile-hamburger-btn {
+                display: inline-flex !important;
+            }
+            #sidebar-close-btn {
+                display: inline-flex !important;
+            }
+        }
     </style>
 </head>
-<body class="text-gray-100 min-h-screen" style="background:#090D0B; font-family:'Inter',sans-serif;" x-data="{ mobileSidebarOpen: false }">
+<body class="text-gray-100 min-h-screen" style="background:#090D0B; font-family:'Inter',sans-serif;">
 
     {{-- Mobile Sidebar Backdrop --}}
-    <div x-show="mobileSidebarOpen"
-         @click="mobileSidebarOpen = false"
-         x-cloak
-         x-transition:enter="transition-opacity ease-linear duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition-opacity ease-linear duration-300"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm lg:hidden">
+    <div id="mobile-sidebar-backdrop"
+         onclick="toggleMobileSidebar(false)"
+         class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none"
+         style="display: none;">
     </div>
 
     {{-- Sidebar Shell --}}
     <div class="flex min-h-screen relative">
         <aside id="sidebar"
-               class="fixed inset-y-0 left-0 z-50 w-64 flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0"
-               :class="mobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'"
+               class="fixed inset-y-0 left-0 flex flex-col"
                style="background:#0F1713; border-right:1px solid #1A2820;">
             {{-- Logo & Mobile Close --}}
             <div class="flex items-center justify-between px-5 py-4" style="border-bottom:1px solid #1A2820;">
@@ -317,11 +375,12 @@
 
                 {{-- Mobile Close Button --}}
                 <button type="button"
-                        @click="mobileSidebarOpen = false"
-                        class="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-                        title="Tutup Menu">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        id="sidebar-close-btn"
+                        onclick="toggleMobileSidebar(false)"
+                        class="p-2 rounded-xl text-gray-400 hover:text-white bg-gray-800/60 hover:bg-red-500/20 hover:text-red-400 border border-gray-700/60 hover:border-red-500/40 transition-all flex items-center justify-center cursor-pointer"
+                        title="Tutup Menu (Esc)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
@@ -411,20 +470,22 @@
         </aside>
 
         {{-- Main Content --}}
-        <main class="flex-1 ml-0 lg:ml-64 flex flex-col min-h-screen min-w-0 transition-all duration-300">
+        <main id="main-content-wrapper" class="flex-1 flex flex-col min-h-screen min-w-0 transition-all duration-300">
             {{-- Top Header --}}
             <header class="px-4 sm:px-6 py-3.5 sticky top-0 z-30" style="background:rgba(9,13,11,.95);backdrop-filter:blur(16px);border-bottom:1px solid #1A2820;">
                 <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-3 min-w-0">
+                    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         {{-- Mobile Menu Hamburger Button --}}
                         <button type="button"
-                                @click="mobileSidebarOpen = true"
-                                class="lg:hidden p-2 -ml-1 rounded-xl text-gray-400 hover:text-white hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/20 transition-all flex-shrink-0"
+                                id="mobile-hamburger-btn"
+                                onclick="toggleMobileSidebar(true)"
+                                class="inline-flex items-center justify-center gap-2 p-2 sm:px-3 sm:py-2 rounded-xl text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 hover:border-emerald-500/40 transition-all flex-shrink-0 cursor-pointer shadow-sm shadow-emerald-500/10"
                                 aria-label="Buka Menu Navigasi"
-                                title="Buka Menu">
-                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                                title="Buka Menu Navigasi">
+                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
                             </svg>
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-300 hidden sm:inline" style="font-family:'Chakra Petch',sans-serif;">Menu</span>
                         </button>
 
                         <div class="min-w-0">
@@ -877,6 +938,49 @@
         initCyberSelects();
     });
     window.initCyberSelects = initCyberSelects;
+
+    // ── Ultra-Reliable Mobile Sidebar Drawer Controls ──
+    window.toggleMobileSidebar = function(open) {
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('mobile-sidebar-backdrop');
+        if (!sidebar || !backdrop) return;
+
+        if (open) {
+            document.body.classList.add('mobile-sidebar-open');
+            sidebar.classList.add('open');
+            backdrop.style.display = 'block';
+            requestAnimationFrame(() => {
+                backdrop.classList.remove('opacity-0', 'pointer-events-none');
+                backdrop.classList.add('opacity-100');
+            });
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.classList.remove('mobile-sidebar-open');
+            sidebar.classList.remove('open');
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                if (!document.body.classList.contains('mobile-sidebar-open')) {
+                    backdrop.style.display = 'none';
+                }
+            }, 300);
+            document.body.style.overflow = '';
+        }
+    };
+
+    // Close mobile drawer on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.body.classList.contains('mobile-sidebar-open')) {
+            toggleMobileSidebar(false);
+        }
+    });
+
+    // Reset when resizing window to desktop (>= 1024px)
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 1024 && document.body.classList.contains('mobile-sidebar-open')) {
+            toggleMobileSidebar(false);
+        }
+    });
     </script>
     @stack('scripts')
 </body>
