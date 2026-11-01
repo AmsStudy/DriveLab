@@ -55,19 +55,21 @@
                              x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
                              x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
                              class="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl py-2 z-50 border backdrop-blur-md"
-                             style="background:rgba(15,23,19,0.98);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
+                             style="min-width:220px;width:220px;background:rgba(15,23,19,0.98);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
                             <a href="{{ route('admin.quizzes.export-csv', $quiz) }}"
-                               class="flex items-center justify-between px-4 py-2 text-xs text-emerald-400 hover:bg-emerald-500/10 font-semibold transition-colors">
+                               class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-emerald-400 hover:bg-emerald-500/10 font-semibold transition-colors"
+                               style="gap:1rem;">
                                 <span>Semua Kelas</span>
-                                <span class="text-[10px] font-mono {{ $totalParticipants > 0 ? 'text-emerald-400' : 'text-gray-600' }}">{{ $totalParticipants }}</span>
+                                <span class="text-[11px] font-mono font-bold {{ $totalParticipants > 0 ? 'text-emerald-400' : 'text-gray-600' }} ml-auto pl-2">{{ $totalParticipants }}</span>
                             </a>
                             <div class="border-t my-1.5" style="border-color:#1A2820;"></div>
                             @foreach($quiz->getClassesList() as $cls)
                                 @php $cCount = $quiz->attempts()->whereNotNull('completed_at')->where('kelas', $cls)->count(); @endphp
                                 <a href="{{ route('admin.quizzes.export-csv', [$quiz, 'kelas' => $cls]) }}"
-                                   class="flex items-center justify-between px-4 py-2 text-xs text-gray-300 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors">
+                                   class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-gray-300 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors"
+                                   style="gap:1rem;">
                                     <span>Kelas {{ $cls }}</span>
-                                    <span class="text-[10px] font-mono {{ $cCount > 0 ? 'text-emerald-400' : 'text-gray-600' }}">{{ $cCount }}</span>
+                                    <span class="text-[11px] font-mono font-bold {{ $cCount > 0 ? 'text-emerald-400' : 'text-gray-600' }} ml-auto pl-2">{{ $cCount }}</span>
                                 </a>
                             @endforeach
                         </div>
