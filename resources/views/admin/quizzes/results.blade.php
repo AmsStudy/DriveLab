@@ -503,74 +503,30 @@
                                             <div class="text-sm sm:text-base font-bold text-white mb-4 leading-relaxed"
                                                  x-html="ans.question ? (ans.question.formatted_text || ans.question.question_text) : 'Pertanyaan'"></div>
 
-                                            {{-- ─── BOX PERBANDINGAN: JAWABAN MAHASISWA VS KUNCI BENAR ─── --}}
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 p-3.5 rounded-2xl bg-[#090D0B] border border-[#16221B]">
-                                                {{-- Versi Mahasiswa --}}
-                                                <div class="p-3 rounded-xl border transition-all"
-                                                     :class="ans.is_correct
-                                                        ? 'bg-emerald-500/10 border-emerald-500/30'
-                                                        : (hasStudentAnswer(ans) ? 'bg-rose-500/10 border-rose-500/30' : 'bg-gray-800/20 border-[#1A2820]')">
-                                                    <div class="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
-                                                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
-                                                            <span>👤</span> Jawaban Mahasiswa (Versi Dia)
-                                                        </span>
-                                                        <template x-if="ans.is_correct">
-                                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                                Benar
-                                                            </span>
-                                                        </template>
-                                                        <template x-if="!ans.is_correct && hasStudentAnswer(ans)">
-                                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-1">
-                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                                Salah
-                                                            </span>
-                                                        </template>
-                                                        <template x-if="!hasStudentAnswer(ans)">
-                                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                                                                Tidak Dijawab
-                                                            </span>
-                                                        </template>
-                                                    </div>
-                                                    <div class="text-xs font-semibold leading-relaxed"
-                                                         :class="ans.is_correct ? 'text-emerald-100' : (hasStudentAnswer(ans) ? 'text-rose-100' : 'text-gray-400')"
-                                                         x-html="getStudentAnswerText(ans)"></div>
+                                            {{-- Status Tidak Dijawab (Jika Mahasiswa Mengosongkan Soal) --}}
+                                            <template x-if="!hasStudentAnswer(ans)">
+                                                <div class="mb-3 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs flex items-center gap-2">
+                                                    <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                                    <span class="font-medium">Mahasiswa tidak memilih jawaban / tidak menjawab butir soal ini.</span>
                                                 </div>
+                                            </template>
 
-                                                {{-- Versi Kunci Benar --}}
-                                                <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 transition-all">
-                                                    <div class="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
-                                                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                                                            <span>🔑</span> Kunci Jawaban (Versi Benar)
-                                                        </span>
-                                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                            Kunci Tepat
-                                                        </span>
-                                                    </div>
-                                                    <div class="text-xs font-semibold text-emerald-100 leading-relaxed"
-                                                         x-html="getCorrectAnswerText(ans)"></div>
-                                                </div>
-                                            </div>
-
-                                            {{-- Options Grid --}}
+                                            {{-- Options Grid: Hanya opsi yang dipilih mahasiswa yang diwarnai (Hijau jika benar, Merah jika salah) --}}
                                             <template x-if="ans.question && ans.question.options && ans.question.options.length > 0">
                                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
                                                     <template x-for="(opt, optIdx) in ans.question.options" :key="opt.id || optIdx">
                                                         <div class="p-3 rounded-xl border flex items-start justify-between gap-2 shadow-sm transition-all"
-                                                             :class="opt.is_correct
-                                                                ? 'border-2 border-emerald-500/60 bg-[#0E2018] text-white'
-                                                                : (isOptSelected(ans, opt.id)
-                                                                    ? 'border-2 border-rose-500/60 bg-[#221013] text-white'
-                                                                    : 'border border-[#1A2820] bg-[#090D0B]/60 text-gray-400')">
+                                                             :class="isOptSelected(ans, opt.id)
+                                                                ? (opt.is_correct
+                                                                    ? 'border-2 border-emerald-500 bg-[#0E2018] text-white shadow-emerald-500/10'
+                                                                    : 'border-2 border-rose-500 bg-[#221013] text-white shadow-rose-500/10')
+                                                                : 'border border-[#1A2820] bg-[#090D0B]/60 text-gray-400'">
                                                             
                                                             <div class="flex items-start gap-2.5 min-w-0 flex-1">
                                                                 <span class="w-6 h-6 rounded-lg font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5"
-                                                                      :class="opt.is_correct
-                                                                        ? 'bg-emerald-500 text-white'
-                                                                        : (isOptSelected(ans, opt.id)
-                                                                            ? 'bg-rose-500 text-white'
-                                                                            : 'bg-[#142019] text-gray-400')"
+                                                                      :class="isOptSelected(ans, opt.id)
+                                                                        ? (opt.is_correct ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white')
+                                                                        : 'bg-[#142019] text-gray-400'"
                                                                       x-text="['A','B','C','D','E','F'][optIdx] || (optIdx + 1)"></span>
 
                                                                 <div class="min-w-0 flex-1">
@@ -582,29 +538,25 @@
                                                                         </div>
                                                                     </template>
                                                                     <div class="font-semibold block leading-snug"
-                                                                         :class="opt.is_correct ? 'text-emerald-100' : (isOptSelected(ans, opt.id) ? 'text-rose-100' : 'text-gray-300')"
+                                                                         :class="isOptSelected(ans, opt.id)
+                                                                            ? (opt.is_correct ? 'text-emerald-100' : 'text-rose-100')
+                                                                            : 'text-gray-300'"
                                                                          x-html="opt.formatted_text || opt.option_text"></div>
                                                                 </div>
                                                             </div>
 
-                                                            {{-- Selection Status Badges --}}
+                                                            {{-- Status Badge Mahasiswa --}}
                                                             <div class="shrink-0 flex items-center">
-                                                                <template x-if="opt.is_correct && isOptSelected(ans, opt.id)">
-                                                                    <span class="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm">
-                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                                        Pilihan Mahasiswa
-                                                                    </span>
-                                                                </template>
-                                                                <template x-if="opt.is_correct && !isOptSelected(ans, opt.id)">
-                                                                    <span class="text-[10px] bg-emerald-600/90 text-white font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
-                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                                        Kunci Benar
-                                                                    </span>
-                                                                </template>
-                                                                <template x-if="!opt.is_correct && isOptSelected(ans, opt.id)">
-                                                                    <span class="text-[10px] bg-rose-500 text-white font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm">
-                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                                        Pilihan Mahasiswa
+                                                                <template x-if="isOptSelected(ans, opt.id)">
+                                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm"
+                                                                          :class="opt.is_correct ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'">
+                                                                        <template x-if="opt.is_correct">
+                                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                                        </template>
+                                                                        <template x-if="!opt.is_correct">
+                                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                                        </template>
+                                                                        <span x-text="opt.is_correct ? 'Pilihan Mahasiswa' : 'Pilihan Mahasiswa (Salah)'"></span>
                                                                     </span>
                                                                 </template>
                                                             </div>
@@ -613,15 +565,53 @@
                                                 </div>
                                             </template>
 
-                                            {{-- Catatan Pembahasan --}}
-                                            <template x-if="ans.question && ans.question.explanation">
-                                                <div class="mt-4 p-3 rounded-xl bg-teal-500/5 border border-teal-500/20 text-xs text-teal-300">
-                                                    <span class="font-bold flex items-center gap-1.5 mb-1 text-teal-400">
-                                                        <span>💡</span> Pembahasan:
-                                                    </span>
-                                                    <div x-text="ans.question.explanation" class="leading-relaxed text-gray-300"></div>
+                                            {{-- ─── BAGIAN PEMBAHASAN & KUNCI JAWABAN ─── --}}
+                                            <div class="mt-4 p-4 rounded-xl border text-xs"
+                                                 :class="ans.is_correct
+                                                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
+                                                    : 'bg-[#0A1410] border-emerald-500/40 text-emerald-100'">
+                                                
+                                                {{-- Baris Kunci / Status Jawaban --}}
+                                                <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                                                    {{-- JIKA BENAR --}}
+                                                    <template x-if="ans.is_correct">
+                                                        <div class="flex items-center gap-2 font-bold text-emerald-400 text-xs sm:text-sm">
+                                                            <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 text-xs">✓</span>
+                                                            <span>Jawaban Mahasiswa Benar:</span>
+                                                            <span class="text-emerald-300 font-semibold" x-html="getCorrectAnswerText(ans)"></span>
+                                                        </div>
+                                                    </template>
+                                                    {{-- JIKA SALAH / TIDAK DIJAWAB --}}
+                                                    <template x-if="!ans.is_correct">
+                                                        <div class="flex items-center gap-2 font-bold text-emerald-400 text-xs sm:text-sm">
+                                                            <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 text-xs">🔑</span>
+                                                            <span>Kunci Jawaban Benar:</span>
+                                                            <span class="text-emerald-200 font-semibold" x-html="getCorrectAnswerText(ans)"></span>
+                                                        </div>
+                                                    </template>
+
+                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md"
+                                                          :class="ans.is_correct ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'"
+                                                          x-text="ans.is_correct ? 'Tepat (+ ' + (ans.points_earned || 0) + ' Poin)' : 'Kunci Tepat'"></span>
                                                 </div>
-                                            </template>
+
+                                                {{-- Isi Catatan Pembahasan --}}
+                                                <div class="pt-2 border-t border-emerald-500/20">
+                                                    <div class="flex items-start gap-2">
+                                                        <span class="font-bold shrink-0 flex items-center gap-1 text-emerald-400">
+                                                            <span>💡</span> Pembahasan:
+                                                        </span>
+                                                        <div class="leading-relaxed text-gray-300 flex-1">
+                                                            <template x-if="ans.question && ans.question.explanation">
+                                                                <span x-text="ans.question.explanation"></span>
+                                                            </template>
+                                                            <template x-if="!ans.question || !ans.question.explanation">
+                                                                <span class="italic text-gray-400" x-text="ans.is_correct ? 'Jawaban mahasiswa sudah tepat dan sesuai dengan materi praktikum.' : 'Tidak ada catatan pembahasan tambahan untuk soal ini.'"></span>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </template>
                                 </div>
@@ -724,8 +714,8 @@
                 return correctOpts.map(opt => {
                     const idx = ans.question.options.findIndex(o => Number(o.id) === Number(opt.id));
                     const letter = letters[idx] || (idx + 1);
-                    return `<span class="inline-block mr-1"><strong>[${letter}]</strong> ${opt.option_text}</span>`;
-                }).join('<br>');
+                    return `<strong>[${letter}]</strong> ${opt.option_text}`;
+                }).join(', ');
             },
             formatDuration(sec) {
                 if (!sec) return '-';

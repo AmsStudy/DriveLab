@@ -261,7 +261,7 @@
                             {{-- Question Text --}}
                             <div class="text-sm sm:text-base font-bold text-white mb-4 leading-relaxed">{!! App\Helpers\RichTextHelper::format($ans->question->question_text ?? 'Pertanyaan') !!}</div>
 
-                            {{-- Options Grid --}}
+                            {{-- Options Grid: Hanya opsi yang dipilih yang diwarnai (Hijau jika benar, Merah jika salah) --}}
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
                                 @php
                                     $labels = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -273,59 +273,54 @@
                                         $isCorrectOption = (bool)$opt->is_correct;
                                     @endphp
 
-                                    @if($isCorrectOption)
-                                        {{-- KUNCI BENAR --}}
-                                        <div class="p-3 rounded-xl border-2 border-emerald-500/60 bg-[#0E2018] text-white flex items-start justify-between gap-2 shadow-sm">
-                                            <div class="flex items-start gap-2.5 min-w-0">
-                                                <span class="w-6 h-6 rounded-lg bg-emerald-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                    {{ $labels[$optIdx] ?? ($optIdx + 1) }}
-                                                </span>
-                                                <div class="min-w-0">
-                                                    @if($opt->image_path)
-                                                        <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
-                                                            <a href="{{ $opt->image_url }}" target="_blank">
-                                                                <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
-                                                            </a>
-                                                        </div>
-                                                    @endif
-                                                    <div class="font-semibold text-emerald-100 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
+                                    @if($isSelectedByStudent)
+                                        @if($isCorrectOption)
+                                            {{-- JAWABAN BENAR MAHASISWA (HIJAU) --}}
+                                            <div class="p-3 rounded-xl border-2 border-emerald-500 bg-[#0E2018] text-white flex items-start justify-between gap-2 shadow-sm shadow-emerald-500/10">
+                                                <div class="flex items-start gap-2.5 min-w-0">
+                                                    <span class="w-6 h-6 rounded-lg bg-emerald-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                        {{ $labels[$optIdx] ?? ($optIdx + 1) }}
+                                                    </span>
+                                                    <div class="min-w-0">
+                                                        @if($opt->image_path)
+                                                            <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
+                                                                <a href="{{ $opt->image_url }}" target="_blank">
+                                                                    <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
+                                                                </a>
+                                                            </div>
+                                                        @endif
+                                                        <div class="font-semibold text-emerald-100 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            @if($isSelectedByStudent)
-                                                <span class="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1">
+                                                <span class="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1 shadow-sm">
                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                                     Pilihan Anda
                                                 </span>
-                                            @else
-                                                <span class="text-[10px] bg-emerald-600 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                    Kunci Benar
-                                                </span>
-                                            @endif
-                                        </div>
-                                    @elseif($isSelectedByStudent)
-                                        {{-- JAWABAN SALAH MAHASISWA --}}
-                                        <div class="p-3 rounded-xl border-2 border-rose-500/60 bg-[#221013] text-white flex items-start justify-between gap-2 shadow-sm">
-                                            <div class="flex items-start gap-2.5 min-w-0">
-                                                <span class="w-6 h-6 rounded-lg bg-rose-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                    {{ $labels[$optIdx] ?? ($optIdx + 1) }}
-                                                </span>
-                                                <div class="min-w-0">
-                                                    @if($opt->image_path)
-                                                        <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
-                                                            <a href="{{ $opt->image_url }}" target="_blank">
-                                                                <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
-                                                            </a>
-                                                        </div>
-                                                    @endif
-                                                    <div class="font-semibold text-rose-200 line-through opacity-90 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
-                                                </div>
                                             </div>
-                                            <span class="text-[10px] bg-rose-600 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                Pilihan Anda (Salah)
-                                            </span>
-                                        </div>
+                                        @else
+                                            {{-- JAWABAN SALAH MAHASISWA (MERAH) --}}
+                                            <div class="p-3 rounded-xl border-2 border-rose-500 bg-[#221013] text-white flex items-start justify-between gap-2 shadow-sm shadow-rose-500/10">
+                                                <div class="flex items-start gap-2.5 min-w-0">
+                                                    <span class="w-6 h-6 rounded-lg bg-rose-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                        {{ $labels[$optIdx] ?? ($optIdx + 1) }}
+                                                    </span>
+                                                    <div class="min-w-0">
+                                                        @if($opt->image_path)
+                                                            <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
+                                                                <a href="{{ $opt->image_url }}" target="_blank">
+                                                                    <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
+                                                                </a>
+                                                            </div>
+                                                        @endif
+                                                        <div class="font-semibold text-rose-200 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
+                                                    </div>
+                                                </div>
+                                                <span class="text-[10px] bg-rose-600 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1 shadow-sm">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                    Pilihan Anda (Salah)
+                                                </span>
+                                            </div>
+                                        @endif
                                     @else
                                         {{-- OPSI LAIN (NETRAL) --}}
                                         <div class="p-3 rounded-xl border border-[#1A2820] bg-[#0E1612] text-gray-400 flex items-start gap-2.5 opacity-75">
@@ -347,16 +342,54 @@
                                 @endforeach
                             </div>
 
-                            {{-- Catatan Pembahasan (Amber Note) --}}
-                            @if(!empty($ans->question->explanation))
-                                <div class="mt-4 p-3.5 rounded-xl bg-[#17140B] border border-amber-500/30 text-xs">
-                                    <div class="flex items-center gap-2 font-bold text-amber-400 mb-1">
-                                        <span class="text-sm">💡</span>
-                                        <span class="uppercase tracking-wider text-[11px]">Penjelasan & Pembahasan:</span>
-                                    </div>
-                                    <div class="text-gray-200 leading-relaxed pl-5 font-normal">{!! App\Helpers\RichTextHelper::format($ans->question->explanation) !!}</div>
+                            {{-- Catatan Pembahasan & Kunci Jawaban --}}
+                            @php
+                                $correctOpts = $ans->question->options->where('is_correct', true)->values();
+                                $correctTextArray = [];
+                                foreach ($correctOpts as $co) {
+                                    $idx = $ans->question->options->search(fn($item) => $item->id === $co->id);
+                                    $ltr = $labels[$idx] ?? ($idx + 1);
+                                    $correctTextArray[] = "[{$ltr}] " . $co->option_text;
+                                }
+                                $correctAnswerDisplay = implode(', ', $correctTextArray);
+                            @endphp
+
+                            <div class="mt-4 p-4 rounded-xl border text-xs {{ $ans->is_correct ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200' : 'bg-[#0A1410] border-emerald-500/40 text-emerald-100' }}">
+                                <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                                    @if($ans->is_correct)
+                                        <div class="flex items-center gap-2 font-bold text-emerald-400 text-xs sm:text-sm">
+                                            <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 text-xs">✓</span>
+                                            <span>Jawaban Anda Benar:</span>
+                                            <span class="text-emerald-300 font-semibold">{{ $correctAnswerDisplay }}</span>
+                                        </div>
+                                    @else
+                                        <div class="flex items-center gap-2 font-bold text-emerald-400 text-xs sm:text-sm">
+                                            <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 text-xs">🔑</span>
+                                            <span>Kunci Jawaban Benar:</span>
+                                            <span class="text-emerald-200 font-semibold">{{ $correctAnswerDisplay }}</span>
+                                        </div>
+                                    @endif
+
+                                    <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md {{ $ans->is_correct ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' }}">
+                                        {{ $ans->is_correct ? 'Tepat (+ ' . ($ans->points_earned ?: 0) . ' Poin)' : 'Kunci Tepat' }}
+                                    </span>
                                 </div>
-                            @endif
+
+                                <div class="pt-2 border-t border-emerald-500/20">
+                                    <div class="flex items-start gap-2">
+                                        <span class="font-bold shrink-0 flex items-center gap-1 text-emerald-400">
+                                            <span>💡</span> Pembahasan:
+                                        </span>
+                                        <div class="leading-relaxed text-gray-300 flex-1">
+                                            @if(!empty($ans->question->explanation))
+                                                {!! App\Helpers\RichTextHelper::format($ans->question->explanation) !!}
+                                            @else
+                                                <span class="italic text-gray-400">{{ $ans->is_correct ? 'Jawaban Anda sudah tepat sesuai materi praktikum.' : 'Tidak ada catatan pembahasan tambahan untuk soal ini.' }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     @endforeach
                 </div>
