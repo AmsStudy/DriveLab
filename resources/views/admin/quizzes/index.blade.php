@@ -128,19 +128,33 @@
 
     {{-- Quizzes Cards Grid --}}
     @if($quizzes->isEmpty())
-        <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-12 text-center">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
+        @if(request()->anyFilled(['search', 'status', 'soal_id']))
+            <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-12 text-center">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <h3 class="text-base font-bold text-white mb-1">Tidak Ada Kuis yang Cocok</h3>
+                <p class="text-xs text-gray-400 max-w-sm mx-auto mb-6">Tidak ditemukan kuis CBT yang sesuai dengan kata kunci atau filter pencarian Anda.</p>
+                <a href="{{ route('admin.quizzes.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Reset Filter Pencarian
+                </a>
             </div>
-            <h3 class="text-base font-bold text-white mb-1">Belum Ada Kuis</h3>
-            <p class="text-xs text-gray-400 max-w-sm mx-auto mb-6">Buat kuis interaktif tipe Quizizz untuk menguji pemahaman mahasiswa sebelum atau setelah praktikum.</p>
-            <button type="button" onclick="openCreateQuizModal()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold hover:opacity-95 transition-all cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                Buat Kuis Sekarang
-            </button>
-        </div>
+        @else
+            <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-12 text-center">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <h3 class="text-base font-bold text-white mb-1">Belum Ada Kuis</h3>
+                <p class="text-xs text-gray-400 max-w-sm mx-auto mb-6">Buat kuis interaktif tipe Quizizz untuk menguji pemahaman mahasiswa sebelum atau setelah praktikum.</p>
+                <button type="button" onclick="openCreateQuizModal()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold hover:opacity-95 transition-all cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Buat Kuis Sekarang
+                </button>
+            </div>
+        @endif
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             @foreach($quizzes as $quiz)
@@ -1124,9 +1138,9 @@
         }
     });
 
-    // Auto-reopen on validation errors / redirects
+    // Auto-reopen on validation errors / redirects / action=create
     document.addEventListener('DOMContentLoaded', () => {
-        @if(session('open_create_modal') || ($errors->any() && old('_method') !== 'PUT'))
+        @if(request('action') === 'create' || session('open_create_modal') || ($errors->any() && old('_method') !== 'PUT'))
             openCreateQuizModal();
         @elseif(session('edit_quiz_id') || ($errors->any() && old('_method') === 'PUT'))
             openEditQuizModal({{ (int)(session('edit_quiz_id') ?? old('quiz_id')) }});

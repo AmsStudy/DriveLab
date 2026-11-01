@@ -96,6 +96,79 @@
 
 </div>
 
+{{-- ─── CBT STATS CARDS ─── --}}
+<div class="mb-8">
+    <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Kuis Interaktif (CBT Exam)
+        </h3>
+        <a href="{{ route('admin.quizzes.index') }}" class="text-xs text-gray-400 hover:text-emerald-400 font-medium transition-colors">
+            Kelola Kuis →
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {{-- Total Kuis --}}
+        <div class="rounded-2xl p-4 sm:p-5 relative overflow-hidden transition-all duration-200 hover:border-emerald-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Kuis</span>
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(16,185,129,.12);">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-3xl font-extrabold text-white tracking-tight">{{ number_format($stats['total_quiz'] ?? 0) }}</p>
+            <p class="text-xs text-gray-400 mt-1">Bank Soal Ujian</p>
+        </div>
+
+        {{-- Kuis Aktif --}}
+        <div class="rounded-2xl p-4 sm:p-5 relative overflow-hidden transition-all duration-200 hover:border-emerald-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Kuis Aktif</span>
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(16,185,129,.12);">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-3xl font-extrabold text-emerald-400 tracking-tight">{{ number_format($stats['quiz_aktif'] ?? 0) }}</p>
+            <p class="text-xs text-gray-400 mt-1">Dapat Dikerjakan</p>
+        </div>
+
+        {{-- Sesi Ujian / Peserta --}}
+        <div class="rounded-2xl p-4 sm:p-5 relative overflow-hidden transition-all duration-200 hover:border-purple-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-purple-400 uppercase tracking-wider">Peserta Selesai</span>
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(168,85,247,.12);">
+                    <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-3xl font-extrabold text-purple-400 tracking-tight">{{ number_format($stats['total_attempts'] ?? 0) }}</p>
+            <p class="text-xs text-gray-400 mt-1">Total Lembar Selesai</p>
+        </div>
+
+        {{-- Rata-rata Skor --}}
+        <div class="rounded-2xl p-4 sm:p-5 relative overflow-hidden transition-all duration-200 hover:border-amber-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Rata-rata Skor</span>
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(245,158,11,.12);">
+                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-3xl font-extrabold text-amber-400 tracking-tight">{{ number_format($stats['avg_quiz_score'] ?? 0, 1) }}</p>
+            <p class="text-xs text-gray-400 mt-1">Skala 0 - 100</p>
+        </div>
+    </div>
+</div>
+
 {{-- ─── SUPER ADMIN EXTRA BANNER / STATS ─── --}}
 @if(auth()->user()->isSuperAdmin())
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -244,6 +317,103 @@
                 </div>
             @endif
         </div>
+
+        {{-- Sesi Ujian CBT Terbaru --}}
+        <div class="rounded-2xl overflow-hidden shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
+            <div class="px-6 py-4 flex items-center justify-between" style="border-bottom:1px solid #1A2820;">
+                <div>
+                    <h3 class="font-bold text-white text-base flex items-center gap-2">
+                        <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        Sesi Ujian CBT Terbaru
+                    </h3>
+                    <p class="text-xs text-gray-400 mt-0.5">Hasil pengerjaan kuis mahasiswa secara real-time</p>
+                </div>
+                <a href="{{ route('admin.quizzes.index') }}" class="text-xs text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 transition-colors">
+                    Semua Kuis
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+
+            @if(!isset($recent_quiz_attempts) || $recent_quiz_attempts->isEmpty())
+                <div class="py-12 text-center text-gray-500">
+                    <svg class="w-12 h-12 mx-auto mb-3 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    <p class="text-sm font-medium">Belum ada mahasiswa yang menyelesaikan sesi ujian CBT.</p>
+                    <p class="text-xs text-gray-600 mt-1">Hasil pengerjaan kuis akan otomatis dicatat di sini begitu mahasiswa menuntaskan ujian.</p>
+                </div>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm min-w-[560px]">
+                        <thead class="text-xs text-gray-500 uppercase tracking-wider" style="border-bottom:1px solid #1A2820;background:rgba(255,255,255,.01);">
+                            <tr>
+                                <th class="px-6 py-3 text-left">Mahasiswa</th>
+                                <th class="px-4 py-3 text-left">Kuis</th>
+                                <th class="px-4 py-3 text-center">Skor</th>
+                                <th class="px-4 py-3 text-center">Anti-Cheat</th>
+                                <th class="px-4 py-3 text-left">Waktu</th>
+                                <th class="px-4 py-3 text-right">Hasil</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800/50">
+                            @foreach($recent_quiz_attempts as $qatt)
+                            <tr class="hover:bg-gray-800/30 transition-colors">
+                                <td class="px-6 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs uppercase flex-shrink-0">
+                                            {{ substr($qatt->student_name, 0, 1) }}
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-semibold text-gray-200 truncate">{{ $qatt->student_name }}</p>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-xs font-mono text-gray-500">{{ $qatt->nim }}</span>
+                                                @if($qatt->kelas)
+                                                    <span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">{{ $qatt->kelas }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    @if($qatt->quiz)
+                                        <a href="{{ route('admin.quizzes.results', $qatt->quiz) }}" class="text-xs text-gray-300 hover:text-emerald-400 font-medium truncate block max-w-xs transition-colors">
+                                            {{ $qatt->quiz->title }}
+                                        </a>
+                                    @else
+                                        <span class="text-xs text-gray-500 italic">Kuis Dihapus</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold font-mono inline-block
+                                        {{ $qatt->score >= 70 ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : ($qatt->score >= 50 ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-rose-500/15 text-rose-400 border border-rose-500/30') }}">
+                                        {{ number_format($qatt->score, 1) }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="text-xs font-semibold px-2 py-0.5 rounded-md
+                                        {{ $qatt->tab_switch_count === 0 ? 'text-emerald-400 bg-emerald-500/10' : 'text-amber-400 bg-amber-500/10' }}">
+                                        {{ $qatt->tab_switch_count === 0 ? '0 Switch 🛡️' : $qatt->tab_switch_count . 'x Switch' }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
+                                    {{ $qatt->completed_at ? $qatt->completed_at->diffForHumans() : '—' }}
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    @if($qatt->quiz)
+                                        <a href="{{ route('admin.quizzes.results', $qatt->quiz) }}" class="text-xs text-purple-400 hover:text-purple-300 p-1.5 hover:bg-purple-500/10 rounded-lg transition-colors inline-block" title="Lihat Hasil Ujian">
+                                            Tinjau →
+                                        </a>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
     </div>
 
     {{-- Right: Dokumen Populer & Quick Actions (1 Col) --}}
@@ -256,7 +426,8 @@
                 <h3 class="font-bold text-white text-sm">Aksi Cepat</h3>
             </div>
             <div class="space-y-2">
-                <a href="{{ route('admin.soal.create') }}"
+                {{-- Buat Soal Baru --}}
+                <a href="{{ route('admin.soal.index') }}?action=create"
                    class="w-full flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-white transition-all group"
                    style="background:linear-gradient(135deg,#10B981,#0D9488);box-shadow:0 4px 12px rgba(16,185,129,.2);"
                    onmouseover="this.style.boxShadow='0 6px 18px rgba(16,185,129,.35)'"
@@ -267,6 +438,34 @@
                     <span>Buat Soal Baru</span>
                     <svg class="w-4 h-4 ml-auto opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
+
+                {{-- Buat Kuis Baru --}}
+                <a href="{{ route('admin.quizzes.index') }}?action=create"
+                   class="w-full flex items-center gap-3 p-3 rounded-xl text-sm font-semibold text-white transition-all group"
+                   style="background:linear-gradient(135deg,#8B5CF6,#6366F1);box-shadow:0 4px 12px rgba(139,92,246,.2);"
+                   onmouseover="this.style.boxShadow='0 6px 18px rgba(139,92,246,.35)'"
+                   onmouseout="this.style.boxShadow='0 4px 12px rgba(139,92,246,.2)'">
+                    <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <span>Buat Kuis Baru</span>
+                    <svg class="w-4 h-4 ml-auto opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+
+                {{-- Bank Kuis CBT --}}
+                <a href="{{ route('admin.quizzes.index') }}"
+                   class="w-full flex items-center gap-3 p-3 rounded-xl text-sm font-semibold transition-all"
+                   style="background:rgba(168,85,247,.07);border:1px solid #1A2820;color:#e9d5ff;"
+                   onmouseover="this.style.background='rgba(168,85,247,.13)';this.style.borderColor='rgba(168,85,247,.3)'"
+                   onmouseout="this.style.background='rgba(168,85,247,.07)';this.style.borderColor='#1A2820'">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(168,85,247,.15);">
+                        <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    </div>
+                    <span class="text-gray-300">Bank Kuis CBT</span>
+                    <svg class="w-4 h-4 ml-auto text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+
+                {{-- Kelola Kategori --}}
                 <a href="{{ route('admin.categories.index') }}"
                    class="w-full flex items-center gap-3 p-3 rounded-xl text-sm font-semibold transition-all"
                    style="background:rgba(16,185,129,.07);border:1px solid #1A2820;color:#d1fae5;"
@@ -278,6 +477,8 @@
                     <span class="text-gray-300">Kelola Kategori</span>
                     <svg class="w-4 h-4 ml-auto text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
+
+                {{-- Portal Mahasiswa --}}
                 <a href="{{ route('home') }}" target="_blank" rel="noopener noreferrer"
                    class="w-full flex items-center gap-3 p-3 rounded-xl text-sm font-medium transition-all"
                    style="background:rgba(255,255,255,.03);border:1px solid #1A2820;color:#9CA3AF;"

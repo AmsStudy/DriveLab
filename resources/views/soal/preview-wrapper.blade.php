@@ -117,13 +117,13 @@
         .badge-secure svg { width: 12px; height: 12px; }
 
         @media (max-width: 640px) {
-            .file-title { max-width: 120px !important; font-size: 12px !important; }
+            .file-title { max-width: 140px !important; font-size: 12px !important; }
             .badge-secure span { display: none !important; }
             .badge-secure { padding: 4px 6px !important; }
-            .zoom-text { min-width: 34px !important; font-size: 10px !important; padding: 0 4px !important; }
-            .zoom-btn { width: 24px !important; height: 24px !important; font-size: 12px !important; }
-            .btn-back { padding: 5px 8px !important; font-size: 11px !important; }
-            .viewer-topbar { padding: 0 10px !important; }
+            .zoom-text { min-width: 38px !important; font-size: 11px !important; padding: 0 4px !important; }
+            .zoom-btn { width: 34px !important; height: 34px !important; font-size: 14px !important; }
+            .btn-back { padding: 6px 10px !important; font-size: 12px !important; min-height: 34px !important; }
+            .viewer-topbar { padding: 0 12px !important; height: 56px !important; }
         }
 
         .zoom-controls {

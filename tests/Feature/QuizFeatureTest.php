@@ -825,5 +825,44 @@ class QuizFeatureTest extends TestCase
         $response->assertSee('Pengawas Anti-Cheat');
         $response->assertSee('Lembar Jawaban', false);
         $response->assertSee('viewAttemptDetail', false);
+        $response->assertSee('Cetak PDF', false);
+        $response->assertSee('@media print', false);
+    }
+
+    public function test_admin_dashboard_renders_cbt_statistics_and_recent_quiz_attempts(): void
+    {
+        $quiz = Quiz::create([
+            'user_id'            => $this->admin->id,
+            'title'              => 'CBT Dashboard Test',
+            'time_limit_minutes' => 20,
+            'is_active'          => true,
+            'unique_token'       => 'cbt-token-123',
+        ]);
+
+        QuizAttempt::create([
+            'quiz_id'               => $quiz->id,
+            'nim'                   => '22019999',
+            'student_name'          => 'Citra Kirana',
+            'kelas'                 => 'IF-01',
+            'score'                 => 95.0,
+            'total_points_earned'   => 19,
+            'total_points_possible' => 20,
+            'correct_answers_count' => 19,
+            'wrong_answers_count'   => 1,
+            'duration_seconds'      => 450,
+            'tab_switch_count'      => 0,
+            'completed_at'          => now(),
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.dashboard'));
+        $response->assertStatus(200);
+
+        // Verify CBT Cards & Recent Attempts
+        $response->assertSee('Kuis Interaktif (CBT Exam)');
+        $response->assertSee('Bank Soal Ujian');
+        $response->assertSee('Sesi Ujian CBT Terbaru');
+        $response->assertSee('Citra Kirana');
+        $response->assertSee('22019999');
+        $response->assertSee('CBT Dashboard Test');
     }
 }

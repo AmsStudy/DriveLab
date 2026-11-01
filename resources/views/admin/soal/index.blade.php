@@ -71,16 +71,30 @@
 {{-- Table --}}
 <div class="rounded-2xl overflow-hidden shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
     @if($soals->isEmpty())
-        <div class="py-16 text-center text-gray-500">
-            <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            <p class="text-lg font-medium">Belum ada dokumen</p>
-            <p class="text-sm mt-1">Tambahkan dokumen pertama Anda sekarang.</p>
-            <button type="button" onclick="openCreateModal()" class="mt-4 inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors shadow-lg shadow-emerald-600/20">
-                + Tambah Dokumen
-            </button>
-        </div>
+        @if(request()->anyFilled(['q', 'category_id', 'status']))
+            <div class="py-16 text-center text-gray-500">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <p class="text-base font-bold text-white">Tidak ada dokumen yang cocok</p>
+                <p class="text-xs text-gray-400 mt-1 max-w-sm mx-auto">Tidak ditemukan dokumen soal yang sesuai dengan kata kunci atau filter yang Anda pilih.</p>
+                <a href="{{ route('admin.soal.index') }}" class="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Reset Filter Pencarian
+                </a>
+            </div>
+        @else
+            <div class="py-16 text-center text-gray-500">
+                <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <p class="text-lg font-medium">Belum ada dokumen</p>
+                <p class="text-sm mt-1">Tambahkan dokumen pertama Anda sekarang.</p>
+                <button type="button" onclick="openCreateModal()" class="mt-4 inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors shadow-lg shadow-emerald-600/20">
+                    + Tambah Dokumen
+                </button>
+            </div>
+        @endif
     @else
         <div class="overflow-x-auto">
             <table class="w-full text-sm min-w-[700px]">
@@ -1434,7 +1448,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     @if($errors->any() && old('_method') === 'PUT' && old('soal_id'))
         openEditModalForSoal({{ old('soal_id') }});
-    @elseif($errors->any())
+    @elseif($errors->any() || request('action') === 'create')
         openCreateModal();
     @endif
 });

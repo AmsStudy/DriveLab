@@ -341,6 +341,7 @@
              @keydown.escape.window="showDetailModal = false">
 
             <div @click.away="showDetailModal = false"
+                 id="quiz-attempt-printable-card"
                  class="bg-[#0F1713] border border-[#1A2820] rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden relative">
                 
                 {{-- Modal Header Bar --}}
@@ -354,9 +355,18 @@
                             <p class="text-xs text-gray-400" x-text="selectedAttempt ? selectedAttempt.student_name + ' (' + selectedAttempt.nim + ')' : ''"></p>
                         </div>
                     </div>
-                    <button type="button" @click="showDetailModal = false" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition-colors" title="Tutup Modal (Esc)">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button type="button"
+                                @click="printAttempt()"
+                                class="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors no-print cursor-pointer"
+                                title="Cetak atau Simpan PDF Lembar Jawaban">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                            <span>Cetak PDF</span>
+                        </button>
+                        <button type="button" @click="showDetailModal = false" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition-colors no-print" title="Tutup Modal (Esc)">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
                 </div>
 
                 {{-- Modal Scrollable Content --}}
@@ -622,7 +632,13 @@
                 </div>
 
                 {{-- Modal Footer --}}
-                <div class="px-6 py-4 border-t border-[#1A2820] bg-[#090D0B]/80 backdrop-blur-md flex justify-end flex-shrink-0">
+                <div class="px-6 py-4 border-t border-[#1A2820] bg-[#090D0B]/80 backdrop-blur-md flex items-center justify-between flex-shrink-0 no-print">
+                    <button type="button"
+                            @click="printAttempt()"
+                            class="px-4 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                        <span>Cetak Lembar Jawaban (PDF)</span>
+                    </button>
                     <button type="button" @click="showDetailModal = false"
                             class="px-5 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold transition-colors">
                         Tutup Lembar Jawaban
@@ -634,6 +650,63 @@
 
 </div>
 
+<style>
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+    #quiz-attempt-printable-card, #quiz-attempt-printable-card * {
+        visibility: visible !important;
+    }
+    #quiz-attempt-printable-card {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: none !important;
+        overflow: visible !important;
+        background: #ffffff !important;
+        color: #111827 !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        z-index: 999999 !important;
+    }
+    .no-print, .no-print * {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    #quiz-attempt-printable-card h1,
+    #quiz-attempt-printable-card h2,
+    #quiz-attempt-printable-card h3,
+    #quiz-attempt-printable-card strong,
+    #quiz-attempt-printable-card .text-white,
+    #quiz-attempt-printable-card .text-gray-100,
+    #quiz-attempt-printable-card .text-gray-200 {
+        color: #111827 !important;
+    }
+    #quiz-attempt-printable-card p,
+    #quiz-attempt-printable-card span,
+    #quiz-attempt-printable-card .text-gray-300,
+    #quiz-attempt-printable-card .text-gray-400 {
+        color: #374151 !important;
+    }
+    #quiz-attempt-printable-card .bg-\[\#0F1713\],
+    #quiz-attempt-printable-card .bg-\[\#090D0B\],
+    #quiz-attempt-printable-card .bg-\[\#0A1410\],
+    #quiz-attempt-printable-card .bg-\[\#090D0B\]\/80 {
+        background: #ffffff !important;
+        border-color: #e5e7eb !important;
+    }
+    #quiz-attempt-printable-card .border-\[\#1A2820\],
+    #quiz-attempt-printable-card .border-\[\#16221B\] {
+        border-color: #e5e7eb !important;
+    }
+}
+</style>
+
 <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
@@ -643,6 +716,9 @@
         return {
             showDetailModal: false,
             selectedAttempt: null,
+            printAttempt() {
+                window.print();
+            },
             init() {
                 this.$watch('showDetailModal', (isOpen) => {
                     document.body.style.overflow = isOpen ? 'hidden' : '';
