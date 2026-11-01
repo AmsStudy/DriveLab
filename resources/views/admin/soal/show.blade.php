@@ -550,7 +550,7 @@
                     <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Ketika mahasiswa mengirimkan file, link, atau teks jawaban, data mereka akan otomatis ditampilkan di sini.</p>
                 </div>
             @else
-                <div class="overflow-x-auto overflow-y-auto rounded-b-2xl relative z-0" style="max-height: 420px; overflow-y: auto; scrollbar-width: thin;">
+                <div class="overflow-x-auto overflow-y-auto rounded-b-2xl relative z-0" style="max-height: 700px; overflow-y: auto; scrollbar-width: thin;">
                     <table class="w-full text-sm min-w-[620px]" id="submissionsTable">
                         <thead class="text-xs text-gray-400 uppercase tracking-wider sticky top-0 z-10 shadow-sm" style="background:#090D0B;border-bottom:1px solid #1A2820;">
                             <tr>
