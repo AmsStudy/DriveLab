@@ -158,9 +158,8 @@
                                     <div class="flex items-center gap-2 mt-1.5 flex-wrap">
                                         <button type="button"
                                                 onclick="copyToClipboard('{{ $accessCode }}', 'Kode akses ({{ $accessCode }}) berhasil disalin!')"
-                                                title="Klik untuk menyalin kode akses mahasiswa"
+                                                title="Klik untuk menyalin kode akses mahasiswa: {{ $accessCode }}"
                                                 class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-[#142019] hover:bg-[#1A2E22] border border-[#1E3327] hover:border-emerald-500/40 text-emerald-400 font-mono text-[11px] font-semibold transition-all group/code cursor-pointer shadow-sm">
-                                            <span class="text-gray-500 text-[10px] font-sans font-normal uppercase tracking-wider">Kode:</span>
                                             <span class="text-emerald-300 font-bold group-hover/code:text-emerald-200">{{ $accessCode }}</span>
                                             <svg class="w-3.5 h-3.5 text-gray-500 group-hover/code:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
