@@ -61,6 +61,18 @@
         html:not(.dark) .logo-text {
             color: #0F1F17 !important;
         }
+        html:not(.dark) .link-muted {
+            color: #64748B !important;
+        }
+        html:not(.dark) .link-muted:hover {
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) .footer-note {
+            color: #64748B !important;
+        }
+        html:not(.dark) .btn-primary {
+            color: #FFFFFF !important;
+        }
         html:not(.dark) .blob-1,
         html:not(.dark) .blob-2 {
             opacity: 0.3 !important;

@@ -13,11 +13,17 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: #090D0B; color: #E5E7EB; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; overflow-x: hidden; }
 
+        .logo-text, .soal-title { color: #fff; }
         html:not(.dark) body { background: #F4F7F5 !important; color: #0F1F17 !important; }
         html:not(.dark) .card { background: #FFFFFF !important; border-color: #E2EAE5 !important; box-shadow: 0 25px 60px rgba(0,0,0,.08) !important; }
         html:not(.dark) .pwd-input { background: #FFFFFF !important; border-color: #D1DCD6 !important; color: #0F1F17 !important; }
         html:not(.dark) label { color: #374151 !important; }
-        html:not(.dark) .logo-text { color: #0F1F17 !important; }
+        html:not(.dark) .logo-text,
+        html:not(.dark) .soal-title { color: #0F1F17 !important; }
+        html:not(.dark) .badge-lifetime { background: rgba(16,185,129,.12); color: #059669 !important; border-color: rgba(16,185,129,.3); }
+        html:not(.dark) .badge-time { background: rgba(217,119,6,.12); color: #B45309 !important; }
+        html:not(.dark) .footer-note { color: #64748B !important; }
+        html:not(.dark) .submit-btn { color: #FFFFFF !important; }
         .blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
         .blob-1 { width: 400px; height: 400px; background: rgba(16,185,129,.09); top: -10%; left: -15%; }
         .blob-2 { width: 400px; height: 400px; background: rgba(52,211,153,.06); bottom: -15%; right: -15%; }
@@ -61,6 +67,10 @@
     </style>
 </head>
 <body>
+    <div style="position:fixed;top:16px;right:16px;z-index:50;">
+        <x-theme-switcher :compact="true" />
+    </div>
+
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
 
@@ -70,7 +80,7 @@
                 <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs Logo" style="width:100%;height:100%;object-fit:contain;" draggable="false">
             </div>
             <div style="display:flex;flex-direction:column;align-items:flex-start;">
-                <span style="font-family:'Orbitron',sans-serif;font-weight:800;font-size:20px;color:#fff;letter-spacing:1px;line-height:1;">IC-LABS</span>
+                <span class="logo-text" style="font-family:'Orbitron',sans-serif;font-weight:800;font-size:20px;letter-spacing:1px;line-height:1;">IC-LABS</span>
                 <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:10px;color:#34D399;letter-spacing:2px;margin-top:4px;">REPOSITORY</span>
             </div>
         </a>
@@ -92,7 +102,7 @@
                     </svg>
                 </div>
                 <div style="flex:1;min-width:0;">
-                    <h2 style="font-size:14px;font-weight:600;color:#fff;line-height:1.4;">{{ $soal->title }}</h2>
+                    <h2 class="soal-title" style="font-size:14px;font-weight:600;line-height:1.4;">{{ $soal->title }}</h2>
                     @if($soal->description)
                         <p style="font-size:12px;color:#6B7280;margin-top:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ $soal->description }}</p>
                     @endif

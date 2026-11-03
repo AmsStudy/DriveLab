@@ -298,10 +298,24 @@
         .cyber-select option:disabled {
             color: #6B7280 !important;
         }
+        .cyber-dropdown-trigger {
+            background-color: #090D0B;
+            border: 1px solid #1A2820;
+            color: #E5E7EB;
+        }
         .cyber-dropdown-trigger:hover {
             border-color: rgba(16, 185, 129, 0.5) !important;
             background-color: #0D1512 !important;
             box-shadow: 0 0 12px rgba(16, 185, 129, 0.18) !important;
+        }
+        .cyber-dropdown-trigger.is-open {
+            border-color: #10B981 !important;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25), 0 0 18px rgba(16, 185, 129, 0.22) !important;
+        }
+        .cyber-dropdown-menu {
+            background: rgba(15, 23, 19, 0.98);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            box-shadow: 0 20px 45px -10px rgba(0,0,0,0.9), 0 0 25px rgba(16, 185, 129, 0.18);
         }
         .cyber-dropdown-menu::-webkit-scrollbar { width: 4px; }
         .cyber-dropdown-menu::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.35); border-radius: 4px; }
@@ -927,11 +941,6 @@
             trigger.className = 'cyber-dropdown-trigger flex items-center justify-between gap-2.5 transition-all cursor-pointer rounded-xl ' +
                 (isFull ? 'w-full ' : '') +
                 (select.classList.contains('text-xs') ? 'text-xs py-2 px-3.5 ' : 'text-sm py-2 px-3.5 ');
-            trigger.style.backgroundColor = '#090D0B';
-            trigger.style.borderColor = '#1A2820';
-            trigger.style.borderWidth = '1px';
-            trigger.style.borderStyle = 'solid';
-            trigger.style.color = '#E5E7EB';
 
             const labelSpan = document.createElement('span');
             labelSpan.className = 'truncate ' + (selectedOption && selectedOption.value ? 'text-gray-100 font-semibold' : 'text-gray-400');
@@ -949,9 +958,6 @@
             const menu = document.createElement('div');
             menu.className = 'cyber-dropdown-menu hidden absolute left-0 mt-2 z-50 p-1.5 rounded-2xl border backdrop-blur-xl shadow-2xl max-h-60 overflow-y-auto ' +
                 (isFull ? 'w-full right-0' : 'min-w-[190px] w-max');
-            menu.style.background = 'rgba(15, 23, 19, 0.98)';
-            menu.style.borderColor = 'rgba(16, 185, 129, 0.35)';
-            menu.style.boxShadow = '0 20px 45px -10px rgba(0,0,0,0.9), 0 0 25px rgba(16,185,129,0.18)';
 
             function renderOptions() {
                 menu.innerHTML = '';
@@ -1000,8 +1006,6 @@
                 document.querySelectorAll('.cyber-dropdown-trigger').forEach(t => {
                     if (t !== trigger) {
                         t.classList.remove('is-open');
-                        t.style.borderColor = '#1A2820';
-                        t.style.boxShadow = '';
                         const ch = t.querySelector('.chevron-icon');
                         if (ch) ch.style.transform = '';
                     }
@@ -1010,16 +1014,12 @@
                 renderOptions();
                 menu.classList.remove('hidden');
                 trigger.classList.add('is-open');
-                trigger.style.borderColor = '#10B981';
-                trigger.style.boxShadow = '0 0 0 2px rgba(16, 185, 129, 0.25), 0 0 18px rgba(16, 185, 129, 0.22)';
                 chevron.style.transform = 'rotate(180deg)';
             }
 
             function closeMenu() {
                 menu.classList.add('hidden');
                 trigger.classList.remove('is-open');
-                trigger.style.borderColor = '#1A2820';
-                trigger.style.boxShadow = '';
                 chevron.style.transform = '';
             }
 
