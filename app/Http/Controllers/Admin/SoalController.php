@@ -669,6 +669,68 @@ class SoalController extends Controller
         return response()->download($realFile, basename($submission->file_original_name));
     }
 
+    public function previewSubmission($id)
+    {
+        $submission = Submission::with('soal')->findOrFail($id);
+        $this->authorizeAccess($submission->soal);
+
+        if ($submission->isLink()) {
+            return redirect()->away($submission->link_url);
+        }
+
+        if ($submission->isText()) {
+            return response()->json([
+                'type'    => 'text',
+                'nama'    => $submission->nama,
+                'nim'     => $submission->nim,
+                'kelas'   => $submission->kelas,
+                'content' => $submission->text_content,
+            ]);
+        }
+
+        if (!$submission->isFile() || empty($submission->file_path)) {
+            abort(404, 'Pengumpulan ini bukan file yang dapat dilihat.');
+        }
+
+        $realBase = realpath(Storage::disk('private')->path(''));
+        $realFile = $this->resolvePrivateFile($submission->file_path, $realBase);
+
+        if ($realFile === null) {
+            abort(404, 'File fisik tidak ditemukan pada server.');
+        }
+
+        $mimeType = mime_content_type($realFile) ?: 'application/octet-stream';
+        $ext = strtolower(pathinfo($submission->file_original_name ?: $submission->file_path, PATHINFO_EXTENSION));
+        $inlineExts = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'svg', 'gif', 'txt'];
+        $disposition = in_array($ext, $inlineExts, true) ? 'inline' : 'attachment';
+
+        return response()->file($realFile, [
+            'Content-Type'           => $mimeType,
+            'Content-Disposition'    => $disposition . '; filename="' . basename($submission->file_original_name ?: 'tugas') . '"',
+            'X-Frame-Options'        => 'SAMEORIGIN',
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control'          => 'no-store, no-cache, must-revalidate',
+        ]);
+    }
+
+    public function destroySubmission($id)
+    {
+        $submission = Submission::with('soal')->findOrFail($id);
+        $soal = $submission->soal;
+        $this->authorizeAccess($soal);
+
+        // Hapus file fisik jika ada
+        if ($submission->isFile() && $submission->file_path) {
+            Storage::disk('private')->delete($submission->file_path);
+        }
+
+        $nim = $submission->nim;
+        $nama = $submission->nama;
+        $submission->delete();
+
+        return back()->with('success', "Data pengumpulan tugas mahasiswa {$nama} ({$nim}) berhasil dihapus. Mahasiswa bersangkutan dapat mengumpulkan ulang.");
+    }
+
     private function resolvePrivateFile(string $filePath, string $realBase): ?string
     {
         $safePath = Storage::disk('private')->path($filePath);

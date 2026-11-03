@@ -248,6 +248,51 @@ class QuizController extends Controller
         return back()->with('success', $quiz->is_active ? 'Kuis berhasil diaktifkan!' : 'Kuis berhasil dinonaktifkan!');
     }
 
+    public function duplicate(Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+
+        return DB::transaction(function () use ($quiz) {
+            do {
+                $newCode = strtoupper(Str::random(6));
+            } while (Quiz::where('access_code', $newCode)->exists());
+
+            do {
+                $newToken = Str::random(8);
+            } while (Quiz::where('unique_token', $newToken)->exists());
+
+            $newQuiz = $quiz->replicate([
+                'access_code',
+                'unique_token',
+                'slug',
+            ]);
+
+            $newQuiz->user_id = auth()->id();
+            $newQuiz->title = $quiz->title . ' (Salinan)';
+            $newQuiz->slug = Str::slug($newQuiz->title) . '-' . strtolower(Str::random(5));
+            $newQuiz->access_code = $newCode;
+            $newQuiz->unique_token = $newToken;
+            $newQuiz->is_active = false;
+            $newQuiz->save();
+
+            $questions = $quiz->questions()->with('options')->get();
+            foreach ($questions as $question) {
+                $newQuestion = $question->replicate();
+                $newQuestion->quiz_id = $newQuiz->id;
+                $newQuestion->save();
+
+                foreach ($question->options as $option) {
+                    $newOption = $option->replicate();
+                    $newOption->quiz_question_id = $newQuestion->id;
+                    $newOption->save();
+                }
+            }
+
+            return redirect()->route('admin.quizzes.index')
+                ->with('success', "Kuis \"{$quiz->title}\" berhasil diduplikasi menjadi \"{$newQuiz->title}\" beserta {$questions->count()} butir soal. Kode akses baru: {$newCode}.");
+        });
+    }
+
     public function questions(Quiz $quiz)
     {
         $this->authorizeQuiz($quiz);

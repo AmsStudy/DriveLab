@@ -92,12 +92,15 @@ Route::prefix('admin')
         Route::get('soal/{soal}/export-submissions', [SoalController::class, 'exportSubmissions'])->name('soal.export-submissions');
         Route::get('soal/{soal}/download-submissions-zip', [SoalController::class, 'downloadSubmissionsZip'])->name('soal.download-submissions-zip');
         Route::get('soal/submission/{id}/download', [SoalController::class, 'downloadSubmission'])->name('soal.download-submissions');
+        Route::get('soal/submission/{id}/preview', [SoalController::class, 'previewSubmission'])->name('soal.submission.preview');
+        Route::delete('soal/submission/{id}', [SoalController::class, 'destroySubmission'])->name('soal.submission.destroy');
 
         // Kategori CRUD
         Route::resource('categories', CategoryController::class)->except(['show']);
 
         // Kuis Interaktif (CMS Quizizz)
         Route::resource('quizzes', QuizController::class);
+        Route::post('quizzes/{quiz}/duplicate', [QuizController::class, 'duplicate'])->name('quizzes.duplicate');
         Route::patch('quizzes/{quiz}/toggle', [QuizController::class, 'toggleActive'])->name('quizzes.toggle');
         Route::get('quizzes/{quiz}/questions', [QuizController::class, 'questions'])->name('quizzes.questions');
         Route::post('quizzes/{quiz}/questions', [QuizController::class, 'storeQuestion'])->name('quizzes.questions.store');

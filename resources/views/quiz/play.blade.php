@@ -662,6 +662,18 @@
                         }
                     }, 15000);
 
+                    // Proactive CSRF token refresh every 10 minutes to prevent session expiration during long exams
+                    setInterval(() => {
+                        fetch('{{ route('csrf.refresh') }}')
+                            .then(r => r.json())
+                            .then(d => {
+                                if (d && d.csrf_token) {
+                                    const meta = document.querySelector('meta[name="csrf-token"]');
+                                    if (meta) meta.content = d.csrf_token;
+                                }
+                            }).catch(() => {});
+                    }, 600000);
+
                     // Initial code syntax highlighting pass
                     this.$nextTick(() => {
                         if (window.Prism) Prism.highlightAll();

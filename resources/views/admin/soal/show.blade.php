@@ -634,26 +634,48 @@
 
                                 {{-- Aksi --}}
                                 <td class="px-4 py-3.5 text-center">
-                                    @if($sub->isLink())
-                                        <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer"
-                                           class="p-2 text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block" title="Buka Link Tautan">
-                                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                        </a>
-                                    @elseif($sub->isText())
-                                        <button type="button"
-                                                data-nama="{{ $sub->nama }}"
-                                                data-nim="{{ $sub->nim }}"
-                                                data-content="{{ $sub->text_content }}"
-                                                onclick="showTextModal(this.dataset.nama, this.dataset.nim, this.dataset.content)"
-                                                class="p-2 text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors inline-block" title="Baca Teks Lengkap">
-                                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        </button>
-                                    @else
-                                        <a href="{{ route('admin.soal.download-submissions', $sub->id) }}"
-                                           class="p-2 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors inline-block" title="Unduh File Mahasiswa">
-                                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                        </a>
-                                    @endif
+                                    <div class="flex items-center justify-center gap-1">
+                                        @if($sub->isLink())
+                                            <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer"
+                                               class="p-2 text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block" title="Buka Link Tautan">
+                                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            </a>
+                                        @elseif($sub->isText())
+                                            <button type="button"
+                                                    data-nama="{{ $sub->nama }}"
+                                                    data-nim="{{ $sub->nim }}"
+                                                    data-content="{{ $sub->text_content }}"
+                                                    onclick="showTextModal(this.dataset.nama, this.dataset.nim, this.dataset.content)"
+                                                    class="p-2 text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Baca Teks Lengkap">
+                                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            </button>
+                                        @else
+                                            @php
+                                                $isImgOrPdf = in_array(strtolower($sub->file_extension ?? ''), ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'svg']);
+                                            @endphp
+                                            @if($isImgOrPdf)
+                                                <button type="button"
+                                                        onclick="showFilePreviewModal('{{ route('admin.soal.submission.preview', $sub->id) }}', '{{ addslashes($sub->file_original_name ?: 'tugas') }}', '{{ addslashes($sub->nama) }} ({{ $sub->nim }})', '{{ strtolower($sub->file_extension ?? '') }}')"
+                                                        class="p-2 text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Lihat Berkas Langsung">
+                                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                </button>
+                                            @endif
+
+                                            <a href="{{ route('admin.soal.download-submissions', $sub->id) }}"
+                                               class="p-2 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors inline-block" title="Unduh File Mahasiswa">
+                                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                            </a>
+                                        @endif
+
+                                        {{-- Hapus / Reset Pengumpulan --}}
+                                        <form method="POST" action="{{ route('admin.soal.submission.destroy', $sub->id) }}" class="inline"
+                                              onsubmit="confirmAction(event, 'Hapus pengumpulan tugas mahasiswa {{ addslashes($sub->nama) }} ({{ $sub->nim }})? Berkas akan dihapus permanen dan mahasiswa dapat mengumpulkan ulang.', 'Ya, Hapus Pengumpulan', true)">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="p-2 text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Hapus / Reset Pengumpulan">
+                                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach
@@ -696,6 +718,41 @@
                     style="background:#1A2820;border-color:#25382D;"
                     onmouseover="this.style.background='#25382D'"
                     onmouseout="this.style.background='#1A2820'">Tutup</button>
+        </div>
+    </div>
+</div>
+
+{{-- ─── IN-APP FILE PREVIEW MODAL ─── --}}
+<div id="filePreviewModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md p-3 sm:p-6 items-center justify-center"
+     onclick="if(event.target === this) closeFilePreviewModal()">
+    <div class="rounded-2xl w-full max-w-5xl overflow-hidden shadow-2xl flex flex-col h-[90vh] border"
+         style="background:#0F1713;border-color:#1A2820;">
+        <div class="px-6 py-4 flex items-center justify-between" style="border-bottom:1px solid #1A2820;background:#0F1713;">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs"
+                     style="background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3);">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-white font-semibold text-sm sm:text-base truncate max-w-md" id="previewFileName">Pratinjau Berkas</h3>
+                    <p class="text-xs text-emerald-400 font-mono mt-0.5" id="previewStudentInfo"></p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <a id="previewOpenNewTab" href="#" target="_blank" rel="noopener noreferrer"
+                   class="px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-300 hover:text-white border transition-colors flex items-center gap-1.5 cursor-pointer"
+                   style="background:#142019;border-color:#1A2820;" title="Buka di Tab Baru">
+                    <svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    <span class="hidden sm:inline">Tab Baru</span>
+                </a>
+                <button type="button" onclick="closeFilePreviewModal()" class="text-gray-400 hover:text-white p-1.5 rounded-lg transition-colors cursor-pointer" title="Tutup">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="flex-1 bg-[#090D0B] p-2 sm:p-4 overflow-hidden relative flex items-center justify-center" id="previewContainer">
+            <iframe id="previewIframe" src="" class="w-full h-full rounded-xl border border-[#1A2820] hidden" frameborder="0"></iframe>
+            <img id="previewImage" src="" class="max-w-full max-h-full object-contain rounded-xl shadow-lg hidden" alt="Pratinjau Gambar">
         </div>
     </div>
 </div>
@@ -1335,6 +1392,41 @@ function closeTextModal() {
     const modal = document.getElementById('textSubmissionModal');
     modal.classList.add('hidden');
     modal.classList.remove('flex');
+}
+
+function showFilePreviewModal(url, fileName, studentInfo, ext) {
+    document.getElementById('previewFileName').textContent = fileName;
+    document.getElementById('previewStudentInfo').textContent = studentInfo;
+    document.getElementById('previewOpenNewTab').href = url;
+
+    const iframe = document.getElementById('previewIframe');
+    const img = document.getElementById('previewImage');
+
+    if (['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'].includes(ext)) {
+        img.src = url;
+        img.classList.remove('hidden');
+        iframe.classList.add('hidden');
+        iframe.src = '';
+    } else {
+        iframe.src = url;
+        iframe.classList.remove('hidden');
+        img.classList.add('hidden');
+        img.src = '';
+    }
+
+    const modal = document.getElementById('filePreviewModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeFilePreviewModal() {
+    const modal = document.getElementById('filePreviewModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    const iframe = document.getElementById('previewIframe');
+    if (iframe) iframe.src = '';
+    const img = document.getElementById('previewImage');
+    if (img) img.src = '';
 }
 
 function copyModalText() {
