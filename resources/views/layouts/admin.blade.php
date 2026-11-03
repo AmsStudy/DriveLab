@@ -479,13 +479,156 @@
         html:not(.dark) [style*="border-right:1px solid #1A2820"] {
             border-right-color: #E2EAE5 !important;
         }
-        html:not(.dark) .sidebar-active {
-            background: rgba(16,185,129,.10) !important;
-            color: #059669 !important;
-            border-right: 2px solid #10B981 !important;
+        /* ─── Sidebar Navigation Items Design System (Crisp, Illuminated, High-Contrast) ─── */
+        .sidebar-nav-item {
+            position: relative;
+            border: 1px solid transparent;
+            color: #9CA3AF;
+            background: transparent;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        html:not(.dark) .sidebar-active svg {
+        .sidebar-nav-item svg {
+            color: #6B7280;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Active State (Dark Mode) */
+        .sidebar-nav-item.is-active {
+            background: rgba(16, 185, 129, 0.14) !important;
+            color: #10B981 !important;
+            border-color: rgba(16, 185, 129, 0.32) !important;
+            font-weight: 600 !important;
+            box-shadow: 0 0 16px rgba(16, 185, 129, 0.14) !important;
+        }
+        .sidebar-nav-item.is-active svg {
+            color: #10B981 !important;
+            filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.6));
+        }
+
+        /* Hover State on Inactive Items (Dark Mode) - Terang, Tajam, Bercahaya Seperti Aktif */
+        .sidebar-nav-item:not(.is-active):hover {
+            background: rgba(16, 185, 129, 0.14) !important;
+            color: #FFFFFF !important;
+            border-color: rgba(16, 185, 129, 0.40) !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.20), inset 0 0 12px rgba(16, 185, 129, 0.08) !important;
+            transform: translateX(4px);
+        }
+        .sidebar-nav-item:not(.is-active):hover svg {
+            color: #34D399 !important;
+            filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.75));
+            transform: scale(1.12);
+        }
+
+        /* User Card in Sidebar */
+        .sidebar-user-card {
+            background: rgba(16, 185, 129, 0.06);
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .sidebar-user-card:hover {
+            background: rgba(16, 185, 129, 0.14) !important;
+            border-color: rgba(16, 185, 129, 0.35) !important;
+            box-shadow: 0 0 16px rgba(16, 185, 129, 0.15) !important;
+            transform: translateX(2px);
+        }
+
+        /* Portal Link in Sidebar */
+        .sidebar-portal-btn {
+            color: #4B7A65;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .sidebar-portal-btn:hover {
+            background: rgba(16, 185, 129, 0.12) !important;
+            color: #10B981 !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+            transform: translateX(3px);
+        }
+        .sidebar-portal-btn:hover svg {
+            color: #10B981 !important;
+            transform: scale(1.1);
+        }
+
+        /* Logout Link in Sidebar */
+        .sidebar-logout-btn {
+            color: #9CA3AF;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .sidebar-logout-btn:hover {
+            background: rgba(239, 68, 68, 0.12) !important;
+            color: #F87171 !important;
+            border-color: rgba(239, 68, 68, 0.35) !important;
+            box-shadow: 0 0 16px rgba(239, 68, 68, 0.15) !important;
+            transform: translateX(3px);
+        }
+        .sidebar-logout-btn:hover svg {
+            color: #EF4444 !important;
+            transform: scale(1.1);
+        }
+
+        /* ─── Light Mode Sidebar Styles ─── */
+        html:not(.dark) .sidebar-nav-item {
+            color: #4B5563;
+        }
+        html:not(.dark) .sidebar-nav-item svg {
+            color: #64748B;
+        }
+        html:not(.dark) .sidebar-nav-item.is-active {
+            background: rgba(16, 185, 129, 0.12) !important;
             color: #059669 !important;
+            border-color: rgba(16, 185, 129, 0.35) !important;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.10) !important;
+        }
+        html:not(.dark) .sidebar-nav-item.is-active svg {
+            color: #059669 !important;
+            filter: drop-shadow(0 1px 3px rgba(16, 185, 129, 0.3));
+        }
+        html:not(.dark) .sidebar-nav-item:not(.is-active):hover {
+            background: rgba(16, 185, 129, 0.12) !important;
+            color: #059669 !important;
+            font-weight: 600 !important;
+            border-color: rgba(16, 185, 129, 0.38) !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.14) !important;
+            transform: translateX(4px);
+        }
+        html:not(.dark) .sidebar-nav-item:not(.is-active):hover svg {
+            color: #059669 !important;
+            filter: drop-shadow(0 1px 4px rgba(16, 185, 129, 0.35));
+            transform: scale(1.12);
+        }
+        html:not(.dark) .sidebar-user-card {
+            background: #F8FAF9;
+            border-color: #E2EAE5;
+        }
+        html:not(.dark) .sidebar-user-card:hover {
+            background: rgba(16, 185, 129, 0.08) !important;
+            border-color: rgba(16, 185, 129, 0.35) !important;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.10) !important;
+        }
+        html:not(.dark) .sidebar-portal-btn {
+            color: #64748B;
+        }
+        html:not(.dark) .sidebar-portal-btn:hover {
+            background: rgba(16, 185, 129, 0.10) !important;
+            color: #059669 !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+        }
+        html:not(.dark) .sidebar-portal-btn:hover svg {
+            color: #059669 !important;
+        }
+        html:not(.dark) .sidebar-logout-btn {
+            color: #64748B;
+        }
+        html:not(.dark) .sidebar-logout-btn:hover {
+            background: rgba(239, 68, 68, 0.10) !important;
+            color: #DC2626 !important;
+            border-color: rgba(239, 68, 68, 0.3) !important;
+        }
+        html:not(.dark) .sidebar-logout-btn:hover svg {
+            color: #DC2626 !important;
         }
     </style>
 </head>
@@ -529,7 +672,7 @@
 
             {{-- User Info --}}
             <div class="px-3 py-3" style="border-bottom:1px solid #1A2820;">
-                <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 rounded-xl p-2.5 group cursor-pointer" style="background:rgba(16,185,129,.06);" onmouseover="this.style.background='rgba(16,185,129,.12)'" onmouseout="this.style.background='rgba(16,185,129,.06)'">
+                <a href="{{ route('profile.edit') }}" class="sidebar-user-card flex items-center gap-3 rounded-xl p-2.5 group cursor-pointer">
                     <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#10B981,#0D9488);">
                         <span class="text-white text-xs font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</span>
                     </div>
@@ -584,11 +727,8 @@
             {{-- Portal Link --}}
             <div class="px-3 py-2" style="border-top:1px solid #1A2820;">
                 <a href="{{ route('home') }}" target="_blank" rel="noopener noreferrer"
-                   class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors"
-                   style="color:#4B7A65;"
-                   onmouseover="this.style.background='rgba(16,185,129,.07)';this.style.color='#10B981'"
-                   onmouseout="this.style.background='transparent';this.style.color='#4B7A65'">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="sidebar-portal-btn flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                     </svg>
                     Portal Mahasiswa
@@ -599,10 +739,8 @@
             <div class="p-3" style="border-top:1px solid #1A2820;">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors" style="color:#6B7280;"
-                            onmouseover="this.style.background='rgba(239,68,68,.08)';this.style.color='#F87171'"
-                            onmouseout="this.style.background='transparent';this.style.color='#6B7280'">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="submit" class="sidebar-logout-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                         </svg>
                         Keluar
