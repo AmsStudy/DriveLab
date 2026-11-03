@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <x-theme-head-script />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,6 +23,193 @@
             --muted:    #4B6358;
             --muted2:   #7A9E8E;
             --text:     #D4E8DC;
+        }
+
+        html:not(.dark) {
+            --bg:       #F4F7F5;
+            --emerald:  #059669;
+            --emerald2: #047857;
+            --mint:     #10B981;
+            --teal:     #0D9488;
+            --sky:      #0284C7;
+            --muted:    #64748B;
+            --muted2:   #475569;
+            --text:     #0F1F17;
+        }
+
+        html:not(.dark) .glass-card {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-color: #E2EAE5 !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.08), 0 0 40px rgba(16, 185, 129, 0.08) !important;
+        }
+
+        html:not(.dark) .bg-scene::before {
+            background:
+                radial-gradient(ellipse 80% 60% at 15% 20%, rgba(16,185,129,.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 85% 75%, rgba(13,148,136,.06) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 40% at 60% 10%, rgba(52,211,153,.05) 0%, transparent 50%),
+                radial-gradient(ellipse 100% 100% at 50% 50%, #F4F7F5 55%, #E2EAE5 100%) !important;
+        }
+
+        html:not(.dark) .brand-name {
+            background: linear-gradient(135deg, #0F1F17 40%, #059669 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+        }
+
+        html:not(.dark) .tabs {
+            background: #F0F4F2 !important;
+            border-color: #E2EAE5 !important;
+        }
+
+        html:not(.dark) .tab-btn {
+            color: #64748B !important;
+        }
+
+        html:not(.dark) .tab-doc {
+            background: rgba(16, 185, 129, 0.15) !important;
+            color: #059669 !important;
+        }
+
+        html:not(.dark) .tab-quiz {
+            background: rgba(13, 148, 136, 0.15) !important;
+            color: #0D9488 !important;
+        }
+
+        html:not(.dark) .tab-lacak {
+            background: rgba(56, 189, 248, 0.15) !important;
+            color: #0284C7 !important;
+        }
+
+        html:not(.dark) .input-wrap {
+            background: #FFFFFF !important;
+            border-color: #D1DCD6 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        html:not(.dark) .input-wrap:focus-within {
+            border-color: #10B981 !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+        }
+
+        html:not(.dark) .inp-icon {
+            color: #059669 !important;
+        }
+
+        html:not(.dark) .main-inp {
+            color: #0F1F17 !important;
+        }
+
+        html:not(.dark) .main-inp::placeholder {
+            color: #94A3B8 !important;
+        }
+
+        html:not(.dark) .cf-label {
+            color: #64748B !important;
+        }
+
+        html:not(.dark) .cf-line {
+            background: #E2EAE5 !important;
+        }
+
+        html:not(.dark) .code-input-wrap {
+            background: #FFFFFF !important;
+            border-color: #D1DCD6 !important;
+        }
+
+        html:not(.dark) .code-input {
+            color: #0F1F17 !important;
+        }
+
+        html:not(.dark) .modal-panel {
+            background: rgba(255, 255, 255, 0.98) !important;
+            border-color: #E2EAE5 !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        html:not(.dark) .modal-title {
+            color: #0F1F17 !important;
+        }
+
+        html:not(.dark) .modal-desc {
+            color: #475569 !important;
+        }
+
+        html:not(.dark) .modal-label {
+            color: #475569 !important;
+        }
+
+        html:not(.dark) .modal-input-wrap {
+            background: #FFFFFF !important;
+            border-color: #D1DCD6 !important;
+        }
+
+        html:not(.dark) .modal-input-wrap:focus-within {
+            border-color: #10B981 !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+        }
+
+        html:not(.dark) .modal-input-icon {
+            background: #FFFFFF !important;
+            color: #059669 !important;
+        }
+
+        html:not(.dark) .modal-input {
+            background: #FFFFFF !important;
+            color: #0F1F17 !important;
+        }
+
+        html:not(.dark) .modal-input::placeholder {
+            color: #94A3B8 !important;
+        }
+
+        html:not(.dark) .modal-pwd-toggle {
+            background: #FFFFFF !important;
+            color: #64748B !important;
+        }
+
+        html:not(.dark) .modal-pwd-toggle:hover {
+            color: #0F1F17 !important;
+        }
+
+        html:not(.dark) .modal-close-btn {
+            background: #F1F5F9 !important;
+            border-color: #E2EAE5 !important;
+            color: #64748B !important;
+        }
+
+        html:not(.dark) .modal-close-btn:hover {
+            background: #E2EAE5 !important;
+            color: #0F1F17 !important;
+        }
+
+        html:not(.dark) .modal-checkbox {
+            color: #475569 !important;
+        }
+
+        html:not(.dark) .modal-link {
+            color: #059669 !important;
+        }
+
+        html:not(.dark) .modal-input:-webkit-autofill,
+        html:not(.dark) .modal-input:-webkit-autofill:hover,
+        html:not(.dark) .modal-input:-webkit-autofill:focus,
+        html:not(.dark) .modal-input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset !important;
+            box-shadow: 0 0 0 1000px #FFFFFF inset !important;
+            -webkit-text-fill-color: #0F1F17 !important;
+            color: #0F1F17 !important;
+            caret-color: #0F1F17 !important;
+        }
+
+        html:not(.dark) .bg-grid {
+            opacity: 0.25 !important;
+        }
+
+        html:not(.dark) .orb-1,
+        html:not(.dark) .orb-2,
+        html:not(.dark) .orb-3 {
+            opacity: 0.35 !important;
         }
 
         html {
@@ -686,13 +874,16 @@
         <div class="bg-noise"></div>
     </div>
 
-    {{-- Admin corner: only rendered when user is authenticated --}}
-    @auth
-        <a href="{{ route('admin.dashboard') }}" class="admin-link">
-            Dashboard
-            <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-        </a>
-    @endauth
+    {{-- Top-Right Controls (Theme Switcher & Admin Link) --}}
+    <div style="position: fixed; top: 20px; right: 24px; z-index: 35; display: flex; align-items: center; gap: 8px;">
+        <x-theme-switcher :compact="true" />
+        @auth
+            <a href="{{ route('admin.dashboard') }}" class="admin-link" style="position: static;">
+                Dashboard
+                <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        @endauth
+    </div>
 
     {{-- Gateway stage --}}
     <main class="stage">

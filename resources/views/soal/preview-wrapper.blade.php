@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $attachment->file_original_name }} — Preview Aman IC-Labs</title>
+    <x-theme-head-script />
     <link rel="icon" type="image/png" href="{{ asset('images/iclabs-logo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
@@ -20,6 +22,57 @@
             --teal: #0D9488;
             --text: #F1EEF6;
             --muted: #8E8A9F;
+        }
+
+        html:not(.dark) {
+            --bg: #F4F7F5;
+            --surface: #FFFFFF;
+            --surface2: #F8FAF9;
+            --border: #E2EAE5;
+            --emerald: #059669;
+            --emerald-dim: rgba(16, 185, 129, 0.12);
+            --mint: #10B981;
+            --teal: #0D9488;
+            --text: #0F1F17;
+            --muted: #64748B;
+        }
+
+        html:not(.dark) .viewer-topbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid #E2EAE5 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        html:not(.dark) .file-title {
+            color: #0F1F17 !important;
+        }
+
+        html:not(.dark) .btn-back {
+            background: #FFFFFF !important;
+            border-color: #E2EAE5 !important;
+            color: #374151 !important;
+        }
+
+        html:not(.dark) .btn-back:hover {
+            border-color: #059669 !important;
+            color: #059669 !important;
+        }
+
+        html:not(.dark) .zoom-controls {
+            background: #FFFFFF !important;
+            border-color: #E2EAE5 !important;
+        }
+
+        html:not(.dark) .zoom-btn {
+            color: #374151 !important;
+        }
+
+        html:not(.dark) .zoom-text {
+            color: #0F1F17 !important;
+        }
+
+        html:not(.dark) .viewer-viewport {
+            background: #EAEFEA !important;
         }
 
         body, html {
@@ -272,6 +325,7 @@
         </div>
 
         <div class="topbar-right">
+            <x-theme-switcher :compact="true" />
             <div class="zoom-controls">
                 <button class="zoom-btn" onclick="adjustZoom(-0.1)" title="Perkecil">−</button>
                 <span class="zoom-text" id="zoom-label">100%</span>

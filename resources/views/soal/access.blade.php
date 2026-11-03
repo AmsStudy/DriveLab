@@ -7,10 +7,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@700;800;900&display=swap" rel="stylesheet">
+    <x-theme-head-script />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: #090D0B; color: #E5E7EB; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; overflow-x: hidden; }
+
+        html:not(.dark) body { background: #F4F7F5 !important; color: #0F1F17 !important; }
+        html:not(.dark) .card { background: #FFFFFF !important; border-color: #E2EAE5 !important; box-shadow: 0 25px 60px rgba(0,0,0,.08) !important; }
+        html:not(.dark) .pwd-input { background: #FFFFFF !important; border-color: #D1DCD6 !important; color: #0F1F17 !important; }
+        html:not(.dark) label { color: #374151 !important; }
+        html:not(.dark) .logo-text { color: #0F1F17 !important; }
         .blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
         .blob-1 { width: 400px; height: 400px; background: rgba(16,185,129,.09); top: -10%; left: -15%; }
         .blob-2 { width: 400px; height: 400px; background: rgba(52,211,153,.06); bottom: -15%; right: -15%; }

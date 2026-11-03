@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@700;800;900&display=swap" rel="stylesheet">
+    <x-theme-head-script />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,6 +25,45 @@
             padding: 24px;
             position: relative;
             overflow-x: hidden;
+        }
+
+        html:not(.dark) body {
+            background: #F4F7F5 !important;
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) .auth-card {
+            background: #FFFFFF !important;
+            border-color: #E2EAE5 !important;
+            box-shadow: 0 25px 60px rgba(0,0,0,.08) !important;
+        }
+        html:not(.dark) .auth-card h2 {
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) .auth-card p {
+            color: #64748B !important;
+        }
+        html:not(.dark) label {
+            color: #374151 !important;
+        }
+        html:not(.dark) input[type="text"],
+        html:not(.dark) input[type="email"],
+        html:not(.dark) input[type="password"] {
+            background: #FFFFFF !important;
+            border-color: #D1DCD6 !important;
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) input[type="text"]:focus,
+        html:not(.dark) input[type="email"]:focus,
+        html:not(.dark) input[type="password"]:focus {
+            border-color: #10B981 !important;
+            box-shadow: 0 0 0 2px rgba(16,185,129,.2) !important;
+        }
+        html:not(.dark) .logo-text {
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) .blob-1,
+        html:not(.dark) .blob-2 {
+            opacity: 0.3 !important;
         }
         .blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
         .blob-1 { width: 500px; height: 500px; background: rgba(16,185,129,.08); top: -10%; left: -15%; }
@@ -107,6 +147,11 @@
     </style>
 </head>
 <body>
+    {{-- Top-Right Theme Switcher --}}
+    <div style="position: fixed; top: 20px; right: 24px; z-index: 30;">
+        <x-theme-switcher :compact="true" />
+    </div>
+
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
 

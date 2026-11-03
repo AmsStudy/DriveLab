@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +12,24 @@
     <script>
         (function() {
             try {
+                var theme = localStorage.getItem('labsoal_theme') || 'system';
+                var isDark = false;
+                if (theme === 'dark') {
+                    isDark = true;
+                } else if (theme === 'light') {
+                    isDark = false;
+                } else {
+                    isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                }
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.remove('light');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
+                }
+                document.documentElement.setAttribute('data-theme', theme);
+
                 if (localStorage.getItem('labsoal_sidebar_collapsed') === 'true' && window.innerWidth >= 1024) {
                     document.documentElement.classList.add('sidebar-collapsed');
                 }
@@ -399,6 +417,62 @@
             top: 0 !important;
             z-index: 40 !important;
         }
+
+        /* ─── Light Mode Theme Overrides for Admin Layout ─── */
+        html:not(.dark) body {
+            background-color: #F4F7F5 !important;
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) #top-navbar,
+        html:not(.dark) header.admin-header {
+            background: rgba(255, 255, 255, 0.92) !important;
+            border-bottom: 1px solid #E2EAE5 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+        }
+        html:not(.dark) #sidebar {
+            background-color: #FFFFFF !important;
+            border-right: 1px solid #E2EAE5 !important;
+            box-shadow: 2px 0 16px rgba(0, 0, 0, 0.03) !important;
+        }
+        html:not(.dark) #sidebar-toggle-btn {
+            background-color: #FFFFFF !important;
+            border-color: #E2EAE5 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+        }
+        html:not(.dark) #sidebar-toggle-btn .hamburger-bar {
+            background-color: #4B5563 !important;
+        }
+        html:not(.dark) #sidebar-toggle-btn:hover .hamburger-bar {
+            background-color: #10B981 !important;
+        }
+        html:not(.dark) #realtime-clock-widget {
+            background-color: #FFFFFF !important;
+            border-color: #E2EAE5 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+        }
+        html:not(.dark) #live-time-display {
+            color: #059669 !important;
+        }
+        html:not(.dark) #live-date-display {
+            color: #64748B !important;
+        }
+        html:not(.dark) [style*="border-bottom:1px solid #1A2820"] {
+            border-bottom-color: #E2EAE5 !important;
+        }
+        html:not(.dark) [style*="border-top:1px solid #1A2820"] {
+            border-top-color: #E2EAE5 !important;
+        }
+        html:not(.dark) [style*="border-right:1px solid #1A2820"] {
+            border-right-color: #E2EAE5 !important;
+        }
+        html:not(.dark) .sidebar-active {
+            background: rgba(16,185,129,.10) !important;
+            color: #059669 !important;
+            border-right: 2px solid #10B981 !important;
+        }
+        html:not(.dark) .sidebar-active svg {
+            color: #059669 !important;
+        }
     </style>
 </head>
 <body class="text-gray-100 min-h-screen" style="background:#090D0B; font-family:'Inter',sans-serif; overflow-x:clip;">
@@ -559,6 +633,9 @@
 
                     <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                         @yield('header-actions')
+
+                        {{-- Cyber Multi-Theme Switcher Widget (Dark / Light / System) --}}
+                        <x-theme-switcher />
 
                         {{-- Real-Time Cyber Clock & Date Widget (Stacked Minimalist) --}}
                         <div id="realtime-clock-widget"

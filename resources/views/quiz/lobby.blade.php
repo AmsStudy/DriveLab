@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lobby Kuis: {{ $quiz->title }} &mdash; IC-Labs</title>
+    <x-theme-head-script />
     <link rel="icon" type="image/png" href="{{ asset('images/iclabs-logo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,11 +18,31 @@
             --emerald: #10B981;
             --emerald-glow: rgba(16, 185, 129, 0.2);
         }
+        html:not(.dark) {
+            --bg: #F4F7F5;
+            --card: #FFFFFF;
+            --border: #E2EAE5;
+            --emerald: #059669;
+            --emerald-glow: rgba(16, 185, 129, 0.15);
+        }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg);
             color: #f3f4f6;
             min-height: 100vh;
+        }
+        html:not(.dark) body {
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) .glow-card {
+            background: #FFFFFF !important;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05) !important;
+        }
+        html:not(.dark) input[type="text"],
+        html:not(.dark) input[type="password"] {
+            background-color: #FFFFFF !important;
+            border-color: #D1DCD6 !important;
+            color: #0F1F17 !important;
         }
         .heading-font {
             font-family: 'Outfit', sans-serif;
@@ -104,6 +125,7 @@
 
             <div class="flex items-center gap-3">
                 <span class="text-xs text-gray-400 font-mono hidden sm:inline">Kode: <strong class="text-emerald-400 font-bold">{{ $quiz->access_code }}</strong></span>
+                <x-theme-switcher :compact="true" />
                 <a href="{{ route('home') }}" class="text-xs text-gray-400 hover:text-white transition-colors">
                     Beranda
                 </a>

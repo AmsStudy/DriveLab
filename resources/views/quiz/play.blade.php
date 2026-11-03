@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Arena Kuis: {{ $quiz->title }} &mdash; IC-Labs</title>
+    <x-theme-head-script />
     <link rel="icon" type="image/png" href="{{ asset('images/iclabs-logo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,6 +22,12 @@
             --border: #1A2820;
             --emerald: #10B981;
         }
+        html:not(.dark) {
+            --bg: #F4F7F5;
+            --card: #FFFFFF;
+            --border: #E2EAE5;
+            --emerald: #059669;
+        }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg);
@@ -28,6 +35,19 @@
             min-height: 100vh;
             user-select: none;
             -webkit-user-select: none;
+        }
+        html:not(.dark) body {
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) .option-card .text-gray-200,
+        html:not(.dark) .option-card .text-white {
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) .option-card.border-emerald-400 {
+            background-color: #ECFDF5 !important;
+        }
+        html:not(.dark) .option-card.border-emerald-400 .text-white {
+            color: #065F46 !important;
         }
         .heading-font {
             font-family: 'Outfit', sans-serif;
@@ -137,6 +157,7 @@
                         <span class="hidden md:inline text-[11px] font-mono text-emerald-300">Kiosk Terkunci</span>
                     </div>
                 @endif
+                <x-theme-switcher :compact="true" />
             </div>
         </div>
 

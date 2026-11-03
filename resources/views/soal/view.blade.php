@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ $soal->title }} — IC-Labs Repository</title>
+<x-theme-head-script />
 <link rel="icon" type="image/png" href="{{ asset('images/iclabs-logo.png') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,6 +32,129 @@
   --blue:#06B6D4;
   --blue-dim:rgba(6,182,212,0.1);
   --amber:#F59E0B;
+}
+
+html:not(.dark) {
+  --bg: #F4F7F5;
+  --surface: #FFFFFF;
+  --surface2: #F8FAF9;
+  --surface3: #F0F4F2;
+  --border: #E2EAE5;
+  --border-emerald: rgba(16,185,129,0.4);
+  --emerald: #059669;
+  --emerald-dim: rgba(16,185,129,0.12);
+  --emerald-glow: rgba(16,185,129,0.15);
+  --violet: #0D9488;
+  --text1: #0F1F17;
+  --text2: #374151;
+  --text3: #64748B;
+  --green: #059669;
+  --green-dim: rgba(16,185,129,0.12);
+  --blue: #0284C7;
+  --blue-dim: rgba(2,132,199,0.1);
+  --amber: #D97706;
+}
+
+html:not(.dark) body::before {
+  opacity: 0.02;
+}
+
+html:not(.dark) .topbar {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-bottom: 1px solid #E2EAE5 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+html:not(.dark) .brand-name {
+  color: #0F1F17 !important;
+}
+
+html:not(.dark) .topbar-divider {
+  background: #E2EAE5 !important;
+}
+
+html:not(.dark) .topbar-doc-title {
+  color: #0F1F17 !important;
+}
+
+html:not(.dark) .field-input,
+html:not(.dark) .custom-cyber-trigger {
+  background: #FFFFFF !important;
+  border-color: #E2EAE5 !important;
+  color: #0F1F17 !important;
+}
+
+html:not(.dark) .field-wrap select.field-input {
+  background-color: #FFFFFF !important;
+  border-color: #E2EAE5 !important;
+  color: #0F1F17 !important;
+}
+html:not(.dark) .field-wrap select.field-input option {
+  background-color: #FFFFFF !important;
+  color: #0F1F17 !important;
+}
+
+html:not(.dark) .content-text-body {
+  background: #F8FAF9 !important;
+  border-color: #E2EAE5 !important;
+  color: #0F1F17 !important;
+}
+
+html:not(.dark) .sub-glow {
+  opacity: 0.3;
+}
+
+html:not(.dark) .dropzone {
+  background: #FFFFFF !important;
+  border-color: #D1DCD6 !important;
+}
+html:not(.dark) .dropzone:hover {
+  background: rgba(16, 185, 129, 0.04) !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+}
+html:not(.dark) .dz-change {
+  background: #E2EAE5 !important;
+  color: #374151 !important;
+}
+html:not(.dark) .custom-cyber-menu {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: #E2EAE5 !important;
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.12), 0 0 15px rgba(16, 185, 129, 0.08) !important;
+}
+html:not(.dark) .custom-cyber-menu-header {
+  color: #64748B !important;
+  border-bottom-color: #E2EAE5 !important;
+}
+html:not(.dark) .custom-cyber-menu-item {
+  color: #374151 !important;
+}
+html:not(.dark) .custom-cyber-menu-item:hover {
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #059669 !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+html:not(.dark) .custom-cyber-menu-item.is-selected {
+  background: rgba(16, 185, 129, 0.12) !important;
+  color: #059669 !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+html:not(.dark) .cyber-swal-popup {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: #E2EAE5 !important;
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.15), 0 0 35px rgba(16, 185, 129, 0.08) !important;
+}
+html:not(.dark) .cyber-swal-title {
+  color: #0F1F17 !important;
+}
+html:not(.dark) .cyber-swal-text {
+  color: #374151 !important;
+}
+html:not(.dark) input:-webkit-autofill,
+html:not(.dark) input:-webkit-autofill:hover,
+html:not(.dark) input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 30px #FFFFFF inset !important;
+  -webkit-text-fill-color: #0F1F17 !important;
 }
 
 body{
@@ -1018,9 +1142,12 @@ footer{
             </div>
         </div>
     </div>
-    <div class="badge-active">
-        <span class="badge-dot"></span>
-        Akses Aktif
+    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <x-theme-switcher :compact="true" />
+        <div class="badge-active">
+            <span class="badge-dot"></span>
+            Akses Aktif
+        </div>
     </div>
 </header>
 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hasil Kuis: {{ $quiz->title }} &mdash; IC-Labs</title>
+    <x-theme-head-script />
     <link rel="icon" type="image/png" href="{{ asset('images/iclabs-logo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,11 +21,20 @@
             --border: #1A2820;
             --emerald: #10B981;
         }
+        html:not(.dark) {
+            --bg: #F4F7F5;
+            --card: #FFFFFF;
+            --border: #E2EAE5;
+            --emerald: #059669;
+        }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg);
             color: #f3f4f6;
             min-height: 100vh;
+        }
+        html:not(.dark) body {
+            color: #0F1F17 !important;
         }
         .heading-font {
             font-family: 'Outfit', sans-serif;
@@ -59,6 +69,7 @@
             </a>
 
             <div class="flex items-center gap-2">
+                <x-theme-switcher :compact="true" />
                 <a href="{{ route('home') }}"
                    class="px-3.5 py-1.5 rounded-xl border border-[#1A2820] hover:bg-gray-800 text-xs text-gray-300 font-medium transition-colors">
                     Beranda

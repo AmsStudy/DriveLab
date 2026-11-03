@@ -86,3 +86,233 @@
         overflow: hidden;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   IC-LABS THEME SYSTEM (Dark / Light / System)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Smooth Theme Transitions */
+html {
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Light Theme Variables & Core Overrides */
+html:not(.dark) {
+    color-scheme: light;
+}
+
+html:not(.dark) body {
+    background-color: #F4F7F5 !important;
+    color: #0F1F17 !important;
+}
+
+/* Scrollbars in Light Mode */
+html:not(.dark) ::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+html:not(.dark) ::-webkit-scrollbar-thumb {
+    background: #CBD5E1 !important;
+    border-radius: 4px;
+}
+html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8 !important;
+}
+
+/* Backgrounds & Surfaces */
+html:not(.dark) [style*="background:#090D0B"],
+html:not(.dark) [style*="background: #090D0B"],
+html:not(.dark) [style*="background:#050907"],
+html:not(.dark) [style*="background: #050907"],
+html:not(.dark) .bg-\[\#090D0B\],
+html:not(.dark) .bg-\[\#090E0B\],
+html:not(.dark) .bg-\[\#050907\],
+html:not(.dark) .bg-\[\#080810\],
+html:not(.dark) .bg-\[\#070C09\] {
+    background-color: #F4F7F5 !important;
+}
+
+html:not(.dark) [style*="background:#0F1713"],
+html:not(.dark) [style*="background: #0F1713"],
+html:not(.dark) .bg-\[\#0F1713\],
+html:not(.dark) .bg-gray-900,
+html:not(.dark) .bg-gray-800 {
+    background-color: #FFFFFF !important;
+}
+
+html:not(.dark) [style*="background:#131E17"],
+html:not(.dark) [style*="background:#142019"],
+html:not(.dark) .bg-\[\#131E17\],
+html:not(.dark) .bg-\[\#142019\] {
+    background-color: #F8FAF9 !important;
+}
+
+/* Borders */
+html:not(.dark) [style*="border:1px solid #1A2820"],
+html:not(.dark) [style*="border: 1px solid #1A2820"],
+html:not(.dark) [style*="border-color:#1A2820"],
+html:not(.dark) [style*="border-color: #1A2820"],
+html:not(.dark) [style*="border-bottom:1px solid #1A2820"],
+html:not(.dark) [style*="border-top:1px solid #1A2820"],
+html:not(.dark) [style*="border-right:1px solid #1A2820"],
+html:not(.dark) .border-\[\#1A2820\],
+html:not(.dark) .border-\[\#1E3327\],
+html:not(.dark) .border-gray-800,
+html:not(.dark) .border-gray-700,
+html:not(.dark) .divide-\[\#1A2820\] > :not([hidden]) ~ :not([hidden]) {
+    border-color: #E2EAE5 !important;
+}
+
+/* Navbar / Sticky Header */
+html:not(.dark) #top-navbar,
+html:not(.dark) header.admin-header {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-bottom: 1px solid #E2EAE5 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Sidebar */
+html:not(.dark) #sidebar {
+    background-color: #FFFFFF !important;
+    border-right: 1px solid #E2EAE5 !important;
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Table Headers & Rows */
+html:not(.dark) thead {
+    background-color: #EDF3F0 !important;
+    border-bottom: 1px solid #E2EAE5 !important;
+}
+html:not(.dark) thead th {
+    color: #4B5563 !important;
+}
+html:not(.dark) tbody tr {
+    border-color: #E8EFEA !important;
+}
+html:not(.dark) tbody tr:hover {
+    background-color: rgba(16, 185, 129, 0.04) !important;
+}
+
+/* Typography Overrides */
+html:not(.dark) .text-white {
+    color: #0F1F17 !important;
+}
+html:not(.dark) .text-gray-100,
+html:not(.dark) .text-gray-200 {
+    color: #1F2937 !important;
+}
+html:not(.dark) .text-gray-300 {
+    color: #374151 !important;
+}
+html:not(.dark) .text-gray-400 {
+    color: #4B5563 !important;
+}
+html:not(.dark) .text-gray-500 {
+    color: #64748B !important;
+}
+
+/* Input & Dropdown in Light Mode */
+html:not(.dark) .cyber-select,
+html:not(.dark) select:not([multiple]) {
+    background-color: #FFFFFF !important;
+    border-color: #D1DCD6 !important;
+    color: #111827 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+html:not(.dark) .cyber-select:hover,
+html:not(.dark) select:not([multiple]):hover {
+    background-color: #F8FAF9 !important;
+    border-color: rgba(16, 185, 129, 0.5) !important;
+}
+html:not(.dark) .cyber-select:focus,
+html:not(.dark) select:not([multiple]):focus {
+    background-color: #FFFFFF !important;
+    border-color: #10B981 !important;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+}
+html:not(.dark) .cyber-select option,
+html:not(.dark) select:not([multiple]) option {
+    background-color: #FFFFFF !important;
+    color: #111827 !important;
+}
+
+/* Dropdown Menus */
+html:not(.dark) [style*="background:rgba(15,23,19"],
+html:not(.dark) .cyber-dropdown-menu {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border-color: #E2EAE5 !important;
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.12), 0 0 15px rgba(16, 185, 129, 0.08) !important;
+}
+
+/* Theme Switcher Button & Dropdown Styles */
+.theme-switcher-btn {
+    background: #0F1713;
+    border-color: #1A2820;
+    color: #E5E7EB;
+}
+.theme-switcher-btn:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+    background: #142019;
+}
+.theme-switcher-dropdown {
+    background: rgba(15, 23, 19, 0.98);
+    border-color: rgba(16, 185, 129, 0.25);
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.8), 0 0 15px rgba(16, 185, 129, 0.08);
+}
+.theme-option-btn:hover {
+    background: rgba(16, 185, 129, 0.1);
+}
+.theme-option-active {
+    background: rgba(16, 185, 129, 0.14) !important;
+}
+
+html:not(.dark) .theme-switcher-btn {
+    background: #FFFFFF !important;
+    border-color: #E2EAE5 !important;
+    color: #0F1F17 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+html:not(.dark) .theme-switcher-btn:hover {
+    border-color: rgba(16, 185, 129, 0.45) !important;
+    background: #F8FAF9 !important;
+}
+html:not(.dark) .theme-switcher-dropdown {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border-color: #E2EAE5 !important;
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.12), 0 0 15px rgba(16, 185, 129, 0.06) !important;
+}
+html:not(.dark) .theme-switcher-header {
+    color: #64748B !important;
+}
+html:not(.dark) .theme-option-btn {
+    color: #374151 !important;
+}
+html:not(.dark) .theme-option-btn:hover {
+    background: rgba(16, 185, 129, 0.08) !important;
+    color: #059669 !important;
+}
+html:not(.dark) .theme-option-active {
+    background: rgba(16, 185, 129, 0.12) !important;
+    color: #059669 !important;
+}
+
+/* Modals in Light Mode */
+html:not(.dark) #editModal > div,
+html:not(.dark) #textSubmissionModal > div,
+html:not(.dark) #createQuizModal > div,
+html:not(.dark) #editQuizModal > div {
+    background-color: #FFFFFF !important;
+    border-color: #E2EAE5 !important;
+    color: #0F1F17 !important;
+}
+
+/* SweetAlert2 Light Mode */
+html:not(.dark) .swal2-popup {
+    background: #FFFFFF !important;
+    color: #0F1F17 !important;
+    border: 1px solid #E2EAE5 !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+}
+html:not(.dark) .swal2-title,
+html:not(.dark) .swal2-html-container {
+    color: #0F1F17 !important;
+}
