@@ -2,702 +2,746 @@
 @php
     $modalUser = auth()->user();
     $totalDokumen = $modalUser ? $modalUser->soals()->count() : 0;
-    $totalKuis = $modalUser ? $modalUser->quizzes()->count() : 0;
+    $totalKuis    = $modalUser ? $modalUser->quizzes()->count() : 0;
     $totalKategori = $modalUser ? $modalUser->categories()->count() : 0;
 @endphp
 
 @if($modalUser)
-<div id="profile-settings-modal"
-     class="fixed inset-0 z-[110] hidden flex items-center justify-center p-3 sm:p-5"
-     style="z-index: 110;"
+
+{{-- ===== PROFILE MODAL STYLES ===== --}}
+<style>
+/* ---- overlay & wrapper ---- */
+#prf-modal { display:none; }
+#prf-modal.prf-open { display:flex; }
+
+/* ---- card ---- */
+.prf-card {
+    background:#0F1713;
+    border:1px solid #1F3028;
+    border-radius:28px;
+    overflow:hidden;
+    width:100%;
+    max-width:560px;
+    max-height:92vh;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 32px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(16,185,129,.06);
+    position:relative;
+    z-index:1;
+}
+
+/* ---- hero banner ---- */
+.prf-hero {
+    background:linear-gradient(140deg,#071510 0%,#0D1F18 50%,#071510 100%);
+    padding:28px 28px 20px;
+    position:relative;
+    overflow:hidden;
+    border-bottom:1px solid #1F3028;
+    flex-shrink:0;
+}
+.prf-hero::before {
+    content:'';
+    position:absolute;
+    top:-60px; right:-60px;
+    width:220px; height:220px;
+    background:radial-gradient(circle,rgba(16,185,129,.18) 0%,transparent 70%);
+    pointer-events:none;
+}
+.prf-hero::after {
+    content:'';
+    position:absolute;
+    bottom:-40px; left:-30px;
+    width:160px; height:160px;
+    background:radial-gradient(circle,rgba(13,148,136,.12) 0%,transparent 70%);
+    pointer-events:none;
+}
+.prf-hero-top {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    position:relative;
+    z-index:1;
+}
+.prf-avatar-wrap {
+    position:relative;
+    flex-shrink:0;
+}
+.prf-avatar {
+    width:56px; height:56px;
+    border-radius:18px;
+    background:linear-gradient(135deg,#059669,#0D9488);
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; font-weight:900;
+    color:#fff;
+    box-shadow:0 8px 24px rgba(5,150,105,.35);
+    border:2px solid rgba(16,185,129,.3);
+}
+.prf-pulse {
+    position:absolute; bottom:-2px; right:-2px;
+    width:14px; height:14px;
+    border-radius:50%;
+    background:#10B981;
+    border:2.5px solid #0F1713;
+    box-shadow:0 0 0 0 rgba(16,185,129,.5);
+    animation:prf-ping 2s ease infinite;
+}
+@keyframes prf-ping {
+    0%,100%  { box-shadow:0 0 0 0 rgba(16,185,129,.5); }
+    50%       { box-shadow:0 0 0 5px rgba(16,185,129,0); }
+}
+.prf-close-btn {
+    width:36px; height:36px;
+    border-radius:12px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.08);
+    display:flex; align-items:center; justify-content:center;
+    color:#6B7280;
+    cursor:pointer;
+    transition:all .2s;
+    flex-shrink:0;
+}
+.prf-close-btn:hover { background:rgba(244,63,94,.15); border-color:rgba(244,63,94,.35); color:#FB7185; }
+
+.prf-name { font-size:17px; font-weight:800; color:#fff; line-height:1.2; }
+.prf-email { font-size:11px; color:#6B7280; font-family:monospace; margin-top:2px; }
+.prf-role-badge {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:3px 10px; border-radius:50px;
+    font-size:10px; font-weight:700; letter-spacing:.03em;
+    background:rgba(16,185,129,.12);
+    border:1px solid rgba(16,185,129,.25);
+    color:#34D399;
+    margin-top:6px;
+}
+
+/* stats strip */
+.prf-stats {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:16px;
+    position:relative; z-index:1;
+}
+.prf-stat-item {
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:14px;
+    padding:10px 8px;
+    text-align:center;
+}
+.prf-stat-num  { font-size:16px; font-weight:900; line-height:1; }
+.prf-stat-lbl  { font-size:9px; color:#6B7280; margin-top:3px; text-transform:uppercase; letter-spacing:.06em; }
+
+/* ---- tabs ---- */
+.prf-tabs {
+    display:flex;
+    gap:4px;
+    padding:12px 20px 0;
+    border-bottom:1px solid #1F3028;
+    flex-shrink:0;
+    background:#0F1713;
+}
+.prf-tab {
+    padding:9px 16px;
+    font-size:11px; font-weight:700;
+    border-radius:10px 10px 0 0;
+    color:#6B7280;
+    cursor:pointer;
+    transition:all .2s;
+    display:flex; align-items:center; gap:6px;
+    border:none; background:transparent;
+    white-space:nowrap;
+    border-bottom:2px solid transparent;
+    margin-bottom:-1px;
+}
+.prf-tab:hover { color:#D1FAE5; background:rgba(16,185,129,.06); }
+.prf-tab.prf-tab--active  { color:#34D399; border-bottom-color:#10B981; background:rgba(16,185,129,.08); }
+.prf-tab.prf-tab--danger  { }
+.prf-tab.prf-tab--danger:hover { color:#FB7185; background:rgba(244,63,94,.06); }
+.prf-tab.prf-tab--danger.prf-tab--active { color:#FB7185; border-bottom-color:#F43F5E; background:rgba(244,63,94,.08); }
+
+/* ---- body ---- */
+.prf-body { padding:24px; overflow-y:auto; flex:1; }
+.prf-panel { display:none; }
+.prf-panel.prf-panel--active { display:block; }
+
+/* ---- field group ---- */
+.prf-field + .prf-field { margin-top:16px; }
+.prf-label {
+    display:block; font-size:10px; font-weight:800;
+    text-transform:uppercase; letter-spacing:.08em;
+    color:#6B7280; margin-bottom:7px;
+}
+.prf-input-wrap { position:relative; }
+.prf-input-icon {
+    position:absolute; left:13px; top:50%; transform:translateY(-50%);
+    color:#374151; pointer-events:none;
+    display:flex; align-items:center;
+}
+.prf-input {
+    width:100%;
+    background:#060C09;
+    border:1px solid #1F3028;
+    border-radius:14px;
+    padding:11px 14px 11px 42px;
+    font-size:13px; color:#E5E7EB;
+    outline:none;
+    transition:border-color .2s, box-shadow .2s;
+    font-family:inherit;
+}
+.prf-input::placeholder { color:#374151; }
+.prf-input:focus {
+    border-color:#10B981;
+    box-shadow:0 0 0 3px rgba(16,185,129,.12);
+}
+.prf-input--danger:focus {
+    border-color:#F43F5E;
+    box-shadow:0 0 0 3px rgba(244,63,94,.12);
+}
+.prf-eye-btn {
+    position:absolute; right:13px; top:50%; transform:translateY(-50%);
+    color:#374151; cursor:pointer; background:none; border:none; padding:2px;
+    display:flex; align-items:center;
+    transition:color .2s;
+}
+.prf-eye-btn:hover { color:#9CA3AF; }
+
+/* info card */
+.prf-info-row {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:16px;
+}
+.prf-info-card {
+    background:#060C09;
+    border:1px solid #1F3028;
+    border-radius:14px;
+    padding:12px 14px;
+    display:flex; align-items:center; gap:10px;
+}
+.prf-info-icon {
+    width:32px; height:32px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+}
+.prf-info-sub  { font-size:9px; color:#4B5563; text-transform:uppercase; letter-spacing:.07em; font-weight:700; }
+.prf-info-val  { font-size:12px; font-weight:700; color:#D1FAE5; margin-top:1px; }
+.prf-info-val--success { color:#34D399; }
+
+/* strength bar */
+.prf-strength-wrap { margin-top:8px; }
+.prf-strength-bar-bg {
+    height:4px; border-radius:4px;
+    background:rgba(255,255,255,.07);
+    overflow:hidden;
+}
+.prf-strength-bar {
+    height:100%; border-radius:4px;
+    transition:width .3s, background-color .3s;
+}
+.prf-strength-label {
+    font-size:10px; font-weight:700; margin-top:4px;
+}
+
+/* danger box */
+.prf-danger-box {
+    background:rgba(244,63,94,.08);
+    border:1px solid rgba(244,63,94,.2);
+    border-radius:16px;
+    padding:16px;
+    display:flex; gap:12px; align-items:flex-start;
+    margin-bottom:20px;
+}
+.prf-danger-icon {
+    width:36px; height:36px; flex-shrink:0;
+    border-radius:12px;
+    background:rgba(244,63,94,.15);
+    display:flex; align-items:center; justify-content:center;
+    color:#FB7185;
+}
+.prf-danger-title { font-size:12px; font-weight:800; color:#FB7185; }
+.prf-danger-text  { font-size:11px; color:#9CA3AF; margin-top:3px; line-height:1.6; }
+
+/* safeguard */
+.prf-check-wrap {
+    display:flex; align-items:flex-start; gap:10px;
+    padding:14px; border-radius:14px;
+    border:1px solid rgba(244,63,94,.18);
+    background:rgba(244,63,94,.05);
+    cursor:pointer;
+    margin-top:16px;
+}
+.prf-check-wrap input { margin-top:1px; accent-color:#F43F5E; }
+.prf-check-label { font-size:11px; color:#9CA3AF; line-height:1.6; }
+
+/* ---- footer / actions ---- */
+.prf-actions {
+    display:flex; align-items:center; justify-content:flex-end; gap:10px;
+    margin-top:24px; padding-top:20px;
+    border-top:1px solid #1F3028;
+}
+.prf-btn-cancel {
+    padding:9px 18px; border-radius:12px;
+    font-size:12px; font-weight:600; color:#6B7280;
+    background:transparent; border:none; cursor:pointer;
+    transition:color .2s;
+}
+.prf-btn-cancel:hover { color:#D1D5DB; }
+.prf-btn-primary {
+    padding:10px 22px; border-radius:14px;
+    font-size:12px; font-weight:800; color:#fff;
+    background:linear-gradient(135deg,#059669,#0D9488);
+    border:none; cursor:pointer;
+    display:flex; align-items:center; gap:7px;
+    box-shadow:0 6px 20px rgba(5,150,105,.35);
+    transition:all .2s;
+}
+.prf-btn-primary:hover {
+    transform:translateY(-1px);
+    box-shadow:0 10px 28px rgba(5,150,105,.45);
+}
+.prf-btn-primary:active { transform:scale(.97); }
+.prf-btn-delete {
+    padding:10px 22px; border-radius:14px;
+    font-size:12px; font-weight:800; color:#fff;
+    background:linear-gradient(135deg,#DC2626,#9F1239);
+    border:none; cursor:pointer;
+    display:flex; align-items:center; gap:7px;
+    box-shadow:0 6px 20px rgba(220,38,38,.3);
+    transition:all .2s;
+    opacity:.45; pointer-events:none;
+}
+.prf-btn-delete.prf-delete-ready {
+    opacity:1; pointer-events:all;
+}
+.prf-btn-delete.prf-delete-ready:hover {
+    transform:translateY(-1px);
+    box-shadow:0 10px 28px rgba(220,38,38,.4);
+}
+
+/* ---- flash banner ---- */
+.prf-flash {
+    margin:0 24px; margin-top:14px;
+    padding:12px 16px; border-radius:14px;
+    display:flex; align-items:center; gap:10px;
+    font-size:12px; font-weight:600;
+    flex-shrink:0;
+}
+.prf-flash--success {
+    background:rgba(16,185,129,.1);
+    border:1px solid rgba(16,185,129,.25);
+    color:#34D399;
+}
+.prf-flash--info {
+    background:rgba(13,148,136,.1);
+    border:1px solid rgba(13,148,136,.25);
+    color:#2DD4BF;
+}
+
+/* ---- Esc hint ---- */
+.prf-hint {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:11px 24px;
+    border-top:1px solid #1A2820;
+    font-size:11px; color:#374151;
+    flex-shrink:0;
+    background:#0A1210;
+}
+.prf-hint kbd {
+    display:inline-block;
+    padding:2px 7px; border-radius:6px;
+    background:#111F18; border:1px solid #2D4039;
+    color:#6B7280; font-family:monospace; font-size:10px;
+}
+
+/* ---- Light Mode ---- */
+html:not(.dark) .prf-card           { background:#FFFFFF; border-color:#E2EAE5; box-shadow:0 24px 64px rgba(0,0,0,.13); }
+html:not(.dark) .prf-hero           { background:linear-gradient(140deg,#F0FDF4,#F8FAF9,#F0FDF4); border-color:#E2EAE5; }
+html:not(.dark) .prf-hero::before   { background:radial-gradient(circle,rgba(16,185,129,.12) 0%,transparent 70%); }
+html:not(.dark) .prf-hero::after    { background:radial-gradient(circle,rgba(13,148,136,.08) 0%,transparent 70%); }
+html:not(.dark) .prf-avatar         { box-shadow:0 8px 24px rgba(5,150,105,.25); }
+html:not(.dark) .prf-pulse          { border-color:#FFFFFF; }
+html:not(.dark) .prf-close-btn      { background:rgba(0,0,0,.04); border-color:#E2EAE5; color:#94A3B8; }
+html:not(.dark) .prf-close-btn:hover { background:#FEE2E2; border-color:#FCA5A5; color:#EF4444; }
+html:not(.dark) .prf-name           { color:#0F1F17; }
+html:not(.dark) .prf-email          { color:#94A3B8; }
+html:not(.dark) .prf-role-badge     { background:rgba(16,185,129,.1); border-color:rgba(16,185,129,.25); color:#059669; }
+html:not(.dark) .prf-stat-item      { background:#FFFFFF; border-color:#E2EAE5; }
+html:not(.dark) .prf-stat-lbl       { color:#94A3B8; }
+html:not(.dark) .prf-tabs           { background:#FFFFFF; border-color:#E2EAE5; }
+html:not(.dark) .prf-tab            { color:#94A3B8; }
+html:not(.dark) .prf-tab:hover      { color:#059669; background:rgba(16,185,129,.06); }
+html:not(.dark) .prf-tab.prf-tab--active { color:#059669; border-bottom-color:#059669; background:rgba(16,185,129,.08); }
+html:not(.dark) .prf-tab.prf-tab--danger:hover { color:#DC2626; background:rgba(220,38,38,.05); }
+html:not(.dark) .prf-tab.prf-tab--danger.prf-tab--active { color:#DC2626; border-bottom-color:#DC2626; background:rgba(220,38,38,.06); }
+html:not(.dark) .prf-body           { background:#FFFFFF; }
+html:not(.dark) .prf-label          { color:#64748B; }
+html:not(.dark) .prf-input          { background:#FFFFFF; border-color:#CBD5E1; color:#0F1F17; }
+html:not(.dark) .prf-input::placeholder { color:#CBD5E1; }
+html:not(.dark) .prf-input:focus    { border-color:#10B981; box-shadow:0 0 0 3px rgba(16,185,129,.1); }
+html:not(.dark) .prf-input-icon     { color:#CBD5E1; }
+html:not(.dark) .prf-eye-btn        { color:#CBD5E1; }
+html:not(.dark) .prf-eye-btn:hover  { color:#94A3B8; }
+html:not(.dark) .prf-info-card      { background:#F8FAF9; border-color:#E2EAE5; }
+html:not(.dark) .prf-info-sub       { color:#94A3B8; }
+html:not(.dark) .prf-info-val       { color:#0F1F17; }
+html:not(.dark) .prf-info-val--success { color:#059669; }
+html:not(.dark) .prf-actions        { border-color:#E2EAE5; }
+html:not(.dark) .prf-btn-cancel:hover { color:#374151; }
+html:not(.dark) .prf-flash--success { background:rgba(16,185,129,.08); border-color:rgba(16,185,129,.2); color:#059669; }
+html:not(.dark) .prf-flash--info    { background:rgba(13,148,136,.08); border-color:rgba(13,148,136,.2); color:#0D9488; }
+html:not(.dark) .prf-hint           { background:#F8FAF9; border-color:#E2EAE5; color:#94A3B8; }
+html:not(.dark) .prf-hint kbd       { background:#FFFFFF; border-color:#E2EAE5; color:#94A3B8; }
+html:not(.dark) .prf-strength-bar-bg { background:rgba(0,0,0,.07); }
+html:not(.dark) .prf-danger-box     { background:rgba(220,38,38,.06); border-color:rgba(220,38,38,.18); }
+html:not(.dark) .prf-danger-text    { color:#64748B; }
+html:not(.dark) .prf-check-wrap     { border-color:rgba(220,38,38,.2); background:rgba(220,38,38,.04); }
+html:not(.dark) .prf-check-label    { color:#64748B; }
+</style>
+
+{{-- ===== MODAL DOM ===== --}}
+<div id="prf-modal"
+     class="fixed inset-0 prf-open:flex items-center justify-center p-4"
+     style="display:none; z-index:110;"
      x-data="{
-         tab: 'profile',
-         open: false,
-         showCurrentPassword: false,
-         showNewPassword: false,
-         showConfirmPassword: false,
-         showDeletePassword: false,
-         confirmDeleteChecked: false,
-         copiedEmail: false,
-         newPasswordInput: '',
+        tab: 'profile',
+        showCurrent: false,
+        showNew: false,
+        showConfirm: false,
+        showDel: false,
+        newPwd: '',
+        copied: false,
+        delChecked: false,
 
-         get passwordStrength() {
-             const p = this.newPasswordInput || '';
-             if (!p) return { score: 0, label: 'Belum diisi', color: 'bg-gray-600', textCol: 'text-gray-400', pct: 0 };
-             let score = 0;
-             if (p.length >= 8) score++;
-             if (/[A-Z]/.test(p) && /[a-z]/.test(p)) score++;
-             if (/[0-9]/.test(p)) score++;
-             if (/[^A-Za-z0-9]/.test(p)) score++;
+        get strength() {
+            const p = this.newPwd;
+            if (!p) return { pct: 0, label: 'Belum diisi', color: '#374151' };
+            let s = 0;
+            if (p.length >= 8) s++;
+            if (/[A-Z]/.test(p) && /[a-z]/.test(p)) s++;
+            if (/\d/.test(p)) s++;
+            if (/[^A-Za-z0-9]/.test(p)) s++;
+            if (s <= 1) return { pct: 25,  label: 'Lemah',       color: '#EF4444' };
+            if (s === 2) return { pct: 50,  label: 'Cukup',       color: '#F59E0B' };
+            if (s === 3) return { pct: 75,  label: 'Kuat',        color: '#14B8A6' };
+            return          { pct: 100, label: 'Sangat Kuat', color: '#10B981' };
+        },
 
-             if (score <= 1) return { score: 1, label: 'Lemah', color: 'bg-rose-500', textCol: 'text-rose-400', pct: 25 };
-             if (score === 2) return { score: 2, label: 'Cukup', color: 'bg-amber-500', textCol: 'text-amber-400', pct: 50 };
-             if (score === 3) return { score: 3, label: 'Kuat', color: 'bg-teal-500', textCol: 'text-teal-400', pct: 75 };
-             return { score: 4, label: 'Sangat Kuat', color: 'bg-emerald-500', textCol: 'text-emerald-400', pct: 100 };
-         },
+        copyEmail() {
+            navigator.clipboard.writeText('{{ addslashes($modalUser->email) }}');
+            this.copied = true;
+            setTimeout(() => this.copied = false, 2000);
+        },
 
-         copyEmail() {
-             navigator.clipboard.writeText('{{ $modalUser->email }}');
-             this.copiedEmail = true;
-             setTimeout(() => { this.copiedEmail = false; }, 2200);
-         },
+        open(t = 'profile') {
+            this.tab = t;
+            const el = document.getElementById('prf-modal');
+            el.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        },
+        close() {
+            document.getElementById('prf-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        },
+        init() {
+            window.openProfileModal  = (t) => this.open(t);
+            window.closeProfileModal = ()  => this.close();
 
-         init() {
-             window.openProfileModal = (targetTab = 'profile') => {
-                 this.tab = targetTab;
-                 document.getElementById('profile-settings-modal').classList.remove('hidden');
-                 document.body.style.overflow = 'hidden';
-                 this.open = true;
-             };
-             window.closeProfileModal = () => {
-                 document.getElementById('profile-settings-modal').classList.add('hidden');
-                 document.body.style.overflow = '';
-                 this.open = false;
-             };
-
-             @if($errors->updatePassword->isNotEmpty() || session('status') === 'password-updated')
-                 this.$nextTick(() => window.openProfileModal('security'));
-             @elseif($errors->userDeletion->isNotEmpty())
-                 this.$nextTick(() => window.openProfileModal('danger'));
-             @elseif($errors->any() && ($errors->has('name') || $errors->has('email')) || session('status') === 'profile-updated')
-                 this.$nextTick(() => window.openProfileModal('profile'));
-             @endif
-         }
+            @if($errors->updatePassword->isNotEmpty() || session('status') === 'password-updated')
+                this.$nextTick(() => this.open('security'));
+            @elseif($errors->userDeletion->isNotEmpty())
+                this.$nextTick(() => this.open('danger'));
+            @elseif($errors->any() && ($errors->has('name') || $errors->has('email')) || session('status') === 'profile-updated')
+                this.$nextTick(() => this.open('profile'));
+            @endif
+        }
      }"
-     @keydown.escape.window="window.closeProfileModal()">
+     @keydown.escape.window="close()">
 
-    {{-- Backdrop with high-class blur --}}
-    <div class="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300"
-         onclick="window.closeProfileModal()"></div>
+    {{-- Backdrop --}}
+    <div class="fixed inset-0 bg-black/75 backdrop-blur-sm" @click="close()"></div>
 
-    {{-- Main Modal Window (2-Column Desktop Architecture) --}}
-    <div class="profile-modal-card relative rounded-3xl w-full max-w-4xl h-auto max-h-[92vh] md:h-[620px] flex flex-col md:flex-row shadow-2xl z-10 overflow-hidden border">
+    {{-- ===== CARD ===== --}}
+    <div class="prf-card">
 
-        {{-- Mobile Top Bar with Close Button (Visible on small screens only) --}}
-        <div class="md:hidden flex items-center justify-between p-4 border-b profile-card-border profile-modal-mobile-header">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 p-0.5 flex items-center justify-center text-white text-xs font-bold">
-                    {{ strtoupper(substr($modalUser->name, 0, 2)) }}
+        {{-- ── HERO HEADER ── --}}
+        <div class="prf-hero">
+            <div class="prf-hero-top">
+                {{-- Avatar --}}
+                <div class="prf-avatar-wrap">
+                    <div class="prf-avatar">{{ strtoupper(substr($modalUser->name, 0, 2)) }}</div>
+                    <span class="prf-pulse"></span>
                 </div>
-                <div>
-                    <h3 class="text-sm font-bold profile-text-main leading-tight">{{ $modalUser->name }}</h3>
-                    <p class="text-[10px] text-gray-400">Pengaturan Akun</p>
+
+                {{-- Identity info --}}
+                <div style="flex:1; min-width:0;">
+                    <div class="prf-name truncate">{{ $modalUser->name }}</div>
+                    <div class="prf-email truncate">{{ $modalUser->email }}</div>
+                    <div class="prf-role-badge">
+                        <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        {{ $modalUser->isSuperAdmin() ? 'Super Administrator' : 'Admin Asisten / Dosen' }}
+                    </div>
+                </div>
+
+                {{-- Copy email + Close --}}
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0;">
+                    <button type="button" class="prf-close-btn" @click="close()" title="Tutup (Esc)">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                    <button type="button" @click="copyEmail()"
+                            style="font-size:10px; color:#34D399; display:flex; align-items:center; gap:4px; background:none; border:none; cursor:pointer; padding:0;"
+                            x-text="copied ? '✓ Tersalin!' : '⎘ Salin Email'"></button>
                 </div>
             </div>
-            <button type="button"
-                    onclick="window.closeProfileModal()"
-                    class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-white bg-gray-800/50">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+
+            {{-- Stats strip --}}
+            <div class="prf-stats" style="margin-top:16px;">
+                <div class="prf-stat-item">
+                    <div class="prf-stat-num" style="color:#34D399;">{{ $totalDokumen }}</div>
+                    <div class="prf-stat-lbl">Dokumen</div>
+                </div>
+                <div class="prf-stat-item">
+                    <div class="prf-stat-num" style="color:#2DD4BF;">{{ $totalKuis }}</div>
+                    <div class="prf-stat-lbl">Kuis CBT</div>
+                </div>
+                <div class="prf-stat-item">
+                    <div class="prf-stat-num" style="color:#38BDF8;">{{ $totalKategori }}</div>
+                    <div class="prf-stat-lbl">Kategori</div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ── FLASH ALERTS ── --}}
+        @if(session('status') === 'profile-updated' || session('success'))
+            <div class="prf-flash prf-flash--success">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                {{ session('success') ?: 'Biodata Anda berhasil diperbarui.' }}
+            </div>
+        @elseif(session('status') === 'password-updated')
+            <div class="prf-flash prf-flash--info">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                Kata sandi Anda berhasil diperbarui.
+            </div>
+        @endif
+
+        {{-- ── TABS ── --}}
+        <div class="prf-tabs">
+            <button type="button" class="prf-tab" :class="tab==='profile' ? 'prf-tab--active' : ''" @click="tab='profile'">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Biodata Diri
+            </button>
+            <button type="button" class="prf-tab" :class="tab==='security' ? 'prf-tab--active' : ''" @click="tab='security'">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                Kata Sandi
+            </button>
+            <button type="button" class="prf-tab prf-tab--danger" :class="tab==='danger' ? 'prf-tab--active' : ''" @click="tab='danger'">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                Zona Bahaya
             </button>
         </div>
 
-        {{-- ─── LEFT COLUMN: Profile Identity & Navigation Sidebar (md:w-80) ─── --}}
-        <aside class="profile-modal-sidebar w-full md:w-80 md:flex-shrink-0 flex flex-col border-b md:border-b-0 md:border-r profile-card-border p-5 relative overflow-hidden">
-            
-            {{-- Cyber Background Ambient Glow --}}
-            <div class="absolute -top-12 -left-12 w-44 h-44 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        {{-- ── BODY ── --}}
+        <div class="prf-body">
 
-            {{-- User Identity Block --}}
-            <div class="relative z-10 flex flex-col items-center text-center pb-5 border-b profile-card-border">
-                {{-- Big Hexagon-styled Avatar with Glow --}}
-                <div class="relative mb-3 group">
-                    <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-emerald-600 p-1 shadow-xl shadow-emerald-500/20 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                        <div class="profile-avatar-inner w-full h-full rounded-[20px] flex items-center justify-center">
-                            <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200">
-                                {{ strtoupper(substr($modalUser->name, 0, 2)) }}
-                            </span>
+            {{-- Panel 1: Biodata --}}
+            <div class="prf-panel" :class="tab==='profile' ? 'prf-panel--active' : ''">
+                <form method="post" action="{{ route('profile.update') }}">
+                    @csrf
+                    @method('patch')
+
+                    <div class="prf-field">
+                        <label class="prf-label" for="pm_name">Nama Lengkap <span style="color:#F43F5E;">*</span></label>
+                        <div class="prf-input-wrap">
+                            <span class="prf-input-icon"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></span>
+                            <input id="pm_name" name="name" type="text" class="prf-input"
+                                   value="{{ old('name', $modalUser->name) }}"
+                                   placeholder="Nama lengkap Anda"
+                                   required autofocus autocomplete="name">
                         </div>
+                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
                     </div>
-                    {{-- Active Status Dot Indicator --}}
-                    <span class="absolute bottom-0 right-0 flex h-4 w-4">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-[#0F1713] shadow-md shadow-emerald-500/40"></span>
-                    </span>
-                </div>
 
-                {{-- Name & Role --}}
-                <h3 class="profile-title text-base font-bold leading-tight truncate w-full px-2" title="{{ $modalUser->name }}">
-                    {{ $modalUser->name }}
-                </h3>
-                
-                {{-- Email & Copy Button --}}
-                <div class="flex items-center justify-center gap-1.5 mt-1.5 max-w-full">
-                    <span class="text-xs text-gray-400 font-mono truncate max-w-[180px]">{{ $modalUser->email }}</span>
-                    <button type="button"
-                            @click="copyEmail()"
-                            class="text-emerald-400 hover:text-emerald-300 p-1 rounded-md transition-colors cursor-pointer"
-                            title="Salin Alamat Email">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    </button>
-                    <span x-show="copiedEmail" x-cloak class="text-[10px] text-emerald-400 font-semibold animate-fade-in">Tersalin!</span>
-                </div>
-
-                {{-- Role Badge --}}
-                <div class="mt-2.5">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border {{ $modalUser->isSuperAdmin() ? 'bg-purple-500/15 text-purple-300 border-purple-500/30' : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' }}">
-                        <span>{{ $modalUser->isSuperAdmin() ? '⚡' : '🛡️' }}</span>
-                        <span>{{ $modalUser->isSuperAdmin() ? 'Super Administrator' : 'Admin Asisten / Dosen' }}</span>
-                    </span>
-                </div>
-            </div>
-
-            {{-- Vertical Navigation Tabs --}}
-            <nav class="relative z-10 py-4 space-y-1.5 flex-1">
-                {{-- Tab: Biodata --}}
-                <button type="button"
-                        @click="tab = 'profile'"
-                        class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer group"
-                        :class="tab === 'profile' ? 'profile-nav-active shadow-md' : 'profile-nav-inactive hover:bg-white/5'">
-                    <div class="flex items-center gap-3">
-                        <div class="w-7 h-7 rounded-xl flex items-center justify-center transition-colors"
-                             :class="tab === 'profile' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'bg-emerald-500/15 text-emerald-400 group-hover:bg-emerald-500/25'">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <div class="prf-field">
+                        <label class="prf-label" for="pm_email">Alamat Email <span style="color:#F43F5E;">*</span></label>
+                        <div class="prf-input-wrap">
+                            <span class="prf-input-icon"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>
+                            <input id="pm_email" name="email" type="email" class="prf-input"
+                                   value="{{ old('email', $modalUser->email) }}"
+                                   placeholder="admin@domain.ac.id"
+                                   required autocomplete="username">
                         </div>
-                        <div class="text-left">
-                            <span class="block font-bold">Biodata Diri</span>
-                            <span class="block text-[10px] opacity-70">Identitas & email</span>
-                        </div>
+                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
-                    <svg class="w-3.5 h-3.5 transition-transform" :class="tab === 'profile' ? 'translate-x-0.5 text-emerald-400' : 'opacity-30'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                </button>
 
-                {{-- Tab: Security --}}
-                <button type="button"
-                        @click="tab = 'security'"
-                        class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer group"
-                        :class="tab === 'security' ? 'profile-nav-active shadow-md' : 'profile-nav-inactive hover:bg-white/5'">
-                    <div class="flex items-center gap-3">
-                        <div class="w-7 h-7 rounded-xl flex items-center justify-center transition-colors"
-                             :class="tab === 'security' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30' : 'bg-teal-500/15 text-teal-400 group-hover:bg-teal-500/25'">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                        </div>
-                        <div class="text-left">
-                            <span class="block font-bold">Kata Sandi</span>
-                            <span class="block text-[10px] opacity-70">Keamanan kredensial</span>
-                        </div>
-                    </div>
-                    <svg class="w-3.5 h-3.5 transition-transform" :class="tab === 'security' ? 'translate-x-0.5 text-emerald-400' : 'opacity-30'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                </button>
-
-                {{-- Tab: Danger --}}
-                <button type="button"
-                        @click="tab = 'danger'"
-                        class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer group"
-                        :class="tab === 'danger' ? 'profile-nav-danger-active shadow-md' : 'profile-nav-inactive hover:bg-rose-500/10 hover:text-rose-400'">
-                    <div class="flex items-center gap-3">
-                        <div class="w-7 h-7 rounded-xl flex items-center justify-center transition-colors"
-                             :class="tab === 'danger' ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30' : 'bg-rose-500/15 text-rose-400 group-hover:bg-rose-500/25'">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                        </div>
-                        <div class="text-left">
-                            <span class="block font-bold">Zona Bahaya</span>
-                            <span class="block text-[10px] opacity-70">Penghapusan akun</span>
-                        </div>
-                    </div>
-                    <svg class="w-3.5 h-3.5 transition-transform" :class="tab === 'danger' ? 'translate-x-0.5 text-rose-400' : 'opacity-30'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                </button>
-            </nav>
-
-            {{-- Quick Stats Box at Sidebar Bottom --}}
-            <div class="relative z-10 pt-4 border-t profile-card-border">
-                <div class="grid grid-cols-3 gap-1.5 text-center">
-                    <div class="p-2 rounded-xl border profile-stat-box">
-                        <div class="text-xs font-black text-emerald-400">{{ $totalDokumen }}</div>
-                        <div class="text-[9px] text-gray-400 leading-tight">Soal</div>
-                    </div>
-                    <div class="p-2 rounded-xl border profile-stat-box">
-                        <div class="text-xs font-black text-teal-400">{{ $totalKuis }}</div>
-                        <div class="text-[9px] text-gray-400 leading-tight">Kuis</div>
-                    </div>
-                    <div class="p-2 rounded-xl border profile-stat-box">
-                        <div class="text-xs font-black text-sky-400">{{ $totalKategori }}</div>
-                        <div class="text-[9px] text-gray-400 leading-tight">Kategori</div>
-                    </div>
-                </div>
-            </div>
-
-        </aside>
-
-        {{-- ─── RIGHT COLUMN: Content Panel & Forms (flex-1) ─── --}}
-        <main class="profile-modal-main flex-1 flex flex-col min-w-0 overflow-hidden">
-
-            {{-- Desktop Top Bar with Section Info & Close Button --}}
-            <div class="hidden md:flex items-center justify-between px-7 py-5 border-b profile-card-border flex-shrink-0">
-                <div>
-                    <h4 class="text-base font-bold profile-text-main flex items-center gap-2">
-                        <span x-show="tab === 'profile'">Pengaturan Biodata Diri</span>
-                        <span x-show="tab === 'security'">Pengaturan Kata Sandi & Keamanan</span>
-                        <span x-show="tab === 'danger'" class="text-rose-400">Peringatan: Zona Bahaya</span>
-                    </h4>
-                    <p class="text-xs text-gray-400 mt-0.5">
-                        <span x-show="tab === 'profile'">Perbarui nama lengkap dan email resmi akun administrator Anda.</span>
-                        <span x-show="tab === 'security'">Gunakan kata sandi yang kuat dan unik untuk melindungi akses admin.</span>
-                        <span x-show="tab === 'danger'">Tindakan destruktif permanen pada data dan akun administrator.</span>
-                    </p>
-                </div>
-
-                {{-- Close Button --}}
-                <button type="button"
-                        onclick="window.closeProfileModal()"
-                        class="profile-modal-close-btn w-9 h-9 rounded-2xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0"
-                        title="Tutup (Esc)">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
-
-            {{-- Flash Alert Inside Modal (If profile/password updated) --}}
-            @if(session('status') === 'profile-updated' || session('success'))
-                <div class="mx-7 mt-4 p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-3 text-xs text-emerald-300 animate-fade-in flex-shrink-0">
-                    <div class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                    <span class="font-medium">{{ session('success') ?: 'Perubahan data profil Anda telah berhasil disimpan.' }}</span>
-                </div>
-            @elseif(session('status') === 'password-updated')
-                <div class="mx-7 mt-4 p-3.5 rounded-2xl bg-teal-500/10 border border-teal-500/30 flex items-center gap-3 text-xs text-teal-300 animate-fade-in flex-shrink-0">
-                    <div class="w-6 h-6 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    </div>
-                    <span class="font-medium">Kata sandi Anda berhasil diperbarui. Silakan gunakan password baru pada login berikutnya.</span>
-                </div>
-            @endif
-
-            {{-- Scrollable Form Container --}}
-            <div class="p-6 md:p-7 overflow-y-auto flex-1 space-y-6">
-
-                {{-- ─── TAB 1: BIODATA DIRI ─── --}}
-                <div x-show="tab === 'profile'" x-cloak class="space-y-6">
-                    <form method="post" action="{{ route('profile.update') }}" class="space-y-5">
-                        @csrf
-                        @method('patch')
-
-                        <div class="space-y-4">
-                            {{-- Field 1: Nama Lengkap --}}
+                    {{-- Info row --}}
+                    <div class="prf-info-row">
+                        <div class="prf-info-card">
+                            <div class="prf-info-icon" style="background:rgba(16,185,129,.12); color:#34D399;">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            </div>
                             <div>
-                                <label for="profile_modal_name" class="profile-input-label block text-xs font-bold uppercase tracking-wider mb-2">
-                                    Nama Lengkap <span class="text-rose-500">*</span>
-                                </label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                    </div>
-                                    <input id="profile_modal_name"
-                                           name="name"
-                                           type="text"
-                                           class="profile-text-input block w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-2xl border focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium"
-                                           value="{{ old('name', $modalUser->name) }}"
-                                           required
-                                           autofocus
-                                           autocomplete="name"
-                                           placeholder="Nama lengkap admin" />
-                                </div>
-                                <x-input-error class="mt-1.5" :messages="$errors->get('name')" />
+                                <div class="prf-info-sub">Unit</div>
+                                <div class="prf-info-val">IC-Labs Repository</div>
                             </div>
-
-                            {{-- Field 2: Alamat Email --}}
+                        </div>
+                        <div class="prf-info-card">
+                            <div class="prf-info-icon" style="background:rgba(16,185,129,.12); color:#34D399;">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
                             <div>
-                                <label for="profile_modal_email" class="profile-input-label block text-xs font-bold uppercase tracking-wider mb-2">
-                                    Alamat Email Resmi <span class="text-rose-500">*</span>
-                                </label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-teal-400">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                                    </div>
-                                    <input id="profile_modal_email"
-                                           name="email"
-                                           type="email"
-                                           class="profile-text-input block w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-2xl border focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium"
-                                           value="{{ old('email', $modalUser->email) }}"
-                                           required
-                                           autocomplete="username"
-                                           placeholder="admin@ic-labs.ac.id" />
-                                </div>
-                                <x-input-error class="mt-1.5" :messages="$errors->get('email')" />
+                                <div class="prf-info-sub">Status</div>
+                                <div class="prf-info-val prf-info-val--success">Aktif ✓</div>
                             </div>
                         </div>
+                    </div>
 
-                        {{-- Info Cards: Unit & Verification --}}
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                            <div class="p-3.5 rounded-2xl border profile-info-card flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center flex-shrink-0">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                </div>
-                                <div class="min-w-0">
-                                    <div class="text-[10px] text-gray-400 uppercase font-semibold">Unit Laboratorium</div>
-                                    <div class="text-xs font-bold profile-text-main truncate">IC-Labs Repository</div>
-                                </div>
-                            </div>
-
-                            <div class="p-3.5 rounded-2xl border profile-info-card flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center flex-shrink-0">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                                </div>
-                                <div class="min-w-0">
-                                    <div class="text-[10px] text-gray-400 uppercase font-semibold">Status Akun</div>
-                                    <div class="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                                        <span>Aktif & Terverifikasi</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Form Footer Actions --}}
-                        <div class="pt-4 border-t profile-card-border flex items-center justify-end gap-3">
-                            <button type="button"
-                                    onclick="window.closeProfileModal()"
-                                    class="px-4 py-2.5 rounded-2xl text-xs font-semibold text-gray-400 hover:text-gray-200 transition-colors cursor-pointer">
-                                Batal
-                            </button>
-                            <button type="submit"
-                                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition-all shadow-lg shadow-emerald-600/25 hover:shadow-emerald-500/35 cursor-pointer active:scale-95">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                <span>Simpan Biodata</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                {{-- ─── TAB 2: KATA SANDI & KEAMANAN ─── --}}
-                <div x-show="tab === 'security'" x-cloak class="space-y-6">
-                    <form method="post" action="{{ route('password.update') }}" class="space-y-5">
-                        @csrf
-                        @method('put')
-
-                        {{-- Current Password --}}
-                        <div>
-                            <label for="profile_modal_current_password" class="profile-input-label block text-xs font-bold uppercase tracking-wider mb-2">
-                                Kata Sandi Saat Ini <span class="text-rose-500">*</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                </div>
-                                <input id="profile_modal_current_password"
-                                       name="current_password"
-                                       :type="showCurrentPassword ? 'text' : 'password'"
-                                       class="profile-text-input block w-full pl-10 pr-11 py-2.5 text-xs sm:text-sm rounded-2xl border focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono"
-                                       autocomplete="current-password"
-                                       placeholder="Ketik kata sandi saat ini" />
-                                <button type="button"
-                                        @click="showCurrentPassword = !showCurrentPassword"
-                                        class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-200 cursor-pointer focus:outline-none"
-                                        tabindex="-1">
-                                    <svg x-show="!showCurrentPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    <svg x-show="showCurrentPassword" x-cloak class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
-                                </button>
-                            </div>
-                            <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-1.5" />
-                        </div>
-
-                        {{-- New Password with Live Strength Bar --}}
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <label for="profile_modal_password" class="profile-input-label block text-xs font-bold uppercase tracking-wider">
-                                    Kata Sandi Baru <span class="text-rose-500">*</span>
-                                </label>
-                                <span class="text-[11px] font-bold" :class="passwordStrength.textCol" x-text="'Tingkat: ' + passwordStrength.label"></span>
-                            </div>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-                                </div>
-                                <input id="profile_modal_password"
-                                       name="password"
-                                       x-model="newPasswordInput"
-                                       :type="showNewPassword ? 'text' : 'password'"
-                                       class="profile-text-input block w-full pl-10 pr-11 py-2.5 text-xs sm:text-sm rounded-2xl border focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono"
-                                       autocomplete="new-password"
-                                       placeholder="Minimal 8 karakter kombinasi" />
-                                <button type="button"
-                                        @click="showNewPassword = !showNewPassword"
-                                        class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-200 cursor-pointer focus:outline-none"
-                                        tabindex="-1">
-                                    <svg x-show="!showNewPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    <svg x-show="showNewPassword" x-cloak class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
-                                </button>
-                            </div>
-
-                            {{-- Visual Strength Bar --}}
-                            <div class="w-full bg-gray-800/40 rounded-full h-1.5 mt-2.5 overflow-hidden">
-                                <div class="h-full transition-all duration-300 rounded-full"
-                                     :class="passwordStrength.color"
-                                     :style="'width: ' + passwordStrength.pct + '%'"></div>
-                            </div>
-                            <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-1.5" />
-                        </div>
-
-                        {{-- Confirm New Password --}}
-                        <div>
-                            <label for="profile_modal_password_confirmation" class="profile-input-label block text-xs font-bold uppercase tracking-wider mb-2">
-                                Konfirmasi Kata Sandi Baru <span class="text-rose-500">*</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                                </div>
-                                <input id="profile_modal_password_confirmation"
-                                       name="password_confirmation"
-                                       :type="showConfirmPassword ? 'text' : 'password'"
-                                       class="profile-text-input block w-full pl-10 pr-11 py-2.5 text-xs sm:text-sm rounded-2xl border focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all font-mono"
-                                       autocomplete="new-password"
-                                       placeholder="Ulangi kata sandi baru" />
-                                <button type="button"
-                                        @click="showConfirmPassword = !showConfirmPassword"
-                                        class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-200 cursor-pointer focus:outline-none"
-                                        tabindex="-1">
-                                    <svg x-show="!showConfirmPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    <svg x-show="showConfirmPassword" x-cloak class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
-                                </button>
-                            </div>
-                            <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-1.5" />
-                        </div>
-
-                        {{-- Form Footer Actions --}}
-                        <div class="pt-4 border-t profile-card-border flex items-center justify-end gap-3">
-                            <button type="button"
-                                    onclick="window.closeProfileModal()"
-                                    class="px-4 py-2.5 rounded-2xl text-xs font-semibold text-gray-400 hover:text-gray-200 transition-colors cursor-pointer">
-                                Batal
-                            </button>
-                            <button type="submit"
-                                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold text-white bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-500 hover:from-teal-500 hover:to-emerald-500 transition-all shadow-lg shadow-teal-600/25 hover:shadow-teal-500/35 cursor-pointer active:scale-95">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                                <span>Perbarui Kata Sandi</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                {{-- ─── TAB 3: ZONA BAHAYA ─── --}}
-                <div x-show="tab === 'danger'" x-cloak class="space-y-6">
-                    <form method="post" action="{{ route('profile.destroy') }}" class="space-y-5">
-                        @csrf
-                        @method('delete')
-
-                        {{-- Danger Notice Box --}}
-                        <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs leading-relaxed flex items-start gap-3.5">
-                            <div class="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-md shadow-rose-500/20">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                            </div>
-                            <div class="space-y-1">
-                                <h5 class="font-bold text-sm text-rose-400">Peringatan Penghapusan Akun Permanen</h5>
-                                <p class="text-rose-300/90">
-                                    Tindakan ini akan menghapus akun administrator Anda beserta seluruh dokumen soal, kuis, pengumpulan, dan rekam jejak aktivitas yang terkait dari server. Data <strong>tidak dapat dipulihkan kembali</strong>.
-                                </p>
-                            </div>
-                        </div>
-
-                        {{-- Password Confirmation Input --}}
-                        <div>
-                            <label for="profile_modal_delete_password" class="profile-input-label block text-xs font-bold uppercase tracking-wider mb-2">
-                                Konfirmasi Password Akun <span class="text-rose-500">*</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-rose-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                </div>
-                                <input id="profile_modal_delete_password"
-                                       name="password"
-                                       :type="showDeletePassword ? 'text' : 'password'"
-                                       class="profile-text-input block w-full pl-10 pr-11 py-2.5 text-xs sm:text-sm rounded-2xl border border-rose-500/30 focus:outline-none focus:ring-2 focus:ring-rose-500/30 transition-all font-mono"
-                                       placeholder="Ketik kata sandi untuk validasi"
-                                       required />
-                                <button type="button"
-                                        @click="showDeletePassword = !showDeletePassword"
-                                        class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-200 cursor-pointer focus:outline-none"
-                                        tabindex="-1">
-                                    <svg x-show="!showDeletePassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    <svg x-show="showDeletePassword" x-cloak class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
-                                </button>
-                            </div>
-                            <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-1.5" />
-                        </div>
-
-                        {{-- Safeguard Checkbox --}}
-                        <label class="flex items-start gap-3 p-3.5 rounded-2xl border border-rose-500/20 bg-rose-500/5 cursor-pointer select-none">
-                            <input type="checkbox"
-                                   x-model="confirmDeleteChecked"
-                                   class="mt-0.5 rounded border-rose-400/40 text-rose-600 focus:ring-rose-500/30 accent-rose-600 w-4 h-4" />
-                            <span class="text-xs text-rose-300 leading-normal">
-                                Saya telah memahami seluruh risiko kehilangan data dan secara sadar mengonfirmasi untuk menghapus akun ini secara permanen dari server.
-                            </span>
-                        </label>
-
-                        {{-- Delete Action Button --}}
-                        <div class="pt-4 border-t profile-card-border flex items-center justify-end gap-3">
-                            <button type="button"
-                                    onclick="window.closeProfileModal()"
-                                    class="px-4 py-2.5 rounded-2xl text-xs font-semibold text-gray-400 hover:text-gray-200 transition-colors cursor-pointer">
-                                Batal
-                            </button>
-                            <button type="submit"
-                                    :disabled="!confirmDeleteChecked"
-                                    :class="confirmDeleteChecked ? 'bg-rose-600 hover:bg-rose-500 cursor-pointer shadow-lg shadow-rose-600/30 active:scale-95' : 'bg-gray-700 opacity-50 cursor-not-allowed'"
-                                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold text-white transition-all"
-                                    onclick="return confirm('Peringatan Terakhir: Apakah Anda yakin 100% ingin menghapus akun ini secara permanen?')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                <span>Hapus Akun Permanen</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
+                    <div class="prf-actions">
+                        <button type="button" class="prf-btn-cancel" @click="close()">Batal</button>
+                        <button type="submit" class="prf-btn-primary">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            Simpan Biodata
+                        </button>
+                    </div>
+                </form>
             </div>
 
-            {{-- Keyboard Hint Strip at Bottom --}}
-            <div class="px-7 py-3 border-t profile-card-border flex items-center justify-between text-[11px] text-gray-400 flex-shrink-0">
-                <span class="inline-flex items-center gap-1.5">
-                    <kbd class="px-1.5 py-0.5 text-[10px] font-mono rounded-md bg-gray-800/80 border border-gray-700 text-gray-300">Esc</kbd>
-                    <span>untuk menutup</span>
-                </span>
-                <span class="text-gray-400">IC-Labs Profile Management</span>
+            {{-- Panel 2: Kata Sandi --}}
+            <div class="prf-panel" :class="tab==='security' ? 'prf-panel--active' : ''">
+                <form method="post" action="{{ route('password.update') }}">
+                    @csrf
+                    @method('put')
+
+                    {{-- Current password --}}
+                    <div class="prf-field">
+                        <label class="prf-label" for="pm_cur">Kata Sandi Saat Ini <span style="color:#F43F5E;">*</span></label>
+                        <div class="prf-input-wrap">
+                            <span class="prf-input-icon"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></span>
+                            <input id="pm_cur" name="current_password"
+                                   :type="showCurrent ? 'text' : 'password'"
+                                   class="prf-input" style="padding-right:42px;"
+                                   placeholder="Kata sandi saat ini" autocomplete="current-password">
+                            <button type="button" class="prf-eye-btn" @click="showCurrent=!showCurrent" tabindex="-1">
+                                <svg x-show="!showCurrent" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <svg x-show="showCurrent" x-cloak width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#34D399;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                            </button>
+                        </div>
+                        <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
+                    </div>
+
+                    {{-- New password with strength --}}
+                    <div class="prf-field">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;">
+                            <label class="prf-label" for="pm_new" style="margin-bottom:0;">Kata Sandi Baru <span style="color:#F43F5E;">*</span></label>
+                            <span class="prf-strength-label" :style="'color:'+strength.color" x-text="newPwd ? strength.label : ''"></span>
+                        </div>
+                        <div class="prf-input-wrap">
+                            <span class="prf-input-icon"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg></span>
+                            <input id="pm_new" name="password"
+                                   :type="showNew ? 'text' : 'password'"
+                                   x-model="newPwd"
+                                   class="prf-input" style="padding-right:42px;"
+                                   placeholder="Min. 8 karakter" autocomplete="new-password">
+                            <button type="button" class="prf-eye-btn" @click="showNew=!showNew" tabindex="-1">
+                                <svg x-show="!showNew" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <svg x-show="showNew" x-cloak width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#34D399;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                            </button>
+                        </div>
+                        <div class="prf-strength-wrap">
+                            <div class="prf-strength-bar-bg">
+                                <div class="prf-strength-bar" :style="'width:'+strength.pct+'%;background-color:'+strength.color"></div>
+                            </div>
+                        </div>
+                        <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
+                    </div>
+
+                    {{-- Confirm new password --}}
+                    <div class="prf-field">
+                        <label class="prf-label" for="pm_conf">Konfirmasi Kata Sandi Baru <span style="color:#F43F5E;">*</span></label>
+                        <div class="prf-input-wrap">
+                            <span class="prf-input-icon"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>
+                            <input id="pm_conf" name="password_confirmation"
+                                   :type="showConfirm ? 'text' : 'password'"
+                                   class="prf-input" style="padding-right:42px;"
+                                   placeholder="Ulangi kata sandi baru" autocomplete="new-password">
+                            <button type="button" class="prf-eye-btn" @click="showConfirm=!showConfirm" tabindex="-1">
+                                <svg x-show="!showConfirm" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <svg x-show="showConfirm" x-cloak width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#34D399;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                            </button>
+                        </div>
+                        <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
+                    </div>
+
+                    <div class="prf-actions">
+                        <button type="button" class="prf-btn-cancel" @click="close()">Batal</button>
+                        <button type="submit" class="prf-btn-primary">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            Perbarui Kata Sandi
+                        </button>
+                    </div>
+                </form>
             </div>
 
-        </main>
+            {{-- Panel 3: Zona Bahaya --}}
+            <div class="prf-panel" :class="tab==='danger' ? 'prf-panel--active' : ''">
+                <form method="post" action="{{ route('profile.destroy') }}">
+                    @csrf
+                    @method('delete')
 
-    </div>
+                    <div class="prf-danger-box">
+                        <div class="prf-danger-icon">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        </div>
+                        <div>
+                            <div class="prf-danger-title">Peringatan: Penghapusan Akun Permanen</div>
+                            <div class="prf-danger-text">Seluruh data, dokumen, kuis, dan rekam jejak aktivitas akan dihapus dari server. Tindakan ini <strong style="color:#FB7185;">tidak dapat dibatalkan.</strong></div>
+                        </div>
+                    </div>
 
-    {{-- Comprehensive Adaptive Styles (Dark & Light Mode) --}}
-    <style>
-        /* ── Dark Mode (Default) ── */
-        .profile-modal-card {
-            background-color: #0F1713;
-            border-color: #1A2820;
-            color: #E5E7EB;
-        }
-        .profile-modal-sidebar {
-            background-color: #090D0B;
-        }
-        .profile-avatar-inner {
-            background-color: #0F1713;
-        }
-        .profile-modal-main {
-            background-color: #0F1713;
-        }
-        .profile-title {
-            color: #FFFFFF;
-        }
-        .profile-text-main {
-            color: #FFFFFF;
-        }
-        .profile-card-border {
-            border-color: #1A2820;
-        }
-        .profile-modal-close-btn {
-            background-color: #142019;
-            border: 1px solid #1E3327;
-            color: #9CA3AF;
-        }
-        .profile-modal-close-btn:hover {
-            background-color: rgba(244, 63, 94, 0.18);
-            border-color: rgba(244, 63, 94, 0.4);
-            color: #FB7185;
-        }
-        .profile-nav-inactive {
-            color: #9CA3AF;
-        }
-        .profile-nav-active {
-            background-color: rgba(16, 185, 129, 0.12);
-            color: #34D399;
-            border: 1px solid rgba(16, 185, 129, 0.25);
-        }
-        .profile-nav-danger-active {
-            background-color: rgba(244, 63, 94, 0.15);
-            color: #FB7185;
-            border: 1px solid rgba(244, 63, 94, 0.35);
-        }
-        .profile-stat-box {
-            background-color: #142019;
-            border-color: #1E3327;
-        }
-        .profile-input-label {
-            color: #9CA3AF;
-        }
-        .profile-text-input {
-            background-color: #090D0B;
-            border-color: #1A2820;
-            color: #FFFFFF;
-        }
-        .profile-text-input:focus {
-            border-color: #10B981;
-        }
-        .profile-info-card {
-            background-color: #090D0B;
-            border-color: #1A2820;
-        }
+                    <div class="prf-field">
+                        <label class="prf-label" for="pm_del">Konfirmasi Kata Sandi <span style="color:#F43F5E;">*</span></label>
+                        <div class="prf-input-wrap">
+                            <span class="prf-input-icon" style="color:#F43F5E;"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></span>
+                            <input id="pm_del" name="password"
+                                   :type="showDel ? 'text' : 'password'"
+                                   class="prf-input prf-input--danger" style="padding-right:42px; border-color:rgba(244,63,94,.3);"
+                                   placeholder="Ketik kata sandi untuk verifikasi" required>
+                            <button type="button" class="prf-eye-btn" @click="showDel=!showDel" tabindex="-1">
+                                <svg x-show="!showDel" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <svg x-show="showDel" x-cloak width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#F43F5E;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                            </button>
+                        </div>
+                        <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
+                    </div>
 
-        /* ── Light Mode Overrides ── */
-        html:not(.dark) .profile-modal-card {
-            background-color: #FFFFFF !important;
-            border-color: #E2EAE5 !important;
-            color: #0F1F17 !important;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.14) !important;
-        }
-        html:not(.dark) .profile-modal-sidebar {
-            background-color: #F8FAF9 !important;
-        }
-        html:not(.dark) .profile-avatar-inner {
-            background-color: #FFFFFF !important;
-        }
-        html:not(.dark) .profile-modal-main {
-            background-color: #FFFFFF !important;
-        }
-        html:not(.dark) .profile-title {
-            color: #0F1F17 !important;
-        }
-        html:not(.dark) .profile-text-main {
-            color: #0F1F17 !important;
-        }
-        html:not(.dark) .profile-card-border {
-            border-color: #E2EAE5 !important;
-        }
-        html:not(.dark) .profile-modal-close-btn {
-            background-color: #FFFFFF !important;
-            border: 1px solid #E2EAE5 !important;
-            color: #64748B !important;
-        }
-        html:not(.dark) .profile-modal-close-btn:hover {
-            background-color: #FEE2E2 !important;
-            border-color: #FCA5A5 !important;
-            color: #EF4444 !important;
-        }
-        html:not(.dark) .profile-nav-inactive {
-            color: #475569 !important;
-        }
-        html:not(.dark) .profile-nav-active {
-            background-color: rgba(16, 185, 129, 0.1) !important;
-            color: #059669 !important;
-            border: 1px solid rgba(16, 185, 129, 0.25) !important;
-        }
-        html:not(.dark) .profile-nav-danger-active {
-            background-color: rgba(244, 63, 94, 0.1) !important;
-            color: #DC2626 !important;
-            border: 1px solid rgba(244, 63, 94, 0.3) !important;
-        }
-        html:not(.dark) .profile-stat-box {
-            background-color: #FFFFFF !important;
-            border-color: #E2EAE5 !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-        }
-        html:not(.dark) .profile-input-label {
-            color: #475569 !important;
-        }
-        html:not(.dark) .profile-text-input {
-            background-color: #FFFFFF !important;
-            border-color: #CBD5E1 !important;
-            color: #0F1F17 !important;
-        }
-        html:not(.dark) .profile-text-input:focus {
-            border-color: #10B981 !important;
-        }
-        html:not(.dark) .profile-info-card {
-            background-color: #F8FAF9 !important;
-            border-color: #E2EAE5 !important;
-        }
-        html:not(.dark) .profile-modal-mobile-header {
-            background-color: #F8FAF9 !important;
-        }
-    </style>
+                    <label class="prf-check-wrap" @click="delChecked=!delChecked" style="cursor:pointer; user-select:none;">
+                        <input type="checkbox" x-model="delChecked" @click.stop style="width:16px;height:16px;accent-color:#F43F5E;flex-shrink:0;margin-top:2px;">
+                        <span class="prf-check-label">Saya memahami semua risiko dan mengonfirmasi penghapusan akun ini secara permanen.</span>
+                    </label>
 
-</div>
+                    <div class="prf-actions">
+                        <button type="button" class="prf-btn-cancel" @click="close()">Batal</button>
+                        <button type="submit"
+                                class="prf-btn-delete" :class="delChecked ? 'prf-delete-ready' : ''"
+                                :disabled="!delChecked"
+                                onclick="return confirm('Konfirmasi terakhir: Anda yakin ingin menghapus akun ini secara permanen?')">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            Hapus Akun Permanen
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>{{-- /prf-body --}}
+
+        {{-- ── BOTTOM HINT ── --}}
+        <div class="prf-hint">
+            <span><kbd>Esc</kbd> untuk menutup</span>
+            <span>IC-Labs · Profile Settings</span>
+        </div>
+
+    </div>{{-- /prf-card --}}
+</div>{{-- /prf-modal --}}
+
 @endif
