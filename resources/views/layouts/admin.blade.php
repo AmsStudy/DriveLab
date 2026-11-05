@@ -726,22 +726,26 @@
                 </button>
             </div>
 
-            {{-- User Info --}}
+            {{-- User Info (Triggers Profile Modal Pop Up) --}}
             <div class="px-3 py-3" style="border-bottom:1px solid #1A2820;">
-                <a href="{{ route('profile.edit') }}" class="sidebar-user-card flex items-center gap-3 rounded-xl p-2.5 group cursor-pointer">
+                <button type="button"
+                        onclick="window.openProfileModal ? window.openProfileModal('profile') : window.location.href='{{ route('profile.edit') }}'"
+                        class="w-full sidebar-user-card flex items-center gap-3 rounded-xl p-2.5 group cursor-pointer text-left focus:outline-none"
+                        title="Buka Pengaturan Profil">
                     <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#10B981,#0D9488);">
                         <span class="text-white text-xs font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</span>
                     </div>
                     <div class="min-w-0 flex-1">
-                        <p class="text-sm font-semibold text-white truncate leading-none mb-1">{{ auth()->user()->name }}</p>
+                        <p class="text-sm font-semibold text-white truncate leading-none mb-1 group-hover:text-emerald-300 transition-colors">{{ auth()->user()->name }}</p>
                         <span class="text-[10px] px-1.5 py-0.5 rounded-full font-semibold" style="background:rgba(16,185,129,.15);color:#34D399;">
                             {{ auth()->user()->isSuperAdmin() ? '⚡ Super Admin' : '👤 Admin' }}
                         </span>
                     </div>
-                    <svg class="w-3.5 h-3.5 text-gray-600 group-hover:text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    <svg class="w-3.5 h-3.5 text-gray-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
-                </a>
+                </button>
             </div>
 
             {{-- Navigation --}}
@@ -880,6 +884,9 @@
 
     {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}
     @include('components.cyber-loading')
+
+    {{-- ─── GLOBAL INTERACTIVE PROFILE SETTINGS MODAL POPUP ─── --}}
+    <x-profile-modal />
 
     {{-- ─── HOVER PREVIEW POPUP (INSTANT BUBBLE SAAT KURSOR MENDEKAT) ─── --}}
     <div id="cyber-hover-preview-bubble" class="cyber-hover-preview-bubble">
