@@ -28,6 +28,15 @@ class QuizOption extends Model
         'formatted_text',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (QuizOption $option) {
+            if ($option->image_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($option->image_path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($option->image_path);
+            }
+        });
+    }
+
     public function getImageUrlAttribute(): ?string
     {
         return $this->image_path ? asset('storage/' . $this->image_path) : null;

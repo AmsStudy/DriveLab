@@ -30,6 +30,16 @@ class SecurityHeaders
         // Proteksi filter XSS untuk browser legacy
         $response->headers->set('X-XSS-Protection', '1; mode=block');
 
+        // HTTP Browser Cache Control untuk Aset Statis & Respons Publik
+        if ($request->is('build/*') || $request->is('images/*') || $request->is('favicon.ico')) {
+            $response->headers->set('Cache-Control', 'public, max-age=31536000, immutable');
+        } elseif ($request->is('storage/*')) {
+            $response->headers->set('Cache-Control', 'public, max-age=2592000'); // 30 hari untuk gambar/media soal
+        } elseif (!$request->isMethodSafe() || $request->routeIs('login', 'logout', 'admin.*', 'profile.*')) {
+            // Halaman dinamis & form admin tetap no-store agar data selalu up to date
+            $response->headers->set('Cache-Control', 'no-cache, private');
+        }
+
         return $response;
     }
 }

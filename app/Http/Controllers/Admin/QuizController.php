@@ -58,6 +58,23 @@ class QuizController extends Controller
         $totalQuizzes = $baseStatsQuery->count();
         $quizIds = (clone $baseStatsQuery)->pluck('id');
         $totalQuestions = QuizQuestion::whereIn('quiz_id', $quizIds)->count();
+        // Auto-finalize any orphaned expired attempts before calculating stats
+        $uncompletedAttempts = QuizAttempt::whereIn('quiz_id', $quizIds)
+            ->whereNull('completed_at')
+            ->whereNotNull('started_at')
+            ->with('quiz')
+            ->get();
+
+        foreach ($uncompletedAttempts as $att) {
+            $quizTime = (int) ($att->quiz->time_limit_minutes ?? 0) + (int) ($att->extra_time_minutes ?? 0);
+            if ($quizTime > 0) {
+                $maxSec = ($quizTime * 60) + 120; // 2 minutes grace period
+                if (now()->diffInSeconds($att->started_at) > $maxSec) {
+                    \App\Services\QuizScoringService::finalize($att, $att->draft_answers ?? [], true);
+                }
+            }
+        }
+
         $totalAttempts = QuizAttempt::whereIn('quiz_id', $quizIds)->count();
         $avgScore = QuizAttempt::whereIn('quiz_id', $quizIds)->whereNotNull('completed_at')->avg('score') ?? 0;
 

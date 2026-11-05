@@ -1863,16 +1863,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function setLoading(loading) {
+function setLoading(loading, progressText) {
     subBtn.disabled = loading;
     if (loading) {
-        btnLabel.textContent = 'Mengirim Tugas...';
+        btnLabel.textContent = progressText || 'Mengirim Tugas...';
         const arrow = document.getElementById('btn-arrow');
         if (arrow) arrow.outerHTML = '<div class="spinner" id="btn-arrow"></div>';
         if (window.showLoading) {
             window.showLoading(
                 'MENGIRIM TUGAS...',
-                'Mengunggah berkas aman dan memverifikasi data ke server...'
+                progressText || 'Mengunggah berkas aman dan memverifikasi data ke server...'
             );
         }
     } else {
@@ -1947,42 +1947,46 @@ document.getElementById('submission-form').addEventListener('submit', async func
     }
 
     const formData = new FormData(this);
-
     setLoading(true);
     subAlert.style.display = 'none';
 
-    try {
-        const activeCsrfToken = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
-        const response = await fetch('{{ route('soal.submitTask', ['token' => $soal->slug ?: $soal->unique_token]) }}', {
-            method: 'POST',
-            headers: { 
-                'X-CSRF-TOKEN': activeCsrfToken,
-                'Accept': 'application/json'
-            },
-            body: formData,
-        });
+    const activeCsrfToken = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
+    const submitUrl = '{{ route('soal.submitTask', ['token' => $soal->slug ?: $soal->unique_token]) }}';
 
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', submitUrl, true);
+    xhr.setRequestHeader('X-CSRF-TOKEN', activeCsrfToken);
+    xhr.setRequestHeader('Accept', 'application/json');
+
+    if (xhr.upload && currentType === 'file') {
+        xhr.upload.onprogress = function(e) {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                setLoading(true, `Mengunggah berkas (${percent}%)...`);
+            }
+        };
+    }
+
+    xhr.onload = function() {
+        setLoading(false);
         let result;
-        const text = await response.text();
         try {
-            result = JSON.parse(text);
+            result = JSON.parse(xhr.responseText);
         } catch {
-            showAlert('error', 'Server error: ' + text.substring(0, 120));
-            setLoading(false);
+            showAlert('error', 'Server error: ' + xhr.responseText.substring(0, 120));
             return;
         }
 
-        if (response.status === 419) {
+        if (xhr.status === 419) {
             if (result && result.csrf_token) {
                 const tokenInput = document.querySelector('input[name="_token"]');
                 if (tokenInput) tokenInput.value = result.csrf_token;
             }
             showAlert('error', 'Sesi pengiriman sempat terputus karena padatnya akses bersamaan. Token keamanan telah disegarkan, silakan tekan tombol Kirim Tugas sekali lagi.');
-            setLoading(false);
             return;
         }
 
-        if (response.ok) {
+        if (xhr.status >= 200 && xhr.status < 300) {
             // Simpan identitas mahasiswa agar tidak perlu ketik ulang
             const nimVal = document.getElementById('sub_nim')?.value.trim();
             const namaVal = document.getElementById('sub_nama')?.value.trim();
@@ -2018,11 +2022,14 @@ document.getElementById('submission-form').addEventListener('submit', async func
             }
             showAlert('error', errorMsg);
         }
-    } catch (err) {
-        showAlert('error', 'Kesalahan koneksi: ' + err.message);
-    }
+    };
 
-    setLoading(false);
+    xhr.onerror = function() {
+        setLoading(false);
+        showAlert('error', 'Terjadi kesalahan jaringan atau koneksi terputus.');
+    };
+
+    xhr.send(formData);
 });
 
 // Auto refresh CSRF token periodically while viewing task
