@@ -12,3 +12,4 @@
 @section('heading', 'Batas Permintaan Terlampaui')
 
 @section('message', 'Sistem mendeteksi terlalu banyak permintaan berturut-turut dari komputer/jaringan Anda demi perlindungan keamanan. Silakan tunggu beberapa saat sebelum mencoba kembali.')
+

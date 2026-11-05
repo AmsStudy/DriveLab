@@ -62,14 +62,16 @@
 
         {{-- Question Image (if uploaded) --}}
         @if($q->image_path)
-            <div class="mb-3 rounded-xl overflow-hidden border border-[#1A2820] bg-black/40 max-h-56 flex items-center justify-center">
-                <a href="{{ $q->image_url }}" target="_blank" class="block group relative">
+            <div class="mb-3 flex items-center justify-center">
+                <button type="button"
+                        onmouseenter="showCyberHoverBubble(event, '{{ $q->image_url }}')"
+                        onmousemove="updateCyberHoverBubblePos(event)"
+                        onmouseleave="hideCyberHoverBubble()"
+                        onclick="openCyberLightbox('{{ $q->image_url }}', 'Gambar Soal #{{ $qNum }}')"
+                        class="inline-block group cursor-zoom-in focus:outline-none rounded-xl overflow-hidden border border-[#1A2820] bg-black/40 hover:border-emerald-500/40 p-1.5 transition-all shadow-sm">
                     <img src="{{ $q->image_url }}" alt="Gambar Soal #{{ $qNum }}"
                          class="max-h-52 w-auto object-contain rounded-lg group-hover:scale-[1.02] transition-transform">
-                    <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/70 text-[10px] text-gray-300 backdrop-blur-sm pointer-events-none">
-                        🔍 Perbesar
-                    </span>
-                </a>
+                </button>
             </div>
         @endif
 
@@ -88,10 +90,15 @@
 
                     <div class="flex-1 min-w-0">
                         @if($opt->image_path)
-                            <div class="mb-1.5 rounded-lg overflow-hidden border border-white/10 max-w-[200px] bg-black/50">
-                                <a href="{{ $opt->image_url }}" target="_blank">
-                                    <img src="{{ $opt->image_url }}" alt="Opsi {{ $labels[$optIndex] ?? '' }}" class="max-h-24 w-auto object-contain">
-                                </a>
+                            <div class="mb-1.5 inline-block">
+                                <button type="button"
+                                        onmouseenter="showCyberHoverBubble(event, '{{ $opt->image_url }}')"
+                                        onmousemove="updateCyberHoverBubblePos(event)"
+                                        onmouseleave="hideCyberHoverBubble()"
+                                        onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIndex] ?? '' }}')"
+                                        class="block group relative cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-white/10 bg-black/50 hover:border-emerald-500/40 p-1 transition-all">
+                                    <img src="{{ $opt->image_url }}" alt="Opsi {{ $labels[$optIndex] ?? '' }}" class="max-h-24 w-auto object-contain group-hover:scale-105 transition-transform">
+                                </button>
                             </div>
                         @endif
                         @if(!empty($opt->option_text))

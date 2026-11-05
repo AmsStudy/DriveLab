@@ -53,9 +53,15 @@ class SoalAccessController extends Controller
         if (!empty($with)) {
             $query->with($with);
         }
-        return $query->where('slug', $identifier)
-            ->orWhere('unique_token', $identifier)
-            ->firstOrFail();
+
+        return $query->where(function ($q) use ($identifier) {
+            if (\Illuminate\Support\Facades\Schema::hasColumn('soals', 'slug')) {
+                $q->where('slug', $identifier)
+                  ->orWhere('unique_token', $identifier);
+            } else {
+                $q->where('unique_token', $identifier);
+            }
+        })->firstOrFail();
     }
 
     /**
@@ -124,7 +130,6 @@ class SoalAccessController extends Controller
 
         // Akses berhasil
         RateLimiter::clear($throttleKey);
-        $soal->increment('access_count');
 
         // Simpan token akses di session agar tidak perlu input password lagi
         session([
@@ -279,7 +284,7 @@ class SoalAccessController extends Controller
 
     public function status(string $token)
     {
-        $soal = Soal::where('slug', $token)->orWhere('unique_token', $token)->first();
+        $soal = $this->findSoalByIdentifier($token);
         if (!$soal) {
             return response()->json(['access_status' => 'deleted']);
         }

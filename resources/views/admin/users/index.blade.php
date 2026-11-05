@@ -144,7 +144,7 @@
 </div>
 
 {{-- Create Modal --}}
-<div id="create-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+<div id="create-modal" class="hidden fixed inset-0 z-[100] overflow-y-auto" style="z-index: 100;" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="document.getElementById('create-modal').classList.add('hidden')"></div>
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>

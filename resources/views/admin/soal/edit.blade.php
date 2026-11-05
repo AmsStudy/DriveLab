@@ -42,9 +42,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="kode_unik" class="block text-sm font-medium text-gray-300 mb-2">Kode Unik Akses <span class="text-red-400">*</span></label>
-                            <input type="text" id="kode_unik" name="kode_unik" value="{{ old('kode_unik', $soal->kode_unik) }}" required
-                                   class="w-full bg-gray-800 border {{ $errors->has('kode_unik') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500">
-                            <p class="mt-1 text-xs text-gray-500">Boleh diubah, asal tidak sama dengan dokumen lain.</p>
+                            <div class="relative">
+                                <input type="text" id="kode_unik" name="kode_unik" value="{{ old('kode_unik', $soal->kode_unik) }}" required
+                                       autocomplete="off"
+                                       class="w-full bg-gray-800 border {{ $errors->has('kode_unik') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-4 py-3 pr-10 text-sm focus:outline-none focus:border-emerald-500 transition-colors">
+                                <div id="kode_unik_indicator" class="absolute right-3.5 top-1/2 -translate-y-1/2 hidden flex items-center pointer-events-none"></div>
+                            </div>
+                            <div id="kode_unik_feedback" class="mt-1.5 text-xs text-gray-500">
+                                Boleh diubah, asal tidak sama dengan dokumen lain.
+                            </div>
                             @error('kode_unik') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
                         </div>
 
@@ -220,7 +226,28 @@
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Tambah Link
                     </button>
                 </div>
-                <div id="edit-links-container" class="space-y-2"></div>
+                <div id="edit-links-container" class="space-y-2">
+                    @php $oldEditLinks = old('links', []); @endphp
+                    @if(is_array($oldEditLinks) && count($oldEditLinks) > 0)
+                        @foreach($oldEditLinks as $idx => $linkData)
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-2 link-row bg-[#090E0B]/50 p-3 rounded-xl border border-[#1A2820]">
+                                <div class="md:col-span-4">
+                                    <input type="text" name="links[{{ $idx }}][title]" value="{{ $linkData['title'] ?? '' }}" placeholder="Label Link (misal: Bahan Modul)"
+                                           class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <div class="md:col-span-7">
+                                    <input type="url" name="links[{{ $idx }}][url]" value="{{ $linkData['url'] ?? '' }}" placeholder="https://..."
+                                           class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <div class="md:col-span-1 flex items-center justify-center">
+                                    <button type="button" onclick="this.closest('.link-row').remove()" class="text-red-400 hover:text-red-300 p-1.5" title="Hapus Link">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
             </div>
 
             {{-- ─── 6. STATUS & MASA AKTIF ─── --}}
@@ -469,7 +496,7 @@ function handleNewFiles(input) {
     });
 }
 
-let editLinkCount = 0;
+let editLinkCount = {{ count(old('links', [])) }};
 function addEditLinkRow() {
     const container = document.getElementById('edit-links-container');
     const div = document.createElement('div');
@@ -492,5 +519,134 @@ function addEditLinkRow() {
     container.appendChild(div);
     editLinkCount++;
 }
+
+// Realtime Kode Unik Availability Checker
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('kode_unik');
+    const feedback = document.getElementById('kode_unik_feedback');
+    const indicator = document.getElementById('kode_unik_indicator');
+    const form = document.getElementById('edit-soal-form');
+    if (!input || !feedback) return;
+
+    let debounceTimer = null;
+    let abortCtrl = null;
+    let isCodeTaken = false;
+    const currentSoalId = {{ $soal->id }};
+
+    const checkAvailability = () => {
+        const val = input.value.trim();
+
+        if (!val) {
+            input.classList.remove('border-red-500', 'border-emerald-500', 'focus:border-red-500');
+            input.classList.add('border-gray-700', 'focus:border-emerald-500');
+            feedback.className = 'mt-1.5 text-xs text-gray-500';
+            feedback.textContent = 'Boleh diubah, asal tidak sama dengan dokumen lain.';
+            if (indicator) {
+                indicator.className = 'absolute right-3.5 top-1/2 -translate-y-1/2 hidden flex items-center pointer-events-none';
+                indicator.innerHTML = '';
+            }
+            isCodeTaken = false;
+            return;
+        }
+
+        if (abortCtrl) abortCtrl.abort();
+        abortCtrl = new AbortController();
+
+        if (indicator) {
+            indicator.classList.remove('hidden');
+            indicator.innerHTML = `
+                <svg class="animate-spin h-4 w-4 text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+            `;
+        }
+        feedback.className = 'mt-1.5 text-xs text-emerald-400 flex items-center gap-1.5';
+        feedback.innerHTML = `<span>Memeriksa ketersediaan kode...</span>`;
+
+        const url = new URL("{{ route('admin.soal.check-kode-unik') }}", window.location.origin);
+        url.searchParams.set('kode_unik', val);
+        url.searchParams.set('ignore_id', currentSoalId);
+
+        fetch(url.toString(), {
+            headers: { 'Accept': 'application/json' },
+            signal: abortCtrl.signal
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (indicator) indicator.classList.remove('hidden');
+            if (data.available) {
+                isCodeTaken = false;
+                input.classList.remove('border-red-500', 'border-gray-700', 'focus:border-red-500');
+                input.classList.add('border-emerald-500');
+                feedback.className = 'mt-1.5 text-xs text-emerald-400 flex items-center gap-1.5 font-medium';
+                feedback.innerHTML = `
+                    <svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span>${data.message || 'Kode unik tersedia.'}</span>
+                `;
+                if (indicator) {
+                    indicator.innerHTML = `
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    `;
+                }
+            } else {
+                isCodeTaken = true;
+                input.classList.remove('border-emerald-500', 'border-gray-700', 'focus:border-emerald-500');
+                input.classList.add('border-red-500', 'focus:border-red-500');
+                feedback.className = 'mt-1.5 text-xs text-red-400 flex items-center gap-1.5 font-medium';
+                feedback.innerHTML = `
+                    <svg class="w-3.5 h-3.5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <span>${data.message || 'Kode unik sudah digunakan.'}</span>
+                `;
+                if (indicator) {
+                    indicator.innerHTML = `
+                        <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    `;
+                }
+            }
+        })
+        .catch(err => {
+            if (err.name === 'AbortError') return;
+            if (indicator) indicator.classList.add('hidden');
+            feedback.className = 'mt-1.5 text-xs text-gray-500';
+            feedback.textContent = 'Boleh diubah, asal tidak sama dengan dokumen lain.';
+        });
+    };
+
+    input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(checkAvailability, 350);
+    });
+
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            if (isCodeTaken) {
+                e.preventDefault();
+                input.focus();
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Kode Unik Telah Digunakan',
+                        text: 'Silakan ubah kode unik akses sebelum menyimpan dokumen.',
+                        background: '#0F1713',
+                        color: '#F3F4F6',
+                        backdrop: 'rgba(9, 13, 11, 0.75)',
+                        confirmButtonText: 'Perbaiki'
+                    });
+                } else {
+                    alert('Kode unik sudah digunakan. Silakan gunakan kode lain.');
+                }
+            }
+        });
+    }
+});
 </script>
 @endpush

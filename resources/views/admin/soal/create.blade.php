@@ -43,10 +43,16 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="kode_unik" class="block text-sm font-medium text-gray-300 mb-2">Kode Unik Akses <span class="text-red-400">*</span></label>
-                            <input type="text" id="kode_unik" name="kode_unik" 
-                                   value="{{ old('kode_unik', 'AMSSOAL-' . Str::upper(Str::random(5))) }}" required
-                                   class="w-full bg-[#090E0B] border {{ $errors->has('kode_unik') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500">
-                            <p class="mt-1 text-xs text-gray-500">Kode yang dimasukkan mahasiswa untuk mengakses dokumen.</p>
+                            <div class="relative">
+                                <input type="text" id="kode_unik" name="kode_unik" 
+                                       value="{{ old('kode_unik', 'AMSSOAL-' . Str::upper(Str::random(5))) }}" required
+                                       autocomplete="off"
+                                       class="w-full bg-[#090E0B] border {{ $errors->has('kode_unik') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-4 py-3 pr-10 text-sm focus:outline-none focus:border-emerald-500 transition-colors">
+                                <div id="kode_unik_indicator" class="absolute right-3.5 top-1/2 -translate-y-1/2 hidden flex items-center pointer-events-none"></div>
+                            </div>
+                            <div id="kode_unik_feedback" class="mt-1.5 text-xs text-gray-500">
+                                Kode yang dimasukkan mahasiswa untuk mengakses dokumen.
+                            </div>
                             @error('kode_unik') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
                         </div>
 
@@ -111,13 +117,15 @@
                 <p class="text-xs text-gray-400 mb-3">Tambahkan link eksternal (Google Drive, Repository GitHub, Video Tutorial, Figma, dll).</p>
 
                 <div id="links-container" class="space-y-2">
+                    @php $oldCreateLinks = old('links', [['title' => '', 'url' => '']]); @endphp
+                    @foreach($oldCreateLinks as $idx => $link)
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-2 link-row bg-gray-800/40 p-3 rounded-xl border border-[#1A2820]">
                         <div class="md:col-span-4">
-                            <input type="text" name="links[0][title]" placeholder="Label Link (misal: GitHub Repo)"
+                            <input type="text" name="links[{{ $idx }}][title]" value="{{ $link['title'] ?? '' }}" placeholder="Label Link (misal: GitHub Repo)"
                                    class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
                         </div>
                         <div class="md:col-span-7">
-                            <input type="url" name="links[0][url]" placeholder="https://..."
+                            <input type="url" name="links[{{ $idx }}][url]" value="{{ $link['url'] ?? '' }}" placeholder="https://..."
                                    class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
                         </div>
                         <div class="md:col-span-1 flex items-center justify-center">
@@ -126,6 +134,7 @@
                             </button>
                         </div>
                     </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -173,27 +182,27 @@
                 <label class="block text-sm font-medium text-gray-300 mb-3">Masa Aktif Akses Dokumen</label>
                 <div class="flex gap-5 mb-3">
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="access_type" value="lifetime" checked
+                        <input type="radio" name="access_type" value="lifetime" {{ old('access_type', 'lifetime') === 'lifetime' ? 'checked' : '' }}
                                class="accent-emerald-500 bg-[#090E0B] border-gray-600"
                                onchange="document.getElementById('schedule-fields').classList.add('hidden')">
                         <span class="text-sm text-gray-300">Selamanya (Tanpa Batas Waktu)</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="access_type" value="scheduled"
+                        <input type="radio" name="access_type" value="scheduled" {{ old('access_type') === 'scheduled' ? 'checked' : '' }}
                                class="accent-emerald-500 bg-[#090E0B] border-gray-600"
                                onchange="document.getElementById('schedule-fields').classList.remove('hidden')">
                         <span class="text-sm text-gray-300">Terjadwal (Waktu Tertentu)</span>
                     </label>
                 </div>
-                <div id="schedule-fields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#090E0B]/40 p-4 rounded-xl border border-[#1A2820]">
+                <div id="schedule-fields" class="{{ old('access_type') === 'scheduled' ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#090E0B]/40 p-4 rounded-xl border border-[#1A2820]">
                     <div>
                         <label class="block text-xs text-gray-400 mb-1.5">Mulai Aktif</label>
-                        <input type="datetime-local" name="active_from"
+                        <input type="datetime-local" name="active_from" value="{{ old('active_from') }}"
                                class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1.5">Berakhir</label>
-                        <input type="datetime-local" name="active_until"
+                        <input type="datetime-local" name="active_until" value="{{ old('active_until') }}"
                                class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
                     </div>
                 </div>
@@ -203,24 +212,24 @@
             <div class="pt-5 border-t border-[#1A2820]">
                 <label class="block text-sm font-medium text-gray-300 mb-2">Fitur Pengumpulan Tugas bagi Mahasiswa</label>
                 <label class="flex items-center gap-2 cursor-pointer mb-3">
-                    <input type="checkbox" name="is_submission_enabled" id="is_submission_enabled" value="1"
+                    <input type="checkbox" name="is_submission_enabled" id="is_submission_enabled" value="1" {{ old('is_submission_enabled') ? 'checked' : '' }}
                            class="accent-emerald-500 bg-[#090E0B] border-gray-600 w-4 h-4 rounded"
                            onchange="toggleSubmissionSection(this.checked)">
                     <span class="text-sm text-gray-300">Aktifkan Form Pengumpulan Tugas pada Soal Ini</span>
                 </label>
 
-                <div id="submission-options" class="hidden space-y-4 bg-[#090E0B]/40 p-4 rounded-xl border border-[#1A2820]">
+                <div id="submission-options" class="{{ old('is_submission_enabled') ? '' : 'hidden' }} space-y-4 bg-[#090E0B]/40 p-4 rounded-xl border border-[#1A2820]">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs text-gray-400 mb-1.5">Batas Waktu Pengumpulan (Deadline) <span class="text-red-400">*</span></label>
-                            <input type="datetime-local" id="deadline_at" name="deadline_at"
+                            <input type="datetime-local" id="deadline_at" name="deadline_at" value="{{ old('deadline_at') }}"
                                    class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1.5">Instruksi Tambahan (Opsional)</label>
                             <textarea name="submission_instructions" rows="2"
                                       placeholder="Contoh: Cantumkan link GitHub/Drive publik atau upload laporan PDF."
-                                      class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+                                      class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-emerald-500 resize-none">{{ old('submission_instructions') }}</textarea>
                         </div>
                     </div>
 
@@ -237,17 +246,20 @@
                     {{-- Tipe Pengumpulan yang Diizinkan --}}
                     <div>
                         <label class="block text-xs text-gray-300 font-semibold mb-2">Metode Pengumpulan yang Diizinkan Mahasiswa <span class="text-red-400">*</span></label>
+                        @php
+                            $oldSubTypes = old('submission_types', ['file', 'link', 'text']);
+                        @endphp
                         <div class="flex flex-wrap gap-4">
                             <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-2 rounded-lg border border-gray-700">
-                                <input type="checkbox" name="submission_types[]" value="file" checked class="accent-emerald-500 w-4 h-4 rounded">
+                                <input type="checkbox" name="submission_types[]" value="file" {{ in_array('file', (array)$oldSubTypes) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                 <span class="text-xs text-gray-200">📁 File Dokumen</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-2 rounded-lg border border-gray-700">
-                                <input type="checkbox" name="submission_types[]" value="link" checked class="accent-emerald-500 w-4 h-4 rounded">
+                                <input type="checkbox" name="submission_types[]" value="link" {{ in_array('link', (array)$oldSubTypes) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                 <span class="text-xs text-gray-200">🔗 Tautan / Link URL</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-2 rounded-lg border border-gray-700">
-                                <input type="checkbox" name="submission_types[]" value="text" checked class="accent-emerald-500 w-4 h-4 rounded">
+                                <input type="checkbox" name="submission_types[]" value="text" {{ in_array('text', (array)$oldSubTypes) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                 <span class="text-xs text-gray-200">📝 Teks Langsung</span>
                             </label>
                         </div>
@@ -257,37 +269,40 @@
                     <div>
                         <label class="block text-xs text-gray-300 font-semibold mb-1">Format File yang Diizinkan (Jika Mengunggah File)</label>
                         <p class="text-[11px] text-gray-400 mb-2">Setiap file yang diupload mahasiswa wajib lolos security check (anti-shell, anti-executable, anti-spoof MIME).</p>
+                        @php
+                            $oldAllowedExts = old('allowed_extensions', ['pdf', 'word', 'excel', 'ppt', 'image', 'archive', 'pkt']);
+                        @endphp
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
                             <label class="flex items-center gap-2 cursor-pointer bg-emerald-500/10 border border-emerald-500/30 p-2 rounded-lg">
-                                <input type="checkbox" name="allowed_extensions[]" value="all" class="accent-emerald-500 w-4 h-4 rounded">
+                                <input type="checkbox" name="allowed_extensions[]" value="all" {{ in_array('all', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                 <span class="text-xs text-emerald-300 font-bold">Semua Format (Aman)</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                <input type="checkbox" name="allowed_extensions[]" value="pdf" checked class="accent-emerald-500 w-4 h-4 rounded">
+                                <input type="checkbox" name="allowed_extensions[]" value="pdf" {{ in_array('pdf', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                 <span class="text-xs text-gray-300">PDF (.pdf)</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                <input type="checkbox" name="allowed_extensions[]" value="word" checked class="accent-emerald-500 w-4 h-4 rounded">
+                                <input type="checkbox" name="allowed_extensions[]" value="word" {{ in_array('word', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                 <span class="text-xs text-gray-300">Word (.doc, .docx)</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                <input type="checkbox" name="allowed_extensions[]" value="excel" class="accent-emerald-500 w-4 h-4 rounded">
+                                <input type="checkbox" name="allowed_extensions[]" value="excel" {{ in_array('excel', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                 <span class="text-xs text-gray-300">Excel (.xls, .xlsx)</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                <input type="checkbox" name="allowed_extensions[]" value="ppt" class="accent-emerald-500 w-4 h-4 rounded">
+                                <input type="checkbox" name="allowed_extensions[]" value="ppt" {{ in_array('ppt', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                 <span class="text-xs text-gray-300">PowerPoint (.ppt)</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                <input type="checkbox" name="allowed_extensions[]" value="image" class="accent-emerald-500 w-4 h-4 rounded">
+                                <input type="checkbox" name="allowed_extensions[]" value="image" {{ in_array('image', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                 <span class="text-xs text-gray-300">Gambar (.jpg, .png)</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                <input type="checkbox" name="allowed_extensions[]" value="archive" class="accent-emerald-500 w-4 h-4 rounded">
+                                <input type="checkbox" name="allowed_extensions[]" value="archive" {{ in_array('archive', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                 <span class="text-xs text-gray-300">Arsip (.zip, .rar)</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                <input type="checkbox" name="allowed_extensions[]" value="pkt" class="accent-emerald-500 w-4 h-4 rounded">
+                                <input type="checkbox" name="allowed_extensions[]" value="pkt" {{ in_array('pkt', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                 <span class="text-xs text-gray-300">Packet Tracer (.pkt)</span>
                             </label>
                         </div>
@@ -406,5 +421,132 @@ function toggleSubmissionSection(checked) {
         document.getElementById('deadline_at').value = '';
     }
 }
+
+// Realtime Kode Unik Availability Checker
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('kode_unik');
+    const feedback = document.getElementById('kode_unik_feedback');
+    const indicator = document.getElementById('kode_unik_indicator');
+    const form = document.getElementById('create-soal-page-form');
+    if (!input || !feedback) return;
+
+    let debounceTimer = null;
+    let abortCtrl = null;
+    let isCodeTaken = false;
+
+    const checkAvailability = () => {
+        const val = input.value.trim();
+
+        if (!val) {
+            input.classList.remove('border-red-500', 'border-emerald-500', 'focus:border-red-500');
+            input.classList.add('border-gray-700', 'focus:border-emerald-500');
+            feedback.className = 'mt-1.5 text-xs text-gray-500';
+            feedback.textContent = 'Kode yang dimasukkan mahasiswa untuk mengakses dokumen.';
+            if (indicator) {
+                indicator.className = 'absolute right-3.5 top-1/2 -translate-y-1/2 hidden flex items-center pointer-events-none';
+                indicator.innerHTML = '';
+            }
+            isCodeTaken = false;
+            return;
+        }
+
+        if (abortCtrl) abortCtrl.abort();
+        abortCtrl = new AbortController();
+
+        if (indicator) {
+            indicator.classList.remove('hidden');
+            indicator.innerHTML = `
+                <svg class="animate-spin h-4 w-4 text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+            `;
+        }
+        feedback.className = 'mt-1.5 text-xs text-emerald-400 flex items-center gap-1.5';
+        feedback.innerHTML = `<span>Memeriksa ketersediaan kode...</span>`;
+
+        const url = new URL("{{ route('admin.soal.check-kode-unik') }}", window.location.origin);
+        url.searchParams.set('kode_unik', val);
+
+        fetch(url.toString(), {
+            headers: { 'Accept': 'application/json' },
+            signal: abortCtrl.signal
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (indicator) indicator.classList.remove('hidden');
+            if (data.available) {
+                isCodeTaken = false;
+                input.classList.remove('border-red-500', 'border-gray-700', 'focus:border-red-500');
+                input.classList.add('border-emerald-500');
+                feedback.className = 'mt-1.5 text-xs text-emerald-400 flex items-center gap-1.5 font-medium';
+                feedback.innerHTML = `
+                    <svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span>${data.message || 'Kode unik tersedia.'}</span>
+                `;
+                if (indicator) {
+                    indicator.innerHTML = `
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    `;
+                }
+            } else {
+                isCodeTaken = true;
+                input.classList.remove('border-emerald-500', 'border-gray-700', 'focus:border-emerald-500');
+                input.classList.add('border-red-500', 'focus:border-red-500');
+                feedback.className = 'mt-1.5 text-xs text-red-400 flex items-center gap-1.5 font-medium';
+                feedback.innerHTML = `
+                    <svg class="w-3.5 h-3.5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <span>${data.message || 'Kode unik sudah digunakan.'}</span>
+                `;
+                if (indicator) {
+                    indicator.innerHTML = `
+                        <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    `;
+                }
+            }
+        })
+        .catch(err => {
+            if (err.name === 'AbortError') return;
+            if (indicator) indicator.classList.add('hidden');
+            feedback.className = 'mt-1.5 text-xs text-gray-500';
+            feedback.textContent = 'Kode yang dimasukkan mahasiswa untuk mengakses dokumen.';
+        });
+    };
+
+    input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(checkAvailability, 350);
+    });
+
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            if (isCodeTaken) {
+                e.preventDefault();
+                input.focus();
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Kode Unik Telah Digunakan',
+                        text: 'Silakan ubah kode unik akses sebelum menyimpan dokumen.',
+                        background: '#0F1713',
+                        color: '#F3F4F6',
+                        backdrop: 'rgba(9, 13, 11, 0.75)',
+                        confirmButtonText: 'Perbaiki'
+                    });
+                } else {
+                    alert('Kode unik sudah digunakan. Silakan gunakan kode lain.');
+                }
+            }
+        });
+    }
+});
 </script>
 @endpush

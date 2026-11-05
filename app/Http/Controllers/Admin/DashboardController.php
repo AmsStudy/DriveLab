@@ -24,7 +24,6 @@ class DashboardController extends Controller
             $stats = [
                 'total_soal'        => Soal::count(),
                 'soal_aktif'        => Soal::where('is_active', true)->count(),
-                'total_views'       => (int) Soal::sum('access_count'),
                 'tugas_masuk'       => Submission::count(),
                 'tugas_hari_ini'    => Submission::whereBetween('created_at', [$todayStart, $todayEnd])->count(),
                 'total_lampiran'    => SoalAttachment::count(),
@@ -54,7 +53,7 @@ class DashboardController extends Controller
 
             $top_soals = Soal::with('category', 'admin')
                 ->withCount('submissions')
-                ->orderByDesc('access_count')
+                ->orderByDesc('submissions_count')
                 ->take(20)
                 ->get();
 
@@ -70,7 +69,6 @@ class DashboardController extends Controller
         $stats = [
             'total_soal'     => $soalIds->count(),
             'soal_aktif'     => Soal::where('user_id', $user->id)->where('is_active', true)->count(),
-            'total_views'    => (int) Soal::where('user_id', $user->id)->sum('access_count'),
             'tugas_masuk'    => Submission::whereIn('soal_id', $soalIds)->count(),
             'tugas_hari_ini' => Submission::whereIn('soal_id', $soalIds)
                 ->whereBetween('created_at', [$todayStart, $todayEnd])->count(),
@@ -98,7 +96,7 @@ class DashboardController extends Controller
         $top_soals = Soal::where('user_id', $user->id)
             ->with('category')
             ->withCount('submissions')
-            ->orderByDesc('access_count')
+            ->orderByDesc('submissions_count')
             ->take(20)
             ->get();
 

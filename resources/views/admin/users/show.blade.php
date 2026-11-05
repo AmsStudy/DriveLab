@@ -127,7 +127,6 @@
                             <tr>
                                 <th class="px-6 py-3 text-left">Dokumen</th>
                                 <th class="px-4 py-3 text-left">Status</th>
-                                <th class="px-4 py-3 text-center">Akses</th>
                                 <th class="px-6 py-3 text-right">Lihat</th>
                             </tr>
                         </thead>
@@ -149,9 +148,6 @@
                                         {{ $st === 'scheduled' ? 'bg-yellow-500/15 text-yellow-400' : '' }}">
                                         {{ $st }}
                                     </span>
-                                </td>
-                                <td class="px-4 py-4 text-center text-gray-400">
-                                    {{ number_format($soal->access_count) }}&times;
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <a href="{{ route('admin.soal.show', $soal) }}" class="text-emerald-400 hover:text-emerald-300 text-xs font-semibold">Detail &rarr;</a>

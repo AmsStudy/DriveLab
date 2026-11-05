@@ -82,6 +82,7 @@ Route::prefix('admin')
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Soal CRUD
+        Route::get('soal/check-kode-unik', [SoalController::class, 'checkKodeUnik'])->name('soal.check-kode-unik');
         Route::get('soal/trash', [SoalController::class, 'trash'])->name('soal.trash');
         Route::patch('soal/{id}/restore', [SoalController::class, 'restore'])->name('soal.restore');
         Route::delete('soal/{id}/force-delete', [SoalController::class, 'forceDelete'])->name('soal.force-delete');

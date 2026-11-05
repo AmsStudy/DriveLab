@@ -326,7 +326,8 @@
 
     {{-- MODAL: TAMBAH WAKTU --}}
     <div x-show="showAddTimeModal" x-cloak
-         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+         class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+         style="z-index: 100;"
          x-transition>
         <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-4"
              @click.away="showAddTimeModal = false">

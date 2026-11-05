@@ -68,11 +68,11 @@
     </button>
 </div>
 
-{{-- Table --}}
-<div class="rounded-2xl overflow-hidden shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
+{{-- Table Card: Memanjang sampai ke bawah halaman (flex-1) --}}
+<div class="rounded-2xl overflow-hidden shadow-xl flex flex-col flex-1" style="background:#0F1713;border:1px solid #1A2820;min-height:0;">
     @if($soals->isEmpty())
         @if(request()->anyFilled(['q', 'category_id', 'status']))
-            <div class="py-16 text-center text-gray-500">
+            <div class="py-16 text-center text-gray-500 m-auto">
                 <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
@@ -84,7 +84,7 @@
                 </a>
             </div>
         @else
-            <div class="py-16 text-center text-gray-500">
+            <div class="py-16 text-center text-gray-500 m-auto">
                 <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
@@ -96,16 +96,15 @@
             </div>
         @endif
     @else
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm min-w-[700px]">
-                <thead>
-                    <tr class="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wider">
+        <div class="overflow-x-auto overflow-y-auto flex-1 h-full min-h-[420px]" style="scrollbar-width: thin;">
+            <table class="w-full text-sm min-w-[700px] border-collapse">
+                <thead class="sticky top-0 z-20 shadow-sm" style="background:#0F1713;">
+                    <tr class="border-b border-gray-800 text-gray-400 text-xs uppercase tracking-wider">
                         <th class="px-6 py-3 text-left">Dokumen</th>
                         <th class="px-4 py-3 text-left">Kategori</th>
                         <th class="px-4 py-3 text-left">Status</th>
                         <th class="px-4 py-3 text-left">Masa Aktif</th>
                         <th class="px-4 py-3 text-center">Tugas</th>
-                        <th class="px-4 py-3 text-right">Dilihat</th>
                         <th class="px-6 py-3 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -270,74 +269,166 @@
                                 <span class="text-gray-600 text-xs">—</span>
                             @endif
                         </td>
-                        <td class="px-4 py-4 text-right">
-                            <span class="text-gray-300 font-medium font-mono text-xs">{{ number_format($soal->access_count) }}×</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center justify-end gap-1">
-                                {{-- Copy Link --}}
-                                <button onclick="copyLink('{{ route('soal.access', $soal->slug ?: $soal->unique_token) }}')"
-                                        id="copy-link-{{ $soal->id }}"
-                                        title="Salin Link"
-                                        class="p-2 rounded-lg text-gray-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        <td class="px-6 py-4 text-right">
+                            <div class="relative inline-block text-left"
+                                 x-data="{
+                                     open: false,
+                                     openUp: false,
+                                     toggleMenu() {
+                                         if (!this.open) {
+                                             const rect = this.$el.getBoundingClientRect();
+                                             // Menu height approx 260px; jika ruang di bawah kurang dari 280px atau berada di paruh bawah layar, buka ke atas
+                                             const spaceBelow = window.innerHeight - rect.bottom;
+                                             this.openUp = spaceBelow < 280 || rect.top > (window.innerHeight * 0.45);
+                                         }
+                                         this.open = !this.open;
+                                     }
+                                 }"
+                                 @click.outside="open = false"
+                                 @close.stop="open = false">
+                                {{-- Trigger Button --}}
+                                <button @click="toggleMenu()" type="button"
+                                        id="action-menu-button-{{ $soal->id }}"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-300 hover:text-white bg-[#142019] hover:bg-[#1C2E24] border border-[#1E3327] hover:border-emerald-500/40 transition-all shadow-sm group cursor-pointer focus:outline-none"
+                                        title="Menu Aksi">
+                                    <svg class="w-3.5 h-3.5 text-emerald-400/80 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                                    </svg>
+                                    <span>Aksi</span>
+                                    <svg class="w-3 h-3 text-gray-400 group-hover:text-gray-300 transition-transform duration-200" :class="open ? 'rotate-180 text-emerald-400' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
-                                {{-- Preview (Simulasikan Mhs) --}}
-                                <a href="{{ route('admin.soal.preview', $soal) }}" target="_blank"
-                                   id="preview-soal-{{ $soal->id }}"
-                                   title="Simulasi / Preview Dokumen"
-                                   class="p-2 rounded-lg text-gray-500 hover:text-green-400 hover:bg-green-500/10 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                </a>
-                                {{-- Detail & Pengumpulan --}}
-                                <a href="{{ route('admin.soal.show', $soal) }}"
-                                   id="show-soal-{{ $soal->id }}"
-                                   title="Detail & Pengumpulan Tugas"
-                                   class="p-2 rounded-lg text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                    </svg>
-                                </a>
-                                {{-- Edit --}}
-                                <button type="button"
-                                        onclick="openEditModalForSoal({{ $soal->id }})"
-                                        id="edit-soal-{{ $soal->id }}"
-                                        title="Edit Dokumen"
-                                        class="p-2 rounded-lg text-gray-500 hover:text-yellow-400 hover:bg-yellow-500/10 transition-colors cursor-pointer">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                    </svg>
-                                </button>
-                                {{-- Toggle Active --}}
-                                <form method="POST" action="{{ route('admin.soal.toggle', $soal) }}" class="inline">
-                                    @csrf @method('PATCH')
-                                    <button type="submit"
-                                            id="toggle-soal-{{ $soal->id }}"
-                                            title="{{ $soal->is_active ? 'Nonaktifkan' : 'Aktifkan' }}"
-                                            class="p-2 rounded-lg text-gray-500 transition-colors {{ $soal->is_active ? 'hover:text-orange-400 hover:bg-orange-500/10' : 'hover:text-green-400 hover:bg-green-500/10' }}">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $soal->is_active ? 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' }}"/>
-                                        </svg>
+
+                                {{-- Dropdown Menu --}}
+                                <div x-show="open" x-cloak
+                                     x-transition:enter="transition ease-out duration-150"
+                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-100"
+                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                     x-transition:leave-end="transform opacity-0 scale-95"
+                                     class="absolute right-0 w-56 rounded-2xl shadow-2xl py-1.5 z-50 border text-left backdrop-blur-xl"
+                                     :class="openUp ? 'bottom-full mb-2' : 'top-full mt-2'"
+                                     style="background:rgba(15,23,19,0.98);border-color:rgba(16,185,129,0.22);box-shadow:0 20px 35px -10px rgba(0,0,0,0.85), 0 0 18px rgba(16,185,129,0.08);">
+
+                                    {{-- Section 1: Navigasi & Detail --}}
+                                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-400 border-b border-[#1A2820]/80">
+                                        Navigasi & Pratinjau
+                                    </div>
+
+                                    {{-- 1. Detail & Pengumpulan --}}
+                                    <a href="{{ route('admin.soal.show', $soal) }}"
+                                       id="show-soal-{{ $soal->id }}"
+                                       class="flex items-center gap-2.5 px-3 py-2 text-xs text-gray-200 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors group">
+                                        <div class="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold truncate">Detail & Pengumpulan</p>
+                                            <p class="text-[10px] text-gray-400 truncate">Kelola kiriman tugas</p>
+                                        </div>
+                                        @if($soal->is_submission_enabled)
+                                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 font-bold">
+                                                {{ $soal->submissions_count ?? $soal->submissions->count() }}
+                                            </span>
+                                        @endif
+                                    </a>
+
+                                    {{-- 2. Edit Dokumen --}}
+                                    <button type="button"
+                                            onclick="openEditModalForSoal({{ $soal->id }}); open = false;"
+                                            id="edit-soal-{{ $soal->id }}"
+                                            class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-gray-200 hover:text-amber-300 hover:bg-amber-500/10 transition-colors group cursor-pointer">
+                                        <div class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold truncate">Edit Dokumen</p>
+                                            <p class="text-[10px] text-gray-400 truncate">Ubah judul, akses & berkas</p>
+                                        </div>
                                     </button>
-                                </form>
-                                {{-- Hapus --}}
-                                <form method="POST" action="{{ route('admin.soal.destroy', $soal) }}" class="inline"
-                                      onsubmit="confirmAction(event, 'Yakin ingin menghapus dokumen ini?', 'Ya, Hapus', true)">
-                                    @csrf @method('DELETE')
-                                    <button type="submit"
-                                            id="delete-soal-{{ $soal->id }}"
-                                            class="p-2 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+
+                                    {{-- 3. Simulasi Mahasiswa (Preview) --}}
+                                    <a href="{{ route('admin.soal.preview', $soal) }}" target="_blank"
+                                       id="preview-soal-{{ $soal->id }}"
+                                       class="flex items-center gap-2.5 px-3 py-2 text-xs text-gray-200 hover:text-green-300 hover:bg-green-500/10 transition-colors group">
+                                        <div class="w-7 h-7 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold truncate">Simulasi Mahasiswa</p>
+                                            <p class="text-[10px] text-gray-400 truncate">Buka pratinjau publik</p>
+                                        </div>
+                                        <svg class="w-3 h-3 text-gray-400 group-hover:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                                         </svg>
+                                    </a>
+
+                                    {{-- 4. Salin Link Akses --}}
+                                    <button type="button"
+                                            onclick="copyLink('{{ route('soal.access', $soal->slug ?: $soal->unique_token) }}'); open = false;"
+                                            id="copy-link-{{ $soal->id }}"
+                                            class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-gray-200 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors group cursor-pointer">
+                                        <div class="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold truncate">Salin Link Akses</p>
+                                            <p class="text-[10px] text-gray-400 truncate">URL portal mahasiswa</p>
+                                        </div>
                                     </button>
-                                </form>
+
+                                    {{-- Section 2: Kontrol Status & Bahaya --}}
+                                    <div class="border-t my-1 border-[#1A2820]"></div>
+
+                                    {{-- 5. Toggle Active --}}
+                                    <form method="POST" action="{{ route('admin.soal.toggle', $soal) }}" class="block m-0">
+                                        @csrf @method('PATCH')
+                                        <button type="submit"
+                                                id="toggle-soal-{{ $soal->id }}"
+                                                class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs transition-colors group cursor-pointer {{ $soal->is_active ? 'text-gray-200 hover:text-orange-300 hover:bg-orange-500/10' : 'text-gray-200 hover:text-green-300 hover:bg-green-500/10' }}">
+                                            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform {{ $soal->is_active ? 'bg-orange-500/10 border border-orange-500/20 text-orange-400' : 'bg-green-500/10 border border-green-500/20 text-green-400' }}">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $soal->is_active ? 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' }}"/>
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="font-semibold truncate">{{ $soal->is_active ? 'Nonaktifkan Dokumen' : 'Aktifkan Dokumen' }}</p>
+                                                <p class="text-[10px] text-gray-400 truncate">{{ $soal->is_active ? 'Kunci akses mahasiswa' : 'Buka akses mahasiswa' }}</p>
+                                            </div>
+                                        </button>
+                                    </form>
+
+                                    {{-- 6. Hapus Dokumen --}}
+                                    <form method="POST" action="{{ route('admin.soal.destroy', $soal) }}" class="block m-0"
+                                          onsubmit="confirmAction(event, 'Yakin ingin menghapus dokumen ini?', 'Ya, Hapus', true)">
+                                        @csrf @method('DELETE')
+                                        <button type="submit"
+                                                id="delete-soal-{{ $soal->id }}"
+                                                class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-rose-300 hover:text-rose-200 hover:bg-rose-500/15 transition-colors group cursor-pointer">
+                                            <div class="w-7 h-7 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="font-semibold truncate">Hapus Dokumen</p>
+                                                <p class="text-[10px] text-rose-400/70 truncate">Pindahkan ke tong sampah</p>
+                                            </div>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -356,7 +447,7 @@
 </div>
 
 {{-- ─── Pop Up Modal: Tambah Dokumen Baru ─── --}}
-<div id="create-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden">
+<div id="create-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 hidden" style="z-index: 100;">
     {{-- Backdrop --}}
     <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="closeCreateModal()"></div>
 
@@ -407,10 +498,16 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="modal_kode_unik" class="block text-sm font-medium text-gray-300 mb-2">Kode Unik Akses <span class="text-red-400">*</span></label>
-                                <input type="text" id="modal_kode_unik" name="kode_unik" 
-                                       value="{{ old('kode_unik', 'AMSSOAL-' . Str::upper(Str::random(5))) }}" required
-                                       class="w-full bg-[#090E0B] border {{ $errors->has('kode_unik') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500">
-                                <p class="mt-1 text-xs text-gray-500">Kode yang dimasukkan mahasiswa untuk mengakses dokumen.</p>
+                                <div class="relative">
+                                    <input type="text" id="modal_kode_unik" name="kode_unik" 
+                                           value="{{ old('kode_unik', 'AMSSOAL-' . Str::upper(Str::random(5))) }}" required
+                                           autocomplete="off"
+                                           class="w-full bg-[#090E0B] border {{ $errors->has('kode_unik') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-4 py-3 pr-10 text-sm focus:outline-none focus:border-emerald-500 transition-colors">
+                                    <div id="modal_kode_unik_indicator" class="absolute right-3.5 top-1/2 -translate-y-1/2 hidden flex items-center pointer-events-none"></div>
+                                </div>
+                                <div id="modal_kode_unik_feedback" class="mt-1.5 text-xs text-gray-500">
+                                    Kode yang dimasukkan mahasiswa untuk mengakses dokumen.
+                                </div>
                                 @error('kode_unik') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
                             </div>
 
@@ -475,13 +572,15 @@
                     <p class="text-xs text-gray-400 mb-3">Tambahkan link eksternal (Google Drive, Repository GitHub, Video Tutorial, Figma, dll).</p>
 
                     <div id="modal-links-container" class="space-y-2">
+                        @php $oldLinks = old('links', [['title' => '', 'url' => '']]); @endphp
+                        @foreach($oldLinks as $idx => $link)
                         <div class="grid grid-cols-1 md:grid-cols-12 gap-2 link-row bg-gray-800/40 p-3 rounded-xl border border-[#1A2820]">
                             <div class="md:col-span-4">
-                                <input type="text" name="links[0][title]" placeholder="Label Link (misal: GitHub Repo)"
+                                <input type="text" name="links[{{ $idx }}][title]" value="{{ $link['title'] ?? '' }}" placeholder="Label Link (misal: GitHub Repo)"
                                        class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
                             </div>
                             <div class="md:col-span-7">
-                                <input type="url" name="links[0][url]" placeholder="https://..."
+                                <input type="url" name="links[{{ $idx }}][url]" value="{{ $link['url'] ?? '' }}" placeholder="https://..."
                                        class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
                             </div>
                             <div class="md:col-span-1 flex items-center justify-center">
@@ -490,6 +589,7 @@
                                 </button>
                             </div>
                         </div>
+                        @endforeach
                     </div>
                 </div>
 
@@ -537,27 +637,27 @@
                     <label class="block text-sm font-medium text-gray-300 mb-3">Masa Aktif Akses Dokumen</label>
                     <div class="flex gap-5 mb-3">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="access_type" value="lifetime" checked
+                            <input type="radio" name="access_type" value="lifetime" {{ old('access_type', 'lifetime') === 'lifetime' ? 'checked' : '' }}
                                    class="accent-emerald-500 bg-[#090E0B] border-gray-600"
                                    onchange="document.getElementById('modal-schedule-fields').classList.add('hidden')">
                             <span class="text-sm text-gray-300">Selamanya (Tanpa Batas Waktu)</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="access_type" value="scheduled"
+                            <input type="radio" name="access_type" value="scheduled" {{ old('access_type') === 'scheduled' ? 'checked' : '' }}
                                    class="accent-emerald-500 bg-[#090E0B] border-gray-600"
                                    onchange="document.getElementById('modal-schedule-fields').classList.remove('hidden')">
                             <span class="text-sm text-gray-300">Terjadwal (Waktu Tertentu)</span>
                         </label>
                     </div>
-                    <div id="modal-schedule-fields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#090E0B]/40 p-4 rounded-xl border border-[#1A2820]">
+                    <div id="modal-schedule-fields" class="{{ old('access_type') === 'scheduled' ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#090E0B]/40 p-4 rounded-xl border border-[#1A2820]">
                         <div>
                             <label class="block text-xs text-gray-400 mb-1.5">Mulai Aktif</label>
-                            <input type="datetime-local" name="active_from"
+                            <input type="datetime-local" name="active_from" value="{{ old('active_from') }}"
                                    class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1.5">Berakhir</label>
-                            <input type="datetime-local" name="active_until"
+                            <input type="datetime-local" name="active_until" value="{{ old('active_until') }}"
                                    class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
                         </div>
                     </div>
@@ -567,24 +667,24 @@
                 <div class="pt-5 border-t border-[#1A2820]">
                     <label class="block text-sm font-medium text-gray-300 mb-2">Fitur Pengumpulan Tugas bagi Mahasiswa</label>
                     <label class="flex items-center gap-2 cursor-pointer mb-3">
-                        <input type="checkbox" name="is_submission_enabled" id="modal_is_submission_enabled" value="1"
+                        <input type="checkbox" name="is_submission_enabled" id="modal_is_submission_enabled" value="1" {{ old('is_submission_enabled') ? 'checked' : '' }}
                                class="accent-emerald-500 bg-[#090E0B] border-gray-600 w-4 h-4 rounded"
                                onchange="toggleModalSubmissionSection(this.checked)">
                         <span class="text-sm text-gray-300">Aktifkan Form Pengumpulan Tugas pada Soal Ini</span>
                     </label>
 
-                    <div id="modal-submission-options" class="hidden space-y-4 bg-[#090E0B]/40 p-4 rounded-xl border border-[#1A2820]">
+                    <div id="modal-submission-options" class="{{ old('is_submission_enabled') ? '' : 'hidden' }} space-y-4 bg-[#090E0B]/40 p-4 rounded-xl border border-[#1A2820]">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs text-gray-400 mb-1.5">Batas Waktu Pengumpulan (Deadline) <span class="text-red-400">*</span></label>
-                                <input type="datetime-local" id="modal_deadline_at" name="deadline_at"
+                                <input type="datetime-local" id="modal_deadline_at" name="deadline_at" value="{{ old('deadline_at') }}"
                                        class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-emerald-500">
                             </div>
                             <div>
                                 <label class="block text-xs text-gray-400 mb-1.5">Instruksi Tambahan (Opsional)</label>
                                 <textarea name="submission_instructions" rows="2"
                                           placeholder="Contoh: Cantumkan link GitHub/Drive publik atau upload laporan PDF."
-                                          class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+                                          class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-emerald-500 resize-none">{{ old('submission_instructions') }}</textarea>
                             </div>
                         </div>
 
@@ -601,17 +701,20 @@
                         {{-- Tipe Pengumpulan yang Diizinkan --}}
                         <div>
                             <label class="block text-xs text-gray-300 font-semibold mb-2">Metode Pengumpulan yang Diizinkan Mahasiswa <span class="text-red-400">*</span></label>
+                            @php
+                                $oldSubTypes = old('submission_types', ['file', 'link', 'text']);
+                            @endphp
                             <div class="flex flex-wrap gap-4">
                                 <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-2 rounded-lg border border-gray-700">
-                                    <input type="checkbox" name="submission_types[]" value="file" checked class="accent-emerald-500 w-4 h-4 rounded">
+                                    <input type="checkbox" name="submission_types[]" value="file" {{ in_array('file', (array)$oldSubTypes) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                     <span class="text-xs text-gray-200">📁 File Dokumen</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-2 rounded-lg border border-gray-700">
-                                    <input type="checkbox" name="submission_types[]" value="link" checked class="accent-emerald-500 w-4 h-4 rounded">
+                                    <input type="checkbox" name="submission_types[]" value="link" {{ in_array('link', (array)$oldSubTypes) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                     <span class="text-xs text-gray-200">🔗 Tautan / Link URL</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-2 rounded-lg border border-gray-700">
-                                    <input type="checkbox" name="submission_types[]" value="text" checked class="accent-emerald-500 w-4 h-4 rounded">
+                                    <input type="checkbox" name="submission_types[]" value="text" {{ in_array('text', (array)$oldSubTypes) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                     <span class="text-xs text-gray-200">📝 Teks Langsung</span>
                                 </label>
                             </div>
@@ -621,37 +724,40 @@
                         <div>
                             <label class="block text-xs text-gray-300 font-semibold mb-1">Format File yang Diizinkan (Jika Mengunggah File)</label>
                             <p class="text-[11px] text-gray-400 mb-2">Setiap file yang diupload mahasiswa wajib lolos security check (anti-shell, anti-executable, anti-spoof MIME).</p>
+                            @php
+                                $oldAllowedExts = old('allowed_extensions', ['pdf', 'word', 'excel', 'ppt', 'image', 'archive', 'pkt']);
+                            @endphp
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
                                 <label class="flex items-center gap-2 cursor-pointer bg-emerald-500/10 border border-emerald-500/30 p-2 rounded-lg">
-                                    <input type="checkbox" name="allowed_extensions[]" value="all" class="accent-emerald-500 w-4 h-4 rounded">
+                                    <input type="checkbox" name="allowed_extensions[]" value="all" {{ in_array('all', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                     <span class="text-xs text-emerald-300 font-bold">Semua Format (Aman)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                    <input type="checkbox" name="allowed_extensions[]" value="pdf" checked class="accent-emerald-500 w-4 h-4 rounded">
+                                    <input type="checkbox" name="allowed_extensions[]" value="pdf" {{ in_array('pdf', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                     <span class="text-xs text-gray-300">PDF (.pdf)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                    <input type="checkbox" name="allowed_extensions[]" value="word" checked class="accent-emerald-500 w-4 h-4 rounded">
+                                    <input type="checkbox" name="allowed_extensions[]" value="word" {{ in_array('word', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                     <span class="text-xs text-gray-300">Word (.doc, .docx)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                    <input type="checkbox" name="allowed_extensions[]" value="excel" class="accent-emerald-500 w-4 h-4 rounded">
+                                    <input type="checkbox" name="allowed_extensions[]" value="excel" {{ in_array('excel', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                     <span class="text-xs text-gray-300">Excel (.xls, .xlsx)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                    <input type="checkbox" name="allowed_extensions[]" value="ppt" class="accent-emerald-500 w-4 h-4 rounded">
+                                    <input type="checkbox" name="allowed_extensions[]" value="ppt" {{ in_array('ppt', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                     <span class="text-xs text-gray-300">PowerPoint (.ppt)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                    <input type="checkbox" name="allowed_extensions[]" value="image" class="accent-emerald-500 w-4 h-4 rounded">
+                                    <input type="checkbox" name="allowed_extensions[]" value="image" {{ in_array('image', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                     <span class="text-xs text-gray-300">Gambar (.jpg, .png)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                    <input type="checkbox" name="allowed_extensions[]" value="archive" class="accent-emerald-500 w-4 h-4 rounded">
+                                    <input type="checkbox" name="allowed_extensions[]" value="archive" {{ in_array('archive', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                     <span class="text-xs text-gray-300">Arsip (.zip, .rar)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
-                                    <input type="checkbox" name="allowed_extensions[]" value="pkt" class="accent-emerald-500 w-4 h-4 rounded">
+                                    <input type="checkbox" name="allowed_extensions[]" value="pkt" {{ in_array('pkt', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
                                     <span class="text-xs text-gray-300">Packet Tracer (.pkt)</span>
                                 </label>
                             </div>
@@ -676,7 +782,7 @@
 </div>
 
 {{-- ─── POP UP MODAL EDIT DOKUMEN ─── --}}
-<div id="editModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 items-center justify-center">
+<div id="editModal" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm p-4 items-center justify-center" style="z-index: 100;">
     <div class="rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] border"
          style="background:#0F1713;border-color:#1A2820;">
 
@@ -721,9 +827,13 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="edit_modal_kode_unik" class="block text-xs font-medium text-gray-300 mb-1.5">Kode Unik Akses <span class="text-red-400">*</span></label>
-                            <input type="text" id="edit_modal_kode_unik" name="kode_unik" required
-                                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500">
-                            <p class="mt-1 text-[11px] text-gray-500">Boleh diubah, asal unik.</p>
+                            <div class="relative">
+                                <input type="text" id="edit_modal_kode_unik" name="kode_unik" required
+                                       autocomplete="off"
+                                       class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 pr-10 text-xs focus:outline-none focus:border-emerald-500 transition-colors">
+                                <div id="edit_modal_kode_unik_indicator" class="absolute right-3 top-1/2 -translate-y-1/2 hidden flex items-center pointer-events-none"></div>
+                            </div>
+                            <div id="edit_modal_kode_unik_feedback" class="mt-1 text-[11px] text-gray-500">Boleh diubah, asal unik.</div>
                         </div>
 
                         <div>
@@ -1130,6 +1240,9 @@ function openEditModalForSoal(id) {
     // Basic Fields
     document.getElementById('edit_modal_title').value = data.title || '';
     document.getElementById('edit_modal_kode_unik').value = data.kode_unik || '';
+    if (typeof resetKodeUnikState === 'function') {
+        resetKodeUnikState('edit_modal_kode_unik', 'edit_modal_kode_unik_feedback', 'edit_modal_kode_unik_indicator', 'Boleh diubah, asal unik.');
+    }
     document.getElementById('edit_modal_category_id').value = data.category_id || '';
     document.getElementById('edit_modal_password').value = '';
     document.getElementById('edit_modal_description').value = data.description || '';
@@ -1543,8 +1656,168 @@ function toggleModalSubmissionSection(checked) {
     }
 }
 
+// Realtime Kode Unik Availability Checker
+function resetKodeUnikState(inputId, feedbackId, indicatorId, defaultText) {
+    const input = document.getElementById(inputId);
+    const feedback = document.getElementById(feedbackId);
+    const indicator = document.getElementById(indicatorId);
+    if (!input || !feedback) return;
+
+    input.classList.remove('border-red-500', 'border-emerald-500', 'focus:border-red-500');
+    input.classList.add('border-gray-700', 'focus:border-emerald-500');
+    feedback.className = 'mt-1 text-xs text-gray-500';
+    feedback.textContent = defaultText;
+    if (indicator) {
+        indicator.className = 'absolute right-3.5 top-1/2 -translate-y-1/2 hidden flex items-center pointer-events-none';
+        indicator.innerHTML = '';
+    }
+}
+
+function initKodeUnikChecker(config) {
+    const input = document.getElementById(config.inputId);
+    const feedback = document.getElementById(config.feedbackId);
+    const indicator = document.getElementById(config.indicatorId);
+    const form = config.formId ? document.getElementById(config.formId) : null;
+    const submitBtn = config.submitBtnId ? document.getElementById(config.submitBtnId) : null;
+    if (!input || !feedback) return;
+
+    let debounceTimer = null;
+    let abortCtrl = null;
+    let isCodeTaken = false;
+
+    const checkAvailability = () => {
+        const val = input.value.trim();
+        const ignoreId = typeof config.getIgnoreId === 'function' ? config.getIgnoreId() : null;
+
+        if (!val) {
+            resetKodeUnikState(config.inputId, config.feedbackId, config.indicatorId, config.defaultText);
+            isCodeTaken = false;
+            if (submitBtn) submitBtn.disabled = false;
+            return;
+        }
+
+        if (abortCtrl) abortCtrl.abort();
+        abortCtrl = new AbortController();
+
+        if (indicator) {
+            indicator.classList.remove('hidden');
+            indicator.innerHTML = `
+                <svg class="animate-spin h-4 w-4 text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+            `;
+        }
+        feedback.className = 'mt-1 text-xs text-emerald-400 flex items-center gap-1.5';
+        feedback.innerHTML = `<span>Memeriksa ketersediaan kode...</span>`;
+
+        const url = new URL("{{ route('admin.soal.check-kode-unik') }}", window.location.origin);
+        url.searchParams.set('kode_unik', val);
+        if (ignoreId) url.searchParams.set('ignore_id', ignoreId);
+
+        fetch(url.toString(), {
+            headers: { 'Accept': 'application/json' },
+            signal: abortCtrl.signal
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (indicator) indicator.classList.remove('hidden');
+            if (data.available) {
+                isCodeTaken = false;
+                input.classList.remove('border-red-500', 'border-gray-700', 'focus:border-red-500');
+                input.classList.add('border-emerald-500');
+                feedback.className = 'mt-1 text-xs text-emerald-400 flex items-center gap-1.5 font-medium';
+                feedback.innerHTML = `
+                    <svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span>${data.message || 'Kode unik tersedia.'}</span>
+                `;
+                if (indicator) {
+                    indicator.innerHTML = `
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    `;
+                }
+                if (submitBtn) submitBtn.disabled = false;
+            } else {
+                isCodeTaken = true;
+                input.classList.remove('border-emerald-500', 'border-gray-700', 'focus:border-emerald-500');
+                input.classList.add('border-red-500', 'focus:border-red-500');
+                feedback.className = 'mt-1 text-xs text-red-400 flex items-center gap-1.5 font-medium';
+                feedback.innerHTML = `
+                    <svg class="w-3.5 h-3.5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <span>${data.message || 'Kode unik sudah digunakan.'}</span>
+                `;
+                if (indicator) {
+                    indicator.innerHTML = `
+                        <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    `;
+                }
+            }
+        })
+        .catch(err => {
+            if (err.name === 'AbortError') return;
+            if (indicator) indicator.classList.add('hidden');
+            feedback.className = 'mt-1 text-xs text-gray-500';
+            feedback.textContent = config.defaultText;
+        });
+    };
+
+    input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(checkAvailability, 350);
+    });
+
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            if (isCodeTaken) {
+                e.preventDefault();
+                input.focus();
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Kode Unik Telah Digunakan',
+                        text: 'Silakan ubah kode unik akses sebelum menyimpan dokumen.',
+                        background: '#0F1713',
+                        color: '#F3F4F6',
+                        backdrop: 'rgba(9, 13, 11, 0.75)',
+                        confirmButtonText: 'Perbaiki'
+                    });
+                }
+            }
+        });
+    }
+}
+
 // Drag & drop support on modal drop zone
 document.addEventListener('DOMContentLoaded', () => {
+    // Inisialisasi Realtime Checker untuk Modal Tambah & Modal Edit
+    initKodeUnikChecker({
+        inputId: 'modal_kode_unik',
+        feedbackId: 'modal_kode_unik_feedback',
+        indicatorId: 'modal_kode_unik_indicator',
+        formId: 'create-soal-modal-form',
+        submitBtnId: 'save-soal-modal-btn',
+        defaultText: 'Kode yang dimasukkan mahasiswa untuk mengakses dokumen.'
+    });
+
+    initKodeUnikChecker({
+        inputId: 'edit_modal_kode_unik',
+        feedbackId: 'edit_modal_kode_unik_feedback',
+        indicatorId: 'edit_modal_kode_unik_indicator',
+        formId: 'modal-edit-soal-form',
+        getIgnoreId: () => {
+            const el = document.getElementById('edit_modal_soal_id');
+            return el ? el.value : null;
+        },
+        defaultText: 'Boleh diubah, asal unik.'
+    });
     const dropZone = document.getElementById('modal-drop-zone');
     const fileInput = document.getElementById('modal_files');
     if (dropZone && fileInput) {
@@ -1570,8 +1843,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    @if($errors->any() && old('_method') === 'PUT' && old('soal_id'))
+    @if($errors->any() && (old('_method') === 'PUT' || old('soal_id')))
         openEditModalForSoal({{ old('soal_id') }});
+        // Populate inputs with old() data if available after failed validation
+        @if(old('title')) document.getElementById('edit_modal_title').value = @json(old('title')); @endif
+        @if(old('kode_unik')) document.getElementById('edit_modal_kode_unik').value = @json(old('kode_unik')); @endif
+        @if(old('category_id')) document.getElementById('edit_modal_category_id').value = @json(old('category_id')); @endif
+        @if(old('description')) document.getElementById('edit_modal_description').value = @json(old('description')); @endif
+        @if(old('content_text')) document.getElementById('edit_modal_content_text').value = @json(old('content_text')); @endif
+        @if(old('access_type'))
+            if (@json(old('access_type')) === 'scheduled') {
+                document.getElementById('edit_access_type_scheduled').checked = true;
+                document.getElementById('edit-modal-schedule-fields').classList.remove('hidden');
+            } else {
+                document.getElementById('edit_access_type_lifetime').checked = true;
+                document.getElementById('edit-modal-schedule-fields').classList.add('hidden');
+            }
+        @endif
+        @if(old('active_from')) document.getElementById('edit_modal_active_from').value = @json(old('active_from')); @endif
+        @if(old('active_until')) document.getElementById('edit_modal_active_until').value = @json(old('active_until')); @endif
+        @if(old('deadline_at')) document.getElementById('edit_modal_deadline_at').value = @json(old('deadline_at')); @endif
+        @if(old('submission_instructions')) document.getElementById('edit_modal_submission_instructions').value = @json(old('submission_instructions')); @endif
+        @if(old('classes')) document.getElementById('edit_modal_classes').value = @json(old('classes')); @endif
     @elseif($errors->any() || request('action') === 'create')
         openCreateModal();
     @endif

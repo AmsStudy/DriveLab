@@ -577,7 +577,11 @@ html:not(.dark) #editModal > div,
 html:not(.dark) #textSubmissionModal > div,
 html:not(.dark) #createQuizModal > div,
 html:not(.dark) #editQuizModal > div,
-html:not(.dark) #create-modal > div {
+html:not(.dark) #create-modal > div,
+html:not(.dark) #addQuestionModal > div,
+html:not(.dark) #editQuestionModal > div,
+html:not(.dark) #importExcelModal > div,
+html:not(.dark) [id$="Modal"] > div {
     background-color: #FFFFFF !important;
     border-color: #E2EAE5 !important;
     color: #0F1F17 !important;
@@ -586,6 +590,68 @@ html:not(.dark) #modalTextContent {
     background-color: #F8FAF9 !important;
     border-color: #E2EAE5 !important;
     color: #0F1F17 !important;
+}
+
+/* Question Cards & CBT Arena in Light Mode */
+html:not(.dark) .question-card,
+html:not(.dark) .bg-\[\#0F1713\] {
+    background-color: #FFFFFF !important;
+    border-color: #E2EAE5 !important;
+}
+html:not(.dark) .bg-\[\#090D0B\],
+html:not(.dark) .bg-\[\#070D09\],
+html:not(.dark) .bg-\[\#0A0F0D\] {
+    background-color: #F8FAF9 !important;
+    border-color: #E2EAE5 !important;
+}
+html:not(.dark) .option-card {
+    background-color: #FFFFFF !important;
+    border-color: #E2EAE5 !important;
+    color: #0F1F17 !important;
+}
+html:not(.dark) .option-card:hover {
+    background-color: #F8FAF9 !important;
+    border-color: #10B981 !important;
+}
+html:not(.dark) .question-img-container,
+html:not(.dark) [class*="cursor-zoom-in"].bg-black\/40,
+html:not(.dark) [class*="cursor-zoom-in"].bg-black\/50 {
+    background-color: #F1F5F3 !important;
+    border-color: #E2EAE5 !important;
+}
+
+/* Light mode protection for question badges */
+html:not(.dark) .badge-tunggal {
+    background-color: #F3F4F6 !important;
+    border-color: #E5E7EB !important;
+    color: #374151 !important;
+}
+
+/* Light mode protection for Action / Aksi dropdown in tables */
+html:not(.dark) [id^="action-menu-button-"] {
+    background-color: #FFFFFF !important;
+    border-color: #D1DCD6 !important;
+    color: #1F2937 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+html:not(.dark) [id^="action-menu-button-"]:hover {
+    background-color: #F8FAF9 !important;
+    border-color: #10B981 !important;
+    color: #059669 !important;
+}
+html:not(.dark) [id^="action-menu-button-"] ~ div {
+    background-color: #FFFFFF !important;
+    border-color: #E2EAE5 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 15px rgba(16, 185, 129, 0.06) !important;
+}
+html:not(.dark) [id^="action-menu-button-"] ~ div a,
+html:not(.dark) [id^="action-menu-button-"] ~ div button {
+    color: #374151 !important;
+}
+html:not(.dark) [id^="action-menu-button-"] ~ div a:hover,
+html:not(.dark) [id^="action-menu-button-"] ~ div button:hover {
+    background-color: rgba(16, 185, 129, 0.08) !important;
+    color: #059669 !important;
 }
 
 /* SweetAlert2 Light Mode */

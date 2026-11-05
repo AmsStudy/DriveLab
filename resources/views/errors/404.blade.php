@@ -12,3 +12,4 @@
 @section('heading', 'Halaman Tidak Ditemukan')
 
 @section('message', 'Tautan yang Anda tuju mungkin salah ketik, telah dipindahkan, atau berkas/kuis tersebut sudah dinonaktifkan oleh instruktur lab.')
+

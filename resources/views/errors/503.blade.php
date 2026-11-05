@@ -13,3 +13,4 @@
 @section('heading', 'Layanan Sedang dalam Pemeliharaan')
 
 @section('message', 'Platform IC-LABS Repository sedang menjalani pemeliharaan berkala untuk peningkatan performa dan keamanan laboratorium. Kami akan segera kembali aktif.')
+

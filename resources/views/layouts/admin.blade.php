@@ -349,7 +349,7 @@
                 left: 0 !important;
                 width: var(--sidebar-width) !important;
                 transform: translateX(0);
-                z-index: 40 !important;
+                z-index: 60 !important;
                 display: flex !important;
                 box-shadow: none !important;
                 transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease !important;
@@ -392,7 +392,7 @@
                 bottom: 0 !important;
                 left: 0 !important;
                 width: min(280px, 86vw) !important;
-                z-index: 60 !important;
+                z-index: 85 !important;
                 transform: translateX(-100%) !important;
                 transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease !important;
                 box-shadow: none !important;
@@ -429,7 +429,7 @@
             position: -webkit-sticky !important;
             position: sticky !important;
             top: 0 !important;
-            z-index: 40 !important;
+            z-index: 70 !important;
         }
 
         /* ─── Light Mode Theme Overrides for Admin Layout ─── */
@@ -630,6 +630,62 @@
         html:not(.dark) .sidebar-logout-btn:hover svg {
             color: #DC2626 !important;
         }
+
+        /* Light mode support for unified cyber lightbox */
+        html:not(.dark) #cyber-image-lightbox .lightbox-card {
+            background-color: #FFFFFF !important;
+            border-color: #D1DCD6 !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), 0 0 30px rgba(16, 185, 129, 0.15) !important;
+        }
+        html:not(.dark) #cyber-image-lightbox .lightbox-close-btn {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            border-color: #D1DCD6 !important;
+            color: #374151 !important;
+        }
+        html:not(.dark) #cyber-image-lightbox .lightbox-close-btn:hover {
+            background-color: #F3F4F6 !important;
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) #cyber-image-lightbox #cyber-lightbox-caption {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-color: #D1DCD6 !important;
+            color: #374151 !important;
+        }
+
+        /* Hover Zoom Tooltip Preview across Admin Views */
+        .cyber-hover-preview-bubble {
+            position: fixed;
+            pointer-events: none;
+            z-index: 110;
+            opacity: 0;
+            transform: scale(0.92) translateY(8px);
+            transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: min(440px, 90vw);
+            max-height: min(340px, 60vh);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            background: #0A0F0D;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(16, 185, 129, 0.25);
+            padding: 6px;
+        }
+        html:not(.dark) .cyber-hover-preview-bubble {
+            background: #FFFFFF !important;
+            border-color: #A7F3D0 !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18), 0 0 20px rgba(16, 185, 129, 0.15) !important;
+        }
+        .cyber-hover-preview-bubble.is-active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        .cyber-hover-preview-bubble img {
+            width: 100%;
+            height: auto;
+            max-height: calc(min(340px, 60vh) - 12px);
+            object-fit: contain;
+            border-radius: 12px;
+            display: block;
+        }
     </style>
 </head>
 <body class="text-gray-100 min-h-screen" style="background:#090D0B; font-family:'Inter',sans-serif; overflow-x:clip;">
@@ -637,7 +693,7 @@
     {{-- Mobile Sidebar Backdrop --}}
     <div id="mobile-sidebar-backdrop"
          onclick="toggleMobileSidebar(false)"
-         class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none"
+         class="fixed inset-0 z-80 bg-black/80 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none"
          style="display: none;">
     </div>
 
@@ -753,8 +809,8 @@
         <main id="main-content-wrapper" class="flex-1 flex flex-col min-h-screen min-w-0 transition-all duration-300">
             {{-- Top Header --}}
             <header id="top-navbar"
-                    class="admin-header px-4 sm:px-6 py-3.5 sticky top-0 z-40 flex items-center"
-                    style="position:-webkit-sticky; position:sticky; top:0; z-index:40; background:rgba(9,13,11,.95); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-bottom:1px solid #1A2820; height:65px;">
+                    class="admin-header px-4 sm:px-6 py-3.5 sticky top-0 z-70 flex items-center"
+                    style="position:-webkit-sticky; position:sticky; top:0; z-index:70; background:rgba(9,13,11,.95); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-bottom:1px solid #1A2820; height:65px;">
                 <div class="flex items-center justify-between gap-3 w-full">
                     <div class="flex items-center gap-3 sm:gap-4 min-w-0">
                         {{-- Master Cyber Hamburger Toggle Button --}}
@@ -816,7 +872,7 @@
             {{-- Flash messages are handled dynamically via modern SweetAlert2 popups below --}}
 
             {{-- Page Content --}}
-            <div class="p-4 sm:p-6 flex-1 min-w-0">
+            <div class="p-4 sm:p-6 flex-1 min-w-0 flex flex-col">
                 @yield('content')
             </div>
         </main>
@@ -824,6 +880,67 @@
 
     {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}
     @include('components.cyber-loading')
+
+    {{-- ─── HOVER PREVIEW POPUP (INSTANT BUBBLE SAAT KURSOR MENDEKAT) ─── --}}
+    <div id="cyber-hover-preview-bubble" class="cyber-hover-preview-bubble">
+        <img id="cyber-hover-preview-img" src="" alt="Pratinjau Kursor">
+    </div>
+
+    {{-- ─── UNIFIED IMAGE LIGHTBOX PREVIEW POPUP DENGAN ZOOM IN / ZOOM OUT ─── --}}
+    <div id="cyber-image-lightbox"
+         class="fixed inset-0 z-[120] hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300"
+         style="z-index: 120;"
+         onclick="closeCyberLightbox(event)">
+        <div class="relative max-w-5xl max-h-[92vh] flex flex-col items-center justify-center select-none" onclick="event.stopPropagation()">
+            
+            {{-- Top Controls Bar: Zoom In, Zoom Out, Reset, & Close --}}
+            <div class="absolute -top-14 right-0 sm:right-0 flex items-center gap-2">
+                <div class="flex items-center bg-[#0F1713]/90 hover:bg-[#142019] border border-[#1E3327] rounded-xl px-1.5 py-1 shadow-lg text-xs font-semibold gap-1 lightbox-card">
+                    <button type="button"
+                            onclick="adjustCyberLightboxZoom(-0.25)"
+                            class="w-7 h-7 rounded-lg flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            title="Zoom Out (−)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                    </button>
+                    <span id="cyber-lightbox-zoom-label" class="px-2 font-mono text-emerald-400 font-bold min-w-[50px] text-center">100%</span>
+                    <button type="button"
+                            onclick="adjustCyberLightboxZoom(0.25)"
+                            class="w-7 h-7 rounded-lg flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            title="Zoom In (+)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    </button>
+                    <button type="button"
+                            onclick="resetCyberLightboxZoom()"
+                            class="px-2 py-1 rounded-md text-[11px] text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer font-mono"
+                            title="Reset Skala 100%">
+                        1:1
+                    </button>
+                </div>
+
+                <button type="button"
+                        onclick="closeCyberLightbox()"
+                        class="p-2 text-gray-400 hover:text-white bg-[#0F1713]/80 hover:bg-[#1A2820] border border-[#1E3327] rounded-xl transition-all shadow-lg flex items-center gap-1.5 text-xs font-semibold lightbox-close-btn"
+                        title="Tutup (Esc)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span class="hidden sm:inline">Tutup</span>
+                </button>
+            </div>
+
+            {{-- Image Box with Zoom --}}
+            <div class="rounded-2xl overflow-hidden border border-emerald-500/30 bg-[#0A0F0D] lightbox-card shadow-[0_0_50px_rgba(0,0,0,0.9),0_0_25px_rgba(16,185,129,0.2)] p-2 max-w-full max-h-[82vh] flex items-center justify-center"
+                 onwheel="handleCyberLightboxWheel(event)">
+                <div class="overflow-hidden flex items-center justify-center">
+                    <img id="cyber-lightbox-img" src="" alt="Pratinjau Gambar"
+                         class="max-w-full max-h-[80vh] w-auto h-auto object-contain rounded-xl transition-transform duration-100 ease-out select-none cursor-grab active:cursor-grabbing"
+                         style="transform: scale(1);"
+                         draggable="false">
+                </div>
+            </div>
+
+            {{-- Caption / Subtitle --}}
+            <p id="cyber-lightbox-caption" class="text-xs text-gray-300 font-medium mt-3 text-center px-4 py-1.5 rounded-full bg-[#0F1713]/90 border border-[#1E3327] max-w-xl truncate lightbox-caption"></p>
+        </div>
+    </div>
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -1094,8 +1211,8 @@
 
             // Floating Options Menu
             const menu = document.createElement('div');
-            menu.className = 'cyber-dropdown-menu hidden absolute left-0 mt-2 z-50 p-1.5 rounded-2xl border backdrop-blur-xl shadow-2xl max-h-60 overflow-y-auto ' +
-                (isFull ? 'w-full right-0' : 'min-w-[190px] w-max');
+            menu.className = 'cyber-dropdown-menu hidden absolute left-0 mt-2 z-[110] p-1.5 rounded-2xl border backdrop-blur-xl shadow-2xl max-h-64 overflow-y-auto ' +
+                (isFull ? 'w-full right-0 min-w-full' : 'min-w-[240px] w-max max-w-sm');
 
             function renderOptions() {
                 menu.innerHTML = '';
@@ -1107,11 +1224,11 @@
                         (isSelected ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30' : 'text-gray-300 hover:bg-emerald-500/10 hover:text-emerald-300');
 
                     const itemContent = document.createElement('span');
-                    itemContent.className = 'flex items-center gap-2 truncate';
-                    itemContent.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-emerald-400 shadow-[0_0_8px_#10B981]' : 'bg-gray-600'}"></span><span>${opt.textContent}</span>`;
+                    itemContent.className = 'flex items-center gap-2 min-w-0 pr-2';
+                    itemContent.innerHTML = `<span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${isSelected ? 'bg-emerald-400 shadow-[0_0_8px_#10B981]' : 'bg-gray-600'}"></span><span class="break-words leading-snug">${opt.textContent}</span>`;
 
                     const checkIcon = document.createElement('span');
-                    checkIcon.className = 'check-icon flex-shrink-0 ' + (isSelected ? 'text-emerald-400' : 'opacity-0');
+                    checkIcon.className = 'check-icon flex-shrink-0 self-center ' + (isSelected ? 'text-emerald-400' : 'opacity-0');
                     checkIcon.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
 
                     item.appendChild(itemContent);
@@ -1357,6 +1474,116 @@
         updateClock();
         setInterval(updateClock, 1000);
     })();
+
+    // ── Global Cyber Lightbox & Hover Zoom Helpers ──
+    let currentCyberLightboxScale = 1.0;
+
+    window.openCyberLightbox = function(src, caption = '') {
+        const lb = document.getElementById('cyber-image-lightbox');
+        const img = document.getElementById('cyber-lightbox-img');
+        const cap = document.getElementById('cyber-lightbox-caption');
+        if (!lb || !img) return;
+
+        window.hideCyberHoverBubble();
+        currentCyberLightboxScale = 1.0;
+        img.src = src;
+        img.style.transform = 'scale(1)';
+        const zoomLbl = document.getElementById('cyber-lightbox-zoom-label');
+        if (zoomLbl) zoomLbl.textContent = '100%';
+
+        if (cap) {
+            cap.textContent = caption || 'Pratinjau Gambar';
+            cap.style.display = caption ? 'inline-block' : 'none';
+        }
+        lb.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeCyberLightbox = function() {
+        const lb = document.getElementById('cyber-image-lightbox');
+        const img = document.getElementById('cyber-lightbox-img');
+        if (!lb) return;
+        lb.classList.add('hidden');
+        if (img) {
+            img.src = '';
+            img.style.transform = 'scale(1)';
+        }
+        currentCyberLightboxScale = 1.0;
+        document.body.style.overflow = '';
+    };
+
+    window.adjustCyberLightboxZoom = function(delta) {
+        let nextScale = Math.round((currentCyberLightboxScale + delta) * 10) / 10;
+        if (nextScale < 0.5) nextScale = 0.5;
+        if (nextScale > 4.0) nextScale = 4.0;
+        currentCyberLightboxScale = nextScale;
+
+        const img = document.getElementById('cyber-lightbox-img');
+        const zoomLbl = document.getElementById('cyber-lightbox-zoom-label');
+        if (img) img.style.transform = `scale(${nextScale})`;
+        if (zoomLbl) zoomLbl.textContent = `${Math.round(nextScale * 100)}%`;
+    };
+
+    window.resetCyberLightboxZoom = function() {
+        currentCyberLightboxScale = 1.0;
+        const img = document.getElementById('cyber-lightbox-img');
+        const zoomLbl = document.getElementById('cyber-lightbox-zoom-label');
+        if (img) img.style.transform = 'scale(1)';
+        if (zoomLbl) zoomLbl.textContent = '100%';
+    };
+
+    window.handleCyberLightboxWheel = function(e) {
+        e.preventDefault();
+        window.adjustCyberLightboxZoom(e.deltaY < 0 ? 0.15 : -0.15);
+    };
+
+    // ── Instant Hover Preview Bubble ──
+    window.showCyberHoverBubble = function(e, src) {
+        const lb = document.getElementById('cyber-image-lightbox');
+        if (lb && !lb.classList.contains('hidden')) return;
+
+        const bubble = document.getElementById('cyber-hover-preview-bubble');
+        const bImg = document.getElementById('cyber-hover-preview-img');
+        if (!bubble || !bImg) return;
+
+        bImg.src = src;
+        bubble.classList.add('is-active');
+        window.updateCyberHoverBubblePos(e);
+    };
+
+    window.updateCyberHoverBubblePos = function(e) {
+        const bubble = document.getElementById('cyber-hover-preview-bubble');
+        if (!bubble || !bubble.classList.contains('is-active')) return;
+
+        const pad = 16;
+        const previewW = Math.min(420, window.innerWidth * 0.85);
+        const previewH = Math.min(320, window.innerHeight * 0.55);
+
+        let posX = e.clientX + pad;
+        let posY = e.clientY - (previewH / 2);
+
+        if (posX + previewW > window.innerWidth - pad) {
+            posX = e.clientX - previewW - pad;
+        }
+        if (posY < pad) posY = pad;
+        if (posY + previewH > window.innerHeight - pad) {
+            posY = window.innerHeight - previewH - pad;
+        }
+
+        bubble.style.left = `${posX}px`;
+        bubble.style.top = `${posY}px`;
+    };
+
+    window.hideCyberHoverBubble = function() {
+        const bubble = document.getElementById('cyber-hover-preview-bubble');
+        if (bubble) bubble.classList.remove('is-active');
+    };
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            window.closeCyberLightbox();
+        }
+    });
     </script>
     @stack('scripts')
 </body>

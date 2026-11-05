@@ -12,3 +12,4 @@
 @section('heading', 'Sesi Anda Telah Berakhir')
 
 @section('message', 'Halaman ini telah terbuka terlalu lama tanpa aktivitas sehingga token keamanan CSRF kedaluwarsa. Silakan muat ulang halaman untuk melanjutkan.')
+

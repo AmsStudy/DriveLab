@@ -44,9 +44,15 @@ class PublicQuizController extends Controller
         if (!empty($with)) {
             $query->with($with);
         }
-        return $query->where('slug', $identifier)
-            ->orWhere('unique_token', $identifier)
-            ->firstOrFail();
+
+        return $query->where(function ($q) use ($identifier) {
+            if (\Illuminate\Support\Facades\Schema::hasColumn('quizzes', 'slug')) {
+                $q->where('slug', $identifier)
+                  ->orWhere('unique_token', $identifier);
+            } else {
+                $q->where('unique_token', $identifier);
+            }
+        })->firstOrFail();
     }
 
     public function lobby(string $token)
@@ -143,11 +149,11 @@ class PublicQuizController extends Controller
                     QuizScoringService::finalize($ongoing, $ongoing->draft_answers ?? []);
                 } else {
                     session(['quiz_attempt_' . $quiz->id => $ongoing->id]);
-                    return redirect()->route('quiz.play', ['token' => $quiz->unique_token, 'attempt' => $ongoing->id]);
+                    return redirect()->route('quiz.play', ['token' => $token, 'attempt' => $ongoing->id]);
                 }
             } else {
                 session(['quiz_attempt_' . $quiz->id => $ongoing->id]);
-                return redirect()->route('quiz.play', ['token' => $quiz->unique_token, 'attempt' => $ongoing->id]);
+                return redirect()->route('quiz.play', ['token' => $token, 'attempt' => $ongoing->id]);
             }
         }
 
@@ -175,7 +181,7 @@ class PublicQuizController extends Controller
 
         session(['quiz_attempt_' . $quiz->id => $attempt->id]);
 
-        return redirect()->route('quiz.play', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
+        return redirect()->route('quiz.play', ['token' => $token, 'attempt' => $attempt->id]);
     }
 
     public function play(string $token, QuizAttempt $attempt)
@@ -184,7 +190,7 @@ class PublicQuizController extends Controller
         $this->validateAttemptAccess($quiz, $attempt);
 
         if ($attempt->isCompleted()) {
-            return redirect()->route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
+            return redirect()->route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]);
         }
 
         // Calculate time limit including any instructor extra time
@@ -198,7 +204,7 @@ class PublicQuizController extends Controller
             if ($timeRemaining <= 0) {
                 // Finalize preserving draft answers
                 QuizScoringService::finalize($attempt, $attempt->draft_answers ?? []);
-                return redirect()->route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
+                return redirect()->route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]);
             }
         }
 
@@ -396,7 +402,7 @@ class PublicQuizController extends Controller
             return response()->json([
                 'success'      => false,
                 'is_completed' => true,
-                'redirect'     => route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]),
+                'redirect'     => route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]),
                 'message'      => $attempt->is_force_submitted ? 'Ujian telah dikumpulkan oleh pengawas lab.' : 'Sesi kuis telah selesai.',
             ]);
         }
@@ -433,9 +439,9 @@ class PublicQuizController extends Controller
 
         if ($attempt->isCompleted()) {
             if ($request->wantsJson()) {
-                return response()->json(['redirect' => route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id])]);
+                return response()->json(['redirect' => route('quiz.results', ['token' => $token, 'attempt' => $attempt->id])]);
             }
-            return redirect()->route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
+            return redirect()->route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]);
         }
 
         $userAnswers = $request->input('answers', $attempt->draft_answers ?? []);
@@ -456,11 +462,11 @@ class PublicQuizController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'success'  => true,
-                'redirect' => route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]),
+                'redirect' => route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]),
             ]);
         }
 
-        return redirect()->route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
+        return redirect()->route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]);
     }
 
     public function results(string $token, QuizAttempt $attempt)
@@ -469,7 +475,7 @@ class PublicQuizController extends Controller
         $this->validateAttemptAccess($quiz, $attempt);
 
         if (!$attempt->isCompleted()) {
-            return redirect()->route('quiz.play', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]);
+            return redirect()->route('quiz.play', ['token' => $token, 'attempt' => $attempt->id]);
         }
 
         // Calculate student rank

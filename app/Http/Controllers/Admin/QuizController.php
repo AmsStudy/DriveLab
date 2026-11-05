@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class QuizController extends Controller
@@ -118,6 +119,9 @@ class QuizController extends Controller
 
         $quiz = new Quiz();
         $quiz->user_id               = auth()->id();
+        if ($quiz->title !== $validated['title'] || empty($quiz->slug)) {
+            $quiz->slug = Quiz::generateUniqueSlug($validated['title'], $quiz->id);
+        }
         $quiz->title                 = $validated['title'];
         if (!empty($validated['access_code'])) {
             $quiz->access_code       = $validated['access_code'];
@@ -195,6 +199,9 @@ class QuizController extends Controller
             'access_code.max'      => 'Kode akses kuis maksimal 20 karakter.',
         ]);
 
+        if ($quiz->title !== $validated['title'] || empty($quiz->slug)) {
+            $quiz->slug = Quiz::generateUniqueSlug($validated['title'], $quiz->id);
+        }
         $quiz->title                 = $validated['title'];
         $quiz->access_code           = $validated['access_code'];
         $quiz->description           = $validated['description'] ?? null;
@@ -854,10 +861,15 @@ class QuizController extends Controller
         return back()->with('success', "Sesi ujian {$attempt->student_name} ({$attempt->nim}) berhasil disubmit secara paksa!");
     }
 
-    public function downloadQuestionsTemplate(Request $request, Quiz $quiz): StreamedResponse
+    public function downloadQuestionsTemplate(Request $request, Quiz $quiz): StreamedResponse|BinaryFileResponse
     {
         $this->authorizeQuiz($quiz);
-        $format = $request->query('format', 'excel');
+        $format = strtolower((string)$request->query('format', 'excel'));
+
+        if ($format === 'excel' || $format === 'xlsx') {
+            return QuizImportService::downloadXlsxTemplate();
+        }
+
         $delimiter = ($format === 'csv' || $format === 'comma' || $format === 'standar') ? ',' : ';';
         return QuizImportService::downloadTemplate($delimiter);
     }

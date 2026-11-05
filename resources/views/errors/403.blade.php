@@ -12,3 +12,4 @@
 @section('heading', 'Akses Tidak Diizinkan')
 
 @section('message', 'Anda tidak memiliki hak akses atau izin yang sesuai untuk membuka halaman/berkas ini. Pastikan Anda telah memasukkan kredensial yang tepat.')
+

@@ -135,8 +135,8 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-         style="display: none;">
+         class="fixed inset-0 z-[100] overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+         style="display: none; z-index: 100;">
 
         <div @click.away="closeModal()"
              class="bg-[#0F1713] border border-[#1A2820] rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
@@ -168,8 +168,8 @@
                         </label>
                         <select name="question_type" x-model="formData.question_type" @change="handleTypeChange()"
                                 class="cyber-select w-full pl-4 pr-10 py-2.5 text-sm font-medium cursor-pointer">
-                            <option value="multiple_choice">Pilihan Ganda (Tunggal - 1 Jawaban Benar)</option>
-                            <option value="multi_select">Pilihan Jamak (Checkbox - Lebih dari 1 Jawaban Benar)</option>
+                            <option value="multiple_choice">Pilihan Ganda (Tunggal)</option>
+                            <option value="multi_select">Pilihan Jamak (Checkbox)</option>
                             <option value="true_false">Benar / Salah (True / False)</option>
                         </select>
                     </div>
@@ -341,7 +341,8 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
-         class="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+         class="fixed inset-0 z-[100] overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+         style="display: none; z-index: 100;">
 
         <div @click.away="showImportModal = false"
              class="bg-[#0F1713] border border-[#1A2820] rounded-3xl w-full max-w-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
@@ -372,26 +373,26 @@
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-300">Format Template Resmi</span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-300">Format Template Resmi (Excel & CSV)</span>
                         </div>
                         <p class="text-xs text-gray-300 leading-relaxed">
-                            Dilengkapi contoh nyata: <strong>Pilihan Tunggal (dengan blok kode C++)</strong>, <strong>Pilihan Jamak</strong>, dan <strong>Benar/Salah</strong>.
+                            Dilengkapi <strong>Dropdown Otomatis</strong> pada kolom <em>Tipe Soal</em> & <em>Kunci Jawaban</em> (tinggal klik & pilih tanpa ketik manual), serta contoh nyata blok kode C++, Pilihan Jamak, dan Benar/Salah.
                         </p>
                     </div>
 
                     {{-- Dual Download Buttons --}}
                     <div class="flex items-center gap-2 flex-shrink-0 flex-wrap">
-                        {{-- Excel Compatible (Semicolon) --}}
+                        {{-- Excel Template with Native Dropdowns (.XLSX) --}}
                         <a href="{{ route('admin.quizzes.questions.template', [$quiz, 'format' => 'excel']) }}"
-                           title="Rekomendasi untuk Microsoft Excel (Regional Indonesia) agar langsung rapi terpisah per kolom"
+                           title="Rekomendasi Utama: Template resmi Microsoft Excel (.xlsx) dengan pilihan dropdown otomatis pada kolom pilihan"
                            class="px-3.5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-md shadow-emerald-500/20 group">
                             <svg class="w-4 h-4 text-emerald-100 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                            <span>Unduh Template Excel</span>
+                            <span>Unduh Excel (Dropdown)</span>
                         </a>
 
                         {{-- Standard CSV (Comma) --}}
                         <a href="{{ route('admin.quizzes.questions.template', [$quiz, 'format' => 'csv']) }}"
-                           title="Format standar koma untuk Google Sheets, WPS Office, LibreOffice, atau Text Editor"
+                           title="Format teks murni CSV untuk Google Sheets, WPS Office, LibreOffice, atau Text Editor"
                            class="px-3.5 py-2.5 rounded-xl bg-[#142019] hover:bg-[#1C2E24] border border-[#1E3327] hover:border-emerald-500/40 text-gray-300 hover:text-white font-semibold text-xs transition-all flex items-center gap-1.5">
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                             <span>CSV Standar (Koma)</span>
@@ -503,7 +504,10 @@
                                     </tr>
                                     <tr>
                                         <td class="py-2 pr-3 font-bold text-white">Tipe_Soal</td>
-                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-sans font-bold text-[10px]">Wajib</span></td>
+                                        <td class="py-2 px-3">
+                                            <span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-sans font-bold text-[10px]">Wajib</span>
+                                            <span class="px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 font-sans font-bold text-[10px]">Dropdown</span>
+                                        </td>
                                         <td class="py-2 px-3 text-sky-300">multiple_choice | multi_select | true_false</td>
                                         <td class="py-2 pl-3 text-gray-400">multiple_choice</td>
                                     </tr>
@@ -521,7 +525,10 @@
                                     </tr>
                                     <tr>
                                         <td class="py-2 pr-3 font-bold text-white">Kunci_Jawaban</td>
-                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-sans font-bold text-[10px]">Wajib</span></td>
+                                        <td class="py-2 px-3">
+                                            <span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-sans font-bold text-[10px]">Wajib</span>
+                                            <span class="px-1.5 py-0.5 rounded bg-teal-500/15 text-teal-300 font-sans font-bold text-[10px]">Dropdown</span>
+                                        </td>
                                         <td class="py-2 px-3 font-sans">Huruf kunci jawaban benar</td>
                                         <td class="py-2 pl-3 text-emerald-400">A (atau "A, C" untuk jamak)</td>
                                     </tr>

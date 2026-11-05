@@ -137,3 +137,4 @@ class SystemEnhancementsTest extends TestCase
         Storage::disk('private')->assertMissing($filePath);
     }
 }
+

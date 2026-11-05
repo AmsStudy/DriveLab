@@ -503,10 +503,15 @@
 
                                             {{-- Gambar Soal (Jika ada) --}}
                                             <template x-if="ans.question && ans.question.image_url">
-                                                <div class="mb-3 rounded-2xl overflow-hidden border border-[#1A2820] bg-black/40 max-h-72 flex items-center justify-center p-2">
-                                                    <a :href="ans.question.image_url" target="_blank">
-                                                        <img :src="ans.question.image_url" alt="Gambar Soal" class="max-h-64 w-auto object-contain rounded-xl">
-                                                    </a>
+                                                <div class="mb-3 flex items-center justify-center">
+                                                    <button type="button"
+                                                            @mouseenter="showCyberHoverBubble($event, ans.question.image_url)"
+                                                            @mousemove="updateCyberHoverBubblePos($event)"
+                                                            @mouseleave="hideCyberHoverBubble()"
+                                                            @click="openCyberLightbox(ans.question.image_url, 'Gambar Soal #' + (ansIdx + 1))"
+                                                            class="inline-block group cursor-zoom-in focus:outline-none rounded-2xl overflow-hidden border border-[#1A2820] bg-black/40 hover:border-emerald-500/40 p-2 transition-all shadow-sm">
+                                                        <img :src="ans.question.image_url" alt="Gambar Soal" class="max-h-64 w-auto object-contain rounded-xl group-hover:scale-[1.01] transition-transform">
+                                                    </button>
                                                 </div>
                                             </template>
 
@@ -542,10 +547,15 @@
 
                                                                 <div class="min-w-0 flex-1">
                                                                     <template x-if="opt.image_url">
-                                                                        <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
-                                                                            <a :href="opt.image_url" target="_blank">
-                                                                                <img :src="opt.image_url" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
-                                                                            </a>
+                                                                        <div class="mb-1.5 inline-block">
+                                                                            <button type="button"
+                                                                                    @mouseenter="showCyberHoverBubble($event, opt.image_url)"
+                                                                                    @mousemove="updateCyberHoverBubblePos($event)"
+                                                                                    @mouseleave="hideCyberHoverBubble()"
+                                                                                    @click="openCyberLightbox(opt.image_url, 'Gambar Opsi ' + (['A','B','C','D','E','F'][optIdx] || ''))"
+                                                                                    class="block group cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-white/10 bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
+                                                                                <img :src="opt.image_url" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform">
+                                                                            </button>
                                                                         </div>
                                                                     </template>
                                                                     <div class="font-semibold block leading-snug"

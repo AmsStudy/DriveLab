@@ -91,22 +91,8 @@
     </div>
 
     {{-- KPI Highlights (Clean Metric Cards) --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5 pt-5">
-        {{-- Stat 1: Total Kunjungan --}}
-        <div class="p-3.5 rounded-xl border flex items-start gap-3" style="background:#090D0B;border-color:#1A2820;">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(16,185,129,.12);color:#10B981;">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-            </div>
-            <div class="min-w-0">
-                <p class="text-[11px] font-medium text-gray-400">Total Kunjungan</p>
-                <p class="text-lg font-bold text-white leading-tight mt-0.5">
-                    {{ number_format($soal->access_count) }}
-                    <span class="text-xs font-normal text-gray-500">kali</span>
-                </p>
-            </div>
-        </div>
-
-        {{-- Stat 2: Tugas Mahasiswa --}}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 pt-5">
+        {{-- Stat 1: Tugas Mahasiswa --}}
         <div class="p-3.5 rounded-xl border flex items-start gap-3" style="background:#090D0B;border-color:#1A2820;">
             <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(13,148,136,.15);color:#2DD4BF;">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -120,7 +106,7 @@
             </div>
         </div>
 
-        {{-- Stat 3: Masa Berlaku --}}
+        {{-- Stat 2: Masa Berlaku --}}
         <div class="p-3.5 rounded-xl border flex items-start gap-3" style="background:#090D0B;border-color:#1A2820;">
             <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(52,211,153,.12);color:#34D399;">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -137,7 +123,7 @@
             </div>
         </div>
 
-        {{-- Stat 4: Batas Pengumpulan --}}
+        {{-- Stat 3: Batas Pengumpulan --}}
         <div class="p-3.5 rounded-xl border flex items-start gap-3" style="background:#090D0B;border-color:#1A2820;">
             <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(245,158,11,.12);color:#FBBF24;">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -690,7 +676,7 @@
 </div>
 
 {{-- ─── TEXT SUBMISSION PREVIEW MODAL ─── --}}
-<div id="textSubmissionModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 items-center justify-center">
+<div id="textSubmissionModal" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm p-4 items-center justify-center" style="z-index: 100;">
     <div class="rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] border"
          style="background:#0F1713;border-color:#1A2820;">
         <div class="px-6 py-4 flex items-center justify-between" style="border-bottom:1px solid #1A2820;">
@@ -723,7 +709,8 @@
 </div>
 
 {{-- ─── IN-APP FILE PREVIEW MODAL ─── --}}
-<div id="filePreviewModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md p-3 sm:p-6 items-center justify-center"
+<div id="filePreviewModal" class="fixed inset-0 z-[100] hidden bg-black/85 backdrop-blur-md p-3 sm:p-6 items-center justify-center"
+     style="z-index: 100;"
      onclick="if(event.target === this) closeFilePreviewModal()">
     <div class="rounded-2xl w-full max-w-5xl overflow-hidden shadow-2xl flex flex-col h-[90vh] border"
          style="background:#0F1713;border-color:#1A2820;">
@@ -758,7 +745,8 @@
 </div>
 
 {{-- ─── MODAL EDIT DOKUMEN ─── --}}
-<div id="editModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 overflow-y-auto items-center justify-center"
+<div id="editModal" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm p-4 overflow-y-auto items-center justify-center"
+     style="z-index: 100;"
      onclick="if(event.target === this) closeEditModal()">
     <div class="rounded-2xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] border my-auto"
          style="background:#0F1713;border-color:#1A2820;">

@@ -12,3 +12,4 @@
 @section('heading', 'Terjadi Kesalahan pada Server')
 
 @section('message', 'Server mengalami kendala tak terduga saat memproses permintaan Anda. Tim asisten laboratorium telah menerima pemberitahuan mengenai insiden ini.')
+

@@ -49,6 +49,73 @@
         html:not(.dark) .option-card.border-emerald-400 .text-white {
             color: #065F46 !important;
         }
+
+        /* Light mode support for question image box and lightbox modal */
+        html:not(.dark) .question-img-container {
+            background-color: #F8FAF9 !important;
+            border-color: #E2EAE5 !important;
+        }
+        html:not(.dark) .question-img-box {
+            background-color: #FFFFFF !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 0 10px rgba(16, 185, 129, 0.1) !important;
+        }
+        html:not(.dark) .lightbox-card {
+            background-color: #FFFFFF !important;
+            border-color: #D1DCD6 !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), 0 0 30px rgba(16, 185, 129, 0.15) !important;
+        }
+        html:not(.dark) .lightbox-close-btn {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            border-color: #D1DCD6 !important;
+            color: #374151 !important;
+        }
+        html:not(.dark) .lightbox-close-btn:hover {
+            background-color: #F3F4F6 !important;
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) .lightbox-caption {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-color: #D1DCD6 !important;
+            color: #374151 !important;
+        }
+
+        /* Hover Zoom Tooltip Preview */
+        .cyber-hover-zoom-wrap {
+            position: relative;
+        }
+        .cyber-hover-preview-bubble {
+            position: fixed;
+            pointer-events: none;
+            z-index: 99;
+            opacity: 0;
+            transform: scale(0.92) translateY(8px);
+            transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: min(440px, 90vw);
+            max-height: min(340px, 60vh);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            background: #0A0F0D;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(16, 185, 129, 0.25);
+            padding: 6px;
+        }
+        html:not(.dark) .cyber-hover-preview-bubble {
+            background: #FFFFFF !important;
+            border-color: #A7F3D0 !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18), 0 0 20px rgba(16, 185, 129, 0.15) !important;
+        }
+        .cyber-hover-preview-bubble.is-active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        .cyber-hover-preview-bubble img {
+            width: 100%;
+            height: auto;
+            max-height: calc(min(340px, 60vh) - 12px);
+            object-fit: contain;
+            border-radius: 12px;
+            display: block;
+        }
         .heading-font {
             font-family: 'Outfit', sans-serif;
         }
@@ -220,9 +287,16 @@
 
                     {{-- Question Image (if uploaded) --}}
                     <template x-if="currentQuestion.image_url">
-                        <div class="my-4 rounded-2xl overflow-hidden border border-[#1A2820] bg-black/50 max-h-80 flex items-center justify-center p-2">
-                            <img :src="currentQuestion.image_url" alt="Gambar Soal"
-                                 class="max-h-72 w-auto object-contain rounded-xl hover:scale-[1.01] transition-transform">
+                        <div class="my-4 flex items-center justify-center question-img-container">
+                            <button type="button"
+                                    @mouseenter="showHoverPreview($event, currentQuestion.image_url)"
+                                    @mousemove="updateHoverPreviewPos($event)"
+                                    @mouseleave="hideHoverPreview()"
+                                    @click="openImagePreview(currentQuestion.image_url, 'Gambar Soal #' + (currentIndex + 1))"
+                                    class="inline-block group cursor-zoom-in focus:outline-none rounded-2xl overflow-hidden border border-[#1A2820] bg-black/40 hover:border-emerald-500/40 p-2 transition-all shadow-sm">
+                                <img :src="currentQuestion.image_url" alt="Gambar Soal"
+                                     class="max-h-72 w-auto object-contain rounded-xl group-hover:scale-[1.01] transition-transform">
+                            </button>
                         </div>
                     </template>
 
@@ -248,8 +322,15 @@
                             {{-- Option Content (Text + Image) --}}
                             <div class="flex-1 min-w-0">
                                 <template x-if="opt.image_url">
-                                    <div class="mb-2 max-h-36 overflow-hidden rounded-xl border border-white/10 bg-black/40 p-1">
-                                        <img :src="opt.image_url" alt="Gambar Opsi" class="max-h-32 w-auto object-contain rounded-lg">
+                                    <div class="mb-2 inline-block">
+                                        <button type="button"
+                                                @mouseenter="showHoverPreview($event, opt.image_url)"
+                                                @mousemove="updateHoverPreviewPos($event)"
+                                                @mouseleave="hideHoverPreview()"
+                                                @click.stop="openImagePreview(opt.image_url, 'Gambar Opsi ' + getOptionLabel(optIdx))"
+                                                class="block group cursor-zoom-in focus:outline-none rounded-xl overflow-hidden border border-white/10 bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
+                                            <img :src="opt.image_url" alt="Gambar Opsi" class="max-h-32 w-auto object-contain rounded-lg group-hover:scale-105 transition-transform">
+                                        </button>
                                     </div>
                                 </template>
                                 <div class="text-sm sm:text-base font-semibold leading-snug"
@@ -332,7 +413,8 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+         class="fixed inset-0 z-[100] overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+         style="z-index: 100;">
 
         <div @click.away="showDrawer = false"
              class="bg-[#0F1713] border border-[#1A2820] rounded-3xl w-full max-w-lg p-6 shadow-2xl">
@@ -391,7 +473,8 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
-         class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+         class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+         style="z-index: 100;">
         
         <div class="bg-[#0F1713] border-2 border-amber-500/40 rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
             {{-- Glowing Ambient --}}
@@ -446,7 +529,8 @@
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
-         class="fixed inset-0 z-50 bg-black/95 backdrop-blur-lg flex items-center justify-center p-4">
+         class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-lg flex items-center justify-center p-4"
+         style="z-index: 100;">
         
         <div class="bg-[#0F1713] border-2 border-rose-500/60 rounded-3xl max-w-lg w-full p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
             {{-- Glowing Ambient --}}
@@ -517,7 +601,8 @@
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
-         class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
+         class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-4"
+         style="z-index: 100;">
         <div class="bg-[#0F1713] border-2 border-emerald-500/40 rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
             <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-3xl mx-auto mb-4 animate-pulse">
@@ -547,7 +632,8 @@
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
-         class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
+         class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-4"
+         style="z-index: 100;">
         <div class="bg-[#0F1713] border-2 border-rose-500/60 rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden">
             <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-rose-500/20 rounded-full blur-3xl pointer-events-none"></div>
             <div class="w-16 h-16 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce">
@@ -572,6 +658,87 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
                 <span>Kembali ke Layar Penuh Sekarang</span>
             </button>
+        </div>
+    </div>
+
+    {{-- ========================================================================= --}}
+    {{-- HOVER PREVIEW POPUP (INSTANT PREVIEW SAAT KURSOR MENDEKAT)                --}}
+    {{-- ========================================================================= --}}
+    <div class="cyber-hover-preview-bubble"
+         :class="{ 'is-active': hoverPreview.active }"
+         :style="'left: ' + hoverPreview.x + 'px; top: ' + hoverPreview.y + 'px;'">
+        <template x-if="hoverPreview.src">
+            <img :src="hoverPreview.src" alt="Pratinjau Kursor">
+        </template>
+    </div>
+
+    {{-- ========================================================================= --}}
+    {{-- LIGHTBOX PREVIEW MODAL (POP-UP PEMBESAR GAMBAR SOAL / OPSI DENGAN ZOOM)    --}}
+    {{-- ========================================================================= --}}
+    <div x-show="previewImageModal.open"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="fixed inset-0 z-[120] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+         style="z-index: 120;"
+         @click="closeImagePreview()"
+         @keydown.escape.window="closeImagePreview()">
+        <div class="relative max-w-5xl max-h-[92vh] flex flex-col items-center justify-center select-none"
+             @click.stop>
+            
+            {{-- Top Controls Bar: Zoom In, Zoom Out, Reset, & Close --}}
+            <div class="absolute -top-14 right-0 sm:right-0 flex items-center gap-2">
+                <div class="flex items-center bg-[#0F1713]/90 hover:bg-[#142019] border border-[#1E3327] rounded-xl px-1.5 py-1 shadow-lg text-xs font-semibold gap-1 lightbox-card">
+                    <button type="button"
+                            @click="zoomPreview(-0.25)"
+                            class="w-7 h-7 rounded-lg flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            title="Zoom Out (−)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                    </button>
+                    <span class="px-2 font-mono text-emerald-400 font-bold min-w-[50px] text-center"
+                          x-text="Math.round(previewImageModal.scale * 100) + '%'"></span>
+                    <button type="button"
+                            @click="zoomPreview(0.25)"
+                            class="w-7 h-7 rounded-lg flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            title="Zoom In (+)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    </button>
+                    <button type="button"
+                            @click="resetPreviewZoom()"
+                            class="px-2 py-1 rounded-md text-[11px] text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer font-mono"
+                            title="Reset Skala 100%">
+                        1:1
+                    </button>
+                </div>
+
+                <button type="button"
+                        @click="closeImagePreview()"
+                        class="p-2 text-gray-400 hover:text-white bg-[#0F1713]/80 hover:bg-[#1A2820] border border-[#1E3327] rounded-xl transition-all shadow-lg flex items-center gap-1.5 text-xs font-semibold cursor-pointer lightbox-close-btn"
+                        title="Tutup (Esc)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span class="hidden sm:inline">Tutup</span>
+                </button>
+            </div>
+
+            {{-- Image Card with Zoom and Pan/Drag Support --}}
+            <div class="rounded-2xl overflow-hidden border border-emerald-500/30 bg-[#0A0F0D] lightbox-card shadow-[0_0_50px_rgba(0,0,0,0.9),0_0_25px_rgba(16,185,129,0.2)] p-2 max-w-full max-h-[82vh] flex items-center justify-center"
+                 @wheel.prevent="zoomPreview($event.deltaY < 0 ? 0.15 : -0.15)">
+                <div class="overflow-hidden flex items-center justify-center"
+                     style="touch-action: none;">
+                    <img :src="previewImageModal.src" alt="Pratinjau Gambar Soal"
+                         class="max-w-full max-h-[80vh] w-auto h-auto object-contain rounded-xl transition-transform duration-100 ease-out select-none cursor-grab active:cursor-grabbing"
+                         :style="'transform: scale(' + previewImageModal.scale + ') translate(' + previewImageModal.translateX + 'px, ' + previewImageModal.translateY + 'px);'"
+                         draggable="false">
+                </div>
+            </div>
+
+            {{-- Caption --}}
+            <p x-show="previewImageModal.caption"
+               x-text="previewImageModal.caption"
+               class="text-xs text-gray-300 font-medium mt-3 text-center px-4 py-1.5 rounded-full bg-[#0F1713]/90 border border-[#1E3327] max-w-xl truncate lightbox-caption"></p>
         </div>
     </div>
 
@@ -606,6 +773,23 @@
                 fullscreenToleranceSeconds: 5,
                 fullscreenToleranceInterval: null,
                 focusCheckInterval: null,
+                previewImageModal: {
+                    open: false,
+                    src: '',
+                    caption: '',
+                    scale: 1.0,
+                    isDragging: false,
+                    startX: 0,
+                    startY: 0,
+                    translateX: 0,
+                    translateY: 0
+                },
+                hoverPreview: {
+                    active: false,
+                    src: '',
+                    x: 0,
+                    y: 0
+                },
 
                 get currentQuestion() {
                     return this.questions[this.currentIndex] || null;
@@ -760,6 +944,74 @@
                     } catch (e) {
                         console.warn('LocalStorage save failed:', e);
                     }
+                },
+
+                openImagePreview(src, caption = '') {
+                    this.previewImageModal.src = src;
+                    this.previewImageModal.caption = caption;
+                    this.previewImageModal.scale = 1.0;
+                    this.previewImageModal.translateX = 0;
+                    this.previewImageModal.translateY = 0;
+                    this.previewImageModal.open = true;
+                    this.hideHoverPreview();
+                },
+
+                closeImagePreview() {
+                    this.previewImageModal.open = false;
+                    this.previewImageModal.src = '';
+                    this.previewImageModal.caption = '';
+                    this.previewImageModal.scale = 1.0;
+                    this.previewImageModal.translateX = 0;
+                    this.previewImageModal.translateY = 0;
+                },
+
+                zoomPreview(delta) {
+                    let nextScale = Math.round((this.previewImageModal.scale + delta) * 10) / 10;
+                    if (nextScale < 0.5) nextScale = 0.5;
+                    if (nextScale > 4.0) nextScale = 4.0;
+                    this.previewImageModal.scale = nextScale;
+                    if (nextScale <= 1.0) {
+                        this.previewImageModal.translateX = 0;
+                        this.previewImageModal.translateY = 0;
+                    }
+                },
+
+                resetPreviewZoom() {
+                    this.previewImageModal.scale = 1.0;
+                    this.previewImageModal.translateX = 0;
+                    this.previewImageModal.translateY = 0;
+                },
+
+                showHoverPreview(e, src) {
+                    if (this.previewImageModal.open) return;
+                    this.hoverPreview.src = src;
+                    this.hoverPreview.active = true;
+                    this.updateHoverPreviewPos(e);
+                },
+
+                updateHoverPreviewPos(e) {
+                    if (!this.hoverPreview.active) return;
+                    const pad = 16;
+                    const previewW = Math.min(420, window.innerWidth * 0.85);
+                    const previewH = Math.min(320, window.innerHeight * 0.55);
+
+                    let posX = e.clientX + pad;
+                    let posY = e.clientY - (previewH / 2);
+
+                    if (posX + previewW > window.innerWidth - pad) {
+                        posX = e.clientX - previewW - pad;
+                    }
+                    if (posY < pad) posY = pad;
+                    if (posY + previewH > window.innerHeight - pad) {
+                        posY = window.innerHeight - previewH - pad;
+                    }
+
+                    this.hoverPreview.x = posX;
+                    this.hoverPreview.y = posY;
+                },
+
+                hideHoverPreview() {
+                    this.hoverPreview.active = false;
                 },
 
                 triggerBackgroundSync() {

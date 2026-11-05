@@ -51,6 +51,60 @@
             background: linear-gradient(180deg, rgba(180, 83, 9, 0.25) 0%, rgba(180, 83, 9, 0.05) 100%);
             border-top: 3px solid #b45309;
         }
+
+        /* Hover Zoom Tooltip Preview & Lightbox in Results View */
+        .cyber-hover-preview-bubble {
+            position: fixed;
+            pointer-events: none;
+            z-index: 110;
+            opacity: 0;
+            transform: scale(0.92) translateY(8px);
+            transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: min(440px, 90vw);
+            max-height: min(340px, 60vh);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            background: #0A0F0D;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(16, 185, 129, 0.25);
+            padding: 6px;
+        }
+        html:not(.dark) .cyber-hover-preview-bubble {
+            background: #FFFFFF !important;
+            border-color: #A7F3D0 !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18), 0 0 20px rgba(16, 185, 129, 0.15) !important;
+        }
+        .cyber-hover-preview-bubble.is-active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        .cyber-hover-preview-bubble img {
+            width: 100%;
+            height: auto;
+            max-height: calc(min(340px, 60vh) - 12px);
+            object-fit: contain;
+            border-radius: 12px;
+            display: block;
+        }
+        html:not(.dark) #cyber-image-lightbox .lightbox-card {
+            background-color: #FFFFFF !important;
+            border-color: #D1DCD6 !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), 0 0 30px rgba(16, 185, 129, 0.15) !important;
+        }
+        html:not(.dark) #cyber-image-lightbox .lightbox-close-btn {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            border-color: #D1DCD6 !important;
+            color: #374151 !important;
+        }
+        html:not(.dark) #cyber-image-lightbox .lightbox-close-btn:hover {
+            background-color: #F3F4F6 !important;
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) #cyber-image-lightbox #cyber-lightbox-caption {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-color: #D1DCD6 !important;
+            color: #374151 !important;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -262,10 +316,15 @@
 
                             {{-- Question Image (if uploaded) --}}
                             @if(!empty($ans->question->image_path))
-                                <div class="mb-3 rounded-2xl overflow-hidden border border-[#1A2820] bg-black/40 max-h-72 flex items-center justify-center p-2">
-                                    <a href="{{ $ans->question->image_url }}" target="_blank">
-                                        <img src="{{ $ans->question->image_url }}" alt="Gambar Soal" class="max-h-64 w-auto object-contain rounded-xl">
-                                    </a>
+                                <div class="mb-3 flex items-center justify-center">
+                                    <button type="button"
+                                            onmouseenter="showCyberHoverBubble(event, '{{ $ans->question->image_url }}')"
+                                            onmousemove="updateCyberHoverBubblePos(event)"
+                                            onmouseleave="hideCyberHoverBubble()"
+                                            onclick="openCyberLightbox('{{ $ans->question->image_url }}', 'Gambar Soal #{{ $idx + 1 }}')"
+                                            class="inline-block group cursor-zoom-in focus:outline-none rounded-2xl overflow-hidden border border-[#1A2820] bg-black/40 hover:border-emerald-500/40 p-2 transition-all shadow-sm">
+                                        <img src="{{ $ans->question->image_url }}" alt="Gambar Soal" class="max-h-64 w-auto object-contain rounded-xl group-hover:scale-[1.01] transition-transform">
+                                    </button>
                                 </div>
                             @endif
 
@@ -294,10 +353,15 @@
                                                     </span>
                                                     <div class="min-w-0">
                                                         @if($opt->image_path)
-                                                            <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
-                                                                <a href="{{ $opt->image_url }}" target="_blank">
-                                                                    <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
-                                                                </a>
+                                                            <div class="mb-1.5 inline-block">
+                                                                <button type="button"
+                                                                        onmouseenter="showCyberHoverBubble(event, '{{ $opt->image_url }}')"
+                                                                        onmousemove="updateCyberHoverBubblePos(event)"
+                                                                        onmouseleave="hideCyberHoverBubble()"
+                                                                        onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIdx] ?? '' }}')"
+                                                                        class="block group cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-white/10 bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
+                                                                    <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform">
+                                                                </button>
                                                             </div>
                                                         @endif
                                                         <div class="font-semibold text-emerald-100 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
@@ -317,10 +381,15 @@
                                                     </span>
                                                     <div class="min-w-0">
                                                         @if($opt->image_path)
-                                                            <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
-                                                                <a href="{{ $opt->image_url }}" target="_blank">
-                                                                    <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
-                                                                </a>
+                                                            <div class="mb-1.5 inline-block">
+                                                                <button type="button"
+                                                                        onmouseenter="showCyberHoverBubble(event, '{{ $opt->image_url }}')"
+                                                                        onmousemove="updateCyberHoverBubblePos(event)"
+                                                                        onmouseleave="hideCyberHoverBubble()"
+                                                                        onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIdx] ?? '' }}')"
+                                                                        class="block group cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-white/10 bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
+                                                                    <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform">
+                                                                </button>
                                                             </div>
                                                         @endif
                                                         <div class="font-semibold text-rose-200 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
@@ -341,9 +410,14 @@
                                             <div class="min-w-0">
                                                 @if($opt->image_path)
                                                     <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
-                                                        <a href="{{ $opt->image_url }}" target="_blank">
-                                                            <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain">
-                                                        </a>
+                                                        <button type="button"
+                                                                onmouseenter="showCyberHoverBubble(event, '{{ $opt->image_url }}')"
+                                                                onmousemove="updateCyberHoverBubblePos(event)"
+                                                                onmouseleave="hideCyberHoverBubble()"
+                                                                onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIdx] ?? '' }}')"
+                                                                class="block group cursor-zoom-in focus:outline-none">
+                                                            <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform">
+                                                        </button>
                                                     </div>
                                                 @endif
                                                 <div class="font-normal block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
@@ -414,7 +488,7 @@
                 ← Kembali ke Portal Lab
             </a>
             @if($quiz->is_active)
-                <a href="{{ route('quiz.lobby', $quiz->unique_token) }}"
+                <a href="{{ route('quiz.lobby', $quiz->slug ?: $quiz->unique_token) }}"
                    class="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-sm font-bold transition-all shadow-lg shadow-emerald-500/20">
                     Selesai
                 </a>
@@ -427,8 +501,178 @@
         &copy; {{ date('Y') }} IC-Labs &bull; Platform Distribusi & Evaluasi Laboratorium
     </footer>
 
-    {{-- Trigger Confetti Celebration --}}
+    {{-- ─── HOVER PREVIEW POPUP (INSTANT BUBBLE SAAT KURSOR MENDEKAT) ─── --}}
+    <div id="cyber-hover-preview-bubble" class="cyber-hover-preview-bubble">
+        <img id="cyber-hover-preview-img" src="" alt="Pratinjau Kursor">
+    </div>
+
+    {{-- ─── UNIFIED IMAGE LIGHTBOX PREVIEW POPUP DENGAN ZOOM IN / ZOOM OUT ─── --}}
+    <div id="cyber-image-lightbox"
+         class="fixed inset-0 z-[120] hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300"
+         style="z-index: 120;"
+         onclick="closeCyberLightbox(event)">
+        <div class="relative max-w-5xl max-h-[92vh] flex flex-col items-center justify-center select-none" onclick="event.stopPropagation()">
+            
+            {{-- Top Controls Bar: Zoom In, Zoom Out, Reset, & Close --}}
+            <div class="absolute -top-14 right-0 sm:right-0 flex items-center gap-2">
+                <div class="flex items-center bg-[#0F1713]/90 hover:bg-[#142019] border border-[#1E3327] rounded-xl px-1.5 py-1 shadow-lg text-xs font-semibold gap-1 lightbox-card">
+                    <button type="button"
+                            onclick="adjustCyberLightboxZoom(-0.25)"
+                            class="w-7 h-7 rounded-lg flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            title="Zoom Out (−)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                    </button>
+                    <span id="cyber-lightbox-zoom-label" class="px-2 font-mono text-emerald-400 font-bold min-w-[50px] text-center">100%</span>
+                    <button type="button"
+                            onclick="adjustCyberLightboxZoom(0.25)"
+                            class="w-7 h-7 rounded-lg flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                            title="Zoom In (+)">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    </button>
+                    <button type="button"
+                            onclick="resetCyberLightboxZoom()"
+                            class="px-2 py-1 rounded-md text-[11px] text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer font-mono"
+                            title="Reset Skala 100%">
+                        1:1
+                    </button>
+                </div>
+
+                <button type="button"
+                        onclick="closeCyberLightbox()"
+                        class="p-2 text-gray-400 hover:text-white bg-[#0F1713]/80 hover:bg-[#1A2820] border border-[#1E3327] rounded-xl transition-all shadow-lg flex items-center gap-1.5 text-xs font-semibold lightbox-close-btn"
+                        title="Tutup (Esc)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span class="hidden sm:inline">Tutup</span>
+                </button>
+            </div>
+
+            {{-- Image Box with Zoom --}}
+            <div class="rounded-2xl overflow-hidden border border-emerald-500/30 bg-[#0A0F0D] lightbox-card shadow-[0_0_50px_rgba(0,0,0,0.9),0_0_25px_rgba(16,185,129,0.2)] p-2 max-w-full max-h-[82vh] flex items-center justify-center"
+                 onwheel="handleCyberLightboxWheel(event)">
+                <div class="overflow-hidden flex items-center justify-center">
+                    <img id="cyber-lightbox-img" src="" alt="Pratinjau Gambar"
+                         class="max-w-full max-h-[80vh] w-auto h-auto object-contain rounded-xl transition-transform duration-100 ease-out select-none cursor-grab active:cursor-grabbing"
+                         style="transform: scale(1);"
+                         draggable="false">
+                </div>
+            </div>
+
+            {{-- Caption / Subtitle --}}
+            <p id="cyber-lightbox-caption" class="text-xs text-gray-300 font-medium mt-3 text-center px-4 py-1.5 rounded-full bg-[#0F1713]/90 border border-[#1E3327] max-w-xl truncate lightbox-caption"></p>
+        </div>
+    </div>
+
+    {{-- Trigger Confetti Celebration & Lightbox JS --}}
     <script>
+        let currentCyberLightboxScale = 1.0;
+
+        window.openCyberLightbox = function(src, caption = '') {
+            const lb = document.getElementById('cyber-image-lightbox');
+            const img = document.getElementById('cyber-lightbox-img');
+            const cap = document.getElementById('cyber-lightbox-caption');
+            if (!lb || !img) return;
+
+            window.hideCyberHoverBubble();
+            currentCyberLightboxScale = 1.0;
+            img.src = src;
+            img.style.transform = 'scale(1)';
+            const zoomLbl = document.getElementById('cyber-lightbox-zoom-label');
+            if (zoomLbl) zoomLbl.textContent = '100%';
+
+            if (cap) {
+                cap.textContent = caption || 'Pratinjau Gambar';
+                cap.style.display = caption ? 'inline-block' : 'none';
+            }
+            lb.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeCyberLightbox = function() {
+            const lb = document.getElementById('cyber-image-lightbox');
+            const img = document.getElementById('cyber-lightbox-img');
+            if (!lb) return;
+            lb.classList.add('hidden');
+            if (img) {
+                img.src = '';
+                img.style.transform = 'scale(1)';
+            }
+            currentCyberLightboxScale = 1.0;
+            document.body.style.overflow = '';
+        };
+
+        window.adjustCyberLightboxZoom = function(delta) {
+            let nextScale = Math.round((currentCyberLightboxScale + delta) * 10) / 10;
+            if (nextScale < 0.5) nextScale = 0.5;
+            if (nextScale > 4.0) nextScale = 4.0;
+            currentCyberLightboxScale = nextScale;
+
+            const img = document.getElementById('cyber-lightbox-img');
+            const zoomLbl = document.getElementById('cyber-lightbox-zoom-label');
+            if (img) img.style.transform = `scale(${nextScale})`;
+            if (zoomLbl) zoomLbl.textContent = `${Math.round(nextScale * 100)}%`;
+        };
+
+        window.resetCyberLightboxZoom = function() {
+            currentCyberLightboxScale = 1.0;
+            const img = document.getElementById('cyber-lightbox-img');
+            const zoomLbl = document.getElementById('cyber-lightbox-zoom-label');
+            if (img) img.style.transform = 'scale(1)';
+            if (zoomLbl) zoomLbl.textContent = '100%';
+        };
+
+        window.handleCyberLightboxWheel = function(e) {
+            e.preventDefault();
+            window.adjustCyberLightboxZoom(e.deltaY < 0 ? 0.15 : -0.15);
+        };
+
+        // ── Instant Hover Preview Bubble ──
+        window.showCyberHoverBubble = function(e, src) {
+            const lb = document.getElementById('cyber-image-lightbox');
+            if (lb && !lb.classList.contains('hidden')) return;
+
+            const bubble = document.getElementById('cyber-hover-preview-bubble');
+            const bImg = document.getElementById('cyber-hover-preview-img');
+            if (!bubble || !bImg) return;
+
+            bImg.src = src;
+            bubble.classList.add('is-active');
+            window.updateCyberHoverBubblePos(e);
+        };
+
+        window.updateCyberHoverBubblePos = function(e) {
+            const bubble = document.getElementById('cyber-hover-preview-bubble');
+            if (!bubble || !bubble.classList.contains('is-active')) return;
+
+            const pad = 16;
+            const previewW = Math.min(420, window.innerWidth * 0.85);
+            const previewH = Math.min(320, window.innerHeight * 0.55);
+
+            let posX = e.clientX + pad;
+            let posY = e.clientY - (previewH / 2);
+
+            if (posX + previewW > window.innerWidth - pad) {
+                posX = e.clientX - previewW - pad;
+            }
+            if (posY < pad) posY = pad;
+            if (posY + previewH > window.innerHeight - pad) {
+                posY = window.innerHeight - previewH - pad;
+            }
+
+            bubble.style.left = `${posX}px`;
+            bubble.style.top = `${posY}px`;
+        };
+
+        window.hideCyberHoverBubble = function() {
+            const bubble = document.getElementById('cyber-hover-preview-bubble');
+            if (bubble) bubble.classList.remove('is-active');
+        };
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.closeCyberLightbox();
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof confetti === 'function') {
                 const score = {{ (float)$attempt->score }};

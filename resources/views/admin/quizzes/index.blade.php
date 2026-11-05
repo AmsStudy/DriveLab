@@ -259,7 +259,7 @@
                         <div class="flex items-center gap-1">
                             {{-- Copy Direct URL --}}
                             <button type="button"
-                                    onclick="copyToClipboard('{{ route('quiz.lobby', $quiz->unique_token) }}', 'Link kuis mahasiswa berhasil disalin!')"
+                                    onclick="copyToClipboard('{{ route('quiz.lobby', $quiz->slug ?: $quiz->unique_token) }}', 'Link kuis mahasiswa berhasil disalin!')"
                                     title="Salin Link Mahasiswa"
                                     class="p-1.5 rounded-lg text-gray-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
@@ -307,7 +307,7 @@
 </div>
 
 {{-- ─── Pop Up Modal: Buat Kuis Baru ─── --}}
-<div id="createQuizModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden">
+<div id="createQuizModal" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 hidden" style="z-index: 100;">
     {{-- Backdrop --}}
     <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="closeCreateQuizModal()"></div>
 
@@ -614,7 +614,7 @@
 </div>
 
 {{-- ─── Pop Up Modal: Edit Pengaturan Kuis ─── --}}
-<div id="editQuizModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden">
+<div id="editQuizModal" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 hidden" style="z-index: 100;">
     {{-- Backdrop --}}
     <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="closeEditQuizModal()"></div>
 
@@ -975,7 +975,7 @@
             'is_active' => (bool)$q->is_active,
             'update_url' => route('admin.quizzes.update', $q),
             'bank_soal_url' => route('admin.quizzes.questions', $q),
-            'lobby_url' => route('quiz.lobby', $q->unique_token),
+            'lobby_url' => route('quiz.lobby', $q->slug ?: $q->unique_token),
         ];
     }
 @endphp

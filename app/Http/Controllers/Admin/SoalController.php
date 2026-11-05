@@ -48,6 +48,45 @@ class SoalController extends Controller
         return view('admin.soal.create', compact('categories'));
     }
 
+    public function checkKodeUnik(Request $request)
+    {
+        $code = trim((string) $request->query('kode_unik', ''));
+        $ignoreId = $request->query('ignore_id');
+
+        if ($code === '') {
+            return response()->json([
+                'available' => false,
+                'message'   => 'Kode unik tidak boleh kosong.',
+            ]);
+        }
+
+        if (mb_strlen($code) > 20) {
+            return response()->json([
+                'available' => false,
+                'message'   => 'Kode unik maksimal 20 karakter.',
+            ]);
+        }
+
+        $exists = Soal::withTrashed()
+            ->where('kode_unik', $code)
+            ->when($ignoreId, function ($query, $ignoreId) {
+                $query->where('id', '!=', $ignoreId);
+            })
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'available' => false,
+                'message'   => 'Kode unik sudah digunakan. Silakan pilih kode lain.',
+            ]);
+        }
+
+        return response()->json([
+            'available' => true,
+            'message'   => 'Kode unik tersedia.',
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

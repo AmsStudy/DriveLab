@@ -7,11 +7,253 @@ use App\Models\QuizOption;
 use App\Models\QuizQuestion;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use ZipArchive;
 
 class QuizImportService
 {
+    /**
+     * Download native Microsoft Excel (.xlsx) template with in-cell dropdown data validations
+     * on choice columns (Tipe_Soal: multiple_choice, multi_select, true_false; Kunci_Jawaban: A-E, Benar, Salah).
+     */
+    public static function downloadXlsxTemplate(): BinaryFileResponse
+    {
+        $filename = 'template_bank_soal_excel_interaktif_dropdown_' . date('Ymd') . '.xlsx';
+        $tempFile = tempnam(sys_get_temp_dir(), 'template_bank_soal_') . '.xlsx';
+
+        $zip = new ZipArchive();
+        if ($zip->open($tempFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            abort(500, 'Gagal membuat file template Excel.');
+        }
+
+        $typesXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>';
+
+        $relsXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>';
+
+        $wbRelsXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>
+</Relationships>';
+
+        $workbookXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="Bank Soal" sheetId="1" r:id="rId1"/>
+    <sheet name="Panduan Kolom" sheetId="2" r:id="rId3"/>
+  </sheets>
+</workbook>';
+
+        $stylesXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="2">
+    <font><sz val="10"/><color rgb="FF1F2937"/><name val="Calibri"/></font>
+    <font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font>
+  </fonts>
+  <fills count="3">
+    <fill><patternFill patternType="none"/></fill>
+    <fill><patternFill patternType="gray125"/></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FF0D9488"/></patternFill></fill>
+  </fills>
+  <borders count="2">
+    <border><left/><right/><top/><bottom/><diagonal/></border>
+    <border>
+      <left style="thin"><color rgb="FFCBD5E1"/></left>
+      <right style="thin"><color rgb="FFCBD5E1"/></right>
+      <top style="thin"><color rgb="FFCBD5E1"/></top>
+      <bottom style="thin"><color rgb="FFCBD5E1"/></bottom>
+    </border>
+  </borders>
+  <cellStyleXfs count="1">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
+  </cellStyleXfs>
+  <cellXfs count="3">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+    <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">
+      <alignment horizontal="center" vertical="center" wrapText="1"/>
+    </xf>
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1">
+      <alignment vertical="top" wrapText="1"/>
+    </xf>
+  </cellXfs>
+</styleSheet>';
+
+        // Sheet 1 Data
+        $s1Rows = [
+            ['Nomor', 'Pertanyaan', 'Tipe_Soal', 'Poin', 'Pilihan_A', 'Pilihan_B', 'Pilihan_C', 'Pilihan_D', 'Pilihan_E', 'Kunci_Jawaban', 'Pembahasan'],
+            [
+                1,
+                "Perhatikan potongan kode C++ berikut:\n```cpp\nint a = 15;\nint *ptr = &a;\n*ptr = *ptr + 10;\ncout << a;\n```\nBerapakah nilai variabel `a` yang tercetak pada layar?",
+                'multiple_choice',
+                10,
+                '15', '25', 'Alamat memori &a', '0', '',
+                'B',
+                'Operator dereference (*ptr) memodifikasi nilai memori variabel a langsung, sehingga a menjadi 15 + 10 = 25.'
+            ],
+            [
+                2,
+                'Fungsi bawaan dalam bahasa C yang bertugas mengalokasikan memori dinamis di area heap adalah...',
+                'multiple_choice',
+                10,
+                'malloc()', 'free()', 'sizeof()', 'realloc()', 'calloc()',
+                'A',
+                'Fungsi malloc() (memory allocation) mengalokasikan sejumlah byte memori di heap tanpa inisialisasi nilai.'
+            ],
+            [
+                3,
+                'Manakah pernyataan berikut yang BENAR mengenai pointer dan array dalam bahasa C? (Centang semua jawaban benar)',
+                'multi_select',
+                15,
+                'Nama array bertindak sebagai pointer konstan yang menunjuk ke elemen pertama (indeks 0)',
+                'Array tidak dapat diakses menggunakan notasi pointer (*arr)',
+                'Operasi aritmatika pointer (ptr++) melompat sebesar ukuran tipe data elemen',
+                'Ukuran array dihitung otomatis saat runtime melalui sizeof(pointer)',
+                '',
+                'A, C',
+                'Pernyataan A dan C benar. Nama array merujuk alamat elemen pertama & pointer arithmetic melompat sesuai ukuran tipe data.'
+            ],
+            [
+                4,
+                'Dalam bahasa pemrograman C, indeks array selalu dimulai dari 0 (zero-indexed) dan alokasi memorinya bersifat kontigu (bersebelahan).',
+                'true_false',
+                10,
+                'Benar', 'Salah', '', '', '',
+                'A',
+                'Benar. Array dalam C selalu dimulai dari indeks 0 dan setiap elemen disimpan pada alamat memori yang berurutan.'
+            ]
+        ];
+
+        $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
+        $s1Data = '<sheetData>';
+        foreach ($s1Rows as $rIdx => $rVals) {
+            $rNum = $rIdx + 1;
+            $sId = ($rNum === 1) ? 1 : 2;
+            $s1Data .= '<row r="' . $rNum . '">';
+            foreach ($rVals as $cIdx => $v) {
+                $cRef = $columns[$cIdx] . $rNum;
+                if (is_int($v)) {
+                    $s1Data .= '<c r="' . $cRef . '" s="' . $sId . '"><v>' . $v . '</v></c>';
+                } else {
+                    $escaped = htmlspecialchars((string)$v, ENT_XML1, 'UTF-8');
+                    $s1Data .= '<c r="' . $cRef . '" t="inlineStr" s="' . $sId . '"><is><t xml:space="preserve">' . $escaped . '</t></is></c>';
+                }
+            }
+            $s1Data .= '</row>';
+        }
+        $s1Data .= '</sheetData>';
+
+        $sheet1Xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <dimension ref="A1:K100"/>
+  <sheetViews>
+    <sheetView tabSelected="1" workbookViewId="0">
+      <pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>
+    </sheetView>
+  </sheetViews>
+  <sheetFormatPr defaultRowHeight="20"/>
+  <cols>
+    <col min="1" max="1" width="8" customWidth="1"/>
+    <col min="2" max="2" width="55" customWidth="1"/>
+    <col min="3" max="3" width="20" customWidth="1"/>
+    <col min="4" max="4" width="10" customWidth="1"/>
+    <col min="5" max="5" width="26" customWidth="1"/>
+    <col min="6" max="6" width="26" customWidth="1"/>
+    <col min="7" max="7" width="26" customWidth="1"/>
+    <col min="8" max="8" width="26" customWidth="1"/>
+    <col min="9" max="9" width="26" customWidth="1"/>
+    <col min="10" max="10" width="18" customWidth="1"/>
+    <col min="11" max="11" width="38" customWidth="1"/>
+  </cols>
+  ' . $s1Data . '
+  <dataValidations count="2">
+    <dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="C2:C500" promptTitle="Pilih Tipe Soal" prompt="Pilih salah satu: multiple_choice, multi_select, true_false" errorTitle="Tipe Soal Tidak Valid" error="Pilih salah satu tipe soal yang tersedia pada dropdown.">
+      <formula1>&quot;multiple_choice,multi_select,true_false&quot;</formula1>
+    </dataValidation>
+    <dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="J2:J500" promptTitle="Pilih Kunci Jawaban" prompt="Pilih huruf kunci jawaban yang sesuai dari dropdown" errorTitle="Kunci Tidak Valid" error="Pilih huruf jawaban benar dari dropdown list.">
+      <formula1>&quot;A,B,C,D,E,Benar,Salah&quot;</formula1>
+    </dataValidation>
+  </dataValidations>
+  <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
+</worksheet>';
+
+        // Sheet 2 Data: Panduan Kolom
+        $s2Rows = [
+            ['Nama Kolom', 'Kewajiban', 'Tipe Data / Pilihan', 'Keterangan'],
+            ['Nomor', 'Opsional', 'Angka Urut', 'Nomor butir pertanyaan (1, 2, 3...)'],
+            ['Pertanyaan', 'Wajib', 'Teks / Markdown', 'Pertanyaan soal. Mendukung blok kode program ```cpp, ```python, tabel, dan format teks.'],
+            ['Tipe_Soal', 'Wajib (Dropdown)', 'multiple_choice | multi_select | true_false', 'Gunakan pilihan pada dropdown kolom C untuk memilih jenis soal tanpa mengetik.'],
+            ['Poin', 'Opsional', 'Angka Bulat Positif', 'Bobot nilai soal (default: 10 jika dikosongkan).'],
+            ['Pilihan_A', 'Wajib', 'Teks Pilihan A', 'Opsi jawaban pertama (atau \'Benar\' untuk true_false).'],
+            ['Pilihan_B', 'Wajib', 'Teks Pilihan B', 'Opsi jawaban kedua (atau \'Salah\' untuk true_false).'],
+            ['Pilihan_C', 'Opsional', 'Teks Pilihan C', 'Opsi jawaban ketiga (opsional untuk pilihan ganda).'],
+            ['Pilihan_D', 'Opsional', 'Teks Pilihan D', 'Opsi jawaban keempat.'],
+            ['Pilihan_E', 'Opsional', 'Teks Pilihan E', 'Opsi jawaban kelima.'],
+            ['Kunci_Jawaban', 'Wajib (Dropdown)', 'A, B, C, D, E, Benar, Salah', 'Pilih huruf kunci jawaban dari dropdown kolom J.'],
+            ['Pembahasan', 'Opsional', 'Teks Penjelasan', 'Catatan atau penjelasan kunci jawaban saat mahasiswa meninjau nilai ujian.'],
+        ];
+
+        $s2Cols = ['A', 'B', 'C', 'D'];
+        $s2Data = '<sheetData>';
+        foreach ($s2Rows as $rIdx => $rVals) {
+            $rNum = $rIdx + 1;
+            $sId = ($rNum === 1) ? 1 : 2;
+            $s2Data .= '<row r="' . $rNum . '">';
+            foreach ($rVals as $cIdx => $v) {
+                $cRef = $s2Cols[$cIdx] . $rNum;
+                $escaped = htmlspecialchars((string)$v, ENT_XML1, 'UTF-8');
+                $s2Data .= '<c r="' . $cRef . '" t="inlineStr" s="' . $sId . '"><is><t xml:space="preserve">' . $escaped . '</t></is></c>';
+            }
+            $s2Data .= '</row>';
+        }
+        $s2Data .= '</sheetData>';
+
+        $sheet2Xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <dimension ref="A1:D15"/>
+  <sheetFormatPr defaultRowHeight="20"/>
+  <cols>
+    <col min="1" max="1" width="20" customWidth="1"/>
+    <col min="2" max="2" width="20" customWidth="1"/>
+    <col min="3" max="3" width="38" customWidth="1"/>
+    <col min="4" max="4" width="60" customWidth="1"/>
+  </cols>
+  ' . $s2Data . '
+  <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
+</worksheet>';
+
+        $zip->addFromString('[Content_Types].xml', $typesXml);
+        $zip->addFromString('_rels/.rels', $relsXml);
+        $zip->addFromString('xl/_rels/workbook.xml.rels', $wbRelsXml);
+        $zip->addFromString('xl/workbook.xml', $workbookXml);
+        $zip->addFromString('xl/styles.xml', $stylesXml);
+        $zip->addFromString('xl/worksheets/sheet1.xml', $sheet1Xml);
+        $zip->addFromString('xl/worksheets/sheet2.xml', $sheet2Xml);
+        $zip->close();
+
+        $headers = [
+            'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
+        ];
+
+        return response()->download($tempFile, $filename, $headers)->deleteFileAfterSend(true);
+    }
+
     /**
      * Download sample CSV template with UTF-8 BOM for Microsoft Excel compatibility.
      * Supports both semicolon ';' (optimal for MS Excel Indonesia) and comma ',' (standard CSV).

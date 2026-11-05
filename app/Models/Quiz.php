@@ -55,14 +55,7 @@ class Quiz extends Model
     {
         static::creating(function (Quiz $quiz) {
             if (empty($quiz->slug)) {
-                $baseSlug = Str::slug($quiz->title) ?: 'kuis-' . Str::lower(Str::random(5));
-                $slug = $baseSlug;
-                $counter = 1;
-                while (static::where('slug', $slug)->exists()) {
-                    $slug = "{$baseSlug}-{$counter}";
-                    $counter++;
-                }
-                $quiz->slug = $slug;
+                $quiz->slug = static::generateUniqueSlug($quiz->title ?? '');
             }
 
             if (empty($quiz->access_code)) {
@@ -79,6 +72,30 @@ class Quiz extends Model
                 $quiz->unique_token = $token;
             }
         });
+    }
+
+    public static function generateUniqueSlug(string $title, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($title) ?: 'kuis-' . Str::lower(Str::random(5));
+
+        $reserved = ['join', 'lobby', 'play', 'results', 'autosave', 'submit', 'attempt', 'start'];
+        if (in_array(strtolower($base), $reserved, true)) {
+            $base = "{$base}-kuis";
+        }
+
+        $slug = $base;
+        $counter = 1;
+        while (static::where('slug', $slug)->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $slug = "{$base}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    public function getSlugOrTokenAttribute(): string
+    {
+        return $this->slug ?: $this->unique_token;
     }
 
     public function user(): BelongsTo

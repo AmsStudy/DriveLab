@@ -68,15 +68,21 @@ class QuizImageService
             $targetImage = $scaled;
         }
 
-        // Simpan sebagai WebP (kualitas 85: tajam, tidak blur, ukuran sangat efisien)
+        // Simpan sebagai WebP jika didukung (kualitas 85: tajam, tidak blur, ukuran sangat efisien)
         if (function_exists('imagewebp')) {
-            imagewebp($targetImage, $absoluteDestination, 85);
-        } else {
-            // Fallback JPEG kualitas 85
+            \imagewebp($targetImage, $absoluteDestination, 85);
+        } elseif (function_exists('imagejpeg')) {
+            // Fallback JPEG kualitas 85 jika WebP tidak didukung
             $filename = Str::random(32) . '.jpg';
             $relativeStoragePath = $targetDirectory . '/' . $filename;
             $absoluteDestination = Storage::disk('public')->path($relativeStoragePath);
-            imagejpeg($targetImage, $absoluteDestination, 85);
+            \imagejpeg($targetImage, $absoluteDestination, 85);
+        } else {
+            // Fallback PNG jika WebP & JPEG tidak tersedia
+            $filename = Str::random(32) . '.png';
+            $relativeStoragePath = $targetDirectory . '/' . $filename;
+            $absoluteDestination = Storage::disk('public')->path($relativeStoragePath);
+            \imagepng($targetImage, $absoluteDestination, 6);
         }
 
         if ($targetImage !== $sourceImage) {

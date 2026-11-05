@@ -35,7 +35,6 @@ class Soal extends Model
         'active_until',
         'is_active',
         'is_downloadable',
-        'access_count',
         'is_submission_enabled',
         'submission_types',
         'deadline_at',

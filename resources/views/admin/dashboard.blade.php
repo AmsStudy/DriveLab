@@ -7,7 +7,7 @@
 @section('content')
 
 {{-- ─── STATS CARDS ─── --}}
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 mb-8">
 
     {{-- Total Dokumen --}}
     <div class="rounded-2xl p-4 sm:p-5 relative overflow-hidden transition-all duration-200 hover:border-emerald-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
@@ -35,21 +35,6 @@
         </div>
         <p class="text-3xl font-extrabold text-emerald-400 tracking-tight">{{ number_format($stats['soal_aktif']) }}</p>
         <p class="text-xs text-gray-400 mt-1">Siap Diakses</p>
-    </div>
-
-    {{-- Total Kunjungan / Views --}}
-    <div class="rounded-2xl p-4 sm:p-5 relative overflow-hidden transition-all duration-200 hover:border-blue-500/30 group" style="background:#0F1713;border:1px solid #1A2820;">
-        <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-semibold text-blue-400/80 uppercase tracking-wider">Kunjungan</span>
-            <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style="background:rgba(59,130,246,.12);">
-                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-            </div>
-        </div>
-        <p class="text-3xl font-extrabold text-blue-400 tracking-tight">{{ number_format($stats['total_views']) }}</p>
-        <p class="text-xs text-gray-400 mt-1">Total Kali Dilihat</p>
     </div>
 
     {{-- Total Tugas Masuk --}}
@@ -492,16 +477,16 @@
             </div>
         </div>
 
-        {{-- Top Dokumen Paling Banyak Diakses --}}
+        {{-- Top Dokumen Paling Aktif --}}
         <div class="rounded-2xl overflow-hidden shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
             <div class="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
                 <h3 class="font-bold text-white text-sm flex items-center gap-2">
-                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                     </svg>
                     Dokumen Terpopuler
                 </h3>
-                <span class="text-[11px] text-gray-500">Berdasarkan Akses</span>
+                <span class="text-[11px] text-gray-500">Berdasarkan Tugas</span>
             </div>
 
             @if($top_soals->isEmpty())
@@ -514,13 +499,13 @@
                             <a href="{{ route('admin.soal.show', $topSoal) }}" class="text-xs font-semibold text-gray-200 hover:text-emerald-400 transition-colors line-clamp-1" title="{{ $topSoal->title }}">
                                 {{ $topSoal->title }}
                             </a>
-                            <span class="text-xs font-bold text-blue-400 flex-shrink-0 bg-blue-500/10 px-2 py-0.5 rounded-md border border-blue-500/20">
-                                {{ number_format($topSoal->access_count) }}×
+                            <span class="text-xs font-bold text-teal-400 flex-shrink-0 bg-teal-500/10 px-2 py-0.5 rounded-md border border-teal-500/20">
+                                {{ $topSoal->submissions_count }} tugas
                             </span>
                         </div>
                         <div class="flex items-center justify-between text-[11px] text-gray-500 mt-1.5">
                             <span class="truncate max-w-[130px]">{{ $topSoal->category->name ?? 'Tanpa Kategori' }}</span>
-                            <span class="text-teal-400 font-medium flex-shrink-0">{{ $topSoal->submissions_count }} tugas terkumpul</span>
+                            <span class="text-gray-400 font-medium flex-shrink-0">{{ $topSoal->created_at->format('d M Y') }}</span>
                         </div>
                     </div>
                     @endforeach
