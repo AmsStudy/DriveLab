@@ -212,6 +212,23 @@
             opacity: 0.35 !important;
         }
 
+        html:not(.dark) .admin-link {
+            background: #FFFFFF !important;
+            border-color: #E2EAE5 !important;
+            color: #0F1F17 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+        }
+        html:not(.dark) .admin-link .admin-link-icon,
+        html:not(.dark) .admin-link .admin-link-arrow {
+            color: #059669 !important;
+        }
+        html:not(.dark) .admin-link:hover {
+            border-color: rgba(16, 185, 129, 0.45) !important;
+            background: #F8FAF9 !important;
+            color: #059669 !important;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.12) !important;
+        }
+
         html {
             min-height: 100%;
         }
@@ -306,32 +323,63 @@
                 border-radius: 20px !important;
             }
             .admin-link {
-                top: 12px !important;
-                right: 12px !important;
+                min-height: 32px !important;
                 font-size: 10px !important;
-                padding: 4px 9px !important;
+                padding: 0 10px !important;
+                border-radius: 10px !important;
+            }
+        }
+
+        .top-nav-controls {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            z-index: 35;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        @media (max-width: 480px) {
+            .top-nav-controls {
+                top: 14px;
+                right: 14px;
+                gap: 6px;
             }
         }
 
         /* ─────────────────── CORNER ADMIN ─────────────────── */
         .admin-link {
-            position: fixed; top: 22px; right: 26px; z-index: 30;
-            display: flex; align-items: center; gap: 5px;
-            font-size: 11px; font-weight: 500; letter-spacing: .06em;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 36px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .05em;
             text-transform: uppercase;
-            color: var(--muted);
+            color: #E5E7EB;
             text-decoration: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(16,185,129,.1);
-            background: rgba(5,9,7,.6);
+            padding: 0 13px;
+            border-radius: 12px;
+            border: 1px solid #1A2820;
+            background: #0F1713;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(8px);
-            transition: color .2s, border-color .2s, background .2s;
+            transition: all .2s ease;
+        }
+        .admin-link .admin-link-icon,
+        .admin-link .admin-link-arrow {
+            color: #34D399;
+            transition: transform .2s ease, color .2s ease;
         }
         .admin-link:hover {
-            color: var(--mint);
-            border-color: rgba(16,185,129,.3);
-            background: rgba(16,185,129,.07);
+            color: #34D399;
+            border-color: rgba(16, 185, 129, 0.45);
+            background: #142019;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
+        }
+        .admin-link:hover .admin-link-arrow {
+            transform: translateX(2px);
         }
 
         /* ─────────────────── MODAL POPUP (ADMIN LOGIN) ─────────────────── */
@@ -875,12 +923,15 @@
     </div>
 
     {{-- Top-Right Controls (Theme Switcher & Admin Link) --}}
-    <div style="position: fixed; top: 20px; right: 24px; z-index: 35; display: flex; align-items: center; gap: 8px;">
+    <div class="top-nav-controls">
         <x-theme-switcher :compact="true" />
         @auth
-            <a href="{{ route('admin.dashboard') }}" class="admin-link" style="position: static;">
-                Dashboard
-                <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            <a href="{{ route('admin.dashboard') }}" class="admin-link">
+                <svg class="admin-link-icon" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                </svg>
+                <span>Dashboard</span>
+                <svg class="admin-link-arrow" width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
             </a>
         @endauth
     </div>
