@@ -406,6 +406,8 @@ html:not(.dark) .text-gray-500 {
 /* High-Contrast Accessible Neon Accent Colors in Light Mode */
 html:not(.dark) .text-emerald-400 { color: #059669 !important; }
 html:not(.dark) .text-emerald-300 { color: #047857 !important; }
+html:not(.dark) .text-emerald-200 { color: #064E3B !important; font-weight: 600 !important; }
+html:not(.dark) .text-emerald-100 { color: #022C22 !important; font-weight: 600 !important; }
 html:not(.dark) .text-teal-400 { color: #0D9488 !important; }
 html:not(.dark) .text-teal-300 { color: #0F766E !important; }
 html:not(.dark) .text-sky-400 { color: #0284C7 !important; }

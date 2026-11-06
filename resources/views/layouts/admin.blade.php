@@ -1493,6 +1493,17 @@
 
         window.hideCyberHoverBubble();
         currentCyberLightboxScale = 1.0;
+        img.onerror = function() {
+            if (cap) {
+                cap.textContent = (caption ? caption + ' — ' : '') + 'Gambar belum tersedia di server (pastikan `php artisan storage:link` aktif)';
+                cap.style.color = '#F59E0B';
+            }
+        };
+        img.onload = function() {
+            if (cap) {
+                cap.style.color = '';
+            }
+        };
         img.src = src;
         img.style.transform = 'scale(1)';
         const zoomLbl = document.getElementById('cyber-lightbox-zoom-label');

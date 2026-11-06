@@ -146,9 +146,8 @@ class SoalController extends Controller
             }
         }
 
-        $soal = Soal::create([
+        $soalData = [
             'title'               => $validated['title'],
-            'slug'                => Soal::generateUniqueSlug($validated['title']),
             'description'         => $validated['description'] ?? null,
             'content_text'        => $validated['content_text'] ?? null,
             'kode_unik'           => $validated['kode_unik'],
@@ -168,7 +167,13 @@ class SoalController extends Controller
             'submission_instructions' => $validated['submission_instructions'] ?? null,
             'allowed_extensions'  => $validated['allowed_extensions'] ?? [],
             'classes'             => $classes,
-        ]);
+        ];
+
+        if (\Illuminate\Support\Facades\Schema::hasColumn('soals', 'slug')) {
+            $soalData['slug'] = Soal::generateUniqueSlug($validated['title']);
+        }
+
+        $soal = Soal::create($soalData);
 
         // 1. Simpan lampiran file fisik (maksimal 15 file)
         if ($request->hasFile('files')) {
@@ -283,9 +288,6 @@ class SoalController extends Controller
 
         $data = [
             'title'        => $validated['title'],
-            'slug'         => ($soal->title !== $validated['title'] || empty($soal->slug))
-                                ? Soal::generateUniqueSlug($validated['title'], $soal->id)
-                                : $soal->slug,
             'description'  => $validated['description'] ?? null,
             'content_text' => $validated['content_text'] ?? null,
             'kode_unik'    => $validated['kode_unik'],
@@ -302,6 +304,12 @@ class SoalController extends Controller
             'allowed_extensions'  => $validated['allowed_extensions'] ?? [],
             'classes'             => $classes,
         ];
+
+        if (\Illuminate\Support\Facades\Schema::hasColumn('soals', 'slug')) {
+            $data['slug'] = ($soal->title !== $validated['title'] || empty($soal->slug))
+                ? Soal::generateUniqueSlug($validated['title'], $soal->id)
+                : $soal->slug;
+        }
 
         // Update password hanya jika diisi
         if (!empty($validated['password'])) {

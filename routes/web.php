@@ -19,6 +19,18 @@ Route::get('/csrf-refresh', function () {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('csrf.refresh');
 
+// Fallback akses file public storage (berguna jika symlink php artisan storage:link belum aktif di hosting)
+Route::get('/storage/{path}', function (string $path) {
+    if (str_contains($path, '..')) {
+        abort(404);
+    }
+    $disk = \Illuminate\Support\Facades\Storage::disk('public');
+    if (!$disk->exists($path)) {
+        abort(404);
+    }
+    return $disk->response($path);
+})->where('path', '.*')->name('storage.fallback');
+
 Route::post('/akses-kode', [SoalAccessController::class, 'accessByCode'])->name('soal.accessByCode');
 
 // Akses Soal (Mahasiswa) — tanpa login

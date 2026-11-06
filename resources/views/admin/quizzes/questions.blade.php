@@ -128,18 +128,19 @@
     @endif
 
     {{-- Question Modal (Create / Edit) --}}
-    <div x-show="showModal"
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-[100] overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-         style="display: none; z-index: 100;">
+    <template x-teleport="body">
+        <div x-show="showModal"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+             style="display: none; z-index: 99999 !important;">
 
-        <div @click.away="closeModal()"
-             class="bg-[#0F1713] border border-[#1A2820] rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+            <div @click.away="closeModal()"
+                 class="quiz-modal-card bg-[#0F1713] border border-[#1A2820] rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             
             {{-- Modal Header --}}
             <div class="px-6 py-4 border-b border-[#1A2820] flex items-center justify-between">
@@ -332,20 +333,22 @@
             </form>
         </div>
     </div>
+    </template>
 
     {{-- Modal Import Massal Soal (Excel / CSV Spreadsheet) --}}
-    <div x-show="showImportModal"
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 scale-95"
-         x-transition:enter-end="opacity-100 scale-100"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100 scale-100"
-         x-transition:leave-end="opacity-0 scale-95"
-         class="fixed inset-0 z-[100] overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
-         style="display: none; z-index: 100;">
+    <template x-teleport="body">
+        <div x-show="showImportModal"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="fixed inset-0 overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+             style="display: none; z-index: 99999 !important;">
 
-        <div @click.away="showImportModal = false"
-             class="bg-[#0F1713] border border-[#1A2820] rounded-3xl w-full max-w-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            <div @click.away="showImportModal = false"
+                 class="quiz-modal-card bg-[#0F1713] border border-[#1A2820] rounded-3xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6 sm:p-8 shadow-2xl relative">
             
             {{-- Glowing Ambient Top --}}
             <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-32 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -570,6 +573,7 @@
             </form>
         </div>
     </div>
+    </template>
 
 </div>
 

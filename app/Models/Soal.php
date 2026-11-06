@@ -58,8 +58,12 @@ class Soal extends Model
     protected static function booted()
     {
         static::creating(function (Soal $soal) {
-            if (empty($soal->slug)) {
-                $soal->slug = static::generateUniqueSlug($soal->title ?? '');
+            if (\Illuminate\Support\Facades\Schema::hasColumn('soals', 'slug')) {
+                if (empty($soal->slug)) {
+                    $soal->slug = static::generateUniqueSlug($soal->title ?? '');
+                }
+            } else {
+                unset($soal->slug);
             }
 
             if (empty($soal->unique_token)) {
@@ -78,6 +82,10 @@ class Soal extends Model
         $reserved = ['tracktask', 'submittask', 'create', 'edit', 'status', 'view', 'file', 'download', 'preview-wrapper'];
         if (in_array(strtolower($base), $reserved, true)) {
             $base = "{$base}-dokumen";
+        }
+
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('soals', 'slug')) {
+            return $base;
         }
 
         $slug = $base;

@@ -83,8 +83,8 @@
         {{-- Options List --}}
         <div class="space-y-2 mb-3">
             @foreach($q->options as $optIndex => $opt)
-                <div class="flex items-start gap-3 p-2.5 rounded-xl border transition-colors {{ $opt->is_correct ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-200' : 'bg-[#090D0B] border-[#1A2820] text-gray-300' }}">
-                    <span class="w-5 h-5 rounded-md text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 {{ $opt->is_correct ? 'bg-emerald-500 text-white' : 'bg-gray-800 text-gray-400' }}">
+                <div class="flex items-start gap-3 p-2.5 rounded-xl border transition-colors {{ $opt->is_correct ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-950 dark:text-emerald-200 font-semibold' : 'bg-[#090D0B] border-[#1A2820] text-gray-800 dark:text-gray-300' }}">
+                    <span class="w-5 h-5 rounded-md text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 {{ $opt->is_correct ? 'bg-emerald-600 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-400' }}">
                         {{ $labels[$optIndex] ?? ($optIndex + 1) }}
                     </span>
 
@@ -97,7 +97,7 @@
                                         onmouseleave="hideCyberHoverBubble()"
                                         onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIndex] ?? '' }}')"
                                         class="block group relative cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-white/10 bg-black/50 hover:border-emerald-500/40 p-1 transition-all">
-                                    <img src="{{ $opt->image_url }}" alt="Opsi {{ $labels[$optIndex] ?? '' }}" class="max-h-24 w-auto object-contain group-hover:scale-105 transition-transform">
+                                    <img src="{{ $opt->image_url }}" alt="Opsi {{ $labels[$optIndex] ?? '' }}" class="max-h-24 w-auto object-contain group-hover:scale-105 transition-transform" loading="lazy">
                                 </button>
                             </div>
                         @endif
@@ -107,7 +107,7 @@
                     </div>
 
                     @if($opt->is_correct)
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full flex-shrink-0">
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full flex-shrink-0">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             Kunci
                         </span>
