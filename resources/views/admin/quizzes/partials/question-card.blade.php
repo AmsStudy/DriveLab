@@ -9,9 +9,29 @@
         {{-- Header Pertanyaan --}}
         <div class="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-[#1A2820]">
             <div class="flex items-center gap-2 flex-wrap">
-                <span class="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-xs flex items-center justify-center">
-                    #{{ $qNum }}
-                </span>
+                @if(isset($totalQuestions) && $totalQuestions > 1)
+                    {{-- Dropdown Ubah Nomor Urut Soal (Otomatis Tersimpan) --}}
+                    <div class="relative inline-flex items-center group/order" title="Klik untuk mengubah nomor urut soal (otomatis tersimpan)">
+                        <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 hover:border-emerald-500 text-emerald-400 font-bold text-xs transition-colors shadow-sm">
+                            <span class="text-emerald-500/80 font-mono text-[11px]">No.</span>
+                            <select onchange="changeQuestionOrder(this, '{{ route('admin.quizzes.questions.reorder', [$quiz, $q]) }}', {{ $qNum }})"
+                                    class="bg-transparent text-emerald-300 font-mono font-bold text-xs cursor-pointer focus:outline-none pr-1 py-0 border-0 appearance-none text-center">
+                                @for($i = 1; $i <= $totalQuestions; $i++)
+                                    <option value="{{ $i }}" class="bg-[#0F1713] text-gray-200" {{ $i === $qNum ? 'selected' : '' }}>
+                                        #{{ $i }}
+                                    </option>
+                                @endfor
+                            </select>
+                            <svg class="w-3 h-3 text-emerald-400/80 pointer-events-none -ml-0.5 group-hover/order:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                @else
+                    <span class="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-xs flex items-center justify-center">
+                        #{{ $qNum }}
+                    </span>
+                @endif
 
                 @if($isMulti)
                     <span class="px-2.5 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold flex items-center gap-1">

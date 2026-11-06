@@ -340,5 +340,41 @@ class SoalPasswordAndModalTest extends TestCase
                 'submission_type' => 'link',
             ]);
     }
+
+    public function test_admin_can_update_soal_with_unchanged_kode_unik(): void
+    {
+        $soal = Soal::create([
+            'title'                 => 'Dokumen Asli',
+            'user_id'               => $this->admin->id,
+            'kode_unik'             => 'KODE-SAMA-1',
+            'unique_token'          => 'token-sama-1',
+            'password'              => bcrypt('secret123'),
+            'plain_password'        => 'secret123',
+            'access_type'           => 'lifetime',
+            'is_active'             => true,
+            'is_downloadable'       => true,
+            'is_submission_enabled' => false,
+        ]);
+
+        // 1. Updating with unchanged kode_unik must succeed
+        $response = $this->actingAs($this->admin)->put(route('admin.soal.update', $soal), [
+            'title'       => 'Dokumen Asli Diperbarui',
+            'kode_unik'   => 'KODE-SAMA-1',
+            'access_type' => 'lifetime',
+            'is_active'   => '1',
+        ]);
+
+        $response->assertSessionHas('success');
+        $soal->refresh();
+        $this->assertEquals('Dokumen Asli Diperbarui', $soal->title);
+        $this->assertEquals('KODE-SAMA-1', $soal->kode_unik);
+
+        // 2. check-kode-unik endpoint with ignore_id returns available: true for same code
+        $checkRes = $this->actingAs($this->admin)->getJson(route('admin.soal.check-kode-unik', [
+            'kode_unik' => 'KODE-SAMA-1',
+            'ignore_id' => $soal->id,
+        ]));
+        $checkRes->assertOk()->assertJson(['available' => true]);
+    }
 }
 

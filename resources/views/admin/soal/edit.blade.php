@@ -44,6 +44,7 @@
                             <label for="kode_unik" class="block text-sm font-medium text-gray-300 mb-2">Kode Unik Akses <span class="text-red-400">*</span></label>
                             <div class="relative">
                                 <input type="text" id="kode_unik" name="kode_unik" value="{{ old('kode_unik', $soal->kode_unik) }}" required
+                                       data-original-code="{{ $soal->kode_unik }}"
                                        autocomplete="off"
                                        class="w-full bg-gray-800 border {{ $errors->has('kode_unik') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-4 py-3 pr-10 text-sm focus:outline-none focus:border-emerald-500 transition-colors">
                                 <div id="kode_unik_indicator" class="absolute right-3.5 top-1/2 -translate-y-1/2 hidden flex items-center pointer-events-none"></div>
@@ -535,6 +536,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const checkAvailability = () => {
         const val = input.value.trim();
+        const originalCode = (input.dataset.originalCode || '').trim();
+
+        // Jika sama dengan kode dokumen ini sendiri, langsung izinkan
+        if (originalCode && val.toUpperCase() === originalCode.toUpperCase()) {
+            input.classList.remove('border-red-500', 'border-emerald-500', 'focus:border-red-500');
+            input.classList.add('border-gray-700', 'focus:border-emerald-500');
+            feedback.className = 'mt-1.5 text-xs text-gray-500';
+            feedback.textContent = 'Boleh diubah, asal tidak sama dengan dokumen lain.';
+            if (indicator) {
+                indicator.className = 'absolute right-3.5 top-1/2 -translate-y-1/2 hidden flex items-center pointer-events-none';
+                indicator.innerHTML = '';
+            }
+            isCodeTaken = false;
+            return;
+        }
 
         if (!val) {
             input.classList.remove('border-red-500', 'border-emerald-500', 'focus:border-red-500');
@@ -628,6 +644,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (form) {
         form.addEventListener('submit', (e) => {
+            const val = input.value.trim();
+            const originalCode = (input.dataset.originalCode || '').trim();
+            if (originalCode && val.toUpperCase() === originalCode.toUpperCase()) {
+                isCodeTaken = false;
+            }
+
             if (isCodeTaken) {
                 e.preventDefault();
                 input.focus();

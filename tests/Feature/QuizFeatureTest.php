@@ -865,4 +865,55 @@ class QuizFeatureTest extends TestCase
         $response->assertSee('22019999');
         $response->assertSee('CBT Dashboard Test');
     }
+
+    public function test_admin_can_reorder_quiz_questions_and_updates_order_nums(): void
+    {
+        $quiz = Quiz::create([
+            'title'       => 'Kuis Urutan Soal',
+            'user_id'     => $this->admin->id,
+            'is_active'   => true,
+            'access_code' => 'REORDER-01',
+        ]);
+
+        $q1 = $quiz->questions()->create(['question_text' => 'Soal Pertama', 'points' => 10, 'order_num' => 1]);
+        $q2 = $quiz->questions()->create(['question_text' => 'Soal Kedua', 'points' => 10, 'order_num' => 2]);
+        $q3 = $quiz->questions()->create(['question_text' => 'Soal Ketiga', 'points' => 10, 'order_num' => 3]);
+        $q4 = $quiz->questions()->create(['question_text' => 'Soal Keempat', 'points' => 10, 'order_num' => 4]);
+
+        // Check index view renders 2-column and dropdown order
+        $viewRes = $this->actingAs($this->admin)->get(route('admin.quizzes.questions', $quiz));
+        $viewRes->assertOk();
+        $viewRes->assertSee('grid-cols-1 lg:grid-cols-2', false);
+        $viewRes->assertDontSee('Soal Ganjil');
+        $viewRes->assertDontSee('Soal Genap');
+        $viewRes->assertSee('changeQuestionOrder', false);
+
+        // Move Q4 to position 2
+        $reorderRes = $this->actingAs($this->admin)->postJson(route('admin.quizzes.questions.reorder', [$quiz, $q4]), [
+            'order' => 2,
+        ]);
+
+        $reorderRes->assertOk()
+            ->assertJson([
+                'success' => true,
+            ]);
+
+        // Reload questions
+        $ordered = $quiz->questions()->get()->pluck('id')->all();
+        $this->assertEquals([$q1->id, $q4->id, $q2->id, $q3->id], $ordered);
+
+        // Check sequential order_num
+        $orderNums = $quiz->questions()->get()->pluck('order_num')->all();
+        $this->assertEquals([1, 2, 3, 4], $orderNums);
+
+        // Now move Q1 (pos 1) to pos 4
+        $reorderRes2 = $this->actingAs($this->admin)->postJson(route('admin.quizzes.questions.reorder', [$quiz, $q1]), [
+            'order' => 4,
+        ]);
+        $reorderRes2->assertOk();
+
+        $ordered2 = $quiz->questions()->get()->pluck('id')->all();
+        $this->assertEquals([$q4->id, $q2->id, $q3->id, $q1->id], $ordered2);
+        $this->assertEquals([1, 2, 3, 4], $quiz->questions()->get()->pluck('order_num')->all());
+    }
 }

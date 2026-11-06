@@ -1239,7 +1239,11 @@ function openEditModalForSoal(id) {
 
     // Basic Fields
     document.getElementById('edit_modal_title').value = data.title || '';
-    document.getElementById('edit_modal_kode_unik').value = data.kode_unik || '';
+    const editKodeInput = document.getElementById('edit_modal_kode_unik');
+    if (editKodeInput) {
+        editKodeInput.value = data.kode_unik || '';
+        editKodeInput.dataset.originalCode = (data.kode_unik || '').trim();
+    }
     if (typeof resetKodeUnikState === 'function') {
         resetKodeUnikState('edit_modal_kode_unik', 'edit_modal_kode_unik_feedback', 'edit_modal_kode_unik_indicator', 'Boleh diubah, asal unik.');
     }
@@ -1663,6 +1667,10 @@ function resetKodeUnikState(inputId, feedbackId, indicatorId, defaultText) {
     const indicator = document.getElementById(indicatorId);
     if (!input || !feedback) return;
 
+    if (typeof input._resetKodeUnikTaken === 'function') {
+        input._resetKodeUnikTaken();
+    }
+
     input.classList.remove('border-red-500', 'border-emerald-500', 'focus:border-red-500');
     input.classList.add('border-gray-700', 'focus:border-emerald-500');
     feedback.className = 'mt-1 text-xs text-gray-500';
@@ -1685,9 +1693,22 @@ function initKodeUnikChecker(config) {
     let abortCtrl = null;
     let isCodeTaken = false;
 
+    input._resetKodeUnikTaken = () => {
+        isCodeTaken = false;
+    };
+
     const checkAvailability = () => {
         const val = input.value.trim();
+        const originalCode = (input.dataset.originalCode || '').trim();
         const ignoreId = typeof config.getIgnoreId === 'function' ? config.getIgnoreId() : null;
+
+        // Jika kode tidak berubah dari kode awal dokumen, izinkan langsung tanpa error
+        if (originalCode && val.toUpperCase() === originalCode.toUpperCase()) {
+            isCodeTaken = false;
+            resetKodeUnikState(config.inputId, config.feedbackId, config.indicatorId, config.defaultText);
+            if (submitBtn) submitBtn.disabled = false;
+            return;
+        }
 
         if (!val) {
             resetKodeUnikState(config.inputId, config.feedbackId, config.indicatorId, config.defaultText);
@@ -1776,6 +1797,12 @@ function initKodeUnikChecker(config) {
 
     if (form) {
         form.addEventListener('submit', (e) => {
+            const val = input.value.trim();
+            const originalCode = (input.dataset.originalCode || '').trim();
+            if (originalCode && val.toUpperCase() === originalCode.toUpperCase()) {
+                isCodeTaken = false;
+            }
+
             if (isCodeTaken) {
                 e.preventDefault();
                 input.focus();
@@ -1793,6 +1820,7 @@ function initKodeUnikChecker(config) {
             }
         });
     }
+}
 }
 
 // Drag & drop support on modal drop zone

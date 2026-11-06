@@ -481,7 +481,59 @@ class QuizController extends Controller
         }
 
         $question->delete();
+
+        // Re-index remaining questions order_num sequentially
+        $remaining = $quiz->questions()->orderBy('order_num')->orderBy('id')->get();
+        foreach ($remaining as $idx => $item) {
+            $pos = $idx + 1;
+            if ($item->order_num !== $pos) {
+                $item->update(['order_num' => $pos]);
+            }
+        }
+
         return back()->with('success', 'Pertanyaan berhasil dihapus!');
+    }
+
+    public function reorderQuestion(Request $request, Quiz $quiz, QuizQuestion $question)
+    {
+        $this->authorizeQuiz($quiz);
+        if ($question->quiz_id !== $quiz->id) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'order' => 'required|integer|min:1',
+        ]);
+
+        $newOrder = (int) $validated['order'];
+        $totalQuestions = $quiz->questions()->count();
+        if ($newOrder > $totalQuestions) {
+            $newOrder = $totalQuestions;
+        }
+
+        DB::transaction(function () use ($quiz, $question, $newOrder) {
+            $questions = $quiz->questions()->orderBy('order_num')->orderBy('id')->get();
+            $filtered = $questions->reject(fn($q) => $q->id === $question->id)->values();
+
+            $insertIndex = max(0, min($newOrder - 1, $filtered->count()));
+            $filtered->splice($insertIndex, 0, [$question]);
+
+            foreach ($filtered as $idx => $item) {
+                $pos = $idx + 1;
+                if ($item->order_num !== $pos) {
+                    $item->update(['order_num' => $pos]);
+                }
+            }
+        });
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Nomor urut pertanyaan berhasil diubah menjadi #{$newOrder}!",
+            ]);
+        }
+
+        return back()->with('success', "Nomor urut pertanyaan berhasil diubah menjadi #{$newOrder}!");
     }
 
     public function results(Request $request, Quiz $quiz)

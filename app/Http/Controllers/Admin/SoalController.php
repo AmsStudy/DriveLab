@@ -11,6 +11,7 @@ use ZipArchive;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class SoalController extends Controller
 {
@@ -102,7 +103,7 @@ class SoalController extends Controller
             'files.*'      => 'file|max:5120', // 5MB per file
             'file_downloadable' => 'nullable|array',
             'is_downloadable' => 'boolean',
-            'kode_unik'    => 'required|string|max:20|unique:soals,kode_unik',
+            'kode_unik'    => ['required', 'string', 'max:20', Rule::unique('soals', 'kode_unik')->whereNull('deleted_at')],
             'is_submission_enabled' => 'boolean',
             'submission_types' => 'nullable|array',
             'submission_types.*' => 'string|in:file,link,text',
@@ -242,7 +243,7 @@ class SoalController extends Controller
             'active_until' => 'nullable|required_if:access_type,scheduled|date|after:active_from',
             'is_active'    => 'boolean',
             'is_downloadable' => 'boolean',
-            'kode_unik'    => 'required|string|max:20|unique:soals,kode_unik,' . $soal->id,
+            'kode_unik'    => ['required', 'string', 'max:20', Rule::unique('soals', 'kode_unik')->ignore($soal->id)->whereNull('deleted_at')],
             'is_submission_enabled' => 'boolean',
             'submission_types' => 'nullable|array',
             'submission_types.*' => 'string|in:file,link,text',

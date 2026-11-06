@@ -119,6 +119,7 @@ Route::prefix('admin')
         Route::post('quizzes/{quiz}/questions', [QuizController::class, 'storeQuestion'])->name('quizzes.questions.store');
         Route::put('quizzes/{quiz}/questions/{question}', [QuizController::class, 'updateQuestion'])->name('quizzes.questions.update');
         Route::delete('quizzes/{quiz}/questions/{question}', [QuizController::class, 'destroyQuestion'])->name('quizzes.questions.destroy');
+        Route::post('quizzes/{quiz}/questions/{question}/reorder', [QuizController::class, 'reorderQuestion'])->name('quizzes.questions.reorder');
         Route::get('quizzes/{quiz}/questions/template', [QuizController::class, 'downloadQuestionsTemplate'])->name('quizzes.questions.template');
         Route::post('quizzes/{quiz}/questions/import', [QuizController::class, 'importQuestions'])->name('quizzes.questions.import');
 

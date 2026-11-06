@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    {{-- Questions List: 2-Column Split (Ganjil di Kiri, Genap di Kanan) --}}
+    {{-- Questions List: 2-Column Grid (Kiri & Kanan Natural) --}}
     @if($quiz->questions->isEmpty())
         <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-16 text-center">
             <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
@@ -77,53 +77,32 @@
         </div>
     @else
         @php
-            $oddItems = [];
-            $evenItems = [];
-            foreach ($quiz->questions as $i => $q) {
-                if ($i % 2 === 0) {
-                    $oddItems[] = ['q' => $q, 'num' => $i + 1];
-                } else {
-                    $evenItems[] = ['q' => $q, 'num' => $i + 1];
-                }
-            }
+            $totalQuestions = $quiz->questions->count();
         @endphp
 
-        <style>
-            .bank-soal-2col {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 1.25rem;
-                align-items: start;
-            }
-            @media (max-width: 860px) {
-                .bank-soal-2col {
-                    grid-template-columns: 1fr !important;
-                }
-            }
-        </style>
-
-        <div class="bank-soal-2col">
-            {{-- Kolom Kiri: Soal Nomor Ganjil (#1, #3, #5, ...) --}}
-            <div class="space-y-4">
-                <div class="flex items-center gap-2 px-1 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    <span>Kolom Kiri &bull; Soal Ganjil</span>
-                </div>
-                @foreach($oddItems as $item)
-                    @include('admin.quizzes.partials.question-card', ['q' => $item['q'], 'qNum' => $item['num']])
-                @endforeach
+        <div class="flex items-center justify-between gap-3 px-1 mb-1 text-xs text-gray-400">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-semibold text-xs">
+                    <span>{{ $totalQuestions }} Pertanyaan</span>
+                    <span>&bull;</span>
+                    <span>Total {{ $quiz->totalPoints() }} Poin</span>
+                </span>
             </div>
+            <p class="text-[11px] text-gray-400 hidden sm:flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Ubah nomor di kartu soal untuk atur urutan (tersimpan otomatis)</span>
+            </p>
+        </div>
 
-            {{-- Kolom Kanan: Soal Nomor Genap (#2, #4, #6, ...) --}}
-            <div class="space-y-4">
-                <div class="flex items-center gap-2 px-1 text-xs font-semibold text-teal-400 uppercase tracking-wider">
-                    <span class="w-2 h-2 rounded-full bg-teal-400"></span>
-                    <span>Kolom Kanan &bull; Soal Genap</span>
-                </div>
-                @foreach($evenItems as $item)
-                    @include('admin.quizzes.partials.question-card', ['q' => $item['q'], 'qNum' => $item['num']])
-                @endforeach
-            </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+            @foreach($quiz->questions as $index => $q)
+                @include('admin.quizzes.partials.question-card', [
+                    'q' => $q,
+                    'qNum' => $index + 1,
+                    'totalQuestions' => $totalQuestions,
+                    'quiz' => $quiz
+                ])
+            @endforeach
         </div>
     @endif
 
@@ -787,6 +766,80 @@
                 }
             }
         };
+    }
+
+    function changeQuestionOrder(selectEl, url, currentNum) {
+        const newNum = parseInt(selectEl.value, 10);
+        if (!newNum || newNum === currentNum) return;
+
+        selectEl.disabled = true;
+        const badge = selectEl.closest('.group\\/order');
+        if (badge) badge.classList.add('opacity-50', 'pointer-events-none');
+
+        if (window.Swal) {
+            Swal.fire({
+                title: 'Memindahkan Soal...',
+                text: `Mengubah urutan pertanyaan #${currentNum} menjadi #${newNum}`,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+                background: '#0F1713',
+                color: '#F3F4F6'
+            });
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ order: newNum })
+        })
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(data => { throw new Error(data.message || 'Gagal mengubah urutan'); });
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Disimpan!',
+                    text: data.message || `Soal berhasil dipindahkan ke nomor #${newNum}!`,
+                    timer: 850,
+                    showConfirmButton: false,
+                    background: '#0F1713',
+                    color: '#F3F4F6'
+                }).then(() => {
+                    window.location.reload();
+                });
+            } else {
+                window.location.reload();
+            }
+        })
+        .catch(err => {
+            selectEl.value = currentNum;
+            selectEl.disabled = false;
+            if (badge) badge.classList.remove('opacity-50', 'pointer-events-none');
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: err.message || 'Terjadi kesalahan saat memindahkan nomor soal.',
+                    background: '#0F1713',
+                    color: '#F3F4F6'
+                });
+            } else {
+                alert(err.message || 'Gagal mengubah urutan.');
+            }
+        });
     }
 </script>
 @endsection

@@ -110,7 +110,7 @@ class Quiz extends Model
 
     public function questions(): HasMany
     {
-        return $this->hasMany(QuizQuestion::class)->orderBy('order_num');
+        return $this->hasMany(QuizQuestion::class)->orderBy('order_num')->orderBy('id');
     }
 
     public function attempts(): HasMany
