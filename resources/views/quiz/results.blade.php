@@ -39,6 +39,32 @@
         .heading-font {
             font-family: 'Outfit', sans-serif;
         }
+
+        /* Score Circle Badge (Dark & Light Mode) */
+        .score-circle-ring {
+            background: radial-gradient(circle at 30% 30%, #1A2D23 0%, #0D1611 100%);
+            border: 4px solid rgba(16, 185, 129, 0.55);
+            box-shadow: 0 0 35px rgba(16, 185, 129, 0.28), inset 0 0 20px rgba(16, 185, 129, 0.15);
+        }
+        .score-circle-ring .score-value {
+            color: #FFFFFF !important;
+        }
+        .score-circle-ring .score-label {
+            color: #34D399 !important;
+        }
+
+        html:not(.dark) .score-circle-ring {
+            background: radial-gradient(circle at 30% 30%, #FFFFFF 0%, #ECFDF5 50%, #D1FAE5 100%) !important;
+            border: 4px solid #10B981 !important;
+            box-shadow: 0 16px 36px -4px rgba(16, 185, 129, 0.35), 0 0 0 6px rgba(16, 185, 129, 0.15), inset 0 2px 5px rgba(255, 255, 255, 0.95) !important;
+        }
+        html:not(.dark) .score-circle-ring .score-value {
+            color: #064E3B !important;
+        }
+        html:not(.dark) .score-circle-ring .score-label {
+            color: #047857 !important;
+        }
+
         .podium-1 {
             background: linear-gradient(180deg, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.05) 100%);
             border-top: 3px solid #f59e0b;
@@ -50,6 +76,36 @@
         .podium-3 {
             background: linear-gradient(180deg, rgba(180, 83, 9, 0.25) 0%, rgba(180, 83, 9, 0.05) 100%);
             border-top: 3px solid #b45309;
+        }
+
+        /* Podium Light Mode Enhancements */
+        html:not(.dark) .podium-1 {
+            background: linear-gradient(180deg, #FEF3C7 0%, #FFFFFF 100%) !important;
+            border-top: 4px solid #F59E0B !important;
+            border-inline: 1px solid #FDE68A !important;
+            border-bottom: 1px solid #FDE68A !important;
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.15) !important;
+        }
+        html:not(.dark) .podium-2 {
+            background: linear-gradient(180deg, #F1F5F9 0%, #FFFFFF 100%) !important;
+            border-top: 4px solid #94A3B8 !important;
+            border-inline: 1px solid #E2E8F0 !important;
+            border-bottom: 1px solid #E2E8F0 !important;
+            box-shadow: 0 8px 25px rgba(148, 163, 184, 0.15) !important;
+        }
+        html:not(.dark) .podium-3 {
+            background: linear-gradient(180deg, #FFEDD5 0%, #FFFFFF 100%) !important;
+            border-top: 4px solid #EA580C !important;
+            border-inline: 1px solid #FED7AA !important;
+            border-bottom: 1px solid #FED7AA !important;
+            box-shadow: 0 8px 25px rgba(234, 88, 12, 0.15) !important;
+        }
+
+        /* Results Card Surface in Light Mode */
+        html:not(.dark) .results-card {
+            background-color: #FFFFFF !important;
+            border-color: #E2EAE5 !important;
+            box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.08) !important;
         }
 
         /* Hover Zoom Tooltip Preview & Lightbox in Results View */
@@ -112,20 +168,20 @@
     {{-- Top App Bar --}}
     <header class="border-b border-[#1A2820] bg-[#090D0B]/80 backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="{{ route('home') }}" class="flex items-center gap-2.5 text-white font-bold group">
+            <a href="{{ route('home') }}" class="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold group">
                 <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center p-1 shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
                     <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs" class="w-full h-full object-contain" draggable="false">
                 </div>
                 <div>
                     <span class="text-sm font-extrabold tracking-wider leading-none block" style="font-family:'Orbitron',sans-serif;">IC-LABS</span>
-                    <span class="text-[9px] text-emerald-400 font-semibold tracking-widest block mt-0.5" style="font-family:'Chakra Petch',sans-serif;">CBT EVALUATION</span>
+                    <span class="text-[9px] text-emerald-600 dark:text-emerald-400 font-semibold tracking-widest block mt-0.5" style="font-family:'Chakra Petch',sans-serif;">CBT EVALUATION</span>
                 </div>
             </a>
 
             <div class="flex items-center gap-2">
                 <x-theme-switcher :compact="true" />
                 <a href="{{ route('home') }}"
-                   class="px-3.5 py-1.5 rounded-xl border border-[#1A2820] hover:bg-gray-800 text-xs text-gray-300 font-medium transition-colors">
+                   class="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-[#1A2820] bg-white dark:bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 text-xs text-gray-700 dark:text-gray-300 font-semibold transition-all shadow-sm">
                     Beranda
                 </a>
             </div>
@@ -136,58 +192,66 @@
     <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-8">
 
         {{-- Hero Score Celebration Card --}}
-        <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-10 text-center relative overflow-hidden shadow-2xl">
+        <div class="results-card bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-10 text-center relative overflow-hidden shadow-2xl">
             <div class="absolute -right-20 -top-20 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -left-20 -bottom-20 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 mb-3">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 border border-emerald-500/30 mb-3 shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                 Pengerjaan Kuis Selesai
             </div>
 
-            <h1 class="text-xl sm:text-2xl font-bold text-white heading-font mb-1">
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white heading-font mb-1">
                 {{ $quiz->title }}
             </h1>
-            <p class="text-xs text-gray-400 mb-6">Mahasiswa: <strong class="text-white">{{ $attempt->student_name }}</strong> ({{ $attempt->nim }})</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-6">Mahasiswa: <strong class="text-gray-900 dark:text-white">{{ $attempt->student_name }}</strong> ({{ $attempt->nim }})</p>
 
             {{-- Score Big Ring --}}
-            <div class="inline-flex flex-col items-center justify-center w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-gradient-to-tr from-[#131E17] to-[#1A2D23] border-4 border-emerald-500/50 shadow-2xl shadow-emerald-500/20 mb-4">
-                <span class="text-3xl sm:text-5xl font-extrabold text-white heading-font tracking-tight font-mono">
+            <div class="score-circle-ring inline-flex flex-col items-center justify-center w-36 h-36 sm:w-44 sm:h-44 rounded-full mb-5 transition-all">
+                <span class="score-value text-3xl sm:text-5xl font-extrabold heading-font tracking-tight font-mono">
                     {{ number_format($attempt->score, 1) }}
                 </span>
-                <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest mt-0.5">Skor Akhir</span>
+                <span class="score-label text-xs font-bold uppercase tracking-widest mt-1">Skor Akhir</span>
             </div>
 
             {{-- Grade Feedback --}}
             <div class="max-w-md mx-auto mb-6">
                 @if($attempt->score >= 85)
-                    <p class="text-sm font-bold text-emerald-300">🏆 Luar Biasa! Anda menunjukkan penguasaan materi yang sangat baik.</p>
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-800 dark:text-emerald-300 text-xs sm:text-sm font-semibold shadow-sm">
+                        <span>🏆</span> <span>Luar Biasa! Anda menunjukkan penguasaan materi yang sangat baik.</span>
+                    </div>
                 @elseif($attempt->score >= 70)
-                    <p class="text-sm font-bold text-teal-300">🎉 Bagus Sekali! Nilai Anda di atas standar kompetensi praktikum.</p>
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-teal-500/10 border border-teal-500/25 text-teal-800 dark:text-teal-300 text-xs sm:text-sm font-semibold shadow-sm">
+                        <span>🎉</span> <span>Bagus Sekali! Nilai Anda di atas standar kompetensi praktikum.</span>
+                    </div>
                 @elseif($attempt->score >= 50)
-                    <p class="text-sm font-bold text-amber-300">👍 Cukup Bagus! Anda telah memahami sebagian besar konsep.</p>
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-800 dark:text-amber-300 text-xs sm:text-sm font-semibold shadow-sm">
+                        <span>👍</span> <span>Cukup Bagus! Anda telah memahami sebagian besar konsep.</span>
+                    </div>
                 @else
-                    <p class="text-sm font-bold text-rose-300">📚 Tetap Semangat! Pelajari kembali modul sebelum praktikum dimulai.</p>
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-rose-500/10 border border-rose-500/25 text-rose-700 dark:text-rose-300 text-xs sm:text-sm font-semibold shadow-sm">
+                        <span>📚</span> <span>Tetap Semangat! Pelajari kembali modul sebelum praktikum dimulai.</span>
+                    </div>
                 @endif
             </div>
 
             {{-- Metrics Breakdown Cards --}}
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto pt-4 border-t border-[#1A2820]">
-                <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820]">
-                    <span class="text-[10px] text-gray-400 uppercase font-semibold block">Jawaban Benar</span>
-                    <span class="text-base font-bold text-emerald-400 mt-0.5 block">{{ $attempt->correct_answers_count }} Soal</span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto pt-5 border-t border-gray-200 dark:border-[#1A2820]">
+                <div class="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-[#090D0B] border border-emerald-500/20 dark:border-[#1A2820] shadow-sm">
+                    <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold block tracking-wider">Jawaban Benar</span>
+                    <span class="text-base font-bold text-emerald-700 dark:text-emerald-400 mt-0.5 block">{{ $attempt->correct_answers_count }} Soal</span>
                 </div>
-                <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820]">
-                    <span class="text-[10px] text-gray-400 uppercase font-semibold block">Jawaban Salah</span>
-                    <span class="text-base font-bold text-rose-400 mt-0.5 block">{{ $attempt->wrong_answers_count }} Soal</span>
+                <div class="p-3.5 rounded-2xl bg-rose-50/70 dark:bg-[#090D0B] border border-rose-500/20 dark:border-[#1A2820] shadow-sm">
+                    <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold block tracking-wider">Jawaban Salah</span>
+                    <span class="text-base font-bold text-rose-700 dark:text-rose-400 mt-0.5 block">{{ $attempt->wrong_answers_count }} Soal</span>
                 </div>
-                <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820]">
-                    <span class="text-[10px] text-gray-400 uppercase font-semibold block">Waktu Selesai</span>
-                    <span class="text-base font-bold text-sky-400 mt-0.5 block">{{ $attempt->formattedDuration() }}</span>
+                <div class="p-3.5 rounded-2xl bg-sky-50/70 dark:bg-[#090D0B] border border-sky-500/20 dark:border-[#1A2820] shadow-sm">
+                    <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold block tracking-wider">Waktu Selesai</span>
+                    <span class="text-base font-bold text-sky-700 dark:text-sky-400 mt-0.5 block">{{ $attempt->formattedDuration() }}</span>
                 </div>
-                <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820]">
-                    <span class="text-[10px] text-gray-400 uppercase font-semibold block">Pengawas Anti-Cheat</span>
-                    <span class="text-base font-bold mt-0.5 block {{ $attempt->tab_switch_count === 0 ? 'text-emerald-400' : 'text-amber-400' }}">
+                <div class="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-[#090D0B] border border-amber-500/20 dark:border-[#1A2820] shadow-sm">
+                    <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold block tracking-wider">Pengawas Anti-Cheat</span>
+                    <span class="text-base font-bold mt-0.5 block {{ $attempt->tab_switch_count === 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400' }}">
                         {{ $attempt->tab_switch_count === 0 ? '0 Switch 🛡️' : $attempt->tab_switch_count . 'x Switch' }}
                     </span>
                 </div>
@@ -196,17 +260,17 @@
 
         {{-- Podium & Leaderboard Section --}}
         @if($quiz->show_leaderboard && $leaderboard)
-            <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8">
-                <div class="flex items-center justify-between mb-6">
+            <div class="results-card bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8">
+                <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
                     <div>
-                        <h2 class="text-lg font-bold text-white heading-font flex items-center gap-2">
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white heading-font flex items-center gap-2">
                             <span>🏆 Leaderboard Mahasiswa</span>
                         </h2>
-                        <p class="text-xs text-gray-400">Peringkat berdasarkan perolehan nilai dan kecepatan pengerjaan</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Peringkat berdasarkan perolehan nilai dan kecepatan pengerjaan</p>
                     </div>
 
                     {{-- Student Current Rank Pill --}}
-                    <div class="px-3.5 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold text-xs">
+                    <div class="px-3.5 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 font-bold text-xs shadow-sm">
                         Peringkat Anda: #{{ $rank }} dari {{ $totalParticipants }} Peserta
                     </div>
                 </div>
@@ -215,56 +279,56 @@
                 @if($leaderboard->count() >= 3)
                     <div class="grid grid-cols-3 gap-2 sm:gap-4 items-end max-w-lg mx-auto mb-8 pt-4">
                         {{-- 2nd Place --}}
-                        <div class="podium-2 rounded-2xl p-3 sm:p-4 text-center flex flex-col justify-end h-36 sm:h-44">
+                        <div class="podium-2 rounded-2xl p-3 sm:p-4 text-center flex flex-col justify-end h-36 sm:h-44 transition-all">
                             <span class="text-xl sm:text-2xl mb-1">🥈</span>
-                            <span class="text-xs sm:text-sm font-bold text-white truncate block">{{ $leaderboard[1]->student_name ?? '-' }}</span>
-                            <span class="text-[10px] text-gray-400 font-mono block">{{ $leaderboard[1]->nim ?? '' }}</span>
-                            <span class="text-xs font-bold text-gray-200 mt-1 block">{{ $leaderboard[1]->score ?? 0 }} Pts</span>
-                            <span class="text-[9px] text-gray-400 mt-0.5 block font-mono">Rank 2</span>
+                            <span class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white truncate block">{{ $leaderboard[1]->student_name ?? '-' }}</span>
+                            <span class="text-[10px] text-slate-500 dark:text-gray-400 font-mono block">{{ $leaderboard[1]->nim ?? '' }}</span>
+                            <span class="text-xs font-bold text-slate-700 dark:text-gray-200 mt-1 block">{{ $leaderboard[1]->score ?? 0 }} Pts</span>
+                            <span class="text-[9px] text-slate-500 dark:text-gray-400 mt-0.5 block font-mono">Rank 2</span>
                         </div>
 
                         {{-- 1st Place (Gold) --}}
-                        <div class="podium-1 rounded-2xl p-3 sm:p-4 text-center flex flex-col justify-end h-44 sm:h-52 ring-2 ring-amber-500/40">
+                        <div class="podium-1 rounded-2xl p-3 sm:p-4 text-center flex flex-col justify-end h-44 sm:h-52 ring-2 ring-amber-500/40 transition-all">
                             <span class="text-2xl sm:text-3xl mb-1 animate-bounce">👑</span>
-                            <span class="text-xs sm:text-sm font-bold text-amber-300 truncate block">{{ $leaderboard[0]->student_name ?? '-' }}</span>
-                            <span class="text-[10px] text-gray-400 font-mono block">{{ $leaderboard[0]->nim ?? '' }}</span>
-                            <span class="text-sm font-bold text-white mt-1 block">{{ $leaderboard[0]->score ?? 0 }} Pts</span>
-                            <span class="text-[10px] font-bold text-amber-400 mt-0.5 block font-mono">Juara 1</span>
+                            <span class="text-xs sm:text-sm font-bold text-amber-800 dark:text-amber-300 truncate block">{{ $leaderboard[0]->student_name ?? '-' }}</span>
+                            <span class="text-[10px] text-amber-700/80 dark:text-gray-400 font-mono block">{{ $leaderboard[0]->nim ?? '' }}</span>
+                            <span class="text-sm font-bold text-amber-900 dark:text-white mt-1 block">{{ $leaderboard[0]->score ?? 0 }} Pts</span>
+                            <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 mt-0.5 block font-mono">Juara 1</span>
                         </div>
 
                         {{-- 3rd Place --}}
-                        <div class="podium-3 rounded-2xl p-3 sm:p-4 text-center flex flex-col justify-end h-32 sm:h-36">
+                        <div class="podium-3 rounded-2xl p-3 sm:p-4 text-center flex flex-col justify-end h-32 sm:h-36 transition-all">
                             <span class="text-lg sm:text-xl mb-1">🥉</span>
-                            <span class="text-xs sm:text-sm font-bold text-white truncate block">{{ $leaderboard[2]->student_name ?? '-' }}</span>
-                            <span class="text-[10px] text-gray-400 font-mono block">{{ $leaderboard[2]->nim ?? '' }}</span>
-                            <span class="text-xs font-bold text-gray-200 mt-1 block">{{ $leaderboard[2]->score ?? 0 }} Pts</span>
-                            <span class="text-[9px] text-gray-400 mt-0.5 block font-mono">Rank 3</span>
+                            <span class="text-xs sm:text-sm font-bold text-orange-950 dark:text-white truncate block">{{ $leaderboard[2]->student_name ?? '-' }}</span>
+                            <span class="text-[10px] text-orange-800/80 dark:text-gray-400 font-mono block">{{ $leaderboard[2]->nim ?? '' }}</span>
+                            <span class="text-xs font-bold text-orange-900 dark:text-gray-200 mt-1 block">{{ $leaderboard[2]->score ?? 0 }} Pts</span>
+                            <span class="text-[9px] text-orange-700/80 dark:text-gray-400 mt-0.5 block font-mono">Rank 3</span>
                         </div>
                     </div>
                 @endif
 
                 {{-- Leaderboard Top 10 List --}}
-                <div class="divide-y divide-[#1A2820] bg-[#090D0B] rounded-2xl border border-[#1A2820] overflow-hidden">
+                <div class="divide-y divide-gray-100 dark:divide-[#1A2820] bg-white dark:bg-[#090D0B] rounded-2xl border border-gray-200 dark:border-[#1A2820] overflow-hidden shadow-sm">
                     @foreach($leaderboard as $idx => $entry)
-                        <div class="p-3.5 sm:px-5 flex items-center justify-between gap-3 {{ $entry->id === $attempt->id ? 'bg-emerald-500/10 border-l-4 border-l-emerald-500' : '' }}">
+                        <div class="p-3.5 sm:px-5 flex items-center justify-between gap-3 {{ $entry->id === $attempt->id ? 'bg-emerald-50 dark:bg-emerald-500/10 border-l-4 border-l-emerald-500 font-medium' : '' }}">
                             <div class="flex items-center gap-3">
-                                <span class="w-6 h-6 rounded-lg text-xs font-mono font-bold flex items-center justify-center {{ $idx === 0 ? 'bg-amber-500/20 text-amber-300' : ($idx === 1 ? 'bg-gray-400/20 text-gray-300' : ($idx === 2 ? 'bg-amber-700/20 text-amber-500' : 'text-gray-500')) }}">
+                                <span class="w-6 h-6 rounded-lg text-xs font-mono font-bold flex items-center justify-center {{ $idx === 0 ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300' : ($idx === 1 ? 'bg-slate-400/20 text-slate-700 dark:text-gray-300' : ($idx === 2 ? 'bg-orange-700/20 text-orange-700 dark:text-amber-500' : 'text-gray-500')) }}">
                                     #{{ $idx + 1 }}
                                 </span>
                                 <div>
-                                    <span class="text-xs sm:text-sm font-semibold text-white block">
+                                    <span class="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white block">
                                         {{ $entry->student_name }}
                                         @if($entry->id === $attempt->id)
-                                            <span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-emerald-500 text-white font-bold">Anda</span>
+                                            <span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-emerald-600 text-white font-bold">Anda</span>
                                         @endif
                                     </span>
-                                    <span class="text-[11px] font-mono text-gray-400">{{ $entry->nim }}</span>
+                                    <span class="text-[11px] font-mono text-gray-500 dark:text-gray-400">{{ $entry->nim }}</span>
                                 </div>
                             </div>
 
                             <div class="text-right">
-                                <span class="text-xs sm:text-sm font-bold text-white block">{{ number_format($entry->score, 1) }}</span>
-                                <span class="text-[10px] font-mono text-gray-400">{{ $entry->formattedDuration() }}</span>
+                                <span class="text-xs sm:text-sm font-bold text-emerald-700 dark:text-white block">{{ number_format($entry->score, 1) }}</span>
+                                <span class="text-[10px] font-mono text-gray-500 dark:text-gray-400">{{ $entry->formattedDuration() }}</span>
                             </div>
                         </div>
                     @endforeach
@@ -274,39 +338,39 @@
 
         {{-- Review Answers & Explanations (if quiz allows show_review) --}}
         @if($quiz->show_review && $reviewAnswers)
-            <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8 space-y-5">
-                <div class="flex items-center gap-3 pb-3 border-b border-[#1A2820]">
-                    <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 text-lg">
+            <div class="results-card bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8 space-y-5">
+                <div class="flex items-center gap-3 pb-3 border-b border-gray-200 dark:border-[#1A2820]">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-500 text-lg shadow-sm">
                         💡
                     </div>
                     <div>
-                        <h2 class="text-lg font-bold text-white heading-font">Pembahasan & Kunci Jawaban</h2>
-                        <p class="text-xs text-gray-400">Tinjau evaluasi butir soal, kunci jawaban yang tepat, dan catatan pembahasan instruktur</p>
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white heading-font">Pembahasan & Kunci Jawaban</h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Tinjau evaluasi butir soal, kunci jawaban yang tepat, dan catatan pembahasan instruktur</p>
                     </div>
                 </div>
 
                 <div class="space-y-5">
                     @foreach($reviewAnswers as $idx => $ans)
-                        <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 shadow-sm transition-all {{ $ans->is_correct ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-rose-500' }}">
+                        <div class="bg-white dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] rounded-2xl p-5 shadow-sm transition-all {{ $ans->is_correct ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-rose-500' }}">
                             {{-- Header Pertanyaan --}}
-                            <div class="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-[#16221B]">
+                            <div class="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-gray-100 dark:border-[#16221B]">
                                 <div class="flex items-center gap-2">
-                                    <span class="font-mono text-xs font-bold text-gray-300 bg-[#142019] border border-[#1E3327] px-2.5 py-1 rounded-lg">
+                                    <span class="font-mono text-xs font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#142019] border border-gray-200 dark:border-[#1E3327] px-2.5 py-1 rounded-lg">
                                         Soal #{{ $idx + 1 }}
                                     </span>
-                                    <span class="text-xs text-gray-400 font-medium">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
                                         {{ $ans->is_correct ? '+' . $ans->points_earned : '0' }} / {{ $ans->question->points ?? 0 }} Poin
                                     </span>
                                 </div>
 
                                 <div>
                                     @if($ans->is_correct)
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 border border-emerald-500/30">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                             Jawaban Benar
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/30">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                                             Jawaban Salah
                                         </span>
@@ -322,14 +386,14 @@
                                             onmousemove="updateCyberHoverBubblePos(event)"
                                             onmouseleave="hideCyberHoverBubble()"
                                             onclick="openCyberLightbox('{{ $ans->question->image_url }}', 'Gambar Soal #{{ $idx + 1 }}')"
-                                            class="inline-block group cursor-zoom-in focus:outline-none rounded-2xl overflow-hidden border border-[#1A2820] bg-black/40 hover:border-emerald-500/40 p-2 transition-all shadow-sm">
-                                        <img src="{{ $ans->question->image_url }}" alt="Gambar Soal" class="max-h-64 w-auto object-contain rounded-xl group-hover:scale-[1.01] transition-transform">
+                                            class="inline-block group cursor-zoom-in focus:outline-none rounded-2xl overflow-hidden border border-gray-200 dark:border-[#1A2820] bg-gray-50 dark:bg-black/40 hover:border-emerald-500/40 p-2 transition-all shadow-sm">
+                                        <img src="{{ $ans->question->image_url }}" alt="Gambar Soal" class="max-h-64 w-auto object-contain rounded-xl group-hover:scale-[1.01] transition-transform" loading="lazy">
                                     </button>
                                 </div>
                             @endif
 
                             {{-- Question Text --}}
-                            <div class="text-sm sm:text-base font-bold text-white mb-4 leading-relaxed">{!! App\Helpers\RichTextHelper::format($ans->question->question_text ?? 'Pertanyaan') !!}</div>
+                            <div class="text-sm sm:text-base font-bold text-gray-900 dark:text-white mb-4 leading-relaxed">{!! App\Helpers\RichTextHelper::format($ans->question->question_text ?? 'Pertanyaan') !!}</div>
 
                             {{-- Options Grid: Hanya opsi yang dipilih yang diwarnai (Hijau jika benar, Merah jika salah) --}}
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
@@ -346,9 +410,9 @@
                                     @if($isSelectedByStudent)
                                         @if($isCorrectOption)
                                             {{-- JAWABAN BENAR MAHASISWA (HIJAU) --}}
-                                            <div class="p-3 rounded-xl border-2 border-emerald-500 bg-[#0E2018] text-white flex items-start justify-between gap-2 shadow-sm shadow-emerald-500/10">
+                                            <div class="p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-[#0E2018] text-gray-900 dark:text-white flex items-start justify-between gap-2 shadow-sm shadow-emerald-500/10">
                                                 <div class="flex items-start gap-2.5 min-w-0">
-                                                    <span class="w-6 h-6 rounded-lg bg-emerald-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                                                         {{ $labels[$optIdx] ?? ($optIdx + 1) }}
                                                     </span>
                                                     <div class="min-w-0">
@@ -359,24 +423,24 @@
                                                                         onmousemove="updateCyberHoverBubblePos(event)"
                                                                         onmouseleave="hideCyberHoverBubble()"
                                                                         onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIdx] ?? '' }}')"
-                                                                        class="block group cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-white/10 bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
-                                                                    <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform">
+                                                                        class="block group cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-gray-200 dark:border-white/10 bg-white dark:bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
+                                                                    <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform" loading="lazy">
                                                                 </button>
                                                             </div>
                                                         @endif
-                                                        <div class="font-semibold text-emerald-100 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
+                                                        <div class="font-semibold text-emerald-950 dark:text-emerald-100 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
                                                     </div>
                                                 </div>
-                                                <span class="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1 shadow-sm">
+                                                <span class="text-[10px] bg-emerald-600 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1 shadow-sm">
                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                                     Pilihan Anda
                                                 </span>
                                             </div>
                                         @else
                                             {{-- JAWABAN SALAH MAHASISWA (MERAH) --}}
-                                            <div class="p-3 rounded-xl border-2 border-rose-500 bg-[#221013] text-white flex items-start justify-between gap-2 shadow-sm shadow-rose-500/10">
+                                            <div class="p-3 rounded-xl border-2 border-rose-500 bg-rose-50 dark:bg-[#221013] text-gray-900 dark:text-white flex items-start justify-between gap-2 shadow-sm shadow-rose-500/10">
                                                 <div class="flex items-start gap-2.5 min-w-0">
-                                                    <span class="w-6 h-6 rounded-lg bg-rose-500 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <span class="w-6 h-6 rounded-lg bg-rose-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                                                         {{ $labels[$optIdx] ?? ($optIdx + 1) }}
                                                     </span>
                                                     <div class="min-w-0">
@@ -387,12 +451,12 @@
                                                                         onmousemove="updateCyberHoverBubblePos(event)"
                                                                         onmouseleave="hideCyberHoverBubble()"
                                                                         onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIdx] ?? '' }}')"
-                                                                        class="block group cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-white/10 bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
-                                                                    <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform">
+                                                                        class="block group cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-gray-200 dark:border-white/10 bg-white dark:bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
+                                                                    <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform" loading="lazy">
                                                                 </button>
                                                             </div>
                                                         @endif
-                                                        <div class="font-semibold text-rose-200 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
+                                                        <div class="font-semibold text-rose-950 dark:text-rose-200 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
                                                     </div>
                                                 </div>
                                                 <span class="text-[10px] bg-rose-600 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1 shadow-sm">
@@ -403,20 +467,20 @@
                                         @endif
                                     @else
                                         {{-- OPSI LAIN (NETRAL) --}}
-                                        <div class="p-3 rounded-xl border border-[#1A2820] bg-[#0E1612] text-gray-400 flex items-start gap-2.5 opacity-75">
-                                            <span class="w-6 h-6 rounded-lg bg-gray-800 text-gray-400 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <div class="p-3 rounded-xl border border-gray-200 dark:border-[#1A2820] bg-gray-50/80 dark:bg-[#0E1612] text-gray-700 dark:text-gray-400 flex items-start gap-2.5">
+                                            <span class="w-6 h-6 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-400 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                                                 {{ $labels[$optIdx] ?? ($optIdx + 1) }}
                                             </span>
                                             <div class="min-w-0">
                                                 @if($opt->image_path)
-                                                    <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-white/10 bg-black/40 p-1">
+                                                    <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-black/40 p-1">
                                                         <button type="button"
                                                                 onmouseenter="showCyberHoverBubble(event, '{{ $opt->image_url }}')"
                                                                 onmousemove="updateCyberHoverBubblePos(event)"
                                                                 onmouseleave="hideCyberHoverBubble()"
                                                                 onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIdx] ?? '' }}')"
                                                                 class="block group cursor-zoom-in focus:outline-none">
-                                                            <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform">
+                                                            <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform" loading="lazy">
                                                         </button>
                                                     </div>
                                                 @endif
@@ -439,37 +503,37 @@
                                 $correctAnswerDisplay = implode(', ', $correctTextArray);
                             @endphp
 
-                            <div class="mt-4 p-4 rounded-xl border text-xs {{ $ans->is_correct ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200' : 'bg-[#0A1410] border-emerald-500/40 text-emerald-100' }}">
+                            <div class="mt-4 p-4 rounded-xl border text-xs {{ $ans->is_correct ? 'bg-emerald-50/80 dark:bg-emerald-500/10 border-emerald-300 dark:border-emerald-500/30 text-emerald-950 dark:text-emerald-200' : 'bg-emerald-50/80 dark:bg-[#0A1410] border-emerald-300 dark:border-emerald-500/40 text-emerald-950 dark:text-emerald-100' }}">
                                 <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
                                     @if($ans->is_correct)
-                                        <div class="flex items-center gap-2 font-bold text-emerald-400 text-xs sm:text-sm">
-                                            <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 text-xs">✓</span>
+                                        <div class="flex items-center gap-2 font-bold text-emerald-800 dark:text-emerald-400 text-xs sm:text-sm">
+                                            <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-xs">✓</span>
                                             <span>Jawaban Anda Benar:</span>
-                                            <span class="text-emerald-300 font-semibold">{{ $correctAnswerDisplay }}</span>
+                                            <span class="text-emerald-800 dark:text-emerald-300 font-semibold">{{ $correctAnswerDisplay }}</span>
                                         </div>
                                     @else
-                                        <div class="flex items-center gap-2 font-bold text-emerald-400 text-xs sm:text-sm">
-                                            <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 text-xs">🔑</span>
+                                        <div class="flex items-center gap-2 font-bold text-emerald-800 dark:text-emerald-400 text-xs sm:text-sm">
+                                            <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-xs">🔑</span>
                                             <span>Kunci Jawaban Benar:</span>
-                                            <span class="text-emerald-200 font-semibold">{{ $correctAnswerDisplay }}</span>
+                                            <span class="text-emerald-800 dark:text-emerald-200 font-semibold">{{ $correctAnswerDisplay }}</span>
                                         </div>
                                     @endif
 
-                                    <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md {{ $ans->is_correct ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' }}">
+                                    <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md {{ $ans->is_correct ? 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30' : 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 border border-emerald-500/30' }}">
                                         {{ $ans->is_correct ? 'Tepat (+ ' . ($ans->points_earned ?: 0) . ' Poin)' : 'Kunci Tepat' }}
                                     </span>
                                 </div>
 
                                 <div class="pt-2 border-t border-emerald-500/20">
                                     <div class="flex items-start gap-2">
-                                        <span class="font-bold shrink-0 flex items-center gap-1 text-emerald-400">
+                                        <span class="font-bold shrink-0 flex items-center gap-1 text-emerald-800 dark:text-emerald-400">
                                             <span>💡</span> Pembahasan:
                                         </span>
-                                        <div class="leading-relaxed text-gray-300 flex-1">
+                                        <div class="leading-relaxed text-gray-800 dark:text-gray-300 flex-1">
                                             @if(!empty($ans->question->explanation))
                                                 {!! App\Helpers\RichTextHelper::format($ans->question->explanation) !!}
                                             @else
-                                                <span class="italic text-gray-400">{{ $ans->is_correct ? 'Jawaban Anda sudah tepat sesuai materi praktikum.' : 'Tidak ada catatan pembahasan tambahan untuk soal ini.' }}</span>
+                                                <span class="italic text-gray-500 dark:text-gray-400">{{ $ans->is_correct ? 'Jawaban Anda sudah tepat sesuai materi praktikum.' : 'Tidak ada catatan pembahasan tambahan untuk soal ini.' }}</span>
                                             @endif
                                         </div>
                                     </div>
@@ -484,7 +548,7 @@
         {{-- Bottom Action Buttons --}}
         <div class="flex items-center justify-center gap-3 pt-2">
             <a href="{{ route('home') }}"
-               class="px-6 py-3 rounded-2xl bg-[#0F1713] border border-[#1A2820] hover:bg-[#1A2820] text-gray-200 text-sm font-semibold transition-colors">
+               class="px-6 py-3 rounded-2xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] hover:bg-gray-50 dark:hover:bg-[#1A2820] text-gray-700 dark:text-gray-200 text-sm font-semibold transition-all shadow-sm">
                 ← Kembali ke Portal Lab
             </a>
             @if($quiz->is_active)
@@ -497,7 +561,7 @@
 
     </main>
 
-    <footer class="py-6 border-t border-[#1A2820] text-center text-xs text-gray-600 mt-auto">
+    <footer class="py-6 border-t border-gray-200 dark:border-[#1A2820] text-center text-xs text-gray-500 dark:text-gray-600 mt-auto">
         &copy; {{ date('Y') }} IC-Labs &bull; Platform Distribusi & Evaluasi Laboratorium
     </footer>
 
