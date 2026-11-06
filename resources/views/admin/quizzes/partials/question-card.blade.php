@@ -82,7 +82,7 @@
 
         {{-- Question Image (if uploaded) --}}
         @if($q->image_path)
-            <div class="mb-3 flex items-center justify-center">
+            <div class="mb-3 flex flex-col items-center justify-center">
                 <button type="button"
                         onmouseenter="showCyberHoverBubble(event, '{{ $q->image_url }}')"
                         onmousemove="updateCyberHoverBubblePos(event)"
@@ -90,8 +90,13 @@
                         onclick="openCyberLightbox('{{ $q->image_url }}', 'Gambar Soal #{{ $qNum }}')"
                         class="inline-block group cursor-zoom-in focus:outline-none rounded-xl overflow-hidden border border-[#1A2820] bg-black/40 hover:border-emerald-500/40 p-1.5 transition-all shadow-sm">
                     <img src="{{ $q->image_url }}" alt="Gambar Soal #{{ $qNum }}"
+                         onerror="this.style.display='none'; if(this.parentElement.nextElementSibling) this.parentElement.nextElementSibling.style.display='flex';"
                          class="max-h-52 w-auto object-contain rounded-lg group-hover:scale-[1.02] transition-transform">
                 </button>
+                <div class="hidden items-center gap-1.5 px-3 py-1.5 mt-1 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[11px] font-mono">
+                    <svg class="w-3.5 h-3.5 text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    <span>Gambar belum dapat dimuat (jalankan <code>php artisan storage:link</code> di server)</span>
+                </div>
             </div>
         @endif
 
