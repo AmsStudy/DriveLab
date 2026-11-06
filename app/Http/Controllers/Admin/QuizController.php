@@ -688,6 +688,7 @@ class QuizController extends Controller
             $handle = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputs($handle, "sep=;\r\n"); // Instruksikan Excel agar otomatis memisahkan kolom dengan delimiter titik-koma (;)
 
             // Header
             fputcsv($handle, [
@@ -704,7 +705,7 @@ class QuizController extends Controller
                 'Pelanggaran Tab Switch',
                 'Waktu Mulai',
                 'Waktu Selesai',
-            ]);
+            ], ';');
 
             $attemptsQuery = $quiz->attempts()
                 ->whereNotNull('completed_at');
@@ -734,7 +735,7 @@ class QuizController extends Controller
                     $att->tab_switch_count,
                     $att->started_at ? $att->started_at->format('Y-m-d H:i:s') : '-',
                     $att->completed_at ? $att->completed_at->format('Y-m-d H:i:s') : '-',
-                ]);
+                ], ';');
             }
 
             fclose($handle);

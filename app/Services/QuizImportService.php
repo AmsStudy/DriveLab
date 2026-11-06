@@ -275,6 +275,7 @@ class QuizImportService
             $handle = fopen('php://output', 'w');
             // Add UTF-8 BOM for Microsoft Excel & Google Sheets compatibility
             fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputs($handle, "sep={$delimiter}\r\n");
 
             // Header columns
             fputcsv($handle, [

@@ -527,7 +527,8 @@ class SoalController extends Controller
         $callback = function() use($submissions) {
             $file = fopen('php://output', 'w');
             fputs($file, "\xEF\xBB\xBF"); // UTF-8 BOM untuk Excel
-            fputcsv($file, ['No', 'NIM', 'Nama Mahasiswa', 'Kelas', 'Tipe Pengumpulan', 'File / Tautan / Teks', 'Waktu Pengumpulan']);
+            fputs($file, "sep=;\r\n"); // Instruksikan Excel agar otomatis memisahkan kolom dengan delimiter titik-koma (;)
+            fputcsv($file, ['No', 'NIM', 'Nama Mahasiswa', 'Kelas', 'Tipe Pengumpulan', 'File / Tautan / Teks', 'Waktu Pengumpulan'], ';');
 
             foreach ($submissions as $index => $sub) {
                 $konten = match ($sub->submission_type) {
@@ -545,7 +546,7 @@ class SoalController extends Controller
                     strtoupper($sub->submission_type ?? 'FILE'),
                     $this->sanitizeCsvCell($konten),
                     $sub->created_at->format('Y-m-d H:i:s')
-                ]);
+                ], ';');
             }
             fclose($file);
         };
