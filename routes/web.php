@@ -50,26 +50,26 @@ Route::prefix('soal')->name('soal.')->group(function () {
 
 // ─── Kuis Interaktif (Mahasiswa) ──────────────────────────────────────────────
 Route::post('/quiz/join', [PublicQuizController::class, 'joinByCode'])
-    ->middleware('throttle:120,1')
+    ->middleware('throttle:quiz-join')
     ->name('quiz.join');
 
 Route::prefix('quiz')->name('quiz.')->group(function () {
     Route::get('/{token}', [PublicQuizController::class, 'lobby'])->name('lobby');
     Route::post('/{token}/start', [PublicQuizController::class, 'start'])
-        ->middleware('throttle:120,1')
+        ->middleware('throttle:quiz-start')
         ->name('start');
     Route::get('/{token}/play/{attempt}', [PublicQuizController::class, 'play'])->name('play');
     Route::post('/{token}/attempt/{attempt}/tab-switch', [PublicQuizController::class, 'recordTabSwitch'])
-        ->middleware('throttle:180,1')
+        ->middleware('throttle:quiz-tab-switch')
         ->name('tab-switch');
     Route::post('/{token}/attempt/{attempt}/unlock-password', [PublicQuizController::class, 'unlockWithPassword'])
-        ->middleware('throttle:30,1')
+        ->middleware('throttle:quiz-unlock')
         ->name('unlock-password');
     Route::post('/{token}/attempt/{attempt}/autosave', [PublicQuizController::class, 'autosave'])
-        ->middleware('throttle:300,1')
+        ->middleware('throttle:quiz-autosave')
         ->name('autosave');
     Route::post('/{token}/submit/{attempt}', [PublicQuizController::class, 'submit'])
-        ->middleware('throttle:120,1')
+        ->middleware('throttle:quiz-submit')
         ->name('submit');
     Route::get('/{token}/results/{attempt}', [PublicQuizController::class, 'results'])->name('results');
 });

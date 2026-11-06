@@ -533,8 +533,8 @@ class SoalAccessController extends Controller
 
     public function trackTask(Request $request)
     {
-        // Rate limiting: maks 15 permintaan pelacakan per menit per IP
-        $rateLimitKey = 'track_task_' . $request->ip();
+        // Rate limiting: maks 15 permintaan pelacakan per menit terisolasi per sesi klien
+        $rateLimitKey = 'track_task_' . $this->getClientRateLimitIdentifier($request);
         if (RateLimiter::tooManyAttempts($rateLimitKey, 15)) {
             $seconds = RateLimiter::availableIn($rateLimitKey);
             return response()->json(['message' => 'Terlalu banyak permintaan pelacakan. Coba lagi dalam ' . ceil($seconds) . ' detik.'], 429);
