@@ -69,16 +69,16 @@
 </div>
 
 {{-- Table Card: Memanjang sampai ke bawah halaman (flex-1) --}}
-<div class="rounded-2xl overflow-hidden shadow-xl flex flex-col flex-1" style="background:#0F1713;border:1px solid #1A2820;min-height:0;">
+<div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-2xl overflow-hidden shadow-xl flex flex-col flex-1 min-h-0">
     @if($soals->isEmpty())
         @if(request()->anyFilled(['q', 'category_id', 'status']))
             <div class="py-16 text-center text-gray-500 m-auto">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 dark:text-amber-400">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
-                <p class="text-base font-bold text-white">Tidak ada dokumen yang cocok</p>
-                <p class="text-xs text-gray-400 mt-1 max-w-sm mx-auto">Tidak ditemukan dokumen soal yang sesuai dengan kata kunci atau filter yang Anda pilih.</p>
-                <a href="{{ route('admin.soal.index') }}" class="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold transition-colors">
+                <p class="text-base font-bold text-gray-900 dark:text-white">Tidak ada dokumen yang cocok</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-sm mx-auto">Tidak ditemukan dokumen soal yang sesuai dengan kata kunci atau filter yang Anda pilih.</p>
+                <a href="{{ route('admin.soal.index') }}" class="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold transition-colors">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                     Reset Filter Pencarian
                 </a>
@@ -88,9 +88,9 @@
                 <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
-                <p class="text-lg font-medium">Belum ada dokumen</p>
-                <p class="text-sm mt-1">Tambahkan dokumen pertama Anda sekarang.</p>
-                <button type="button" onclick="openCreateModal()" class="mt-4 inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors shadow-lg shadow-emerald-600/20">
+                <p class="text-lg font-medium text-gray-800 dark:text-gray-200">Belum ada dokumen</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tambahkan dokumen pertama Anda sekarang.</p>
+                <button type="button" onclick="openCreateModal()" class="mt-4 inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors shadow-lg shadow-emerald-600/20 cursor-pointer">
                     + Tambah Dokumen
                 </button>
             </div>
@@ -98,8 +98,8 @@
     @else
         <div class="overflow-x-auto overflow-y-auto flex-1 h-full min-h-[420px]" style="scrollbar-width: thin;">
             <table class="w-full text-sm min-w-[700px] border-collapse">
-                <thead class="sticky top-0 z-20 shadow-sm" style="background:#0F1713;">
-                    <tr class="border-b border-gray-800 text-gray-400 text-xs uppercase tracking-wider">
+                <thead class="sticky top-0 z-20 shadow-xs bg-gray-50/95 dark:bg-[#0F1713] border-b border-gray-200 dark:border-gray-800">
+                    <tr class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-semibold">
                         <th class="px-6 py-3 text-left">Dokumen</th>
                         <th class="px-4 py-3 text-left">Kategori</th>
                         <th class="px-4 py-3 text-left">Status</th>
@@ -108,47 +108,54 @@
                         <th class="px-6 py-3 text-right">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-800/60">
+                <tbody class="divide-y divide-gray-100 dark:divide-gray-800/60">
                     @foreach($soals as $soal)
                     @php
                         $accessCode = $soal->kode_unik ?: $soal->unique_token;
                     @endphp
-                    <tr class="hover:bg-gray-800/30 transition-colors">
+                    <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-800/30 transition-colors">
                         <td class="px-6 py-4">
                             <div class="flex items-start gap-3.5">
                                 {{-- Kotak Ikon Dokumen & Floating Badge Jumlah Berkas --}}
                                 @if($soal->attachments->count() > 0)
                                     <div class="relative flex-shrink-0 mt-0.5">
-                                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 shadow-sm transition-transform hover:scale-105"
+                                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm transition-transform hover:scale-105"
                                              title="{{ $soal->attachments->count() }} Lampiran Berkas">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                             </svg>
                                         </div>
-                                        <span class="absolute -top-1.5 -right-1.5 px-1.5 h-4 min-w-[18px] rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-[#070D09] text-[10px] font-mono font-black flex items-center justify-center shadow-md shadow-emerald-500/40 border border-[#0F1713]"
+                                        <span class="absolute -top-1.5 -right-1.5 px-1.5 h-4 min-w-[18px] rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white dark:text-[#070D09] text-[10px] font-mono font-black flex items-center justify-center shadow-md shadow-emerald-500/40 border border-white dark:border-[#0F1713]"
                                               title="{{ $soal->attachments->count() }} File Lampiran">
                                             {{ $soal->attachments->count() }}
                                         </span>
                                     </div>
                                 @elseif($soal->content_text)
-                                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 shadow-sm flex-shrink-0 mt-0.5"
+                                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-sm flex-shrink-0 mt-0.5"
                                          title="Materi / Soal Teks Langsung">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h7"/>
                                         </svg>
                                     </div>
                                 @else
-                                    <div class="w-10 h-10 rounded-xl bg-gray-800/80 border border-gray-700/50 flex items-center justify-center text-gray-500 flex-shrink-0 mt-0.5">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                        </svg>
+                                    <div class="relative flex-shrink-0 mt-0.5">
+                                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-dashed border-emerald-500/30 flex items-center justify-center text-emerald-600/70 dark:text-emerald-400/70 shadow-xs transition-transform hover:scale-105"
+                                             title="Dokumen Belum Memiliki Lampiran">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                        </div>
+                                        <span class="absolute -top-1.5 -right-1.5 px-1.5 h-4 min-w-[18px] rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-[10px] font-mono font-bold flex items-center justify-center shadow-xs border border-white dark:border-[#0F1713]"
+                                              title="0 File Lampiran">
+                                            0
+                                        </span>
                                     </div>
                                 @endif
 
                                 <div class="min-w-0 flex-1">
                                     {{-- Baris 1: Nama Dokumen --}}
                                     <a href="{{ route('admin.soal.show', $soal) }}"
-                                       class="font-semibold text-sm text-gray-100 hover:text-emerald-400 transition-colors truncate block max-w-sm sm:max-w-md leading-snug"
+                                       class="font-semibold text-sm text-gray-900 dark:text-gray-100 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors truncate block max-w-sm sm:max-w-md leading-snug"
                                        title="{{ $soal->title }}">
                                         {{ $soal->title }}
                                     </a>
@@ -158,9 +165,9 @@
                                         <button type="button"
                                                 onclick="copyToClipboard('{{ $accessCode }}', 'Kode akses ({{ $accessCode }}) berhasil disalin!')"
                                                 title="Klik untuk menyalin kode akses mahasiswa: {{ $accessCode }}"
-                                                class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-[#142019] hover:bg-[#1A2E22] border border-[#1E3327] hover:border-emerald-500/40 text-emerald-400 font-mono text-[11px] font-semibold transition-all group/code cursor-pointer shadow-sm">
-                                            <span class="text-emerald-300 font-bold group-hover/code:text-emerald-200">{{ $accessCode }}</span>
-                                            <svg class="w-3.5 h-3.5 text-gray-500 group-hover/code:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-[#142019] hover:bg-emerald-100 dark:hover:bg-[#1A2E22] border border-emerald-200 dark:border-[#1E3327] hover:border-emerald-500/40 text-emerald-700 dark:text-emerald-400 font-mono text-[11px] font-semibold transition-all group/code cursor-pointer shadow-sm">
+                                            <span class="text-emerald-800 dark:text-emerald-300 font-bold group-hover/code:text-emerald-950 dark:group-hover/code:text-emerald-200">{{ $accessCode }}</span>
+                                            <svg class="w-3.5 h-3.5 text-emerald-600/70 dark:text-gray-500 group-hover/code:text-emerald-700 dark:group-hover/code:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                             </svg>
                                         </button>
