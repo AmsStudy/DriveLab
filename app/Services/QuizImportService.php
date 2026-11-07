@@ -516,8 +516,21 @@ class QuizImportService
         }
 
         $rows = [];
+        $delimiterDetected = $delimiter;
+        $firstProcessed = false;
+
         // fgetcsv natively reads multiline quoted fields across multiple lines!
-        while (($row = fgetcsv($handle, 0, $delimiter, '"', '\\')) !== false) {
+        while (($row = fgetcsv($handle, 0, $delimiterDetected, '"', '\\')) !== false) {
+            // Check for sep= delimiter indicator on line 1
+            if (!$firstProcessed && !empty($row)) {
+                $firstProcessed = true;
+                $trimmedFirst = trim((string)($row[0] ?? ''));
+                if (preg_match('/^sep=(.)$/i', $trimmedFirst, $sepMatches)) {
+                    $delimiterDetected = $sepMatches[1];
+                    continue; // Skip the sep= line!
+                }
+            }
+
             // Skip empty rows
             if (empty($row) || (count($row) === 1 && ($row[0] === null || trim((string)$row[0]) === ''))) {
                 continue;
@@ -561,8 +574,61 @@ class QuizImportService
             }
         }
 
-        // 2. Read first worksheet
-        $sheetXml = $zip->getFromName('xl/worksheets/sheet1.xml');
+        // 2. Locate worksheet: try sheets named "Bank Soal", or first sheet referenced in workbook.xml, or fallback to xl/worksheets/sheet1.xml
+        $sheetPath = 'xl/worksheets/sheet1.xml';
+        $workbookXml = $zip->getFromName('xl/workbook.xml');
+        $wbRelsXml = $zip->getFromName('xl/_rels/workbook.xml.rels');
+
+        if ($workbookXml !== false && $wbRelsXml !== false) {
+            $wb = @simplexml_load_string($workbookXml);
+            $wbRels = @simplexml_load_string($wbRelsXml);
+
+            if ($wb && $wbRels && isset($wb->sheets->sheet)) {
+                $targetRId = null;
+                // Prefer sheet named 'Bank Soal' if user kept our template sheet name
+                foreach ($wb->sheets->sheet as $s) {
+                    $sName = (string)$s['name'];
+                    $rId = (string)$s->attributes('http://schemas.openxmlformats.org/officeDocument/2006/relationships')['id'];
+                    if (strcasecmp($sName, 'Bank Soal') === 0 || strcasecmp($sName, 'Soal') === 0) {
+                        $targetRId = $rId;
+                        break;
+                    }
+                }
+
+                // If not found by name, pick the first sheet
+                if (!$targetRId && isset($wb->sheets->sheet[0])) {
+                    $targetRId = (string)$wb->sheets->sheet[0]->attributes('http://schemas.openxmlformats.org/officeDocument/2006/relationships')['id'];
+                }
+
+                if ($targetRId) {
+                    foreach ($wbRels->Relationship as $rel) {
+                        if ((string)$rel['Id'] === $targetRId) {
+                            $targetPath = (string)$rel['Target'];
+                            if (!str_starts_with($targetPath, 'xl/')) {
+                                $targetPath = 'xl/' . ltrim($targetPath, '/');
+                            }
+                            $sheetPath = $targetPath;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        $sheetXml = $zip->getFromName($sheetPath);
+        if ($sheetXml === false) {
+            // Fallback: search any file in xl/worksheets/
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $entryName = $zip->getNameIndex($i);
+                if (preg_match('#^xl/worksheets/sheet\d+\.xml$#i', $entryName)) {
+                    $sheetXml = $zip->getFromName($entryName);
+                    if ($sheetXml !== false) {
+                        break;
+                    }
+                }
+            }
+        }
+
         if ($sheetXml === false) {
             $zip->close();
             return [];

@@ -529,26 +529,12 @@
                 {{-- Modal Action Footer --}}
                 <div class="pt-4 border-t border-gray-200 dark:border-[#1A2820] flex items-center justify-between gap-3">
                     <button type="button" @click="showImportModal = false"
-                            class="px-5 py-2.5 rounded-xl border border-gray-200 dark:border-[#1A2820] bg-white dark:bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-semibold transition-colors shadow-sm">
+                            class="px-5 py-2.5 rounded-xl border border-gray-200 dark:border-[#1A2820] bg-white dark:bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-semibold transition-colors shadow-sm cursor-pointer">
                         Batal
                     </button>
 
                     <button type="submit" :disabled="!importFile || isSubmittingImport"
-                            class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 disabled:opacity-50 disabled:from-gray-200 disabled:to-gray-200 disabled:text-gray-400 disabled:border disabled:border-gray-300 dark:disabled:from-emerald-950 dark:disabled:to-teal-950 dark:disabled:text-emerald-300/40 disabled:cursor-not-allowed disabled:shadow-none text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2">
-                        <template x-if="!isSubmittingImport">
-                            <span class="flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                                <span>Mulai Import Soal Sekarang</span>
-                            </span>
-                        </template>
-                        <template x-if="isSubmittingImport">
-                            <span class="flex items-center gap-2">
-                                <svg class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                                <span>Memproses & Menyimpan Soal...</span>
-                            </span>
-                        </template>
-                    </button>
-                </div>
+                            class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 disabled:opacity-50 disabled:from-gray-200 disabled:to-gray-200 disabled:text-gray-400 disabled:border disabled:border-gray-300 dark:disabled:from-emerald-950 dark:disabled:to-teal-950 dark:disabled:text-emerald-300/40 disabled:cursor-not-allowed disabled:shadow-none text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2 cursor-pointer">
                         <template x-if="!isSubmittingImport">
                             <span class="flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
