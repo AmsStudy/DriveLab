@@ -897,6 +897,9 @@
 
                     // Setup Keyboard shortcuts
                     this.setupKeyboardShortcuts();
+
+                    // Setup Network & Page Unload Listeners (Prioritas 1 & Prioritas 3)
+                    this.setupNetworkAndUnloadGuards();
                 },
 
                 enterFullscreen() {
@@ -1069,11 +1072,11 @@
                     this.hoverPreview.active = false;
                 },
 
-                triggerBackgroundSync() {
+                triggerBackgroundSync(isImmediate = false) {
                     this.syncStatus = 'saving';
                     if (this.syncDebounceTimer) clearTimeout(this.syncDebounceTimer);
 
-                    this.syncDebounceTimer = setTimeout(() => {
+                    const doSync = () => {
                         fetch('{{ route('quiz.autosave', [$quiz->unique_token, $attempt->id]) }}', {
                             method: 'POST',
                             headers: {
@@ -1130,7 +1133,13 @@
                         .catch(() => {
                             this.syncStatus = 'offline';
                         });
-                    }, 400);
+                    };
+
+                    if (isImmediate) {
+                        doSync();
+                    } else {
+                        this.syncDebounceTimer = setTimeout(doSync, 400);
+                    }
                 },
 
                 startSessionHeartbeat() {
@@ -1377,6 +1386,60 @@
                             this.prevQuestion();
                         }
                     });
+                },
+
+                setupNetworkAndUnloadGuards() {
+                    // 1. Deteksi saat koneksi internet / WiFi lab kembali pulih (Prioritas 3)
+                    window.addEventListener('online', () => {
+                        this.handleNetworkRestored();
+                    });
+
+                    // 2. Deteksi saat koneksi internet / WiFi lab terputus
+                    window.addEventListener('offline', () => {
+                        this.syncStatus = 'offline';
+                        if (window.Swal) {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'warning',
+                                title: 'Koneksi jaringan terputus. Jawaban tetap tersimpan di draf lokal perangkat Anda.',
+                                showConfirmButton: false,
+                                timer: 4000,
+                                background: '#0F1713',
+                                color: '#FBBF24',
+                                customClass: { popup: 'border border-amber-500/40 rounded-xl' }
+                            });
+                        }
+                    });
+
+                    // 3. Proteksi Anti Tutup Tab / Back / Reload Tidak Sengaja (Prioritas 1)
+                    window.addEventListener('beforeunload', (e) => {
+                        if (!this.isSubmitting && !this.isLocked) {
+                            e.preventDefault();
+                            // Mengatur returnValue memunculkan dialog konfirmasi bawaan browser (Leave Site?)
+                            e.returnValue = 'Ujian sedang berlangsung! Apakah Anda yakin ingin meninggalkan atau memuat ulang halaman?';
+                            return e.returnValue;
+                        }
+                    });
+                },
+
+                handleNetworkRestored() {
+                    // Segera sinkronkan draf jawaban lokal ke server
+                    this.triggerBackgroundSync(true);
+
+                    if (window.Swal) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Koneksi internet pulih. Draf jawaban telah berhasil disinkronisasi ke server!',
+                            showConfirmButton: false,
+                            timer: 3500,
+                            background: '#0F1713',
+                            color: '#34D399',
+                            customClass: { popup: 'border border-emerald-500/40 rounded-xl' }
+                        });
+                    }
                 },
 
                 selectOption(questionId, optionId) {

@@ -13,6 +13,11 @@ class QuizScoringService
      */
     public static function finalize(QuizAttempt $attempt, array $userAnswers = [], bool $isForceSubmitted = false): void
     {
+        // Idempotency guard: prevent duplicate score calculations or answer wipes if called concurrently
+        if ($attempt->completed_at !== null) {
+            return;
+        }
+
         $quiz = $attempt->quiz;
         $questions = $quiz->questions()->with('options')->get();
 

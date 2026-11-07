@@ -596,36 +596,48 @@ class PublicQuizController extends Controller
         $quiz = $this->findQuizByIdentifier($token);
         $this->validateAttemptAccess($quiz, $attempt);
 
-        if ($attempt->isCompleted()) {
+        return DB::transaction(function () use ($request, $quiz, $attempt, $token) {
+            // Pessimistic locking: lock the attempt record so concurrent requests wait and resolve idempotently
+            /** @var QuizAttempt $lockedAttempt */
+            $lockedAttempt = QuizAttempt::where('id', $attempt->id)->lockForUpdate()->first();
+
+            if (!$lockedAttempt || $lockedAttempt->isCompleted()) {
+                $redirectUrl = route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]);
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success'  => true,
+                        'redirect' => $redirectUrl,
+                    ]);
+                }
+                return redirect()->to($redirectUrl);
+            }
+
+            $userAnswers = $request->input('answers', $lockedAttempt->draft_answers ?? []);
+
+            // Server-side strict time enforcement (with 90-second network latency tolerance)
+            $totalAllowedMinutes = $quiz->time_limit_minutes + ($lockedAttempt->extra_time_minutes ?? 0);
+            if ($totalAllowedMinutes > 0) {
+                $elapsedSeconds = abs((int) now()->diffInSeconds($lockedAttempt->started_at));
+                $maxAllowedSeconds = ($totalAllowedMinutes * 60) + 90;
+                if ($elapsedSeconds > $maxAllowedSeconds) {
+                    // If submitted well past the time limit, fall back to what was autosaved in drafts prior to expiration
+                    $userAnswers = $lockedAttempt->draft_answers ?? [];
+                }
+            }
+
+            QuizScoringService::finalize($lockedAttempt, is_array($userAnswers) ? $userAnswers : []);
+
+            $redirectUrl = route('quiz.results', ['token' => $token, 'attempt' => $lockedAttempt->id]);
+
             if ($request->wantsJson()) {
-                return response()->json(['redirect' => route('quiz.results', ['token' => $token, 'attempt' => $attempt->id])]);
+                return response()->json([
+                    'success'  => true,
+                    'redirect' => $redirectUrl,
+                ]);
             }
-            return redirect()->route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]);
-        }
 
-        $userAnswers = $request->input('answers', $attempt->draft_answers ?? []);
-
-        // Server-side strict time enforcement (with 90-second network latency tolerance)
-        $totalAllowedMinutes = $quiz->time_limit_minutes + ($attempt->extra_time_minutes ?? 0);
-        if ($totalAllowedMinutes > 0) {
-            $elapsedSeconds = abs((int) now()->diffInSeconds($attempt->started_at));
-            $maxAllowedSeconds = ($totalAllowedMinutes * 60) + 90;
-            if ($elapsedSeconds > $maxAllowedSeconds) {
-                // If submitted well past the time limit, fall back to what was autosaved in drafts prior to expiration
-                $userAnswers = $attempt->draft_answers ?? [];
-            }
-        }
-
-        QuizScoringService::finalize($attempt, is_array($userAnswers) ? $userAnswers : []);
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success'  => true,
-                'redirect' => route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]),
-            ]);
-        }
-
-        return redirect()->route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]);
+            return redirect()->to($redirectUrl);
+        });
     }
 
     public function results(string $token, QuizAttempt $attempt)
