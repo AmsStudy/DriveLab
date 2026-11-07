@@ -1413,10 +1413,34 @@
                     });
 
                     // 3. Proteksi Anti Tutup Tab / Back / Reload Tidak Sengaja (Prioritas 1)
+                    // Push state ke history agar tombol Back browser tertahan
+                    try {
+                        history.pushState(null, document.title, location.href);
+                        window.addEventListener('popstate', (e) => {
+                            if (!this.isSubmitting && !this.isCompleted && !this.isLocked) {
+                                history.pushState(null, document.title, location.href);
+                                if (window.Swal) {
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'warning',
+                                        title: 'Navigasi Back dinonaktifkan selama ujian berlangsung!',
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        background: '#0F1713',
+                                        color: '#FBBF24',
+                                        customClass: { popup: 'border border-amber-500/40 rounded-xl' }
+                                    });
+                                }
+                            }
+                        });
+                    } catch (e) {}
+
+                    // beforeunload untuk tombol Close [X] browser, Ctrl+W, F5, atau Alt+F4
                     window.addEventListener('beforeunload', (e) => {
-                        if (!this.isSubmitting && !this.isLocked) {
+                        if (!this.isSubmitting && !this.isCompleted && !this.isLocked) {
                             e.preventDefault();
-                            // Mengatur returnValue memunculkan dialog konfirmasi bawaan browser (Leave Site?)
+                            // Mengatur returnValue memunculkan dialog konfirmasi native browser
                             e.returnValue = 'Ujian sedang berlangsung! Apakah Anda yakin ingin meninggalkan atau memuat ulang halaman?';
                             return e.returnValue;
                         }
