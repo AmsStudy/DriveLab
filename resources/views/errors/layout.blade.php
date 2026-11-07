@@ -202,7 +202,7 @@
     {{-- Footer --}}
     <footer class="relative z-10 w-full py-4 text-center text-xs border-t border-[#1A2820]/40 dark:border-[#1A2820]/40 light:border-[#E2EAE5]"
             style="color: var(--err-text-body);">
-        <p>&copy; {{ date('Y') }} IC-LABS &bull; Laboratorium Informatika. Seluruh hak cipta dilindungi.</p>
+        <p>&copy; 2026-AAN MS</p>
     </footer>
 
 </body>

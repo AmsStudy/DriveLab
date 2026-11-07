@@ -182,7 +182,7 @@
             {{ $slot }}
         </div>
 
-        <p class="footer-note">© {{ date('Y') }} Platform Distribusi Dokumen Laboratorium</p>
+        <p class="footer-note">© 2026-AAN MS</p>
     </div>
 
     {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}

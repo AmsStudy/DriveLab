@@ -843,7 +843,7 @@
     </main>
 
     <footer class="py-6 border-t border-gray-200 dark:border-[#1A2820] text-center text-xs text-gray-500 dark:text-gray-600 mt-auto">
-        &copy; {{ date('Y') }} IC-Labs &bull; Platform Distribusi & Evaluasi Laboratorium
+        &copy; 2026-AAN MS
     </footer>
 
     {{-- ─── HOVER PREVIEW POPUP (INSTANT BUBBLE SAAT KURSOR MENDEKAT) ─── --}}
