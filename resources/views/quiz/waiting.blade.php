@@ -164,9 +164,36 @@
             animation: pulseGlowWave 2s ease-in-out infinite alternate;
         }
         html:not(.dark) .reactor-core {
-            background: radial-gradient(circle at 35% 35%, #059669 0%, #065F46 100%);
+            background: radial-gradient(circle at 35% 35%, #059669 0%, #047857 100%);
             border: 2px solid rgba(16, 185, 129, 0.6);
-            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.45);
+            box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35);
+        }
+
+        /* Light Mode Specific Overrides for Reactor Rings */
+        html:not(.dark) .reactor-ring-outer {
+            border-color: rgba(5, 150, 105, 0.3);
+        }
+        html:not(.dark) .reactor-ring-outer::before {
+            background: #059669;
+            box-shadow: 0 0 10px rgba(5, 150, 105, 0.7);
+        }
+        html:not(.dark) .reactor-ring-outer::after {
+            background: #0891B2;
+            box-shadow: 0 0 10px rgba(8, 145, 178, 0.7);
+        }
+        html:not(.dark) .reactor-ring-mid {
+            border-top-color: #059669;
+            border-right-color: #10B981;
+            border-left-color: rgba(5, 150, 105, 0.35);
+            filter: drop-shadow(0 2px 8px rgba(5, 150, 105, 0.4));
+        }
+        html:not(.dark) .reactor-ring-inner {
+            border-bottom-color: #0891B2;
+            border-left-color: #059669;
+            filter: drop-shadow(0 2px 6px rgba(8, 145, 178, 0.35));
+        }
+        html:not(.dark) .reactor-ring-dotted {
+            border-color: rgba(5, 150, 105, 0.4);
         }
 
         /* Dynamic Digital Equalizer / Activity Bars */
@@ -175,6 +202,9 @@
             border-radius: 9999px;
             background: #10B981;
             animation: audioWave 1.2s ease-in-out infinite alternate;
+        }
+        html:not(.dark) .audio-wave-bar {
+            background: #059669;
         }
         @keyframes audioWave {
             0% { height: 6px; opacity: 0.4; }
@@ -318,26 +348,26 @@
                 </p>
 
                 {{-- Waiting Room Live Participants Pill with Pulse --}}
-                <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-emerald-50/80 dark:bg-[#090D0B] border border-emerald-300/70 dark:border-[#1E3327] shadow-xs mb-8">
+                <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-emerald-50/90 dark:bg-[#090D0B] border border-emerald-300 dark:border-[#1E3327] shadow-xs mb-8">
                     <span class="relative flex h-2.5 w-2.5">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600 dark:bg-emerald-500"></span>
                     </span>
                     <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">Peserta di Ruang Tunggu:</span>
                     <span class="font-mono font-bold text-sm text-emerald-800 dark:text-emerald-400" x-text="waitingCount + ' Mahasiswa'">{{ $waitingCount }} Mahasiswa</span>
                 </div>
 
                 {{-- Student Identity Info Card --}}
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-xl mx-auto pt-6 border-t border-gray-100 dark:border-[#1A2820] text-left">
-                    <div class="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#090D0B] border border-gray-200/80 dark:border-[#1A2820] hover:border-emerald-500/30 transition-colors">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-xl mx-auto pt-6 border-t border-gray-200 dark:border-[#1A2820] text-left">
+                    <div class="p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] hover:border-emerald-500/40 transition-colors">
                         <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider block font-bold">Nama Mahasiswa</span>
                         <span class="text-xs font-bold text-gray-900 dark:text-white mt-0.5 block truncate">{{ $attempt->student_name }}</span>
                     </div>
-                    <div class="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#090D0B] border border-gray-200/80 dark:border-[#1A2820] hover:border-emerald-500/30 transition-colors">
+                    <div class="p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] hover:border-emerald-500/40 transition-colors">
                         <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider block font-bold">NIM</span>
                         <span class="text-xs font-bold font-mono text-emerald-700 dark:text-emerald-400 mt-0.5 block">{{ $attempt->nim }}</span>
                     </div>
-                    <div class="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#090D0B] border border-gray-200/80 dark:border-[#1A2820] hover:border-emerald-500/30 transition-colors">
+                    <div class="p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] hover:border-emerald-500/40 transition-colors">
                         <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider block font-bold">Kelas & Status</span>
                         <span class="text-xs font-bold text-gray-900 dark:text-gray-200 mt-0.5 block">
                             {{ $attempt->kelas ? 'Kelas ' . $attempt->kelas : 'Reguler' }} &bull; <span class="text-emerald-700 dark:text-emerald-400 font-bold">Siap</span>
@@ -349,15 +379,15 @@
             {{-- Exam Integrity & Instructions Card --}}
             <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-3xl p-6 sm:p-7 shadow-sm">
                 <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-gray-100 dark:border-[#1A2820]">
-                    <div class="w-7 h-7 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-sm text-amber-500">
+                    <div class="w-7 h-7 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-sm text-amber-600 dark:text-amber-400">
                         💡
                     </div>
                     <h4 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">Petunjuk Selama Menunggu</h4>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-600 dark:text-gray-300">
-                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/70 dark:bg-[#090D0B]/70 border border-gray-100 dark:border-[#1A2820] hover:border-emerald-500/30 transition-all">
-                        <div class="w-6 h-6 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#090D0B]/70 border border-gray-200/80 dark:border-[#1A2820] hover:border-emerald-500/40 transition-all">
+                        <div class="w-6 h-6 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
                             ⏱️
                         </div>
                         <div class="leading-relaxed">
@@ -366,8 +396,8 @@
                         </div>
                     </div>
 
-                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/70 dark:bg-[#090D0B]/70 border border-gray-100 dark:border-[#1A2820] hover:border-emerald-500/30 transition-all">
-                        <div class="w-6 h-6 rounded-lg bg-rose-500/10 dark:bg-rose-500/20 border border-rose-500/30 text-rose-600 dark:text-rose-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#090D0B]/70 border border-gray-200/80 dark:border-[#1A2820] hover:border-emerald-500/40 transition-all">
+                        <div class="w-6 h-6 rounded-lg bg-rose-500/10 dark:bg-rose-500/20 border border-rose-500/30 text-rose-700 dark:text-rose-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
                             🛡️
                         </div>
                         <div class="leading-relaxed">
@@ -376,8 +406,8 @@
                         </div>
                     </div>
 
-                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/70 dark:bg-[#090D0B]/70 border border-gray-100 dark:border-[#1A2820] hover:border-emerald-500/30 transition-all">
-                        <div class="w-6 h-6 rounded-lg bg-teal-500/10 dark:bg-teal-500/20 border border-teal-500/30 text-teal-600 dark:text-teal-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#090D0B]/70 border border-gray-200/80 dark:border-[#1A2820] hover:border-emerald-500/40 transition-all">
+                        <div class="w-6 h-6 rounded-lg bg-teal-500/10 dark:bg-teal-500/20 border border-teal-500/30 text-teal-700 dark:text-teal-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
                             💾
                         </div>
                         <div class="leading-relaxed">
@@ -386,8 +416,8 @@
                         </div>
                     </div>
 
-                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/70 dark:bg-[#090D0B]/70 border border-gray-100 dark:border-[#1A2820] hover:border-emerald-500/30 transition-all">
-                        <div class="w-6 h-6 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#090D0B]/70 border border-gray-200/80 dark:border-[#1A2820] hover:border-emerald-500/40 transition-all">
+                        <div class="w-6 h-6 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 text-amber-700 dark:text-amber-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
                             🔔
                         </div>
                         <div class="leading-relaxed">
