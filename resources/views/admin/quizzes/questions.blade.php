@@ -197,7 +197,7 @@
                     </template>
 
                     <input type="file" name="question_image" accept="image/*" @change="previewQuestionImage($event)"
-                           class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-500/20 file:text-teal-300 hover:file:bg-teal-500/30 file:cursor-pointer cursor-pointer">
+                           class="cyber-file-input w-full text-xs text-gray-600 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-3.5 file:rounded-xl file:border file:border-emerald-500/30 file:text-xs file:font-semibold file:bg-emerald-50 dark:file:bg-emerald-500/20 file:text-emerald-800 dark:file:text-emerald-300 hover:file:bg-emerald-100 dark:hover:file:bg-emerald-500/30 file:cursor-pointer cursor-pointer transition-all shadow-sm">
                     
                     <input type="hidden" name="remove_question_image" :value="formData.remove_question_image ? 1 : 0">
                     <p class="text-[11px] text-gray-500 mt-1.5">Format: JPG, PNG, WebP. Gambar dikompresi otomatis tanpa pecah/blur agar cepat diakses mahasiswa.</p>
@@ -278,7 +278,7 @@
 
                                     <input type="file" :name="'option_images[' + idx + ']'" accept="image/*"
                                            @change="previewOptionImage($event, idx)"
-                                           class="text-[11px] text-gray-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[11px] file:font-medium file:bg-[#1A2820] file:text-gray-300 hover:file:bg-gray-800 file:cursor-pointer cursor-pointer">
+                                           class="cyber-file-input text-[11px] text-gray-600 dark:text-gray-400 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border file:border-emerald-500/30 file:text-[11px] file:font-semibold file:bg-emerald-50 dark:file:bg-emerald-500/20 file:text-emerald-800 dark:file:text-emerald-300 hover:file:bg-emerald-100 dark:hover:file:bg-emerald-500/30 file:cursor-pointer cursor-pointer transition-all shadow-sm">
 
                                     <input type="hidden" :name="'existing_option_images[' + idx + ']'" :value="formData.existing_option_images[idx] || ''">
                                     <input type="hidden" :name="'remove_option_images[' + idx + ']'" :value="formData.remove_option_images[idx] ? 1 : 0">

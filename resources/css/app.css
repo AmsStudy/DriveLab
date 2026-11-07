@@ -76,6 +76,53 @@
     select:not([multiple]) option:disabled {
         color: #6B7280 !important;
     }
+
+    /* Cyber File Input Design System */
+    .cyber-file-input,
+    input[type="file"].cyber-file-input {
+        color: #9CA3AF;
+        cursor: pointer;
+    }
+    .cyber-file-input::file-selector-button,
+    input[type="file"].cyber-file-input::file-selector-button {
+        margin-right: 0.75rem !important;
+        padding: 0.375rem 0.85rem !important;
+        border-radius: 0.625rem !important;
+        border: 1px solid rgba(16, 185, 129, 0.35) !important;
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+        background-color: rgba(16, 185, 129, 0.16) !important;
+        color: #34D399 !important;
+        cursor: pointer !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .cyber-file-input::-webkit-file-upload-button,
+    input[type="file"].cyber-file-input::-webkit-file-upload-button {
+        margin-right: 0.75rem !important;
+        padding: 0.375rem 0.85rem !important;
+        border-radius: 0.625rem !important;
+        border: 1px solid rgba(16, 185, 129, 0.35) !important;
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+        background-color: rgba(16, 185, 129, 0.16) !important;
+        color: #34D399 !important;
+        cursor: pointer !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .cyber-file-input::file-selector-button:hover,
+    input[type="file"].cyber-file-input::file-selector-button:hover {
+        background-color: rgba(16, 185, 129, 0.28) !important;
+        border-color: rgba(16, 185, 129, 0.6) !important;
+        color: #6EE7B7 !important;
+        box-shadow: 0 0 14px rgba(16, 185, 129, 0.25) !important;
+    }
+    .cyber-file-input::-webkit-file-upload-button:hover,
+    input[type="file"].cyber-file-input::-webkit-file-upload-button:hover {
+        background-color: rgba(16, 185, 129, 0.28) !important;
+        border-color: rgba(16, 185, 129, 0.6) !important;
+        color: #6EE7B7 !important;
+        box-shadow: 0 0 14px rgba(16, 185, 129, 0.25) !important;
+    }
 }
 
 @layer utilities {
@@ -574,6 +621,45 @@ html:not(.dark) .theme-option-active {
     color: #059669 !important;
 }
 
+/* Cyber File Input Design System in Light Mode */
+html:not(.dark) .cyber-file-input,
+html:not(.dark) input[type="file"].cyber-file-input,
+html:not(.dark) .quiz-modal-card input[type="file"] {
+    color: #4B5563 !important;
+}
+html:not(.dark) .cyber-file-input::file-selector-button,
+html:not(.dark) input[type="file"].cyber-file-input::file-selector-button,
+html:not(.dark) .quiz-modal-card input[type="file"]::file-selector-button {
+    background-color: #ECFDF5 !important;
+    border: 1px solid #A7F3D0 !important;
+    color: #065F46 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+html:not(.dark) .cyber-file-input::-webkit-file-upload-button,
+html:not(.dark) input[type="file"].cyber-file-input::-webkit-file-upload-button,
+html:not(.dark) .quiz-modal-card input[type="file"]::-webkit-file-upload-button {
+    background-color: #ECFDF5 !important;
+    border: 1px solid #A7F3D0 !important;
+    color: #065F46 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+html:not(.dark) .cyber-file-input::file-selector-button:hover,
+html:not(.dark) input[type="file"].cyber-file-input::file-selector-button:hover,
+html:not(.dark) .quiz-modal-card input[type="file"]::file-selector-button:hover {
+    background-color: #D1FAE5 !important;
+    border-color: #10B981 !important;
+    color: #047857 !important;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15) !important;
+}
+html:not(.dark) .cyber-file-input::-webkit-file-upload-button:hover,
+html:not(.dark) input[type="file"].cyber-file-input::-webkit-file-upload-button:hover,
+html:not(.dark) .quiz-modal-card input[type="file"]::-webkit-file-upload-button:hover {
+    background-color: #D1FAE5 !important;
+    border-color: #10B981 !important;
+    color: #047857 !important;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15) !important;
+}
+
 /* Modals in Light Mode */
 html:not(.dark) #editModal > div,
 html:not(.dark) #textSubmissionModal > div,
@@ -583,7 +669,8 @@ html:not(.dark) #create-modal > div,
 html:not(.dark) #addQuestionModal > div,
 html:not(.dark) #editQuestionModal > div,
 html:not(.dark) #importExcelModal > div,
-html:not(.dark) [id$="Modal"] > div {
+html:not(.dark) [id$="Modal"] > div,
+html:not(.dark) .quiz-modal-card {
     background-color: #FFFFFF !important;
     border-color: #E2EAE5 !important;
     color: #0F1F17 !important;
