@@ -674,6 +674,52 @@
             border-color: #A7F3D0 !important;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18), 0 0 20px rgba(16, 185, 129, 0.15) !important;
         }
+        /* Light mode overrides for custom cyber dropdowns and selects */
+        html:not(.dark) .cyber-select {
+            background-color: #FFFFFF !important;
+            border: 1px solid #D1D5DB !important;
+            color: #111827 !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+        }
+        html:not(.dark) .cyber-select:hover {
+            border-color: #10B981 !important;
+            background-color: #F9FAFB !important;
+        }
+        html:not(.dark) .cyber-select:focus {
+            background-color: #FFFFFF !important;
+            border-color: #10B981 !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+        }
+        html:not(.dark) .cyber-select option {
+            background-color: #FFFFFF !important;
+            color: #111827 !important;
+        }
+        html:not(.dark) .cyber-dropdown-trigger {
+            background-color: #FFFFFF !important;
+            border: 1px solid #D1D5DB !important;
+            color: #111827 !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+        }
+        html:not(.dark) .cyber-dropdown-trigger:hover {
+            border-color: #10B981 !important;
+            background-color: #F9FAFB !important;
+        }
+        html:not(.dark) .cyber-dropdown-trigger.is-open {
+            border-color: #10B981 !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+        }
+        html:not(.dark) .cyber-dropdown-menu {
+            background: #FFFFFF !important;
+            border: 1px solid #E5E7EB !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+        }
+        html:not(.dark) .cyber-dropdown-item {
+            color: #374151 !important;
+        }
+        html:not(.dark) .cyber-dropdown-item:hover {
+            background-color: rgba(16, 185, 129, 0.1) !important;
+            color: #059669 !important;
+        }
         .cyber-hover-preview-bubble.is-active {
             opacity: 1;
             transform: scale(1) translateY(0);

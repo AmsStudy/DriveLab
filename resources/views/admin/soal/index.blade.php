@@ -452,21 +452,21 @@
     <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="closeCreateModal()"></div>
 
     {{-- Modal Card --}}
-    <div class="relative bg-[#0F1713] border border-[#1A2820] rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl z-10 overflow-hidden">
+    <div class="relative bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl z-10 overflow-hidden">
         {{-- Modal Header --}}
-        <div class="flex items-center justify-between px-6 py-4 border-b border-[#1A2820] bg-[#0F1713] flex-shrink-0">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-[#1A2820] bg-gray-50/90 dark:bg-[#0F1713] flex-shrink-0">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-base font-bold text-white leading-tight">Tambah Dokumen Baru</h2>
-                    <p class="text-xs text-gray-400">Unggah materi, teks soal, tautan referensi, dan atur pengumpulan tugas</p>
+                    <h2 class="text-base font-bold text-gray-900 dark:text-white leading-tight">Tambah Dokumen Baru</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Unggah materi, teks soal, tautan referensi, dan atur pengumpulan tugas</p>
                 </div>
             </div>
-            <button type="button" onclick="closeCreateModal()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800 transition-colors" title="Tutup Modal (Esc)">
+            <button type="button" onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer" title="Tutup Modal (Esc)">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -482,37 +482,37 @@
 
                 {{-- ─── 1. INFORMASI DOKUMEN ─── --}}
                 <div>
-                    <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <h3 class="text-sm font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Informasi Dokumen
                     </h3>
 
                     <div class="space-y-4">
                         <div>
-                            <label for="modal_title" class="block text-sm font-medium text-gray-300 mb-2">Judul Dokumen / Soal <span class="text-red-400">*</span></label>
+                            <label for="modal_title" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Judul Dokumen / Soal <span class="text-red-500">*</span></label>
                             <input type="text" id="modal_title" name="title" value="{{ old('title') }}" required
                                    placeholder="Contoh: Modul 3 — Konfigurasi Routing RIP & OSPF"
-                                   class="w-full bg-[#090E0B] border {{ $errors->has('title') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500">
-                            @error('title') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                                   class="w-full bg-white dark:bg-[#090E0B] border {{ $errors->has('title') ? 'border-red-500' : 'border-gray-300 dark:border-gray-700' }} text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500">
+                            @error('title') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label for="modal_kode_unik" class="block text-sm font-medium text-gray-300 mb-2">Kode Unik Akses <span class="text-red-400">*</span></label>
+                                <label for="modal_kode_unik" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Kode Unik Akses <span class="text-red-500">*</span></label>
                                 <div class="relative">
                                     <input type="text" id="modal_kode_unik" name="kode_unik" 
                                            value="{{ old('kode_unik', 'AMSSOAL-' . Str::upper(Str::random(5))) }}" required
                                            autocomplete="off"
-                                           class="w-full bg-[#090E0B] border {{ $errors->has('kode_unik') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-4 py-3 pr-10 text-sm focus:outline-none focus:border-emerald-500 transition-colors">
+                                           class="w-full bg-white dark:bg-[#090E0B] border {{ $errors->has('kode_unik') ? 'border-red-500' : 'border-gray-300 dark:border-gray-700' }} text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl px-4 py-3 pr-10 text-sm focus:outline-none focus:border-emerald-500 transition-colors">
                                     <div id="modal_kode_unik_indicator" class="absolute right-3.5 top-1/2 -translate-y-1/2 hidden flex items-center pointer-events-none"></div>
                                 </div>
-                                <div id="modal_kode_unik_feedback" class="mt-1.5 text-xs text-gray-500">
+                                <div id="modal_kode_unik_feedback" class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                                     Kode yang dimasukkan mahasiswa untuk mengakses dokumen.
                                 </div>
-                                @error('kode_unik') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                                @error('kode_unik') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
-                                <label for="modal_category_id" class="block text-sm font-medium text-gray-300 mb-2">Kategori</label>
+                                <label for="modal_category_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
                                 <select id="modal_category_id" name="category_id"
                                         class="cyber-select w-full pl-4 pr-10 py-3 text-sm">
                                     <option value="">— Pilih Kategori —</option>
@@ -525,66 +525,66 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label for="modal_password" class="block text-sm font-medium text-gray-300 mb-2">Password Akses <span class="text-red-400">*</span></label>
+                                <label for="modal_password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Password Akses <span class="text-red-500">*</span></label>
                                 <div class="relative">
                                     <input type="password" id="modal_password" name="password" required minlength="4"
                                            placeholder="Minimal 4 karakter"
-                                           class="w-full bg-[#090E0B] border {{ $errors->has('password') ? 'border-red-500' : 'border-gray-700' }} text-gray-100 rounded-xl px-4 py-3 pr-10 text-sm focus:outline-none focus:border-emerald-500">
+                                           class="w-full bg-white dark:bg-[#090E0B] border {{ $errors->has('password') ? 'border-red-500' : 'border-gray-300 dark:border-gray-700' }} text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl px-4 py-3 pr-10 text-sm focus:outline-none focus:border-emerald-500">
                                     <button type="button" onclick="const p = document.getElementById('modal_password'); p.type = p.type === 'password' ? 'text' : 'password'"
-                                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     </button>
                                 </div>
-                                @error('password') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                                @error('password') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                             </div>
 
                             <div>
-                                <label for="modal_description" class="block text-sm font-medium text-gray-300 mb-2">Deskripsi Singkat</label>
+                                <label for="modal_description" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Deskripsi Singkat</label>
                                 <input type="text" id="modal_description" name="description" value="{{ old('description') }}"
                                        placeholder="Catatan / deskripsi umum..."
-                                       class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500">
+                                       class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500">
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {{-- ─── 2. KONTEN SOAL BERUPA TEKS (OPSIONAL) ─── --}}
-                <div class="pt-5 border-t border-[#1A2820]">
-                    <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <div class="pt-5 border-t border-gray-200 dark:border-[#1A2820]">
+                    <h3 class="text-sm font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider mb-2 flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-blue-500"></span> Soal / Materi Berupa Teks Langsung <span class="text-xs text-gray-500 font-normal lowercase">(opsional)</span>
                     </h3>
-                    <p class="text-xs text-gray-400 mb-3">Tulis butir-butir soal atau instruksi praktikum langsung di sini jika ingin ditampilkan di layar mahasiswa tanpa harus mendownload file.</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Tulis butir-butir soal atau instruksi praktikum langsung di sini jika ingin ditampilkan di layar mahasiswa tanpa harus mendownload file.</p>
                     <textarea id="modal_content_text" name="content_text" rows="5"
                               placeholder="Ketik isi soal atau instruksi langsung di sini... (Mendukung paragraf, baris baru, dan studi kasus)"
-                              class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 font-mono">{{ old('content_text') }}</textarea>
+                              class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 font-mono">{{ old('content_text') }}</textarea>
                 </div>
 
                 {{-- ─── 3. TAUTAN / LINK MATERI (OPSIONAL) ─── --}}
-                <div class="pt-5 border-t border-[#1A2820]">
+                <div class="pt-5 border-t border-gray-200 dark:border-[#1A2820]">
                     <div class="flex justify-between items-center mb-2">
-                        <h3 class="text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                        <h3 class="text-sm font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wider flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-purple-500"></span> Tautan / Link Materi & Soal <span class="text-xs text-gray-500 font-normal lowercase">(opsional)</span>
                         </h3>
-                        <button type="button" onclick="addModalLinkRow()" class="text-xs bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 px-3 py-1.5 rounded-lg border border-purple-500/30 transition-colors flex items-center gap-1 cursor-pointer">
+                        <button type="button" onclick="addModalLinkRow()" class="text-xs bg-purple-50 hover:bg-purple-100 dark:bg-purple-600/20 dark:hover:bg-purple-600/30 text-purple-700 dark:text-purple-300 px-3 py-1.5 rounded-lg border border-purple-200 dark:border-purple-500/30 transition-colors flex items-center gap-1 cursor-pointer">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Tambah Link
                         </button>
                     </div>
-                    <p class="text-xs text-gray-400 mb-3">Tambahkan link eksternal (Google Drive, Repository GitHub, Video Tutorial, Figma, dll).</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Tambahkan link eksternal (Google Drive, Repository GitHub, Video Tutorial, Figma, dll).</p>
 
                     <div id="modal-links-container" class="space-y-2">
                         @php $oldLinks = old('links', [['title' => '', 'url' => '']]); @endphp
                         @foreach($oldLinks as $idx => $link)
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-2 link-row bg-gray-800/40 p-3 rounded-xl border border-[#1A2820]">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-2 link-row bg-gray-50/90 dark:bg-gray-800/40 p-3 rounded-xl border border-gray-200 dark:border-[#1A2820]">
                             <div class="md:col-span-4">
                                 <input type="text" name="links[{{ $idx }}][title]" value="{{ $link['title'] ?? '' }}" placeholder="Label Link (misal: GitHub Repo)"
-                                       class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                       class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
                             </div>
                             <div class="md:col-span-7">
                                 <input type="url" name="links[{{ $idx }}][url]" value="{{ $link['url'] ?? '' }}" placeholder="https://..."
-                                       class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                       class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
                             </div>
                             <div class="md:col-span-1 flex items-center justify-center">
-                                <button type="button" onclick="this.closest('.link-row').remove()" class="text-red-400 hover:text-red-300 p-1.5 cursor-pointer" title="Hapus Link">
+                                <button type="button" onclick="this.closest('.link-row').remove()" class="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 p-1.5 cursor-pointer" title="Hapus Link">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
                             </div>
@@ -594,171 +594,171 @@
                 </div>
 
                 {{-- ─── 4. UPLOAD FILE LAMPIRAN (MAKS. 15 FILE) ─── --}}
-                <div class="pt-5 border-t border-[#1A2820]">
+                <div class="pt-5 border-t border-gray-200 dark:border-[#1A2820]">
                     <div class="flex flex-wrap justify-between items-center gap-3 mb-2">
-                        <h3 class="text-sm font-bold text-green-400 uppercase tracking-wider flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-green-500"></span> File Lampiran Dokumen <span class="text-xs text-gray-500 font-normal lowercase">(Maksimal 15 File, 5MB per file)</span>
+                        <h3 class="text-sm font-bold text-emerald-700 dark:text-green-400 uppercase tracking-wider flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> File Lampiran Dokumen <span class="text-xs text-gray-500 font-normal lowercase">(Maksimal 15 File, 5MB per file)</span>
                         </h3>
                         
                         {{-- Master Download Toggle --}}
-                        <div class="flex items-center gap-2 bg-gray-800/80 px-3 py-1.5 rounded-xl border border-gray-700">
+                        <div class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200/60 dark:bg-gray-800/80 px-3 py-1.5 rounded-xl border border-gray-300 dark:border-gray-700 transition-colors">
                             <input type="hidden" name="is_downloadable" value="0">
                             <input type="checkbox" id="modal_master_downloadable" name="is_downloadable" value="1" checked
                                    onchange="toggleModalAllFileDownloads(this.checked)"
-                                   class="accent-emerald-500 bg-gray-700 border-gray-600 w-4 h-4 rounded">
-                            <label for="modal_master_downloadable" class="text-xs text-gray-200 cursor-pointer">
+                                   class="accent-emerald-500 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 w-4 h-4 rounded">
+                            <label for="modal_master_downloadable" class="text-xs font-medium text-gray-700 dark:text-gray-200 cursor-pointer">
                                 Izinkan Unduh Semua File
                             </label>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-400 mb-3">Dukungan format: PDF, Word, Excel, PPT, Gambar, ZIP/RAR, dan Cisco Packet Tracer (.pkt). Anda dapat mengatur izin download per-file di bawah.</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Dukungan format: PDF, Word, Excel, PPT, Gambar, ZIP/RAR, dan Cisco Packet Tracer (.pkt). Anda dapat mengatur izin download per-file di bawah.</p>
 
-                    <div id="modal-drop-zone" class="border-2 border-dashed border-gray-700 hover:border-emerald-500 rounded-xl p-6 text-center cursor-pointer transition-colors group"
+                    <div id="modal-drop-zone" class="border-2 border-dashed border-gray-300 hover:border-emerald-500 dark:border-gray-700 bg-gray-50/70 hover:bg-emerald-50/40 dark:bg-[#090E0B]/40 rounded-xl p-6 text-center cursor-pointer transition-colors group"
                          onclick="document.getElementById('modal_files').click()">
-                        <svg class="w-8 h-8 mx-auto text-gray-600 group-hover:text-emerald-500 mb-2 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                        <p class="text-sm text-gray-300 font-medium">Klik atau drop file lampiran di sini (maks. 15 file)</p>
-                        <p class="text-xs text-gray-500 mt-1">Bisa pilih banyak file sekaligus (hingga 15 file, 5MB/file)</p>
+                        <svg class="w-8 h-8 mx-auto text-gray-400 group-hover:text-emerald-500 mb-2 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <p class="text-sm text-gray-700 dark:text-gray-300 font-medium">Klik atau drop file lampiran di sini (maks. 15 file)</p>
+                        <p class="text-xs text-gray-400 mt-1">Bisa pilih banyak file sekaligus (hingga 15 file, 5MB/file)</p>
                     </div>
                     <input type="file" id="modal_files" name="files[]" multiple class="hidden"
                            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.zip,.pkt"
                            onchange="handleModalFilesSelected(this)">
-                    @error('files') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
-                    @error('files.*') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                    @error('files') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                    @error('files.*') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
 
                     {{-- Selected Files List with Per-File Download Toggle --}}
                     <div id="modal-selected-files-container" class="mt-3 space-y-2 hidden">
-                        <p class="text-xs text-gray-400 font-semibold mb-1">Daftar File yang Dipilih & Hak Unduh Per-File:</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 font-semibold mb-1">Daftar File yang Dipilih & Hak Unduh Per-File:</p>
                         <div id="modal-selected-files-list" class="space-y-2"></div>
                     </div>
                 </div>
 
                 {{-- ─── 5. MASA AKTIF DOKUMEN ─── --}}
-                <div class="pt-5 border-t border-[#1A2820]">
-                    <label class="block text-sm font-medium text-gray-300 mb-3">Masa Aktif Akses Dokumen</label>
+                <div class="pt-5 border-t border-gray-200 dark:border-[#1A2820]">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Masa Aktif Akses Dokumen</label>
                     <div class="flex gap-5 mb-3">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="access_type" value="lifetime" {{ old('access_type', 'lifetime') === 'lifetime' ? 'checked' : '' }}
-                                   class="accent-emerald-500 bg-[#090E0B] border-gray-600"
+                                   class="accent-emerald-500"
                                    onchange="document.getElementById('modal-schedule-fields').classList.add('hidden')">
-                            <span class="text-sm text-gray-300">Selamanya (Tanpa Batas Waktu)</span>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Selamanya (Tanpa Batas Waktu)</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="access_type" value="scheduled" {{ old('access_type') === 'scheduled' ? 'checked' : '' }}
-                                   class="accent-emerald-500 bg-[#090E0B] border-gray-600"
+                                   class="accent-emerald-500"
                                    onchange="document.getElementById('modal-schedule-fields').classList.remove('hidden')">
-                            <span class="text-sm text-gray-300">Terjadwal (Waktu Tertentu)</span>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Terjadwal (Waktu Tertentu)</span>
                         </label>
                     </div>
-                    <div id="modal-schedule-fields" class="{{ old('access_type') === 'scheduled' ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#090E0B]/40 p-4 rounded-xl border border-[#1A2820]">
+                    <div id="modal-schedule-fields" class="{{ old('access_type') === 'scheduled' ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50/90 dark:bg-[#090E0B]/40 p-4 rounded-xl border border-gray-200 dark:border-[#1A2820]">
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1.5">Mulai Aktif</label>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Mulai Aktif</label>
                             <input type="datetime-local" name="active_from" value="{{ old('active_from') }}"
-                                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
+                                   class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1.5">Berakhir</label>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Berakhir</label>
                             <input type="datetime-local" name="active_until" value="{{ old('active_until') }}"
-                                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
+                                   class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
                         </div>
                     </div>
                 </div>
 
                 {{-- ─── 6. FITUR PENGUMPULAN TUGAS (SUBMISSIONS) ─── --}}
-                <div class="pt-5 border-t border-[#1A2820]">
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Fitur Pengumpulan Tugas bagi Mahasiswa</label>
+                <div class="pt-5 border-t border-gray-200 dark:border-[#1A2820]">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Fitur Pengumpulan Tugas bagi Mahasiswa</label>
                     <label class="flex items-center gap-2 cursor-pointer mb-3">
                         <input type="checkbox" name="is_submission_enabled" id="modal_is_submission_enabled" value="1" {{ old('is_submission_enabled') ? 'checked' : '' }}
-                               class="accent-emerald-500 bg-[#090E0B] border-gray-600 w-4 h-4 rounded"
+                               class="accent-emerald-500 w-4 h-4 rounded"
                                onchange="toggleModalSubmissionSection(this.checked)">
-                        <span class="text-sm text-gray-300">Aktifkan Form Pengumpulan Tugas pada Soal Ini</span>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Aktifkan Form Pengumpulan Tugas pada Soal Ini</span>
                     </label>
 
-                    <div id="modal-submission-options" class="{{ old('is_submission_enabled') ? '' : 'hidden' }} space-y-4 bg-[#090E0B]/40 p-4 rounded-xl border border-[#1A2820]">
+                    <div id="modal-submission-options" class="{{ old('is_submission_enabled') ? '' : 'hidden' }} space-y-4 bg-gray-50/90 dark:bg-[#090E0B]/40 p-4 rounded-xl border border-gray-200 dark:border-[#1A2820]">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs text-gray-400 mb-1.5">Batas Waktu Pengumpulan (Deadline) <span class="text-red-400">*</span></label>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Batas Waktu Pengumpulan (Deadline) <span class="text-red-500">*</span></label>
                                 <input type="datetime-local" id="modal_deadline_at" name="deadline_at" value="{{ old('deadline_at') }}"
-                                       class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-emerald-500">
+                                       class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-emerald-500">
                             </div>
                             <div>
-                                <label class="block text-xs text-gray-400 mb-1.5">Instruksi Tambahan (Opsional)</label>
+                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Instruksi Tambahan (Opsional)</label>
                                 <textarea name="submission_instructions" rows="2"
                                           placeholder="Contoh: Cantumkan link GitHub/Drive publik atau upload laporan PDF."
-                                          class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-emerald-500 resize-none">{{ old('submission_instructions') }}</textarea>
+                                          class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-emerald-500 resize-none">{{ old('submission_instructions') }}</textarea>
                             </div>
                         </div>
 
                         {{-- Daftar Pilihan Kelas (Opsional) --}}
                         <div>
-                            <label class="block text-xs text-gray-300 font-semibold mb-1">Daftar Pilihan Kelas (Opsional)</label>
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Daftar Pilihan Kelas (Opsional)</label>
                             <input type="text" name="classes" value="{{ old('classes') }}"
                                    placeholder="Contoh: A1, A2, B1, B2 (Pisahkan dengan tanda koma)"
-                                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500">
-                            <p class="text-[11px] text-gray-400 mt-1">Jika diisi, mahasiswa wajib memilih salah satu kelas saat mengumpulkan tugas. Anda juga dapat mengunduh arsip tugas berdasarkan kelasnya.</p>
-                            @error('classes') <p class="mt-1 text-[11px] text-red-400">{{ $message }}</p> @enderror
+                                   class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500">
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Jika diisi, mahasiswa wajib memilih salah satu kelas saat mengumpulkan tugas. Anda juga dapat mengunduh arsip tugas berdasarkan kelasnya.</p>
+                            @error('classes') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Tipe Pengumpulan yang Diizinkan --}}
                         <div>
-                            <label class="block text-xs text-gray-300 font-semibold mb-2">Metode Pengumpulan yang Diizinkan Mahasiswa <span class="text-red-400">*</span></label>
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Metode Pengumpulan yang Diizinkan Mahasiswa <span class="text-red-500">*</span></label>
                             @php
                                 $oldSubTypes = old('submission_types', ['file', 'link', 'text']);
                             @endphp
                             <div class="flex flex-wrap gap-4">
-                                <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-2 rounded-lg border border-gray-700">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs">
                                     <input type="checkbox" name="submission_types[]" value="file" {{ in_array('file', (array)$oldSubTypes) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
-                                    <span class="text-xs text-gray-200">📁 File Dokumen</span>
+                                    <span class="text-xs font-medium text-gray-700 dark:text-gray-200">📁 File Dokumen</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-2 rounded-lg border border-gray-700">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs">
                                     <input type="checkbox" name="submission_types[]" value="link" {{ in_array('link', (array)$oldSubTypes) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
-                                    <span class="text-xs text-gray-200">🔗 Tautan / Link URL</span>
+                                    <span class="text-xs font-medium text-gray-700 dark:text-gray-200">🔗 Tautan / Link URL</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-2 rounded-lg border border-gray-700">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs">
                                     <input type="checkbox" name="submission_types[]" value="text" {{ in_array('text', (array)$oldSubTypes) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
-                                    <span class="text-xs text-gray-200">📝 Teks Langsung</span>
+                                    <span class="text-xs font-medium text-gray-700 dark:text-gray-200">📝 Teks Langsung</span>
                                 </label>
                             </div>
                         </div>
 
                         {{-- Format File yang Diizinkan (Dengan Security Check) --}}
                         <div>
-                            <label class="block text-xs text-gray-300 font-semibold mb-1">Format File yang Diizinkan (Jika Mengunggah File)</label>
-                            <p class="text-[11px] text-gray-400 mb-2">Setiap file yang diupload mahasiswa wajib lolos security check (anti-shell, anti-executable, anti-spoof MIME).</p>
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Format File yang Diizinkan (Jika Mengunggah File)</label>
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-2">Setiap file yang diupload mahasiswa wajib lolos security check (anti-shell, anti-executable, anti-spoof MIME).</p>
                             @php
                                 $oldAllowedExts = old('allowed_extensions', ['pdf', 'word', 'excel', 'ppt', 'image', 'archive', 'pkt']);
                             @endphp
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-                                <label class="flex items-center gap-2 cursor-pointer bg-emerald-500/10 border border-emerald-500/30 p-2 rounded-lg">
+                                <label class="flex items-center gap-2 cursor-pointer bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/30 p-2 rounded-lg">
                                     <input type="checkbox" name="allowed_extensions[]" value="all" {{ in_array('all', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
-                                    <span class="text-xs text-emerald-300 font-bold">Semua Format (Aman)</span>
+                                    <span class="text-xs text-emerald-800 dark:text-emerald-300 font-bold">Semua Format (Aman)</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs">
                                     <input type="checkbox" name="allowed_extensions[]" value="pdf" {{ in_array('pdf', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
-                                    <span class="text-xs text-gray-300">PDF (.pdf)</span>
+                                    <span class="text-xs text-gray-700 dark:text-gray-300">PDF (.pdf)</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs">
                                     <input type="checkbox" name="allowed_extensions[]" value="word" {{ in_array('word', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
-                                    <span class="text-xs text-gray-300">Word (.doc, .docx)</span>
+                                    <span class="text-xs text-gray-700 dark:text-gray-300">Word (.doc, .docx)</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs">
                                     <input type="checkbox" name="allowed_extensions[]" value="excel" {{ in_array('excel', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
-                                    <span class="text-xs text-gray-300">Excel (.xls, .xlsx)</span>
+                                    <span class="text-xs text-gray-700 dark:text-gray-300">Excel (.xls, .xlsx)</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs">
                                     <input type="checkbox" name="allowed_extensions[]" value="ppt" {{ in_array('ppt', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
-                                    <span class="text-xs text-gray-300">PowerPoint (.ppt)</span>
+                                    <span class="text-xs text-gray-700 dark:text-gray-300">PowerPoint (.ppt)</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs">
                                     <input type="checkbox" name="allowed_extensions[]" value="image" {{ in_array('image', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
-                                    <span class="text-xs text-gray-300">Gambar (.jpg, .png)</span>
+                                    <span class="text-xs text-gray-700 dark:text-gray-300">Gambar (.jpg, .png)</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs">
                                     <input type="checkbox" name="allowed_extensions[]" value="archive" {{ in_array('archive', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
-                                    <span class="text-xs text-gray-300">Arsip (.zip, .rar)</span>
+                                    <span class="text-xs text-gray-700 dark:text-gray-300">Arsip (.zip, .rar)</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs">
                                     <input type="checkbox" name="allowed_extensions[]" value="pkt" {{ in_array('pkt', (array)$oldAllowedExts) ? 'checked' : '' }} class="accent-emerald-500 w-4 h-4 rounded">
-                                    <span class="text-xs text-gray-300">Packet Tracer (.pkt)</span>
+                                    <span class="text-xs text-gray-700 dark:text-gray-300">Packet Tracer (.pkt)</span>
                                 </label>
                             </div>
                         </div>
@@ -768,8 +768,8 @@
             </div>
 
             {{-- Modal Footer --}}
-            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#1A2820] bg-[#0F1713] flex-shrink-0">
-                <button type="button" onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-200 px-4 py-2.5 rounded-xl text-sm transition-colors cursor-pointer">
+            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-[#1A2820] bg-gray-50/90 dark:bg-[#0F1713] flex-shrink-0">
+                <button type="button" onclick="closeCreateModal()" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 px-4 py-2.5 rounded-xl text-sm transition-colors cursor-pointer">
                     Batal
                 </button>
                 <button type="submit" id="save-soal-modal-btn"
@@ -783,23 +783,22 @@
 
 {{-- ─── POP UP MODAL EDIT DOKUMEN ─── --}}
 <div id="editModal" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm p-4 items-center justify-center" style="z-index: 100;">
-    <div class="rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] border"
-         style="background:#0F1713;border-color:#1A2820;">
+    <div class="rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] border bg-white dark:bg-[#0F1713] border-gray-200 dark:border-[#1A2820]">
 
         {{-- Modal Header --}}
-        <div class="flex items-center justify-between px-6 py-4 border-b flex-shrink-0" style="border-color:#1A2820;background:#090E0B;">
+        <div class="flex items-center justify-between px-6 py-4 border-b flex-shrink-0 bg-gray-50/90 dark:bg-[#090E0B] border-gray-200 dark:border-[#1A2820]">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl flex items-center justify-center text-emerald-400" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/25">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         Edit Dokumen Soal
                     </h3>
-                    <p class="text-xs text-gray-400 mt-0.5">Perbarui informasi, berkas lampiran, dan form pengumpulan tugas</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Perbarui informasi, berkas lampiran, dan form pengumpulan tugas</p>
                 </div>
             </div>
-            <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-white p-1.5 rounded-lg transition-colors cursor-pointer" title="Tutup Modal">
+            <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-1.5 rounded-lg transition-colors cursor-pointer" title="Tutup Modal">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -813,31 +812,31 @@
 
             {{-- 1. INFORMASI UTAMA --}}
             <div>
-                <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <h4 class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Informasi Dokumen
                 </h4>
 
                 <div class="space-y-4">
                     <div>
-                        <label for="edit_modal_title" class="block text-xs font-medium text-gray-300 mb-1.5">Judul Dokumen <span class="text-red-400">*</span></label>
+                        <label for="edit_modal_title" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Judul Dokumen <span class="text-red-500">*</span></label>
                         <input type="text" id="edit_modal_title" name="title" required
-                               class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500">
+                               class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="edit_modal_kode_unik" class="block text-xs font-medium text-gray-300 mb-1.5">Kode Unik Akses <span class="text-red-400">*</span></label>
+                            <label for="edit_modal_kode_unik" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Kode Unik Akses <span class="text-red-500">*</span></label>
                             <div class="relative">
                                 <input type="text" id="edit_modal_kode_unik" name="kode_unik" required
                                        autocomplete="off"
-                                       class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 pr-10 text-xs focus:outline-none focus:border-emerald-500 transition-colors">
+                                       class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-4 py-2.5 pr-10 text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-colors">
                                 <div id="edit_modal_kode_unik_indicator" class="absolute right-3 top-1/2 -translate-y-1/2 hidden flex items-center pointer-events-none"></div>
                             </div>
-                            <div id="edit_modal_kode_unik_feedback" class="mt-1 text-[11px] text-gray-500">Boleh diubah, asal unik.</div>
+                            <div id="edit_modal_kode_unik_feedback" class="mt-1 text-[11px] text-gray-500 dark:text-gray-400">Boleh diubah, asal unik.</div>
                         </div>
 
                         <div>
-                            <label for="edit_modal_category_id" class="block text-xs font-medium text-gray-300 mb-1.5">Kategori</label>
+                            <label for="edit_modal_category_id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Kategori</label>
                             <select id="edit_modal_category_id" name="category_id"
                                     class="cyber-select w-full pl-3.5 pr-10 py-2.5 text-xs cursor-pointer">
                                 <option value="">— Tanpa Kategori —</option>
@@ -850,81 +849,81 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="edit_modal_password" class="block text-xs font-medium text-gray-300 mb-1.5">
-                                Password Baru <span class="text-gray-500 text-[11px]">(kosongkan jika tidak diubah)</span>
+                            <label for="edit_modal_password" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                Password Baru <span class="text-gray-500 dark:text-gray-400 text-[11px]">(kosongkan jika tidak diubah)</span>
                             </label>
                             <div class="relative">
                                 <input type="password" id="edit_modal_password" name="password" minlength="4"
                                        placeholder="Biarkan kosong jika tetap menggunakan password lama"
-                                       class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 pr-10 text-xs placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+                                       class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-4 py-2.5 pr-10 text-xs placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20">
                                 <button type="button" onclick="const p = document.getElementById('edit_modal_password'); p.type = p.type === 'password' ? 'text' : 'password'"
-                                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 p-1">
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 </button>
                             </div>
                         </div>
 
                         <div>
-                            <label for="edit_modal_description" class="block text-xs font-medium text-gray-300 mb-1.5">Deskripsi Singkat</label>
+                            <label for="edit_modal_description" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Deskripsi Singkat</label>
                             <input type="text" id="edit_modal_description" name="description"
                                    placeholder="Keterangan singkat materi..."
-                                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500">
+                                   class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-4 py-2.5 text-xs placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20">
                         </div>
                     </div>
                 </div>
             </div>
 
             {{-- 2. SOAL / MATERI BERUPA TEKS LANGSUNG --}}
-            <div class="pt-5 border-t border-[#1A2820]">
-                <h4 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1.5 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> Soal / Materi Berupa Teks Langsung <span class="text-[11px] text-gray-500 font-normal lowercase">(opsional)</span>
+            <div class="pt-5 border-t border-gray-200 dark:border-[#1A2820]">
+                <h4 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1.5 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> Soal / Materi Berupa Teks Langsung <span class="text-[11px] text-gray-500 dark:text-gray-400 font-normal lowercase">(opsional)</span>
                 </h4>
-                <p class="text-[11px] text-gray-400 mb-2.5">Teks soal akan langsung ditampilkan rapi di layar mahasiswa tanpa harus mengunduh file.</p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-2.5">Teks soal akan langsung ditampilkan rapi di layar mahasiswa tanpa harus mengunduh file.</p>
                 <textarea id="edit_modal_content_text" name="content_text" rows="4"
                           placeholder="Ketik isi soal atau instruksi langsung di sini..."
-                          class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500 font-mono"></textarea>
+                          class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 font-mono"></textarea>
             </div>
 
             {{-- 3. LAMPIRAN SAAT INI --}}
-            <div id="edit-modal-existing-attachments-section" class="pt-5 border-t border-[#1A2820] space-y-3 hidden">
+            <div id="edit-modal-existing-attachments-section" class="pt-5 border-t border-gray-200 dark:border-[#1A2820] space-y-3 hidden">
                 <div class="flex justify-between items-center">
-                    <h4 class="text-xs font-bold text-yellow-400 uppercase tracking-wider flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-yellow-500"></span> Lampiran Dokumen Saat Ini
+                    <h4 class="text-xs font-bold text-amber-600 dark:text-yellow-400 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 dark:bg-yellow-500"></span> Lampiran Dokumen Saat Ini
                     </h4>
-                    <span id="edit-modal-existing-attachments-count" class="text-[11px] text-gray-500">0 Lampiran Tersimpan</span>
+                    <span id="edit-modal-existing-attachments-count" class="text-[11px] text-gray-500 dark:text-gray-400 font-medium">0 Lampiran Tersimpan</span>
                 </div>
 
-                <div id="edit-modal-existing-attachments-list" class="bg-[#090E0B]/50 rounded-xl p-3 space-y-2 border border-[#1A2820]"></div>
+                <div id="edit-modal-existing-attachments-list" class="bg-gray-50/90 dark:bg-[#090E0B]/50 rounded-xl p-3 space-y-2 border border-gray-200 dark:border-[#1A2820]"></div>
             </div>
 
             {{-- 4. TAMBAH FILE BARU --}}
-            <div class="pt-5 border-t border-[#1A2820]">
+            <div class="pt-5 border-t border-gray-200 dark:border-[#1A2820]">
                 <div class="flex justify-between items-center mb-2">
-                    <h4 class="text-xs font-bold text-green-400 uppercase tracking-wider flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-green-500"></span> Tambahkan File Baru <span class="text-[11px] text-gray-500 font-normal lowercase">(Maks. total 15 file)</span>
+                    <h4 class="text-xs font-bold text-emerald-600 dark:text-green-400 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 dark:bg-green-500"></span> Tambahkan File Baru <span class="text-[11px] text-gray-500 dark:text-gray-400 font-normal lowercase">(Maks. total 15 file)</span>
                     </h4>
                 </div>
-                <div class="border-2 border-dashed border-gray-700 hover:border-emerald-500 rounded-xl p-5 text-center cursor-pointer transition-colors bg-[#090E0B]/40"
+                <div class="border-2 border-dashed border-gray-300 hover:border-emerald-500 dark:border-gray-700 dark:hover:border-emerald-500 rounded-xl p-5 text-center cursor-pointer transition-colors bg-gray-50/70 hover:bg-emerald-50/40 dark:bg-[#090E0B]/40 group"
                      onclick="document.getElementById('edit_modal_files').click()">
-                    <p class="text-xs text-gray-400">Klik untuk memilih file tambahan (Maks. 5MB per file)</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">Klik untuk memilih file tambahan (Maks. 5MB per file)</p>
                 </div>
                 <input type="file" id="edit_modal_files" name="files[]" multiple class="hidden"
                        onchange="handleEditModalNewFiles(this)"
                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.zip,.pkt">
 
                 <div id="edit-modal-new-files-container" class="mt-3 space-y-2 hidden">
-                    <p class="text-[11px] text-gray-400 font-semibold mb-1">File Baru yang Akan Diunggah & Hak Unduh:</p>
+                    <p class="text-[11px] text-gray-700 dark:text-gray-400 font-semibold mb-1">File Baru yang Akan Diunggah & Hak Unduh:</p>
                     <div id="edit-modal-new-files-list" class="space-y-2"></div>
                 </div>
             </div>
 
             {{-- 5. TAMBAH TAUTAN LINK BARU --}}
-            <div class="pt-5 border-t border-[#1A2820]">
+            <div class="pt-5 border-t border-gray-200 dark:border-[#1A2820]">
                 <div class="flex justify-between items-center mb-2">
-                    <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                    <h4 class="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-purple-500"></span> Tambah Tautan / Link Materi Baru
                     </h4>
-                    <button type="button" onclick="addEditModalLinkRow()" class="text-xs bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 px-2.5 py-1.5 rounded-lg border border-purple-500/30 transition-colors flex items-center gap-1 cursor-pointer">
+                    <button type="button" onclick="addEditModalLinkRow()" class="text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-600/20 dark:hover:bg-purple-600/30 dark:text-purple-300 px-2.5 py-1.5 rounded-lg border border-purple-200 dark:border-purple-500/30 transition-colors flex items-center gap-1 cursor-pointer font-medium shadow-xs">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Tambah Link
                     </button>
                 </div>
@@ -932,148 +931,148 @@
             </div>
 
             {{-- 6. STATUS & MASA AKTIF --}}
-            <div class="pt-5 border-t border-[#1A2820] space-y-4">
-                <div class="flex items-center justify-between p-3.5 bg-[#090E0B]/50 rounded-xl border border-[#1A2820]">
+            <div class="pt-5 border-t border-gray-200 dark:border-[#1A2820] space-y-4">
+                <div class="flex items-center justify-between p-3.5 bg-gray-50/90 dark:bg-[#090E0B]/50 rounded-xl border border-gray-200 dark:border-[#1A2820]">
                     <div>
-                        <p class="text-xs font-medium text-gray-200">Status Dokumen</p>
-                        <p class="text-[11px] text-gray-500 mt-0.5">Aktifkan atau nonaktifkan akses dokumen bagi mahasiswa</p>
+                        <p class="text-xs font-semibold text-gray-900 dark:text-gray-200">Status Dokumen</p>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Aktifkan atau nonaktifkan akses dokumen bagi mahasiswa</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="hidden" name="is_active" value="0">
                         <input type="checkbox" id="edit_modal_is_active" name="is_active" value="1" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-700 peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        <div class="w-11 h-6 bg-gray-300 dark:bg-gray-700 peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
                     </label>
                 </div>
 
-                <div class="flex items-center justify-between p-3.5 bg-[#090E0B]/50 rounded-xl border border-[#1A2820]">
+                <div class="flex items-center justify-between p-3.5 bg-gray-50/90 dark:bg-[#090E0B]/50 rounded-xl border border-gray-200 dark:border-[#1A2820]">
                     <div>
-                        <p class="text-xs font-medium text-gray-200">Master Hak Unduh Dokumen</p>
-                        <p class="text-[11px] text-gray-500 mt-0.5">Pengaturan global izin unduh (jika aktif, default file baru diizinkan unduh)</p>
+                        <p class="text-xs font-semibold text-gray-900 dark:text-gray-200">Master Hak Unduh Dokumen</p>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Pengaturan global izin unduh (jika aktif, default file baru diizinkan unduh)</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="hidden" name="is_downloadable" value="0">
                         <input type="checkbox" id="edit_modal_is_downloadable" name="is_downloadable" value="1" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-700 peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        <div class="w-11 h-6 bg-gray-300 dark:bg-gray-700 peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
                     </label>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-gray-300 mb-2">Masa Aktif Dokumen</label>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Masa Aktif Dokumen</label>
                     <div class="flex gap-4 mb-3">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="access_type" id="edit_access_type_lifetime" value="lifetime"
-                                   class="text-emerald-500 bg-gray-800 border-gray-600 cursor-pointer"
+                                   class="accent-emerald-500 text-emerald-600 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 cursor-pointer"
                                    onchange="document.getElementById('edit-modal-schedule-fields').classList.add('hidden')">
-                            <span class="text-xs text-gray-300">Selamanya</span>
+                            <span class="text-xs text-gray-700 dark:text-gray-300">Selamanya</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="access_type" id="edit_access_type_scheduled" value="scheduled"
-                                   class="text-emerald-500 bg-gray-800 border-gray-600 cursor-pointer"
+                                   class="accent-emerald-500 text-emerald-600 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 cursor-pointer"
                                    onchange="document.getElementById('edit-modal-schedule-fields').classList.remove('hidden')">
-                            <span class="text-xs text-gray-300">Waktu Tertentu</span>
+                            <span class="text-xs text-gray-700 dark:text-gray-300">Waktu Tertentu</span>
                         </label>
                     </div>
-                    <div id="edit-modal-schedule-fields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-3 bg-[#090E0B]/40 p-3.5 rounded-xl border border-[#1A2820]">
+                    <div id="edit-modal-schedule-fields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-3 bg-gray-50/90 dark:bg-[#090E0B]/40 p-3.5 rounded-xl border border-gray-200 dark:border-[#1A2820]">
                         <div>
-                            <label class="block text-[11px] text-gray-400 mb-1">Mulai Aktif</label>
+                            <label class="block text-[11px] text-gray-700 dark:text-gray-400 mb-1">Mulai Aktif</label>
                             <input type="datetime-local" id="edit_modal_active_from" name="active_from"
-                                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                   class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-[11px] text-gray-400 mb-1">Berakhir</label>
+                            <label class="block text-[11px] text-gray-700 dark:text-gray-400 mb-1">Berakhir</label>
                             <input type="datetime-local" id="edit_modal_active_until" name="active_until"
-                                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                   class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
                         </div>
                     </div>
                 </div>
             </div>
 
             {{-- 7. PENGUMPULAN TUGAS --}}
-            <div class="pt-5 border-t border-[#1A2820]">
-                <label class="block text-xs font-medium text-gray-300 mb-2">Fitur Pengumpulan Tugas bagi Mahasiswa</label>
+            <div class="pt-5 border-t border-gray-200 dark:border-[#1A2820]">
+                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Fitur Pengumpulan Tugas bagi Mahasiswa</label>
                 <label class="flex items-center gap-2 cursor-pointer mb-3">
                     <input type="checkbox" name="is_submission_enabled" id="edit_modal_is_submission_enabled" value="1" 
-                           class="accent-emerald-500 bg-gray-800 border-gray-600 w-4 h-4 rounded cursor-pointer" 
+                           class="accent-emerald-500 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 w-4 h-4 rounded cursor-pointer" 
                            onchange="toggleEditModalSubmissionFields(this.checked)">
-                    <span class="text-xs text-gray-300">Aktifkan Form Pengumpulan Tugas bagi Mahasiswa</span>
+                    <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">Aktifkan Form Pengumpulan Tugas bagi Mahasiswa</span>
                 </label>
 
-                <div id="edit-modal-submission-fields" class="hidden space-y-4 bg-[#090E0B]/40 p-3.5 rounded-xl border border-[#1A2820]">
+                <div id="edit-modal-submission-fields" class="hidden space-y-4 bg-gray-50/90 dark:bg-[#090E0B]/40 p-3.5 rounded-xl border border-gray-200 dark:border-[#1A2820]">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-[11px] text-gray-400 mb-1">Batas Waktu Pengumpulan (Deadline) <span class="text-red-400">*</span></label>
+                            <label class="block text-[11px] text-gray-700 dark:text-gray-400 mb-1">Batas Waktu Pengumpulan (Deadline) <span class="text-red-500">*</span></label>
                             <input type="datetime-local" id="edit_modal_deadline_at" name="deadline_at" 
-                                    class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                    class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-[11px] text-gray-400 mb-1">Instruksi Tambahan (Opsional)</label>
-                            <textarea id="edit_modal_submission_instructions" name="submission_instructions" rows="2" class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-emerald-500 resize-none" placeholder="Contoh: Format laporan dalam PDF, ukuran max 5MB."></textarea>
+                            <label class="block text-[11px] text-gray-700 dark:text-gray-400 mb-1">Instruksi Tambahan (Opsional)</label>
+                            <textarea id="edit_modal_submission_instructions" name="submission_instructions" rows="2" class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-emerald-500 resize-none" placeholder="Contoh: Format laporan dalam PDF, ukuran max 5MB."></textarea>
                         </div>
                     </div>
 
                     {{-- Daftar Pilihan Kelas (Opsional) --}}
                     <div>
-                        <label class="block text-xs text-gray-300 font-semibold mb-1">Daftar Pilihan Kelas (Opsional)</label>
+                        <label class="block text-xs text-gray-700 dark:text-gray-300 font-semibold mb-1">Daftar Pilihan Kelas (Opsional)</label>
                         <input type="text" id="edit_modal_classes" name="classes"
                                placeholder="Contoh: A1, A2, B1, B2 (Pisahkan dengan tanda koma)"
-                               class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
-                        <p class="text-[11px] text-gray-500 mt-1">Jika diisi, mahasiswa wajib memilih salah satu kelas saat mengumpulkan tugas.</p>
+                               class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Jika diisi, mahasiswa wajib memilih salah satu kelas saat mengumpulkan tugas.</p>
                     </div>
 
                     {{-- Pilihan Tipe Pengumpulan --}}
                     <div>
-                        <label class="block text-xs text-gray-300 font-semibold mb-2">Metode Pengumpulan yang Diizinkan Mahasiswa <span class="text-red-400">*</span></label>
+                        <label class="block text-xs text-gray-700 dark:text-gray-300 font-semibold mb-2">Metode Pengumpulan yang Diizinkan Mahasiswa <span class="text-red-500">*</span></label>
                         <div class="flex flex-wrap gap-3">
-                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                            <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500/30 transition-colors">
                                 <input type="checkbox" id="edit_sub_type_file" name="submission_types[]" value="file" class="accent-emerald-500 w-3.5 h-3.5 rounded">
-                                <span class="text-xs text-gray-200">📁 File Dokumen</span>
+                                <span class="text-xs text-gray-800 dark:text-gray-200 font-medium">📁 File Dokumen</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                            <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500/30 transition-colors">
                                 <input type="checkbox" id="edit_sub_type_link" name="submission_types[]" value="link" class="accent-emerald-500 w-3.5 h-3.5 rounded">
-                                <span class="text-xs text-gray-200">🔗 Tautan / Link URL</span>
+                                <span class="text-xs text-gray-800 dark:text-gray-200 font-medium">🔗 Tautan / Link URL</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
+                            <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500/30 transition-colors">
                                 <input type="checkbox" id="edit_sub_type_text" name="submission_types[]" value="text" class="accent-emerald-500 w-3.5 h-3.5 rounded">
-                                <span class="text-xs text-gray-200">📝 Teks Langsung</span>
+                                <span class="text-xs text-gray-800 dark:text-gray-200 font-medium">📝 Teks Langsung</span>
                             </label>
                         </div>
                     </div>
 
                     {{-- Format File yang Diizinkan --}}
                     <div>
-                        <label class="block text-xs text-gray-300 font-semibold mb-1">Format File yang Diizinkan (Jika Mengunggah File) <span class="text-red-400">*</span></label>
+                        <label class="block text-xs text-gray-700 dark:text-gray-300 font-semibold mb-1">Format File yang Diizinkan (Jika Mengunggah File) <span class="text-red-500">*</span></label>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            <label class="flex items-center gap-2 cursor-pointer bg-emerald-500/10 border border-emerald-500/30 p-2 rounded-lg">
+                            <label class="flex items-center gap-2 cursor-pointer bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/30 p-2 rounded-lg">
                                 <input type="checkbox" id="edit_ext_all" name="allowed_extensions[]" value="all" class="accent-emerald-500 w-3.5 h-3.5 rounded">
-                                <span class="text-xs text-emerald-300 font-bold">Semua Format (Aman)</span>
+                                <span class="text-xs text-emerald-800 dark:text-emerald-300 font-bold">Semua Format (Aman)</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                            <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500/30 transition-colors">
                                 <input type="checkbox" id="edit_ext_pdf" name="allowed_extensions[]" value="pdf" class="accent-emerald-500 w-3.5 h-3.5 rounded">
-                                <span class="text-xs text-gray-300">PDF (.pdf)</span>
+                                <span class="text-xs text-gray-700 dark:text-gray-300">PDF (.pdf)</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                            <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500/30 transition-colors">
                                 <input type="checkbox" id="edit_ext_word" name="allowed_extensions[]" value="word" class="accent-emerald-500 w-3.5 h-3.5 rounded">
-                                <span class="text-xs text-gray-300">Word (.doc, .docx)</span>
+                                <span class="text-xs text-gray-700 dark:text-gray-300">Word (.doc, .docx)</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                            <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500/30 transition-colors">
                                 <input type="checkbox" id="edit_ext_excel" name="allowed_extensions[]" value="excel" class="accent-emerald-500 w-3.5 h-3.5 rounded">
-                                <span class="text-xs text-gray-300">Excel (.xls, .xlsx)</span>
+                                <span class="text-xs text-gray-700 dark:text-gray-300">Excel (.xls, .xlsx)</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                            <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500/30 transition-colors">
                                 <input type="checkbox" id="edit_ext_ppt" name="allowed_extensions[]" value="ppt" class="accent-emerald-500 w-3.5 h-3.5 rounded">
-                                <span class="text-xs text-gray-300">PowerPoint (.ppt)</span>
+                                <span class="text-xs text-gray-700 dark:text-gray-300">PowerPoint (.ppt)</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                            <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500/30 transition-colors">
                                 <input type="checkbox" id="edit_ext_image" name="allowed_extensions[]" value="image" class="accent-emerald-500 w-3.5 h-3.5 rounded">
-                                <span class="text-xs text-gray-300">Gambar (.jpg, .png)</span>
+                                <span class="text-xs text-gray-700 dark:text-gray-300">Gambar (.jpg, .png)</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                            <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500/30 transition-colors">
                                 <input type="checkbox" id="edit_ext_archive" name="allowed_extensions[]" value="archive" class="accent-emerald-500 w-3.5 h-3.5 rounded">
-                                <span class="text-xs text-gray-300">Arsip (.zip, .rar)</span>
+                                <span class="text-xs text-gray-700 dark:text-gray-300">Arsip (.zip, .rar)</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer bg-gray-800 p-2 rounded-lg border border-gray-700">
+                            <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-800 p-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500/30 transition-colors">
                                 <input type="checkbox" id="edit_ext_pkt" name="allowed_extensions[]" value="pkt" class="accent-emerald-500 w-3.5 h-3.5 rounded">
-                                <span class="text-xs text-gray-300">Packet Tracer (.pkt)</span>
+                                <span class="text-xs text-gray-700 dark:text-gray-300">Packet Tracer (.pkt)</span>
                             </label>
                         </div>
                     </div>
@@ -1083,8 +1082,8 @@
         </form>
 
         {{-- Modal Footer --}}
-        <div class="flex items-center justify-end gap-3 px-6 py-4 border-t flex-shrink-0" style="border-color:#1A2820;background:#090E0B;">
-            <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-200 px-4 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors">
+        <div class="flex items-center justify-end gap-3 px-6 py-4 border-t flex-shrink-0 bg-gray-50/90 dark:bg-[#090E0B] border-gray-200 dark:border-[#1A2820]">
+            <button type="button" onclick="closeEditModal()" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 px-4 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors">
                 Batal
             </button>
             <button type="submit" form="modal-edit-soal-form"
@@ -1339,40 +1338,44 @@ function renderEditModalAttachments(attachments) {
     attachments.forEach(att => {
         const item = document.createElement('div');
         item.id = `edit-modal-attachment-${att.id}`;
-        item.className = 'flex flex-wrap items-center justify-between gap-2.5 bg-gray-800/80 p-2.5 rounded-xl border border-gray-700';
+        item.className = 'flex flex-wrap items-center justify-between gap-2.5 bg-white dark:bg-gray-800/80 p-2.5 rounded-xl border border-gray-200/90 dark:border-gray-700 shadow-xs hover:border-emerald-400 dark:hover:border-emerald-500/40 transition-colors';
 
         const iconHtml = att.is_link
             ? `<svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>`
-            : `<span class="text-[10px] font-bold text-emerald-400 uppercase font-mono">${att.file_type || 'FILE'}</span>`;
+            : `<span class="text-[10px] font-bold uppercase font-mono">${att.file_type || 'FILE'}</span>`;
+
+        const iconContainerClass = att.is_link
+            ? 'w-8 h-8 rounded-lg bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400 border border-purple-200/60 dark:border-purple-500/30 flex items-center justify-center flex-shrink-0'
+            : 'w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/30 flex items-center justify-center flex-shrink-0';
 
         const subInfoHtml = att.is_link
-            ? `<a href="${att.link_url}" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:underline truncate max-w-xs">${att.link_url}</a>`
+            ? `<a href="${att.link_url}" target="_blank" rel="noopener noreferrer" class="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:underline truncate max-w-xs">${att.link_url}</a>`
             : `<span>${att.file_size_formatted || ''}</span>`;
 
         const dlHtml = att.is_file ? `
-            <label class="flex items-center gap-1.5 cursor-pointer bg-gray-900/70 px-2.5 py-1 rounded-lg border border-gray-700 text-[11px]">
+            <label class="flex items-center gap-1.5 cursor-pointer bg-gray-100 hover:bg-gray-200/60 dark:bg-gray-900/70 px-2.5 py-1 rounded-lg border border-gray-300 dark:border-gray-700 text-[11px] transition-colors">
                 <input type="hidden" name="attachment_downloadable[${att.id}]" value="0">
                 <input type="checkbox" name="attachment_downloadable[${att.id}]" value="1" ${att.is_downloadable ? 'checked' : ''}
                        class="accent-emerald-500 w-3.5 h-3.5 rounded cursor-pointer">
-                <span class="text-gray-300">Boleh Diunduh</span>
+                <span class="text-gray-700 dark:text-gray-300 font-medium">Boleh Diunduh</span>
             </label>
         ` : '';
 
         item.innerHTML = `
             <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                <div class="w-8 h-8 rounded-lg bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <div class="${iconContainerClass}">
                     ${iconHtml}
                 </div>
                 <div class="min-w-0">
-                    <p class="text-xs text-gray-200 font-medium truncate">${att.file_original_name || att.file_name}</p>
-                    <div class="flex items-center gap-2 text-[11px] text-gray-500 font-mono">
+                    <p class="text-xs text-gray-900 dark:text-gray-200 font-medium truncate">${att.file_original_name || att.file_name}</p>
+                    <div class="flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400 font-mono">
                         ${subInfoHtml}
                     </div>
                 </div>
             </div>
             <div class="flex items-center gap-2.5">
                 ${dlHtml}
-                <button type="button" onclick="removeEditModalExistingFile(${att.id})" class="p-1.5 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors cursor-pointer" title="Hapus Lampiran Ini">
+                <button type="button" onclick="removeEditModalExistingFile(${att.id})" class="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/20 rounded-lg transition-colors cursor-pointer" title="Hapus Lampiran Ini">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
             </div>
@@ -1382,6 +1385,7 @@ function renderEditModalAttachments(attachments) {
 }
 
 function removeEditModalExistingFile(id) {
+    const isDark = document.documentElement.classList.contains('dark');
     if (window.Swal) {
         Swal.fire({
             title: 'Konfirmasi',
@@ -1389,13 +1393,13 @@ function removeEditModalExistingFile(id) {
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#374151',
+            cancelButtonColor: isDark ? '#374151' : '#9ca3af',
             confirmButtonText: 'Ya, Hapus',
             cancelButtonText: 'Batal',
-            background: '#0F1713',
-            color: '#f3f4f6',
+            background: isDark ? '#0F1713' : '#FFFFFF',
+            color: isDark ? '#f3f4f6' : '#111827',
             customClass: {
-                popup: 'border border-[#1A2820] rounded-2xl',
+                popup: 'border border-gray-200 dark:border-[#1A2820] rounded-2xl shadow-xl',
                 confirmButton: 'rounded-xl px-4 py-2 text-sm font-medium',
                 cancelButton: 'rounded-xl px-4 py-2 text-sm font-medium'
             }
@@ -1440,14 +1444,14 @@ function handleEditModalNewFiles(input) {
     }
 
     if (editModalExistingCount + input.files.length > 15) {
+        const isDark = document.documentElement.classList.contains('dark');
         if (window.Swal) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Batas Maksimum Berkas',
                 text: 'Total file (tersisa + baru) tidak boleh lebih dari 15 file.',
-                background: '#0F1713',
-                color: '#F3F4F6',
-                backdrop: 'rgba(9, 13, 11, 0.75)',
+                background: isDark ? '#0F1713' : '#FFFFFF',
+                color: isDark ? '#F3F4F6' : '#111827',
                 confirmButtonText: 'Mengerti'
             });
         } else {
@@ -1463,14 +1467,14 @@ function handleEditModalNewFiles(input) {
         if (f.size > 5 * 1024 * 1024) hasLarge = true;
     });
     if (hasLarge) {
+        const isDark = document.documentElement.classList.contains('dark');
         if (window.Swal) {
             Swal.fire({
                 icon: 'error',
                 title: 'Ukuran Berkas Terlalu Besar',
                 text: 'Satu atau lebih berkas melebihi batas maksimal 5 MB per file!',
-                background: '#0F1713',
-                color: '#F3F4F6',
-                backdrop: 'rgba(9, 13, 11, 0.75)',
+                background: isDark ? '#0F1713' : '#FFFFFF',
+                color: isDark ? '#F3F4F6' : '#111827',
                 confirmButtonText: 'Perbaiki'
             });
         } else {
@@ -1489,18 +1493,18 @@ function handleEditModalNewFiles(input) {
         const sizeStr = kb < 1024 ? `${kb.toFixed(1)} KB` : `${(kb/1024).toFixed(2)} MB`;
 
         const row = document.createElement('div');
-        row.className = 'flex items-center justify-between bg-gray-800/80 p-2.5 rounded-lg border border-gray-700 text-xs';
+        row.className = 'flex items-center justify-between bg-white dark:bg-gray-800/80 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs shadow-xs';
         row.innerHTML = `
             <div class="flex items-center gap-2 min-w-0">
-                <span class="text-emerald-400 font-bold">+ Baru</span>
-                <span class="text-gray-200 truncate max-w-xs">${file.name}</span>
-                <span class="text-gray-500">(${sizeStr})</span>
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold">+ Baru</span>
+                <span class="text-gray-900 dark:text-gray-200 truncate max-w-xs font-medium">${file.name}</span>
+                <span class="text-gray-500 dark:text-gray-400 font-mono">(${sizeStr})</span>
             </div>
-            <label class="flex items-center gap-1.5 cursor-pointer ml-3 flex-shrink-0">
+            <label class="flex items-center gap-1.5 cursor-pointer ml-3 flex-shrink-0 bg-gray-100 hover:bg-gray-200/60 dark:bg-gray-900/70 px-2.5 py-1 rounded-lg border border-gray-300 dark:border-gray-700 text-[11px] transition-colors">
                 <input type="hidden" name="file_downloadable[${index}]" value="0">
                 <input type="checkbox" name="file_downloadable[${index}]" value="1" ${isMasterDl ? 'checked' : ''}
                        class="accent-emerald-500 w-3.5 h-3.5 rounded cursor-pointer">
-                <span class="text-[11px] text-gray-300">Boleh Diunduh</span>
+                <span class="text-gray-700 dark:text-gray-300 font-medium">Boleh Diunduh</span>
             </label>
         `;
         list.appendChild(row);
@@ -1510,18 +1514,18 @@ function handleEditModalNewFiles(input) {
 function addEditModalLinkRow() {
     const container = document.getElementById('edit-modal-links-container');
     const div = document.createElement('div');
-    div.className = 'grid grid-cols-1 md:grid-cols-12 gap-2 link-row bg-[#090E0B]/50 p-2.5 rounded-xl border border-[#1A2820]';
+    div.className = 'grid grid-cols-1 md:grid-cols-12 gap-2 link-row bg-gray-50 dark:bg-[#090E0B]/50 p-2.5 rounded-xl border border-gray-200 dark:border-[#1A2820]';
     div.innerHTML = `
         <div class="md:col-span-4">
             <input type="text" name="links[${editModalLinkCount}][title]" placeholder="Label Link (misal: Bahan Modul)"
-                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                   class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
         </div>
         <div class="md:col-span-7">
             <input type="url" name="links[${editModalLinkCount}][url]" placeholder="https://..."
-                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                   class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
         </div>
         <div class="md:col-span-1 flex items-center justify-center">
-            <button type="button" onclick="this.closest('.link-row').remove()" class="text-red-400 hover:text-red-300 p-1.5 cursor-pointer" title="Hapus Link">
+            <button type="button" onclick="this.closest('.link-row').remove()" class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1.5 cursor-pointer" title="Hapus Link">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
         </div>
@@ -1546,18 +1550,18 @@ function addModalLinkRow() {
     }
     const container = document.getElementById('modal-links-container');
     const div = document.createElement('div');
-    div.className = 'grid grid-cols-1 md:grid-cols-12 gap-2 link-row bg-gray-800/40 p-3 rounded-xl border border-[#1A2820]';
+    div.className = 'grid grid-cols-1 md:grid-cols-12 gap-2 link-row bg-gray-50/90 dark:bg-gray-800/40 p-3 rounded-xl border border-gray-200 dark:border-[#1A2820]';
     div.innerHTML = `
         <div class="md:col-span-4">
             <input type="text" name="links[${modalLinkCount}][title]" placeholder="Label Link (misal: Bahan Modul)"
-                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                   class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
         </div>
         <div class="md:col-span-7">
             <input type="url" name="links[${modalLinkCount}][url]" placeholder="https://..."
-                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                   class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
         </div>
         <div class="md:col-span-1 flex items-center justify-center">
-            <button type="button" onclick="this.closest('.link-row').remove()" class="text-red-400 hover:text-red-300 p-1.5 cursor-pointer" title="Hapus Link">
+            <button type="button" onclick="this.closest('.link-row').remove()" class="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 p-1.5 cursor-pointer" title="Hapus Link">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
         </div>
@@ -1582,14 +1586,18 @@ function handleModalFilesSelected(input) {
         return;
     }
 
+    const isDark = document.documentElement.classList.contains('dark');
+    const swalBg = isDark ? '#0F1713' : '#ffffff';
+    const swalColor = isDark ? '#F3F4F6' : '#111827';
+
     if (input.files.length > 15) {
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 icon: 'warning',
                 title: 'Batas Berkas Terlampaui',
                 text: 'Maksimal hanya 15 file yang dapat diunggah sekaligus.',
-                background: '#0F1713',
-                color: '#F3F4F6',
+                background: swalBg,
+                color: swalColor,
                 customClass: { popup: 'cyber-swal-popup cyber-swal-error' }
             });
         } else {
@@ -1614,8 +1622,8 @@ function handleModalFilesSelected(input) {
                 icon: 'error',
                 title: 'Ukuran File Terlalu Besar',
                 text: 'Maksimal ukuran tiap berkas adalah 5 MB. File melebihi batas: ' + largeFiles.join(', '),
-                background: '#0F1713',
-                color: '#F3F4F6',
+                background: swalBg,
+                color: swalColor,
                 customClass: { popup: 'cyber-swal-popup cyber-swal-error' }
             });
         } else {
@@ -1634,18 +1642,18 @@ function handleModalFilesSelected(input) {
         const sizeStr = kb < 1024 ? `${kb.toFixed(1)} KB` : `${(kb/1024).toFixed(2)} MB`;
 
         const row = document.createElement('div');
-        row.className = 'flex items-center justify-between bg-gray-800 p-2.5 rounded-lg border border-gray-700 text-xs';
+        row.className = 'flex items-center justify-between bg-white dark:bg-gray-800/80 p-2.5 rounded-xl border border-gray-200/90 dark:border-gray-700 text-xs shadow-xs';
         row.innerHTML = `
             <div class="flex items-center gap-2 min-w-0">
-                <span class="text-emerald-400 font-bold">#${index + 1}</span>
-                <span class="text-gray-200 truncate max-w-xs">${file.name}</span>
-                <span class="text-gray-500">(${sizeStr})</span>
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold">#${index + 1}</span>
+                <span class="text-gray-900 dark:text-gray-200 font-medium truncate max-w-xs">${file.name}</span>
+                <span class="text-gray-500 dark:text-gray-400">(${sizeStr})</span>
             </div>
             <label class="flex items-center gap-1.5 cursor-pointer ml-3 flex-shrink-0">
                 <input type="hidden" name="file_downloadable[${index}]" value="0">
                 <input type="checkbox" name="file_downloadable[${index}]" value="1" ${masterChecked ? 'checked' : ''}
                        class="modal-file-dl-checkbox accent-emerald-500 w-3.5 h-3.5 rounded">
-                <span class="text-[11px] text-gray-300">Boleh Diunduh</span>
+                <span class="text-[11px] font-medium text-gray-700 dark:text-gray-300">Boleh Diunduh</span>
             </label>
         `;
         list.appendChild(row);
