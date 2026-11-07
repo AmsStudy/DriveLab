@@ -389,39 +389,6 @@
             zoomLabel.textContent = Math.round(currentZoom * 100) + '%';
         }
 
-        // ─── Dynamic Canvas Watermark ───
-        function drawWatermark(canvas) {
-            const ctx = canvas.getContext('2d');
-            ctx.save();
-
-            const angle = -28 * Math.PI / 180;
-            const stepY = 240;
-            const stepX = 360;
-
-            for (let y = 80; y < canvas.height + 250; y += stepY) {
-                for (let x = -80; x < canvas.width + 250; x += stepX) {
-                    ctx.save();
-                    ctx.translate(x, y);
-                    ctx.rotate(angle);
-
-                    // Baris 1: Kode Unik & Brand
-                    ctx.font = 'bold ' + Math.max(13, Math.floor(canvas.width / 42)) + 'px Inter, sans-serif';
-                    ctx.fillStyle = 'rgba(16, 185, 129, 0.16)';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('IC-LABS · {{ $soal->kode_unik }}', 0, 0);
-
-                    // Baris 2: Status & Tanggal
-                    ctx.font = '500 ' + Math.max(10, Math.floor(canvas.width / 58)) + 'px Inter, sans-serif';
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.11)';
-                    ctx.fillText('DOKUMEN RAHASIA · {{ now()->format("d/m/Y") }}', 0, 16);
-
-                    ctx.restore();
-                }
-            }
-
-            ctx.restore();
-        }
-
         // ─── Render Handler ───
         const isPdf = '{{ $ext }}' === 'pdf';
 
@@ -460,9 +427,7 @@
                             viewport: viewport
                         };
 
-                        page.render(renderContext).promise.then(function() {
-                            drawWatermark(canvas);
-                        });
+                        page.render(renderContext);
                     });
                 }
             }).catch(function(err) {
@@ -490,7 +455,6 @@
                     canvas.height = img.naturalHeight || img.height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0);
-                    drawWatermark(canvas);
                     viewerTarget.appendChild(canvas);
                     URL.revokeObjectURL(img.src);
                 };
@@ -518,23 +482,45 @@
         });
 
         document.addEventListener('dragstart', e => e.preventDefault());
+        document.addEventListener('copy', e => {
+            e.preventDefault();
+            triggerSecurityWarning('Menyalin konten dinonaktifkan.');
+        });
+        document.addEventListener('cut', e => {
+            e.preventDefault();
+            triggerSecurityWarning('Menyalin konten dinonaktifkan.');
+        });
+
+        // Tangkal screenshot saat jendela kehilangan fokus atau pintasan tombol screenshot (Win+Shift+S / Snipping Tool)
+        window.addEventListener('keyup', e => {
+            if (e.key === 'PrintScreen') {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText('').catch(() => {});
+                }
+                screenFlash.style.opacity = '1';
+                setTimeout(() => screenFlash.style.opacity = '0', 800);
+                triggerSecurityWarning('Tangkapan layar dinonaktifkan demi keamanan dokumen!');
+            }
+        });
 
         document.addEventListener('keydown', e => {
             // Blokir PrintScreen
             if (e.key === 'PrintScreen') {
-                if (navigator.clipboard) navigator.clipboard.writeText('');
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText('').catch(() => {});
+                }
                 screenFlash.style.opacity = '1';
                 setTimeout(() => screenFlash.style.opacity = '0', 800);
                 triggerSecurityWarning('Tangkapan layar dinonaktifkan demi keamanan dokumen!');
             }
 
-            // Blokir Pintasan Keyboard Penyimpanan & Inspeksi
+            // Blokir Pintasan Keyboard Penyimpanan, Cetak, Copy, Select All & Inspeksi
             const isCtrl = e.ctrlKey || e.metaKey;
             const key = e.key.toLowerCase();
 
-            if (isCtrl && ['s', 'p', 'u', 'a'].includes(key)) {
+            if (isCtrl && ['s', 'p', 'u', 'a', 'c', 'x'].includes(key)) {
                 e.preventDefault();
-                triggerSecurityWarning('Pintasan Ctrl+' + key.toUpperCase() + ' dinonaktifkan.');
+                triggerSecurityWarning('Pintasan keyboard dinonaktifkan.');
             }
 
             // Blokir DevTools (F12, Ctrl+Shift+I/J/C)
