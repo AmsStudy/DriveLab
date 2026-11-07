@@ -414,7 +414,7 @@
                                              x-transition:leave="transition ease-in duration-100"
                                              x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                                              x-transition:leave-end="opacity-0 -translate-y-2 scale-98"
-                                             class="absolute left-0 right-0 mt-2 z-50 p-1.5 rounded-2xl border border-gray-200 dark:border-emerald-500/35 bg-white/95 dark:bg-[#0F1713]/98 backdrop-blur-xl shadow-xl shadow-gray-200/60 dark:shadow-[0_20px_45px_-10px_rgba(0,0,0,0.9),0_0_25px_rgba(16,185,129,0.18)] max-h-60 overflow-y-auto">
+                                             class="absolute left-0 right-0 mt-2 z-50 p-1.5 rounded-2xl border border-gray-200 dark:border-emerald-500/35 bg-white/95 dark:bg-[#0F1713] backdrop-blur-xl shadow-xl shadow-gray-200/60 dark:shadow-[0_20px_45px_-10px_rgba(0,0,0,0.9),0_0_25px_rgba(16,185,129,0.18)] max-h-60 overflow-y-auto">
                                              <div class="px-3 py-1.5 text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider border-b border-gray-100 dark:border-[#1A2820] mb-1 flex items-center justify-between">
                                                  <span>Pilih Kelas Ujian</span>
                                                  <span class="text-emerald-600 dark:text-emerald-400 font-mono text-[9px]">{{ count($quiz->getClassesList()) }} Kelas</span>

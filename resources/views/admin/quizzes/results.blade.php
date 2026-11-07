@@ -54,7 +54,7 @@
                              x-transition:leave="transition ease-in duration-100"
                              x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
                              x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
-                             class="absolute right-0 mt-2 w-60 min-w-[220px] rounded-2xl shadow-xl shadow-gray-200/60 dark:shadow-[0_20px_30px_-10px_rgba(0,0,0,0.8),0_0_15px_rgba(16,185,129,0.08)] py-2 z-50 border border-gray-200/90 dark:border-emerald-500/25 bg-white/95 dark:bg-[#0F1713]/98 backdrop-blur-md">
+                             class="absolute right-0 mt-2 w-60 min-w-[220px] rounded-2xl shadow-xl shadow-gray-200/60 dark:shadow-[0_20px_30px_-10px_rgba(0,0,0,0.8),0_0_15px_rgba(16,185,129,0.08)] py-2 z-50 border border-gray-200/90 dark:border-emerald-500/25 bg-white/95 dark:bg-[#0F1713] backdrop-blur-md">
                             <a href="{{ route('admin.quizzes.export-csv', $quiz) }}"
                                class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-semibold transition-colors"
                                style="gap:1rem;">

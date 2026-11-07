@@ -315,11 +315,11 @@
                                      x-transition:leave="transition ease-in duration-100"
                                      x-transition:leave-start="transform opacity-100 scale-100"
                                      x-transition:leave-end="transform opacity-0 scale-95"
-                                     class="absolute right-0 w-56 rounded-2xl shadow-xl shadow-gray-200/60 dark:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.85),0_0_18px_rgba(16,185,129,0.08)] py-1.5 z-50 border border-gray-200 dark:border-emerald-500/22 bg-white/95 dark:bg-[#0F1713]/98 text-left backdrop-blur-xl"
+                                     class="absolute right-0 w-56 rounded-2xl shadow-xl shadow-gray-200/60 dark:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.85),0_0_18px_rgba(16,185,129,0.08)] py-1.5 z-50 border border-gray-200 dark:border-emerald-500/20 bg-white/95 dark:bg-[#0F1713] text-left backdrop-blur-xl"
                                      :class="openUp ? 'bottom-full mb-2' : 'top-full mt-2'">
 
                                     {{-- Section 1: Navigasi & Detail --}}
-                                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-[#1A2820]/80">
+                                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-[#1A2820]">
                                         Navigasi & Pratinjau
                                     </div>
 
