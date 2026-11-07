@@ -99,7 +99,7 @@ class QuizAttempt extends Model
         if ($this->isCompleted()) {
             return false;
         }
-        return $this->last_heartbeat_at && now()->diffInSeconds($this->last_heartbeat_at) < 65;
+        return $this->last_heartbeat_at && now()->diffInSeconds($this->last_heartbeat_at) < 35;
     }
 
     public function answeredQuestionsCount(): int

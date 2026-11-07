@@ -972,4 +972,71 @@ class QuizFeatureTest extends TestCase
         $this->assertEquals(range(1, 10), $orderAfterScenario2->pluck('order_num')->all());
         $this->assertCount(10, $orderAfterScenario2);
     }
+
+    public function test_admin_can_access_live_monitor_and_fetches_realtime_data(): void
+    {
+        $quiz = Quiz::create([
+            'title'              => 'Live Monitor Test CBT',
+            'user_id'            => $this->admin->id,
+            'is_active'          => true,
+            'access_code'        => 'MONITOR-01',
+            'session_status'     => 'started',
+            'time_limit_minutes' => 60,
+        ]);
+
+        $q = $quiz->questions()->create(['question_text' => 'Soal 1', 'points' => 50, 'order_num' => 1]);
+
+        // Active student
+        $activeAtt = $quiz->attempts()->create([
+            'nim'                   => '13020210088',
+            'student_name'          => 'Ahmad Fajar',
+            'kelas'                 => 'A',
+            'total_points_possible' => 50,
+            'started_at'            => now(),
+            'last_heartbeat_at'     => now(),
+            'draft_answers'         => [$q->id => 1],
+        ]);
+
+        // Completed student
+        $completedAtt = $quiz->attempts()->create([
+            'nim'                   => '13020210089',
+            'student_name'          => 'Bunga Lestari',
+            'kelas'                 => 'B',
+            'total_points_possible' => 50,
+            'started_at'            => now()->subMinutes(30),
+            'completed_at'          => now()->subMinutes(5),
+            'score'                 => 50,
+        ]);
+
+        // 1. Admin loads monitor page
+        $viewRes = $this->actingAs($this->admin)->get(route('admin.quizzes.monitor', $quiz));
+        $viewRes->assertOk();
+        $viewRes->assertSee('Live Exam Monitor', false);
+        $viewRes->assertSee('viewMode', false);
+
+        // 2. Admin polls live monitor data endpoint
+        $dataRes = $this->actingAs($this->admin)->getJson(route('admin.quizzes.monitor.data', $quiz));
+        $dataRes->assertOk();
+        $dataRes->assertJson([
+            'success'        => true,
+            'session_status' => 'started',
+            'summary'        => [
+                'session_status'  => 'started',
+                'total_active'    => 1,
+                'total_completed' => 1,
+                'total_locked'    => 0,
+                'total_online'    => 1,
+            ],
+        ]);
+
+        $json = $dataRes->json();
+        $this->assertCount(1, $json['active']);
+        $this->assertEquals('13020210088', $json['active'][0]['nim']);
+        $this->assertTrue($json['active'][0]['is_online']);
+        $this->assertEquals(1, $json['active'][0]['answered_count']);
+
+        $this->assertCount(1, $json['completed']);
+        $this->assertEquals('13020210089', $json['completed'][0]['nim']);
+        $this->assertEquals(50, $json['completed'][0]['score']);
+    }
 }

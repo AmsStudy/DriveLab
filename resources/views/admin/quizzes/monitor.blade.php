@@ -204,6 +204,24 @@
         </div>
 
         <div class="flex items-center gap-3">
+            {{-- Toggle Tampilan: Kartu (Grid) vs Tabel Ringkas (Table) --}}
+            <div x-show="activeTab === 'active'" class="inline-flex items-center p-0.5 rounded-xl bg-gray-100 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820]">
+                <button type="button" @click="viewMode = 'grid'"
+                        class="p-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1"
+                        :class="viewMode === 'grid' ? 'bg-white dark:bg-[#142019] text-emerald-700 dark:text-emerald-400 shadow-xs' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
+                        title="Tampilan Grid Kartu">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                    <span class="hidden md:inline text-[11px]">Kartu</span>
+                </button>
+                <button type="button" @click="viewMode = 'table'"
+                        class="p-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1"
+                        :class="viewMode === 'table' ? 'bg-white dark:bg-[#142019] text-emerald-700 dark:text-emerald-400 shadow-xs' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
+                        title="Tampilan Tabel Ringkas">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                    <span class="hidden md:inline text-[11px]">Tabel</span>
+                </button>
+            </div>
+
             {{-- Quick Filter Pills for Active Tab --}}
             <div x-show="activeTab === 'active'" class="flex items-center gap-1.5 text-xs">
                 <button type="button" @click="statusFilter = 'all'"
@@ -239,7 +257,7 @@
             </div>
         </template>
 
-        <div x-show="filteredActive.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div x-show="filteredActive.length > 0 && viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <template x-for="item in filteredActive" :key="item.id">
                 <div class="bg-white dark:bg-[#0F1713] border rounded-2xl p-5 shadow-sm relative overflow-hidden transition-all hover:border-emerald-500/30"
                      :class="item.is_locked ? 'border-rose-400 dark:border-rose-500/50 bg-rose-50/50 dark:bg-rose-950/10' : (item.is_online ? 'border-gray-200 dark:border-[#1A2820]' : 'border-gray-200 dark:border-[#1A2820] opacity-80')">
@@ -344,6 +362,92 @@
 
                 </div>
             </template>
+        </div>
+
+        {{-- TAMPILAN TABEL RINGKAS (UNTUK MONITORING CEPAT 300 MAHASISWA) --}}
+        <div x-show="filteredActive.length > 0 && viewMode === 'table'" class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-2xl overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="border-b border-gray-200 dark:border-[#1A2820] text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-[#090D0B]">
+                        <tr>
+                            <th class="px-4 py-3.5 font-semibold">Mahasiswa</th>
+                            <th class="px-3 py-3.5 font-semibold text-center">Status</th>
+                            <th class="px-4 py-3.5 font-semibold text-center">Progres Jawaban</th>
+                            <th class="px-4 py-3.5 font-semibold text-center">Sisa Waktu</th>
+                            <th class="px-3 py-3.5 font-semibold text-center">Switch Tab</th>
+                            <th class="px-4 py-3.5 font-semibold text-right">Aksi Pengawas</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-[#1A2820]">
+                        <template x-for="item in filteredActive" :key="item.id">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-[#142019]/40 transition-colors"
+                                :class="item.is_locked ? 'bg-rose-50/40 dark:bg-rose-950/20' : ''">
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="font-bold text-gray-900 dark:text-white" x-text="item.student_name"></div>
+                                        <template x-if="item.kelas">
+                                            <span class="px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-[#142019] border border-emerald-200 dark:border-[#1E3327] text-emerald-800 dark:text-emerald-400 font-mono text-[10px] font-bold" x-text="'Kelas ' + item.kelas"></span>
+                                        </template>
+                                    </div>
+                                    <div class="text-xs font-mono text-gray-500 dark:text-gray-400" x-text="item.nim"></div>
+                                </td>
+                                <td class="px-3 py-3 text-center">
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                                         :class="item.is_locked ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30' : (item.is_online ? 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-700')">
+                                        <span class="w-1.5 h-1.5 rounded-full"
+                                              :class="item.is_locked ? 'bg-rose-500' : (item.is_online ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400')"></span>
+                                        <span x-text="item.is_locked ? 'TERKUNCI' : (item.is_online ? 'Online' : 'Terputus')"></span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="flex items-center justify-center gap-1.5">
+                                        <span class="font-mono font-bold text-xs text-gray-800 dark:text-gray-200" x-text="item.answered_count + '/' + item.total_questions"></span>
+                                        <span class="text-[10px] text-gray-400 font-mono" x-text="'(' + item.progress_percent + '%)'"></span>
+                                        <template x-if="item.flagged_count > 0">
+                                            <span class="text-[10px] bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 px-1 rounded font-semibold" title="Ragu-ragu">🚩<span x-text="item.flagged_count"></span></span>
+                                        </template>
+                                    </div>
+                                    <div class="w-24 h-1.5 mx-auto mt-1 rounded-full bg-gray-100 dark:bg-[#090D0B] overflow-hidden border border-gray-200 dark:border-[#1A2820]">
+                                        <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-300" :style="'width: ' + item.progress_percent + '%'"></div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-center font-mono text-xs">
+                                    <span class="font-bold text-amber-600 dark:text-amber-400" x-text="item.time_remaining_human"></span>
+                                    <template x-if="item.extra_time_minutes > 0">
+                                        <span class="text-[10px] bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 px-1 rounded font-bold ml-1" x-text="'+' + item.extra_time_minutes + 'm'"></span>
+                                    </template>
+                                </td>
+                                <td class="px-3 py-3 text-center text-xs">
+                                    <template x-if="item.tab_switch_count > 0">
+                                        <span class="px-2 py-0.5 rounded-full font-semibold bg-amber-50 dark:bg-amber-500/15 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30" x-text="item.tab_switch_count + 'x'"></span>
+                                    </template>
+                                    <template x-if="!item.tab_switch_count">
+                                        <span class="text-gray-400 dark:text-gray-500 font-mono text-[11px]">0</span>
+                                    </template>
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    <div class="inline-flex items-center gap-1.5">
+                                        <template x-if="item.is_locked">
+                                            <button type="button" @click="remoteUnlock(item)"
+                                                    class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs" title="Buka Kunci Layar">
+                                                Buka
+                                            </button>
+                                        </template>
+                                        <button type="button" @click="openAddTimeModal(item)"
+                                                class="px-2 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-[#142019] dark:hover:bg-[#1E3327] border border-gray-200 dark:border-[#1E3327] text-gray-700 dark:text-gray-300 text-xs font-semibold shadow-xs" title="Tambah Waktu Ujian">
+                                            + Waktu
+                                        </button>
+                                        <button type="button" @click="confirmForceSubmit(item)"
+                                                class="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/15 dark:hover:bg-rose-500/25 border border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400 text-xs font-semibold shadow-xs" title="Paksa Kumpulkan">
+                                            Kumpul
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -466,11 +570,6 @@
             </div>
         </div>
     </div>
-                    Simpan & Tambah
-                </button>
-            </div>
-        </div>
-    </div>
 
 </div>
 
@@ -481,6 +580,7 @@ function liveExamMonitor(quizId) {
         sessionStatus: '{{ $quiz->session_status ?? 'waiting' }}',
         isSessionProcessing: false,
         activeTab: 'active',
+        viewMode: 'grid',
         statusFilter: 'all',
         searchQuery: '',
         isLoading: false,
@@ -501,12 +601,28 @@ function liveExamMonitor(quizId) {
         targetStudent: null,
         addedMinutes: 5,
 
+        getCsrfToken() {
+            return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+        },
+
         initMonitor() {
             this.fetchData();
-            // Auto refresh every 5 seconds
+            // Auto refresh realtime setiap 4 detik tanpa reload halaman
             this.timer = setInterval(() => {
                 this.fetchData();
-            }, 5000);
+            }, 4000);
+
+            // Heartbeat penyegar token CSRF tiap 10 menit agar sesi admin tidak kadaluarsa
+            setInterval(async () => {
+                try {
+                    const res = await fetch('{{ route('csrf.refresh') }}');
+                    const data = await res.json();
+                    if (data && data.csrf_token) {
+                        const meta = document.querySelector('meta[name="csrf-token"]');
+                        if (meta) meta.setAttribute('content', data.csrf_token);
+                    }
+                } catch (e) {}
+            }, 10 * 60 * 1000);
         },
 
         get filteredActive() {
@@ -537,7 +653,7 @@ function liveExamMonitor(quizId) {
             this.isFetching = true;
             if (manual) this.isLoading = true;
             try {
-                const res = await fetch(`{{ url('admin/quizzes/' . $quiz->id . '/monitor/data') }}`);
+                const res = await fetch(`{{ route('admin.quizzes.monitor.data', $quiz) }}`);
                 const data = await res.json();
                 if (data.success) {
                     if (data.session_status) {
@@ -582,7 +698,7 @@ function liveExamMonitor(quizId) {
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Accept': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                'X-CSRF-TOKEN': this.getCsrfToken()
                             }
                         });
                         const data = await res.json();
@@ -636,7 +752,7 @@ function liveExamMonitor(quizId) {
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Accept': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                'X-CSRF-TOKEN': this.getCsrfToken()
                             }
                         });
                         const data = await res.json();
@@ -690,7 +806,7 @@ function liveExamMonitor(quizId) {
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Accept': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                'X-CSRF-TOKEN': this.getCsrfToken()
                             }
                         });
                         const data = await res.json();
@@ -714,7 +830,7 @@ function liveExamMonitor(quizId) {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': this.getCsrfToken()
                     }
                 });
                 const data = await res.json();
@@ -752,7 +868,7 @@ function liveExamMonitor(quizId) {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': this.getCsrfToken()
                     },
                     body: JSON.stringify({ minutes: this.addedMinutes })
                 });
@@ -800,7 +916,7 @@ function liveExamMonitor(quizId) {
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Accept': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                'X-CSRF-TOKEN': this.getCsrfToken()
                             }
                         });
                         const data = await res.json();
