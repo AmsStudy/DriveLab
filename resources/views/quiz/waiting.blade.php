@@ -200,6 +200,11 @@
         .waiting-rule-box {
             background-color: #F9FAFB !important;
             border: 1px solid #E5E7EB !important;
+            transition: all 0.2s ease !important;
+        }
+        .waiting-rule-box:hover {
+            border-color: rgba(16, 185, 129, 0.5) !important;
+            background-color: #F0FDF4 !important;
         }
         .waiting-rule-title {
             color: #111827 !important;
@@ -208,14 +213,22 @@
             color: #4B5563 !important;
         }
 
-        html.dark .waiting-rule-box {
+        html.dark .waiting-rule-box,
+        html[data-theme="dark"] .waiting-rule-box {
             background-color: #0D1612 !important;
             border: 1px solid #1E3327 !important;
         }
-        html.dark .waiting-rule-title {
+        html.dark .waiting-rule-box:hover,
+        html[data-theme="dark"] .waiting-rule-box:hover {
+            border-color: rgba(16, 185, 129, 0.45) !important;
+            background-color: #13221A !important;
+        }
+        html.dark .waiting-rule-title,
+        html[data-theme="dark"] .waiting-rule-title {
             color: #F9FAFB !important;
         }
-        html.dark .waiting-rule-desc {
+        html.dark .waiting-rule-desc,
+        html[data-theme="dark"] .waiting-rule-desc {
             color: #9CA3AF !important;
         }
 

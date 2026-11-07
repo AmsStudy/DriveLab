@@ -53,7 +53,7 @@
     </div>
 
     {{-- ─── LIVE EXAM SESSION CONTROL BANNER (START / END / WAITING ROOM) ─── --}}
-    <div class="rounded-2xl p-4 sm:p-5 border transition-all duration-300 shadow-sm"
+    <div class="rounded-2xl p-4 sm:p-5 border transition-all duration-300 shadow-sm session-status-banner"
          :class="{
              'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-amber-300 dark:border-amber-500/30': sessionStatus === 'waiting',
              'bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-300 dark:border-emerald-500/30': sessionStatus === 'started',
@@ -62,11 +62,11 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-start sm:items-center gap-3.5">
                 {{-- Status Icon --}}
-                <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm session-status-icon"
                      :class="{
-                         'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-500/40': sessionStatus === 'waiting',
-                         'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/40': sessionStatus === 'started',
-                         'bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-300 dark:border-rose-500/40': sessionStatus === 'ended'
+                         'session-icon-waiting bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-500/40': sessionStatus === 'waiting',
+                         'session-icon-started bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/40': sessionStatus === 'started',
+                         'session-icon-ended bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-300 dark:border-rose-500/40': sessionStatus === 'ended'
                      }">
                     <template x-if="sessionStatus === 'waiting'">
                         <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -81,26 +81,26 @@
 
                 <div>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full"
+                        <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full session-status-badge"
                               :class="{
-                                  'bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30': sessionStatus === 'waiting',
-                                  'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30': sessionStatus === 'started',
-                                  'bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30': sessionStatus === 'ended'
+                                  'session-badge-waiting bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30': sessionStatus === 'waiting',
+                                  'session-badge-started bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30': sessionStatus === 'started',
+                                  'session-badge-ended bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30': sessionStatus === 'ended'
                               }"
                               x-text="sessionStatus === 'waiting' ? '⏳ Ruang Tunggu Aktif (Lobby)' : (sessionStatus === 'started' ? '🟢 Ujian Sedang Berlangsung' : '⛔ Ujian Telah Selesai')">
                         </span>
-                        <span class="text-xs font-mono text-gray-500 dark:text-gray-400"
+                        <span class="text-xs font-mono text-gray-600 dark:text-gray-400 font-semibold"
                               x-show="sessionStatus === 'waiting'"
                               x-text="'(' + summary.total_active + ' Mahasiswa Siap di Ruang Tunggu)'"></span>
                     </div>
 
-                    <h4 class="text-base font-bold text-gray-900 dark:text-white mt-1">
+                    <h4 class="text-base font-extrabold session-banner-title mt-1.5">
                         <span x-show="sessionStatus === 'waiting'">Menunggu Pengawas Membuka Pengerjaan Soal</span>
                         <span x-show="sessionStatus === 'started'">Akses Soal Terbuka & Hitungan Mundur Waktu Berjalan</span>
                         <span x-show="sessionStatus === 'ended'">Akses Pengerjaan Ditutup & Nilai Telah Direkap</span>
                     </h4>
 
-                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                    <p class="text-xs session-banner-desc mt-0.5 font-medium leading-relaxed">
                         <span x-show="sessionStatus === 'waiting'">Mahasiswa yang mengisi NIM berkumpul di Ruang Tunggu. Tekan tombol hijau di samping untuk memulai ujian serentak.</span>
                         <span x-show="sessionStatus === 'started'">Mahasiswa sedang aktif menjawab. Tekan tombol merah di samping jika Anda ingin menghentikan ujian sewaktu-waktu.</span>
                         <span x-show="sessionStatus === 'ended'">Seluruh pengerjaan aktif telah dikumpulkan dan dinilai. Anda dapat membuka kembali ruang tunggu jika ada sesi susulan.</span>
@@ -943,4 +943,56 @@ function liveExamMonitor(quizId) {
     };
 }
 </script>
+
+@push('styles')
+<style>
+    /* Direct High-Contrast Rules for Session Control Banner */
+    html:not(.dark) .session-status-banner .session-banner-title {
+        color: #0F172A !important;
+    }
+    html:not(.dark) .session-status-banner .session-banner-desc {
+        color: #334155 !important;
+    }
+    html.dark .session-status-banner .session-banner-title {
+        color: #FFFFFF !important;
+    }
+    html.dark .session-status-banner .session-banner-desc {
+        color: #9CA3AF !important;
+    }
+
+    /* Status Badges */
+    html:not(.dark) .session-badge-waiting {
+        background-color: #FEF3C7 !important;
+        color: #92400E !important;
+        border-color: #FCD34D !important;
+    }
+    html:not(.dark) .session-badge-started {
+        background-color: #D1FAE5 !important;
+        color: #065F46 !important;
+        border-color: #6EE7B7 !important;
+    }
+    html:not(.dark) .session-badge-ended {
+        background-color: #FFE4E6 !important;
+        color: #9F1239 !important;
+        border-color: #FDA4AF !important;
+    }
+
+    /* Status Icons */
+    html:not(.dark) .session-icon-waiting {
+        background-color: #FEF3C7 !important;
+        color: #B45309 !important;
+        border-color: #FCD34D !important;
+    }
+    html:not(.dark) .session-icon-started {
+        background-color: #D1FAE5 !important;
+        color: #047857 !important;
+        border-color: #6EE7B7 !important;
+    }
+    html:not(.dark) .session-icon-ended {
+        background-color: #FFE4E6 !important;
+        color: #BE123C !important;
+        border-color: #FDA4AF !important;
+    }
+</style>
+@endpush
 @endsection

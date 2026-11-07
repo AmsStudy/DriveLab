@@ -878,6 +878,7 @@
             display: block;
         }
     </style>
+    @stack('styles')
 </head>
 <body class="text-gray-100 min-h-screen" style="background:#090D0B; font-family:'Inter',sans-serif; overflow-x:clip;">
 
