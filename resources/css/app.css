@@ -745,6 +745,180 @@ html:not(.dark) .badge-tunggal {
     color: #374151 !important;
 }
 
+/* Quiz Results & Review Surfaces */
+.leaderboard-list-box {
+    background-color: #090D0B;
+    border-color: #1A2820;
+}
+.leaderboard-row {
+    color: #F3F4F6;
+}
+.leaderboard-row .student-name {
+    color: #FFFFFF;
+}
+.leaderboard-row.is-self {
+    background-color: rgba(16, 185, 129, 0.12);
+    border-left: 4px solid #10B981;
+}
+.review-question-card {
+    background-color: #090D0B;
+    border-color: #1A2820;
+    color: #F3F4F6;
+}
+.review-question-text {
+    color: #FFFFFF;
+}
+.review-badge-soal {
+    background-color: #142019;
+    border-color: #1E3327;
+    color: #D1D5DB;
+}
+.review-option-neutral {
+    background-color: #0E1612;
+    border-color: #1A2820;
+    color: #D1D5DB;
+}
+.review-option-correct {
+    background-color: #0E2018;
+    border-color: #10B981;
+    color: #ECFDF5;
+}
+.review-option-wrong {
+    background-color: #221013;
+    border-color: #F43F5E;
+    color: #FFF1F2;
+}
+.review-opt-badge {
+    background-color: #1F2937;
+    color: #9CA3AF;
+}
+.review-explanation-box {
+    background-color: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #D1FAE5;
+}
+.btn-back-portal {
+    background-color: #0F1713;
+    border-color: #1A2820;
+    color: #E5E7EB;
+}
+.btn-back-portal:hover {
+    background-color: #1A2820;
+    color: #FFFFFF;
+}
+.btn-nav-home {
+    background-color: transparent;
+    border-color: #1A2820;
+    color: #D1D5DB;
+}
+.btn-nav-home:hover {
+    background-color: #1F2937;
+    color: #FFFFFF;
+}
+.metric-stat-card {
+    background-color: #090D0B;
+    border-color: #1A2820;
+}
+.review-opt-img-box {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Light mode overrides for Quiz Results */
+html:not(.dark) .leaderboard-list-box {
+    background-color: #FFFFFF !important;
+    border-color: #E2EAE5 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+html:not(.dark) .leaderboard-row {
+    color: #0F1F17 !important;
+}
+html:not(.dark) .leaderboard-row .student-name {
+    color: #111827 !important;
+}
+html:not(.dark) .leaderboard-row.is-self {
+    background-color: #ECFDF5 !important;
+    border-left: 4px solid #10B981 !important;
+}
+html:not(.dark) .review-question-card {
+    background-color: #FFFFFF !important;
+    border-color: #E2EAE5 !important;
+    color: #0F1F17 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+html:not(.dark) .review-question-text {
+    color: #111827 !important;
+}
+html:not(.dark) .review-badge-soal {
+    background-color: #F3F4F6 !important;
+    border-color: #E5E7EB !important;
+    color: #374151 !important;
+}
+html:not(.dark) .review-option-neutral {
+    background-color: rgba(249, 250, 251, 0.8) !important;
+    border-color: #E5E7EB !important;
+    color: #374151 !important;
+}
+html:not(.dark) .review-option-correct {
+    background-color: #ECFDF5 !important;
+    border-color: #10B981 !important;
+    color: #064E3B !important;
+}
+html:not(.dark) .review-option-wrong {
+    background-color: #FFF1F2 !important;
+    border-color: #F43F5E !important;
+    color: #881337 !important;
+}
+html:not(.dark) .review-opt-badge {
+    background-color: #E5E7EB !important;
+    color: #4B5563 !important;
+}
+html:not(.dark) .review-explanation-box {
+    background-color: rgba(236, 253, 245, 0.85) !important;
+    border-color: #A7F3D0 !important;
+    color: #064E3B !important;
+}
+html:not(.dark) .btn-back-portal {
+    background-color: #FFFFFF !important;
+    border-color: #D1DCD6 !important;
+    color: #374151 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+html:not(.dark) .btn-back-portal:hover {
+    background-color: #F8FAF9 !important;
+    color: #111827 !important;
+    border-color: #10B981 !important;
+}
+html:not(.dark) .btn-nav-home {
+    background-color: #FFFFFF !important;
+    border-color: #E2EAE5 !important;
+    color: #374151 !important;
+}
+html:not(.dark) .btn-nav-home:hover {
+    background-color: #F8FAF9 !important;
+    color: #111827 !important;
+}
+html:not(.dark) .metric-stat-card.metric-emerald {
+    background-color: rgba(236, 253, 245, 0.7) !important;
+    border-color: rgba(16, 185, 129, 0.2) !important;
+}
+html:not(.dark) .metric-stat-card.metric-rose {
+    background-color: rgba(255, 241, 242, 0.7) !important;
+    border-color: rgba(244, 63, 94, 0.2) !important;
+}
+html:not(.dark) .metric-stat-card.metric-sky {
+    background-color: rgba(240, 249, 255, 0.7) !important;
+    border-color: rgba(14, 165, 233, 0.2) !important;
+}
+html:not(.dark) .metric-stat-card.metric-amber {
+    background-color: rgba(254, 243, 199, 0.7) !important;
+    border-color: rgba(245, 158, 11, 0.2) !important;
+}
+html:not(.dark) .review-opt-img-box {
+    background-color: #FFFFFF !important;
+    border-color: #E2EAE5 !important;
+}
+
 /* Light mode protection for Action / Aksi dropdown in tables */
 html:not(.dark) [id^="action-menu-button-"] {
     background-color: #FFFFFF !important;

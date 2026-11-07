@@ -108,6 +108,192 @@
             box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.08) !important;
         }
 
+        /* Leaderboard & Review Surfaces (Dark Mode Cyber Default) */
+        .leaderboard-list-box {
+            background-color: #090D0B !important;
+            border-color: #1A2820 !important;
+        }
+        .leaderboard-row {
+            color: #F3F4F6 !important;
+        }
+        .leaderboard-row .student-name {
+            color: #FFFFFF !important;
+        }
+        .leaderboard-row.is-self {
+            background-color: rgba(16, 185, 129, 0.12) !important;
+            border-left: 4px solid #10B981 !important;
+        }
+        .review-question-card {
+            background-color: #090D0B !important;
+            border-color: #1A2820 !important;
+            color: #F3F4F6 !important;
+        }
+        .review-question-text {
+            color: #FFFFFF !important;
+        }
+        .review-badge-soal {
+            background-color: #142019 !important;
+            border-color: #1E3327 !important;
+            color: #D1D5DB !important;
+        }
+        .review-option-neutral {
+            background-color: #0E1612 !important;
+            border-color: #1A2820 !important;
+            color: #D1D5DB !important;
+        }
+        .review-option-correct {
+            background-color: #0E2018 !important;
+            border-color: #10B981 !important;
+            color: #ECFDF5 !important;
+        }
+        .review-option-wrong {
+            background-color: #221013 !important;
+            border-color: #F43F5E !important;
+            color: #FFF1F2 !important;
+        }
+        .review-opt-badge {
+            background-color: #1F2937 !important;
+            color: #9CA3AF !important;
+        }
+        .review-explanation-box {
+            background-color: rgba(16, 185, 129, 0.08) !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+            color: #D1FAE5 !important;
+        }
+        .review-explanation-box .exp-title {
+            color: #34D399 !important;
+        }
+        .review-explanation-box .exp-text {
+            color: #D1D5DB !important;
+        }
+        .btn-back-portal {
+            background-color: #0F1713 !important;
+            border-color: #1A2820 !important;
+            color: #E5E7EB !important;
+        }
+        .btn-back-portal:hover {
+            background-color: #1A2820 !important;
+            color: #FFFFFF !important;
+        }
+        .btn-nav-home {
+            background-color: transparent !important;
+            border-color: #1A2820 !important;
+            color: #D1D5DB !important;
+        }
+        .btn-nav-home:hover {
+            background-color: #1F2937 !important;
+            color: #FFFFFF !important;
+        }
+        .metric-stat-card {
+            background-color: #090D0B !important;
+            border-color: #1A2820 !important;
+        }
+        .review-opt-img-box {
+            background-color: rgba(0, 0, 0, 0.4) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Light Mode Overrides for Leaderboard & Review */
+        html:not(.dark) .leaderboard-list-box {
+            background-color: #FFFFFF !important;
+            border-color: #E2EAE5 !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+        }
+        html:not(.dark) .leaderboard-row {
+            color: #0F1F17 !important;
+        }
+        html:not(.dark) .leaderboard-row .student-name {
+            color: #111827 !important;
+        }
+        html:not(.dark) .leaderboard-row.is-self {
+            background-color: #ECFDF5 !important;
+            border-left: 4px solid #10B981 !important;
+        }
+        html:not(.dark) .review-question-card {
+            background-color: #FFFFFF !important;
+            border-color: #E2EAE5 !important;
+            color: #0F1F17 !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+        }
+        html:not(.dark) .review-question-text {
+            color: #111827 !important;
+        }
+        html:not(.dark) .review-badge-soal {
+            background-color: #F3F4F6 !important;
+            border-color: #E5E7EB !important;
+            color: #374151 !important;
+        }
+        html:not(.dark) .review-option-neutral {
+            background-color: rgba(249, 250, 251, 0.8) !important;
+            border-color: #E5E7EB !important;
+            color: #374151 !important;
+        }
+        html:not(.dark) .review-option-correct {
+            background-color: #ECFDF5 !important;
+            border-color: #10B981 !important;
+            color: #064E3B !important;
+        }
+        html:not(.dark) .review-option-wrong {
+            background-color: #FFF1F2 !important;
+            border-color: #F43F5E !important;
+            color: #881337 !important;
+        }
+        html:not(.dark) .review-opt-badge {
+            background-color: #E5E7EB !important;
+            color: #4B5563 !important;
+        }
+        html:not(.dark) .review-explanation-box {
+            background-color: rgba(236, 253, 245, 0.85) !important;
+            border-color: #A7F3D0 !important;
+            color: #064E3B !important;
+        }
+        html:not(.dark) .review-explanation-box .exp-title {
+            color: #065F46 !important;
+        }
+        html:not(.dark) .review-explanation-box .exp-text {
+            color: #1F2937 !important;
+        }
+        html:not(.dark) .btn-back-portal {
+            background-color: #FFFFFF !important;
+            border-color: #D1DCD6 !important;
+            color: #374151 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+        }
+        html:not(.dark) .btn-back-portal:hover {
+            background-color: #F8FAF9 !important;
+            color: #111827 !important;
+            border-color: #10B981 !important;
+        }
+        html:not(.dark) .btn-nav-home {
+            background-color: #FFFFFF !important;
+            border-color: #E2EAE5 !important;
+            color: #374151 !important;
+        }
+        html:not(.dark) .btn-nav-home:hover {
+            background-color: #F8FAF9 !important;
+            color: #111827 !important;
+        }
+        html:not(.dark) .metric-stat-card.metric-emerald {
+            background-color: rgba(236, 253, 245, 0.7) !important;
+            border-color: rgba(16, 185, 129, 0.2) !important;
+        }
+        html:not(.dark) .metric-stat-card.metric-rose {
+            background-color: rgba(255, 241, 242, 0.7) !important;
+            border-color: rgba(244, 63, 94, 0.2) !important;
+        }
+        html:not(.dark) .metric-stat-card.metric-sky {
+            background-color: rgba(240, 249, 255, 0.7) !important;
+            border-color: rgba(14, 165, 233, 0.2) !important;
+        }
+        html:not(.dark) .metric-stat-card.metric-amber {
+            background-color: rgba(254, 243, 199, 0.7) !important;
+            border-color: rgba(245, 158, 11, 0.2) !important;
+        }
+        html:not(.dark) .review-opt-img-box {
+            background-color: #FFFFFF !important;
+            border-color: #E2EAE5 !important;
+        }
+
         /* Hover Zoom Tooltip Preview & Lightbox in Results View */
         .cyber-hover-preview-bubble {
             position: fixed;
@@ -181,7 +367,7 @@
             <div class="flex items-center gap-2">
                 <x-theme-switcher :compact="true" />
                 <a href="{{ route('home') }}"
-                   class="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-[#1A2820] bg-white dark:bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 text-xs text-gray-700 dark:text-gray-300 font-semibold transition-all shadow-sm">
+                   class="btn-nav-home px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all shadow-sm">
                     Beranda
                 </a>
             </div>
@@ -237,19 +423,19 @@
 
             {{-- Metrics Breakdown Cards --}}
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto pt-5 border-t border-gray-200 dark:border-[#1A2820]">
-                <div class="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-[#090D0B] border border-emerald-500/20 dark:border-[#1A2820] shadow-sm">
+                <div class="metric-stat-card metric-emerald p-3.5 rounded-2xl border shadow-sm">
                     <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold block tracking-wider">Jawaban Benar</span>
                     <span class="text-base font-bold text-emerald-700 dark:text-emerald-400 mt-0.5 block">{{ $attempt->correct_answers_count }} Soal</span>
                 </div>
-                <div class="p-3.5 rounded-2xl bg-rose-50/70 dark:bg-[#090D0B] border border-rose-500/20 dark:border-[#1A2820] shadow-sm">
+                <div class="metric-stat-card metric-rose p-3.5 rounded-2xl border shadow-sm">
                     <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold block tracking-wider">Jawaban Salah</span>
                     <span class="text-base font-bold text-rose-700 dark:text-rose-400 mt-0.5 block">{{ $attempt->wrong_answers_count }} Soal</span>
                 </div>
-                <div class="p-3.5 rounded-2xl bg-sky-50/70 dark:bg-[#090D0B] border border-sky-500/20 dark:border-[#1A2820] shadow-sm">
+                <div class="metric-stat-card metric-sky p-3.5 rounded-2xl border shadow-sm">
                     <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold block tracking-wider">Waktu Selesai</span>
                     <span class="text-base font-bold text-sky-700 dark:text-sky-400 mt-0.5 block">{{ $attempt->formattedDuration() }}</span>
                 </div>
-                <div class="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-[#090D0B] border border-amber-500/20 dark:border-[#1A2820] shadow-sm">
+                <div class="metric-stat-card metric-amber p-3.5 rounded-2xl border shadow-sm">
                     <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold block tracking-wider">Pengawas Anti-Cheat</span>
                     <span class="text-base font-bold mt-0.5 block {{ $attempt->tab_switch_count === 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400' }}">
                         {{ $attempt->tab_switch_count === 0 ? '0 Switch 🛡️' : $attempt->tab_switch_count . 'x Switch' }}
@@ -308,15 +494,15 @@
                 @endif
 
                 {{-- Leaderboard Top 10 List --}}
-                <div class="divide-y divide-gray-100 dark:divide-[#1A2820] bg-white dark:bg-[#090D0B] rounded-2xl border border-gray-200 dark:border-[#1A2820] overflow-hidden shadow-sm">
+                <div class="leaderboard-list-box divide-y divide-gray-100 dark:divide-[#1A2820] bg-[#090D0B] rounded-2xl border border-gray-200 dark:border-[#1A2820] overflow-hidden shadow-sm">
                     @foreach($leaderboard as $idx => $entry)
-                        <div class="p-3.5 sm:px-5 flex items-center justify-between gap-3 {{ $entry->id === $attempt->id ? 'bg-emerald-50 dark:bg-emerald-500/10 border-l-4 border-l-emerald-500 font-medium' : '' }}">
+                        <div class="leaderboard-row p-3.5 sm:px-5 flex items-center justify-between gap-3 {{ $entry->id === $attempt->id ? 'is-self font-medium' : '' }}">
                             <div class="flex items-center gap-3">
                                 <span class="w-6 h-6 rounded-lg text-xs font-mono font-bold flex items-center justify-center {{ $idx === 0 ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300' : ($idx === 1 ? 'bg-slate-400/20 text-slate-700 dark:text-gray-300' : ($idx === 2 ? 'bg-orange-700/20 text-orange-700 dark:text-amber-500' : 'text-gray-500')) }}">
                                     #{{ $idx + 1 }}
                                 </span>
                                 <div>
-                                    <span class="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white block">
+                                    <span class="student-name text-xs sm:text-sm font-semibold text-gray-900 dark:text-white block">
                                         {{ $entry->student_name }}
                                         @if($entry->id === $attempt->id)
                                             <span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-emerald-600 text-white font-bold">Anda</span>
@@ -351,11 +537,11 @@
 
                 <div class="space-y-5">
                     @foreach($reviewAnswers as $idx => $ans)
-                        <div class="bg-white dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] rounded-2xl p-5 shadow-sm transition-all {{ $ans->is_correct ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-rose-500' }}">
+                        <div class="review-question-card bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] rounded-2xl p-5 shadow-sm transition-all {{ $ans->is_correct ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-rose-500' }}">
                             {{-- Header Pertanyaan --}}
                             <div class="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-gray-100 dark:border-[#16221B]">
                                 <div class="flex items-center gap-2">
-                                    <span class="font-mono text-xs font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#142019] border border-gray-200 dark:border-[#1E3327] px-2.5 py-1 rounded-lg">
+                                    <span class="review-badge-soal font-mono text-xs font-bold px-2.5 py-1 rounded-lg">
                                         Soal #{{ $idx + 1 }}
                                     </span>
                                     <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
@@ -393,7 +579,7 @@
                             @endif
 
                             {{-- Question Text --}}
-                            <div class="text-sm sm:text-base font-bold text-gray-900 dark:text-white mb-4 leading-relaxed">{!! App\Helpers\RichTextHelper::format($ans->question->question_text ?? 'Pertanyaan') !!}</div>
+                            <div class="review-question-text text-sm sm:text-base font-bold text-gray-900 dark:text-white mb-4 leading-relaxed">{!! App\Helpers\RichTextHelper::format($ans->question->question_text ?? 'Pertanyaan') !!}</div>
 
                             {{-- Options Grid: Hanya opsi yang dipilih yang diwarnai (Hijau jika benar, Merah jika salah) --}}
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
@@ -410,7 +596,7 @@
                                     @if($isSelectedByStudent)
                                         @if($isCorrectOption)
                                             {{-- JAWABAN BENAR MAHASISWA (HIJAU) --}}
-                                            <div class="p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-[#0E2018] text-gray-900 dark:text-white flex items-start justify-between gap-2 shadow-sm shadow-emerald-500/10">
+                                            <div class="review-option-correct p-3 rounded-xl border-2 border-emerald-500 bg-[#0E2018] flex items-start justify-between gap-2 shadow-sm shadow-emerald-500/10">
                                                 <div class="flex items-start gap-2.5 min-w-0">
                                                     <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                                                         {{ $labels[$optIdx] ?? ($optIdx + 1) }}
@@ -423,12 +609,12 @@
                                                                         onmousemove="updateCyberHoverBubblePos(event)"
                                                                         onmouseleave="hideCyberHoverBubble()"
                                                                         onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIdx] ?? '' }}')"
-                                                                        class="block group cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-gray-200 dark:border-white/10 bg-white dark:bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
+                                                                        class="review-opt-img-box block group cursor-zoom-in focus:outline-none rounded-lg border hover:border-emerald-500/40 p-1 transition-all">
                                                                     <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform" loading="lazy">
                                                                 </button>
                                                             </div>
                                                         @endif
-                                                        <div class="font-semibold text-emerald-950 dark:text-emerald-100 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
+                                                        <div class="font-semibold block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
                                                     </div>
                                                 </div>
                                                 <span class="text-[10px] bg-emerald-600 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1 shadow-sm">
@@ -438,7 +624,7 @@
                                             </div>
                                         @else
                                             {{-- JAWABAN SALAH MAHASISWA (MERAH) --}}
-                                            <div class="p-3 rounded-xl border-2 border-rose-500 bg-rose-50 dark:bg-[#221013] text-gray-900 dark:text-white flex items-start justify-between gap-2 shadow-sm shadow-rose-500/10">
+                                            <div class="review-option-wrong p-3 rounded-xl border-2 border-rose-500 bg-[#221013] flex items-start justify-between gap-2 shadow-sm shadow-rose-500/10">
                                                 <div class="flex items-start gap-2.5 min-w-0">
                                                     <span class="w-6 h-6 rounded-lg bg-rose-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                                                         {{ $labels[$optIdx] ?? ($optIdx + 1) }}
@@ -451,12 +637,12 @@
                                                                         onmousemove="updateCyberHoverBubblePos(event)"
                                                                         onmouseleave="hideCyberHoverBubble()"
                                                                         onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIdx] ?? '' }}')"
-                                                                        class="block group cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-gray-200 dark:border-white/10 bg-white dark:bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
+                                                                        class="review-opt-img-box block group cursor-zoom-in focus:outline-none rounded-lg border hover:border-emerald-500/40 p-1 transition-all">
                                                                     <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform" loading="lazy">
                                                                 </button>
                                                             </div>
                                                         @endif
-                                                        <div class="font-semibold text-rose-950 dark:text-rose-200 block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
+                                                        <div class="font-semibold block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
                                                     </div>
                                                 </div>
                                                 <span class="text-[10px] bg-rose-600 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1 shadow-sm">
@@ -467,13 +653,13 @@
                                         @endif
                                     @else
                                         {{-- OPSI LAIN (NETRAL) --}}
-                                        <div class="p-3 rounded-xl border border-gray-200 dark:border-[#1A2820] bg-gray-50/80 dark:bg-[#0E1612] text-gray-700 dark:text-gray-400 flex items-start gap-2.5">
-                                            <span class="w-6 h-6 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-400 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <div class="review-option-neutral p-3 rounded-xl border border-gray-200 dark:border-[#1A2820] flex items-start gap-2.5">
+                                            <span class="review-opt-badge w-6 h-6 rounded-lg font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                                                 {{ $labels[$optIdx] ?? ($optIdx + 1) }}
                                             </span>
                                             <div class="min-w-0">
                                                 @if($opt->image_path)
-                                                    <div class="mb-1.5 max-h-24 overflow-hidden rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-black/40 p-1">
+                                                    <div class="review-opt-img-box mb-1.5 max-h-24 overflow-hidden rounded-lg border p-1">
                                                         <button type="button"
                                                                 onmouseenter="showCyberHoverBubble(event, '{{ $opt->image_url }}')"
                                                                 onmousemove="updateCyberHoverBubblePos(event)"
@@ -503,33 +689,33 @@
                                 $correctAnswerDisplay = implode(', ', $correctTextArray);
                             @endphp
 
-                            <div class="mt-4 p-4 rounded-xl border text-xs {{ $ans->is_correct ? 'bg-emerald-50/80 dark:bg-emerald-500/10 border-emerald-300 dark:border-emerald-500/30 text-emerald-950 dark:text-emerald-200' : 'bg-emerald-50/80 dark:bg-[#0A1410] border-emerald-300 dark:border-emerald-500/40 text-emerald-950 dark:text-emerald-100' }}">
+                            <div class="review-explanation-box mt-4 p-4 rounded-xl border text-xs">
                                 <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
                                     @if($ans->is_correct)
-                                        <div class="flex items-center gap-2 font-bold text-emerald-800 dark:text-emerald-400 text-xs sm:text-sm">
+                                        <div class="flex items-center gap-2 font-bold exp-title text-xs sm:text-sm">
                                             <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-xs">✓</span>
                                             <span>Jawaban Anda Benar:</span>
-                                            <span class="text-emerald-800 dark:text-emerald-300 font-semibold">{{ $correctAnswerDisplay }}</span>
+                                            <span class="font-semibold">{{ $correctAnswerDisplay }}</span>
                                         </div>
                                     @else
-                                        <div class="flex items-center gap-2 font-bold text-emerald-800 dark:text-emerald-400 text-xs sm:text-sm">
+                                        <div class="flex items-center gap-2 font-bold exp-title text-xs sm:text-sm">
                                             <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-xs">🔑</span>
                                             <span>Kunci Jawaban Benar:</span>
-                                            <span class="text-emerald-800 dark:text-emerald-200 font-semibold">{{ $correctAnswerDisplay }}</span>
+                                            <span class="font-semibold">{{ $correctAnswerDisplay }}</span>
                                         </div>
                                     @endif
 
-                                    <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md {{ $ans->is_correct ? 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30' : 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 border border-emerald-500/30' }}">
+                                    <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
                                         {{ $ans->is_correct ? 'Tepat (+ ' . ($ans->points_earned ?: 0) . ' Poin)' : 'Kunci Tepat' }}
                                     </span>
                                 </div>
 
                                 <div class="pt-2 border-t border-emerald-500/20">
                                     <div class="flex items-start gap-2">
-                                        <span class="font-bold shrink-0 flex items-center gap-1 text-emerald-800 dark:text-emerald-400">
+                                        <span class="font-bold shrink-0 flex items-center gap-1 exp-title">
                                             <span>💡</span> Pembahasan:
                                         </span>
-                                        <div class="leading-relaxed text-gray-800 dark:text-gray-300 flex-1">
+                                        <div class="leading-relaxed exp-text flex-1">
                                             @if(!empty($ans->question->explanation))
                                                 {!! App\Helpers\RichTextHelper::format($ans->question->explanation) !!}
                                             @else
@@ -548,7 +734,7 @@
         {{-- Bottom Action Buttons --}}
         <div class="flex items-center justify-center gap-3 pt-2">
             <a href="{{ route('home') }}"
-               class="px-6 py-3 rounded-2xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] hover:bg-gray-50 dark:hover:bg-[#1A2820] text-gray-700 dark:text-gray-200 text-sm font-semibold transition-all shadow-sm">
+               class="btn-back-portal px-6 py-3 rounded-2xl bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] text-sm font-semibold transition-all shadow-sm">
                 ← Kembali ke Portal Lab
             </a>
             @if($quiz->is_active)
