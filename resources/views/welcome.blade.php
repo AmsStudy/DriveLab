@@ -1068,13 +1068,25 @@
                             type="text"
                             x-model="nim"
                             class="main-inp"
-                            placeholder="Masukkan NIM…"
+                            placeholder="11 digit NIM (0-9)…"
                             autocomplete="off"
+                            inputmode="numeric"
+                            pattern="[0-9]{11}"
+                            maxlength="11"
+                            @input="nim = nim.replace(/\D/g, '').slice(0, 11)"
                         >
                         <button type="submit" class="go-btn go-green" :disabled="loading">
                             <span x-show="!loading">Cari →</span>
                             <span x-show="loading" style="opacity:.7">…</span>
                         </button>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding:0 4px;">
+                        <span style="font-size:11px;"
+                              :style="nim.length === 11 ? 'color:#10B981;' : (nim.length > 0 ? 'color:#F59E0B;' : 'color:var(--text3,#9CA3AF);')"
+                              x-text="nim.length === 11 ? '✓ Format NIM valid (11 digit)' : (nim.length > 0 ? '⚠️ Masukkan ' + (11 - nim.length) + ' digit lagi' : 'Format: 11 digit angka 0-9')"></span>
+                        <span style="font-size:11px;font-family:monospace;font-weight:600;"
+                              :style="nim.length === 11 ? 'color:#10B981;' : (nim.length > 0 ? 'color:#F59E0B;' : 'color:#9CA3AF;')"
+                              x-text="nim.length + '/11 digit'"></span>
                     </div>
                 </form>
 
@@ -1300,7 +1312,12 @@
                 tasks: [],
 
                 async cari() {
-                    if (!this.nim.trim()) return;
+                    this.nim = (this.nim || '').replace(/\D/g, '').slice(0, 11);
+                    if (!this.nim || this.nim.length !== 11) {
+                        this.errMsg = 'NIM harus terdiri dari tepat 11 digit angka (0-9).';
+                        this.result = false;
+                        return;
+                    }
                     this.loading = true;
                     this.result  = false;
                     this.errMsg  = '';

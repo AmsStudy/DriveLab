@@ -1441,18 +1441,24 @@ footer{
 
                         <div class="form-grid {{ $soal->hasClasses() ? 'has-classes' : '' }}">
                             <div class="field-group">
-                                <label class="field-label">
-                                    NIM Mahasiswa <span class="req">*</span>
-                                </label>
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                                    <label class="field-label" style="margin-bottom:0;">
+                                        NIM Mahasiswa <span class="req">*</span>
+                                    </label>
+                                    <span id="sub_nim_badge" style="font-size:11px;font-family:monospace;font-weight:600;color:var(--text3);">0/11 digit</span>
+                                </div>
                                 <div class="field-wrap">
                                     <input type="text" id="sub_nim" name="nim" required
-                                           placeholder="Contoh: 13020230081"
+                                           inputmode="numeric" pattern="[0-9]{11}" maxlength="11" minlength="11"
+                                           placeholder="Wajib 11 digit angka (0-9)"
                                            autocomplete="off"
-                                           class="field-input">
+                                           class="field-input"
+                                           oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11);">
                                     <svg class="field-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                                     </svg>
                                 </div>
+                                <p id="sub_nim_hint" style="font-size:11px;margin-top:5px;display:none;"></p>
                             </div>
                             <div class="field-group">
                                 <label class="field-label">
@@ -1828,20 +1834,59 @@ document.addEventListener('DOMContentLoaded', function() {
     const namaInput = document.getElementById('sub_nama');
     const kelasInput = document.getElementById('sub_kelas');
 
+    function updateSubNimFeedback(inputEl) {
+        if (!inputEl) return;
+        inputEl.value = inputEl.value.replace(/\D/g, '').slice(0, 11);
+        const len = inputEl.value.length;
+        const badge = document.getElementById('sub_nim_badge');
+        const hint = document.getElementById('sub_nim_hint');
+        if (badge) {
+            badge.textContent = `${len}/11 digit`;
+            if (len === 11) {
+                badge.style.color = '#10B981';
+            } else if (len > 0) {
+                badge.style.color = '#F59E0B';
+            } else {
+                badge.style.color = 'var(--text3)';
+            }
+        }
+        if (hint) {
+            if (len === 11) {
+                hint.textContent = '✓ Format NIM valid (11 digit)';
+                hint.style.color = '#10B981';
+                hint.style.display = 'block';
+            } else if (len > 0) {
+                hint.textContent = `⚠️ Masukkan ${11 - len} digit lagi (harus tepat 11 digit angka 0-9)`;
+                hint.style.color = '#F59E0B';
+                hint.style.display = 'block';
+            } else {
+                hint.style.display = 'none';
+            }
+        }
+    }
+
     if (nimInput) {
         if (!nimInput.value && storedNim) nimInput.value = storedNim;
+        updateSubNimFeedback(nimInput);
+
         nimInput.addEventListener('input', function() {
+            updateSubNimFeedback(this);
             const val = this.value.trim();
             localStorage.setItem('labsoal_student_nim', val);
             clearTimeout(checkNimTimeout);
-            checkNimTimeout = setTimeout(() => checkExistingSubmission(val), 400);
+            if (val.length === 11) {
+                checkNimTimeout = setTimeout(() => checkExistingSubmission(val), 350);
+            }
         });
         nimInput.addEventListener('change', function() {
+            updateSubNimFeedback(this);
             const val = this.value.trim();
             localStorage.setItem('labsoal_student_nim', val);
-            checkExistingSubmission(val);
+            if (val.length === 11) {
+                checkExistingSubmission(val);
+            }
         });
-        if (nimInput.value) {
+        if (nimInput.value && nimInput.value.length === 11) {
             checkExistingSubmission(nimInput.value.trim());
         }
     }
@@ -1912,6 +1957,14 @@ if (dropzone) {
 
 document.getElementById('submission-form').addEventListener('submit', async function(e) {
     e.preventDefault();
+
+    const nimInput = document.getElementById('sub_nim');
+    const nimVal = nimInput ? nimInput.value.replace(/\D/g, '') : '';
+    if (!nimVal || nimVal.length !== 11) {
+        showAlert('error', 'NIM harus terdiri dari tepat 11 digit angka (0-9). Saat ini: ' + (nimVal ? nimVal.length : 0) + ' digit.');
+        if (nimInput) nimInput.focus();
+        return;
+    }
 
     const subKelasEl = document.getElementById('sub_kelas');
     if (subKelasEl && !subKelasEl.value) {

@@ -312,12 +312,20 @@
                             @csrf
 
                             <div>
-                                <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">
-                                    Nomor Induk Mahasiswa (NIM) <span class="text-emerald-400">*</span>
-                                </label>
-                                <input type="text" id="lobby_nim" name="nim" value="{{ old('nim') }}" required autocomplete="off"
-                                       placeholder="Contoh: 220101004"
-                                       class="w-full px-4 py-3 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-600 font-mono">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                                        Nomor Induk Mahasiswa (NIM) <span class="text-emerald-400">*</span>
+                                    </label>
+                                    <span id="lobby_nim_badge" class="text-[11px] font-mono font-semibold text-gray-400">0/11 digit</span>
+                                </div>
+                                <div class="relative">
+                                    <input type="text" id="lobby_nim" name="nim" value="{{ old('nim') }}" required autocomplete="off"
+                                           inputmode="numeric" pattern="[0-9]{11}" maxlength="11" minlength="11"
+                                           placeholder="Wajib 11 digit angka (0-9)"
+                                           oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11);"
+                                           class="w-full px-4 py-3 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-600 font-mono transition-colors">
+                                </div>
+                                <p id="lobby_nim_hint" class="text-[11px] mt-1.5 font-medium transition-colors" style="display:none;"></p>
                                 @error('nim')
                                     <p class="text-xs text-red-400 mt-1">{{ $message }}</p>
                                 @enderror
@@ -615,5 +623,85 @@
         });
     </script>
     @endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const lobbyNim = document.getElementById('lobby_nim');
+            function updateLobbyNimFeedback() {
+                if (!lobbyNim) return;
+                lobbyNim.value = lobbyNim.value.replace(/\D/g, '').slice(0, 11);
+                const len = lobbyNim.value.length;
+                const badge = document.getElementById('lobby_nim_badge');
+                const hint = document.getElementById('lobby_nim_hint');
+                if (badge) {
+                    badge.textContent = `${len}/11 digit`;
+                    if (len === 11) {
+                        badge.className = 'text-[11px] font-mono font-bold text-emerald-400';
+                    } else if (len > 0) {
+                        badge.className = 'text-[11px] font-mono font-bold text-amber-400';
+                    } else {
+                        badge.className = 'text-[11px] font-mono text-gray-400';
+                    }
+                }
+                if (hint) {
+                    if (len === 11) {
+                        hint.textContent = '✓ Format NIM valid (11 digit)';
+                        hint.className = 'text-[11px] mt-1.5 font-medium text-emerald-400';
+                        hint.style.display = 'block';
+                        lobbyNim.classList.remove('border-amber-500', 'border-red-500');
+                        lobbyNim.classList.add('border-emerald-500/60');
+                    } else if (len > 0) {
+                        hint.textContent = `⚠️ Masukkan ${11 - len} digit lagi (harus tepat 11 digit angka 0-9)`;
+                        hint.className = 'text-[11px] mt-1.5 font-medium text-amber-400';
+                        hint.style.display = 'block';
+                        lobbyNim.classList.remove('border-emerald-500/60');
+                        lobbyNim.classList.add('border-amber-500/70');
+                    } else {
+                        hint.style.display = 'none';
+                        lobbyNim.classList.remove('border-emerald-500/60', 'border-amber-500/70', 'border-red-500');
+                    }
+                }
+            }
+
+            if (lobbyNim) {
+                lobbyNim.addEventListener('input', updateLobbyNimFeedback);
+                lobbyNim.addEventListener('change', updateLobbyNimFeedback);
+                lobbyNim.addEventListener('paste', () => setTimeout(updateLobbyNimFeedback, 10));
+                if (lobbyNim.value) updateLobbyNimFeedback();
+
+                const lobbyForm = lobbyNim.closest('form');
+                if (lobbyForm) {
+                    lobbyForm.addEventListener('submit', function(e) {
+                        const cleanNim = lobbyNim.value.replace(/\D/g, '');
+                        lobbyNim.value = cleanNim;
+                        if (cleanNim.length !== 11) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'NIM Harus 11 Digit',
+                                    text: 'NIM harus terdiri dari tepat 11 digit angka (0-9). Saat ini Anda memasukkan ' + cleanNim.length + ' digit.',
+                                    background: document.documentElement.classList.contains('dark') ? '#0F1713' : '#FFFFFF',
+                                    color: document.documentElement.classList.contains('dark') ? '#F3F4F6' : '#111827',
+                                    confirmButtonText: 'Lengkapi NIM',
+                                    customClass: {
+                                        popup: 'cyber-swal-popup cyber-swal-warning',
+                                        title: 'cyber-swal-title',
+                                        htmlContainer: 'cyber-swal-text',
+                                        confirmButton: 'cyber-swal-btn cyber-swal-btn-warning'
+                                    }
+                                });
+                            } else {
+                                alert('NIM harus terdiri dari tepat 11 digit angka (0-9).');
+                            }
+                            lobbyNim.focus();
+                            return false;
+                        }
+                    }, true);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
