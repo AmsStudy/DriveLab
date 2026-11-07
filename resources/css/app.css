@@ -710,15 +710,17 @@ html:not(.dark) .quiz-modal-card input[type="file"]::-webkit-file-upload-button:
 }
 
 /* Modals in Light Mode */
-html:not(.dark) #editModal > div,
-html:not(.dark) #textSubmissionModal > div,
-html:not(.dark) #createQuizModal > div,
-html:not(.dark) #editQuizModal > div,
-html:not(.dark) #create-modal > div,
-html:not(.dark) #addQuestionModal > div,
-html:not(.dark) #editQuestionModal > div,
-html:not(.dark) #importExcelModal > div,
-html:not(.dark) [id$="Modal"] > div,
+html:not(.dark) #editModal > .modal-card,
+html:not(.dark) #textSubmissionModal > .modal-card,
+html:not(.dark) #createQuizModal > .modal-card,
+html:not(.dark) #editQuizModal > .modal-card,
+html:not(.dark) #create-modal > .modal-card,
+html:not(.dark) #create-modal > div:not(.modal-backdrop):not(.fixed),
+html:not(.dark) #addQuestionModal > .modal-card,
+html:not(.dark) #editQuestionModal > .modal-card,
+html:not(.dark) #importExcelModal > .modal-card,
+html:not(.dark) [id$="Modal"] > .modal-card,
+html:not(.dark) [id$="Modal"] > div:not(.modal-backdrop):not(.fixed),
 html:not(.dark) .quiz-modal-card {
     background-color: #FFFFFF !important;
     border-color: #E2EAE5 !important;

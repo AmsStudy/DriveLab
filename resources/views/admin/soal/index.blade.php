@@ -455,10 +455,10 @@
 {{-- ─── Pop Up Modal: Tambah Dokumen Baru ─── --}}
 <div id="create-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 hidden" style="z-index: 100;">
     {{-- Backdrop --}}
-    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="closeCreateModal()"></div>
+    <div class="modal-backdrop fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-md transition-opacity" onclick="closeCreateModal()"></div>
 
     {{-- Modal Card --}}
-    <div class="relative bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl z-10 overflow-hidden">
+    <div class="modal-card relative bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl z-10 overflow-hidden">
         {{-- Modal Header --}}
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-[#1A2820] bg-gray-50/90 dark:bg-[#0F1713] flex-shrink-0">
             <div class="flex items-center gap-3">
@@ -788,8 +788,8 @@
 </div>
 
 {{-- ─── POP UP MODAL EDIT DOKUMEN ─── --}}
-<div id="editModal" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm p-4 items-center justify-center" style="z-index: 100;">
-    <div class="rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] border bg-white dark:bg-[#0F1713] border-gray-200 dark:border-[#1A2820]">
+<div id="editModal" class="fixed inset-0 z-[100] hidden bg-black/60 dark:bg-black/80 backdrop-blur-md p-4 items-center justify-center" style="z-index: 100;">
+    <div class="modal-card rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] border bg-white dark:bg-[#0F1713] border-gray-200 dark:border-[#1A2820]">
 
         {{-- Modal Header --}}
         <div class="flex items-center justify-between px-6 py-4 border-b flex-shrink-0 bg-gray-50/90 dark:bg-[#090E0B] border-gray-200 dark:border-[#1A2820]">
