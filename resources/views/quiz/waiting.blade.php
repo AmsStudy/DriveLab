@@ -30,6 +30,7 @@
             background-color: var(--bg);
             color: #f3f4f6;
             min-height: 100vh;
+            overflow-x: hidden;
         }
         html:not(.dark) body {
             color: #0F1F17 !important;
@@ -46,40 +47,154 @@
             box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05) !important;
         }
 
-        /* Ambient Glow & Grid Pattern */
-        .ambient-grid {
-            background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
-        html:not(.dark) .ambient-grid {
-            background-image: radial-gradient(rgba(16, 185, 129, 0.12) 1px, transparent 1px);
-        }
-
-        /* Radar Pulse Animation */
-        @keyframes pulseRingOuter {
-            0% { transform: scale(0.85); opacity: 0.8; }
-            50% { transform: scale(1.3); opacity: 0; }
-            100% { transform: scale(0.85); opacity: 0; }
-        }
-        @keyframes pulseRingInner {
-            0% { transform: scale(0.9); opacity: 0.9; }
-            50% { transform: scale(1.15); opacity: 0.3; }
-            100% { transform: scale(0.9); opacity: 0.9; }
-        }
-        .pulse-ring-outer {
-            animation: pulseRingOuter 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        .pulse-ring-inner {
-            animation: pulseRingInner 2.2s ease-in-out infinite;
-        }
-
-        /* Subtle Sweep Animation */
-        @keyframes sweepRotate {
+        /* ─── Cyber Quantum Reactor Spinner (Ultra "Wah" & Futuristik) ─── */
+        @keyframes orbitCW {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .sweep-effect {
-            animation: sweepRotate 4s linear infinite;
+        @keyframes orbitCCW {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+        @keyframes pulseGlowWave {
+            0%, 100% {
+                transform: scale(0.92);
+                box-shadow: 0 0 15px rgba(16, 185, 129, 0.3), inset 0 0 10px rgba(16, 185, 129, 0.2);
+            }
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 0 35px rgba(52, 211, 153, 0.7), 0 0 60px rgba(16, 185, 129, 0.4), inset 0 0 18px rgba(52, 211, 153, 0.4);
+            }
+        }
+        @keyframes floatingOrb {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(180deg); }
+        }
+
+        .quantum-reactor {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.75rem;
+        }
+
+        /* Ring 1 - Outermost Multi-Segment Ring with Glowing Orbits */
+        .reactor-ring-outer {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px dashed rgba(16, 185, 129, 0.25);
+            animation: orbitCW 18s linear infinite;
+        }
+        .reactor-ring-outer::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #34D399;
+            box-shadow: 0 0 12px #34D399, 0 0 20px #10B981;
+        }
+        .reactor-ring-outer::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #06B6D4;
+            box-shadow: 0 0 12px #06B6D4;
+        }
+
+        /* Ring 2 - Tech Circuit Gradient Ring */
+        .reactor-ring-mid {
+            position: absolute;
+            inset: 14px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top: 3px solid #10B981;
+            border-right: 3px solid #34D399;
+            border-bottom: 3px solid transparent;
+            border-left: 3px solid rgba(16, 185, 129, 0.3);
+            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.6));
+            animation: orbitCW 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        /* Ring 3 - Counter Rotating Segment */
+        .reactor-ring-inner {
+            position: absolute;
+            inset: 28px;
+            border-radius: 50%;
+            border: 2.5px solid transparent;
+            border-bottom: 2.5px solid #06B6D4;
+            border-left: 2.5px solid #10B981;
+            filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5));
+            animation: orbitCCW 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        /* Ring 4 - Ambient Particle Track */
+        .reactor-ring-dotted {
+            position: absolute;
+            inset: 40px;
+            border-radius: 50%;
+            border: 2px dotted rgba(52, 211, 153, 0.45);
+            animation: orbitCW 7s linear infinite;
+        }
+
+        /* Center Glowing Core */
+        .reactor-core {
+            position: relative;
+            width: 58px;
+            height: 58px;
+            border-radius: 20px;
+            background: radial-gradient(circle at 35% 35%, #10B981 0%, #064E3B 100%);
+            border: 2px solid rgba(52, 211, 153, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            animation: pulseGlowWave 2s ease-in-out infinite alternate;
+        }
+        html:not(.dark) .reactor-core {
+            background: radial-gradient(circle at 35% 35%, #059669 0%, #065F46 100%);
+            border: 2px solid rgba(16, 185, 129, 0.6);
+            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.45);
+        }
+
+        /* Dynamic Digital Equalizer / Activity Bars */
+        .audio-wave-bar {
+            width: 3px;
+            border-radius: 9999px;
+            background: #10B981;
+            animation: audioWave 1.2s ease-in-out infinite alternate;
+        }
+        @keyframes audioWave {
+            0% { height: 6px; opacity: 0.4; }
+            100% { height: 22px; opacity: 1; }
+        }
+
+        /* Background Moving Gradient Orbs */
+        @keyframes floatBackdrop1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(25px, -20px) scale(1.1); }
+        }
+        @keyframes floatBackdrop2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-30px, 25px) scale(1.15); }
+        }
+        .backdrop-orb-1 {
+            animation: floatBackdrop1 10s ease-in-out infinite;
+        }
+        .backdrop-orb-2 {
+            animation: floatBackdrop2 12s ease-in-out infinite;
         }
     </style>
 </head>
@@ -132,38 +247,61 @@
     {{-- Main Content --}}
     <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-8 md:py-12 flex flex-col justify-center relative">
 
-        <div class="space-y-6">
+        {{-- Background Ambient Gradient Orbs --}}
+        <div class="absolute -top-12 -left-16 w-80 h-80 rounded-full bg-emerald-500/10 dark:bg-emerald-500/5 blur-3xl pointer-events-none backdrop-orb-1"></div>
+        <div class="absolute -bottom-12 -right-16 w-80 h-80 rounded-full bg-teal-500/10 dark:bg-teal-500/5 blur-3xl pointer-events-none backdrop-orb-2"></div>
+
+        <div class="space-y-6 relative z-10">
 
             {{-- Main Hero Waiting Card --}}
             <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-3xl p-6 sm:p-10 glow-card relative overflow-hidden text-center shadow-xl">
-                {{-- Decorative Ambient Glows --}}
-                <div class="absolute -right-20 -top-20 w-72 h-72 bg-emerald-500/15 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute -left-20 -bottom-20 w-72 h-72 bg-teal-500/10 dark:bg-teal-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                {{-- Decorative Ambient Glows inside card --}}
+                <div class="absolute -right-24 -top-24 w-80 h-80 bg-emerald-500/15 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-24 -bottom-24 w-80 h-80 bg-teal-500/10 dark:bg-teal-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
-                {{-- Status Chip --}}
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-7 shadow-xs">
-                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                {{-- Status Chip with Glowing Aura --}}
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-8 shadow-xs relative">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
                     <span>Ruang Tunggu Ujian Aktif</span>
                 </div>
 
-                {{-- Enhanced Radar / Pulse Visualizer --}}
-                <div class="relative w-32 h-32 mx-auto mb-7 flex items-center justify-center">
-                    {{-- Outer pulsing radar circles --}}
-                    <div class="absolute inset-0 rounded-full border-2 border-emerald-500/25 pulse-ring-outer"></div>
-                    <div class="absolute inset-2.5 rounded-full border border-emerald-500/30 pulse-ring-inner"></div>
-                    <div class="absolute inset-5 rounded-full border border-dashed border-emerald-500/40"></div>
-                    
-                    {{-- Rotating Sweep Beam Effect --}}
-                    <div class="absolute inset-2 rounded-full overflow-hidden pointer-events-none opacity-40 dark:opacity-30">
-                        <div class="w-full h-full sweep-effect origin-center bg-gradient-to-tr from-transparent via-transparent to-emerald-400/30"></div>
-                    </div>
+                {{-- ─── QUANTUM REACTOR SPINNER ("WAH" & FUTURISTIC ANIMATION) ─── --}}
+                <div class="quantum-reactor">
+                    {{-- Outer dashed counter-spinning orbit ring with twin satellites --}}
+                    <div class="reactor-ring-outer"></div>
 
-                    {{-- Core Icon Box --}}
-                    <div class="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-[#14231B] dark:to-[#0D1812] border-2 border-emerald-400/50 dark:border-emerald-500/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-lg shadow-emerald-500/20">
-                        <svg class="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {{-- Middle cyber glowing arc ring --}}
+                    <div class="reactor-ring-mid"></div>
+
+                    {{-- Inner high-speed counter-rotating cyan/emerald ring --}}
+                    <div class="reactor-ring-inner"></div>
+
+                    {{-- Particle dotted track --}}
+                    <div class="reactor-ring-dotted"></div>
+
+                    {{-- Center Pulsing Glowing Core with Tech Icon --}}
+                    <div class="reactor-core shadow-2xl">
+                        <svg class="w-7 h-7 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
+                </div>
+
+                {{-- Interactive Live Radar Sweep Signal Bar --}}
+                <div class="flex items-center justify-center gap-1.5 mb-5 opacity-80">
+                    <span class="audio-wave-bar" style="animation-delay: 0.1s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.3s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.5s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.2s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.4s;"></span>
+                    <span class="text-[11px] font-mono font-bold tracking-widest uppercase text-emerald-600 dark:text-emerald-400 mx-2">
+                        STANDBY &bull; SYNCING
+                    </span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.2s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.4s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.1s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.5s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.3s;"></span>
                 </div>
 
                 {{-- Quiz Title --}}
@@ -173,14 +311,14 @@
 
                 {{-- Status Descriptions --}}
                 <p class="text-sm text-gray-600 dark:text-gray-300 max-w-lg mx-auto mb-6 leading-relaxed">
-                    Data Anda telah terverifikasi dan siap mengikuti ujian.
+                    Data Anda telah terverifikasi dan siap mengikuti ujian laboratorium.
                     <span class="text-emerald-700 dark:text-emerald-400 font-semibold block mt-1.5 text-xs sm:text-sm">
                         Halaman ini akan otomatis beralih sendiri ke lembar soal saat pengawas menekan tombol <strong>Mulai</strong>. Anda tidak perlu me-refresh browser.
                     </span>
                 </p>
 
-                {{-- Waiting Room Live Participants Pill --}}
-                <div class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-emerald-50/70 dark:bg-[#090D0B] border border-emerald-200 dark:border-[#1E3327] shadow-xs mb-7">
+                {{-- Waiting Room Live Participants Pill with Pulse --}}
+                <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-emerald-50/80 dark:bg-[#090D0B] border border-emerald-300/70 dark:border-[#1E3327] shadow-xs mb-8">
                     <span class="relative flex h-2.5 w-2.5">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
