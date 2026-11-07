@@ -641,6 +641,9 @@ class QuizFeatureTest extends TestCase
         $this->assertFalse($options[3]->is_correct); // Flash Disk
         $this->assertNotNull($options[0]->image_path);
         Storage::disk('public')->assertExists($options[0]->image_path);
+        $this->assertStringStartsWith('/storage/', $options[0]->image_url);
+        $storageResponse = $this->get($options[0]->image_url);
+        $storageResponse->assertStatus(200);
 
         // 2. Student Submits Perfect Answer (both RAM and Cache L1)
         $start1 = $this->post(route('quiz.start', $quiz->unique_token), [

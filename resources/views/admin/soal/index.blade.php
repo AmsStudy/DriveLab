@@ -1170,22 +1170,23 @@ function copyLink(url) {
 function toggleDocPassword(id, pwd = '', title = '') {
     const closedBtn = document.getElementById(`pwd-badge-closed-${id}`);
     const openBadge = document.getElementById(`pwd-badge-open-${id}`);
+    const isDark = document.documentElement.classList.contains('dark');
 
     if (!pwd && (!openBadge || openBadge.classList.contains('hidden'))) {
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 icon: 'info',
                 title: 'Password Terenkripsi',
-                html: `<p class="text-sm text-gray-300">Dokumen <strong class="text-amber-400">${title || 'ini'}</strong> dilindungi password yang tersimpan dengan enkripsi.</p><p class="text-xs text-gray-400 mt-2">Anda dapat memperbarui password melalui menu Edit Dokumen.</p>`,
-                background: '#0D1512',
-                color: '#f3f4f6',
+                html: `<p class="text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}">Dokumen <strong class="text-amber-500 font-semibold">${title || 'ini'}</strong> dilindungi password yang tersimpan dengan enkripsi satu arah (hash).</p><p class="text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-2">Untuk menampilkan password secara langsung di sini, silakan simpan ulang password melalui menu Edit Dokumen.</p>`,
+                background: isDark ? '#0D1512' : '#ffffff',
+                color: isDark ? '#f3f4f6' : '#111827',
                 confirmButtonColor: '#10b981',
                 confirmButtonText: 'Edit Dokumen',
                 showCancelButton: true,
                 cancelButtonText: 'Tutup',
-                cancelButtonColor: '#374151',
+                cancelButtonColor: isDark ? '#374151' : '#6b7280',
                 customClass: {
-                    popup: 'border border-[#1E3327] rounded-2xl shadow-2xl'
+                    popup: isDark ? 'border border-[#1E3327] rounded-2xl shadow-2xl' : 'border border-gray-200 rounded-2xl shadow-2xl'
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
