@@ -724,13 +724,22 @@
             </div>
 
             {{-- Image Card with Zoom and Pan/Drag Support --}}
-            <div class="rounded-2xl overflow-hidden border border-emerald-500/30 bg-[#0A0F0D] lightbox-card shadow-[0_0_50px_rgba(0,0,0,0.9),0_0_25px_rgba(16,185,129,0.2)] p-2 max-w-full max-h-[82vh] flex items-center justify-center"
-                 @wheel.prevent="zoomPreview($event.deltaY < 0 ? 0.15 : -0.15)">
-                <div class="overflow-hidden flex items-center justify-center"
-                     style="touch-action: none;">
+            <div class="w-[92vw] max-w-5xl h-[78vh] sm:h-[82vh] rounded-2xl overflow-hidden border border-emerald-500/30 bg-[#0A0F0D] lightbox-card shadow-[0_0_50px_rgba(0,0,0,0.9),0_0_25px_rgba(16,185,129,0.2)] p-2 relative flex items-center justify-center select-none"
+                 @wheel.prevent="zoomPreview($event.deltaY < 0 ? 0.2 : -0.2)">
+                <div class="w-full h-full flex items-center justify-center overflow-hidden relative"
+                     style="touch-action: none;"
+                     @mousedown="startDrag($event)"
+                     @mousemove="onDrag($event)"
+                     @mouseup="stopDrag()"
+                     @mouseleave="stopDrag()"
+                     @touchstart="onTouchStart($event)"
+                     @touchmove="onTouchMove($event)"
+                     @touchend="stopDrag()"
+                     @dblclick="toggleZoom()">
                     <img :src="previewImageModal.src" alt="Pratinjau Gambar Soal"
-                         class="max-w-full max-h-[80vh] w-auto h-auto object-contain rounded-xl transition-transform duration-100 ease-out select-none cursor-grab active:cursor-grabbing"
-                         :style="'transform: scale(' + previewImageModal.scale + ') translate(' + previewImageModal.translateX + 'px, ' + previewImageModal.translateY + 'px);'"
+                         class="max-w-full max-h-full object-contain rounded-xl transition-transform duration-75 ease-out select-none"
+                         :class="previewImageModal.scale > 1 ? (previewImageModal.isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'"
+                         :style="'transform: translate(' + previewImageModal.translateX + 'px, ' + previewImageModal.translateY + 'px) scale(' + previewImageModal.scale + ');'"
                          draggable="false">
                 </div>
             </div>
@@ -963,12 +972,13 @@
                     this.previewImageModal.scale = 1.0;
                     this.previewImageModal.translateX = 0;
                     this.previewImageModal.translateY = 0;
+                    this.previewImageModal.isDragging = false;
                 },
 
                 zoomPreview(delta) {
                     let nextScale = Math.round((this.previewImageModal.scale + delta) * 10) / 10;
                     if (nextScale < 0.5) nextScale = 0.5;
-                    if (nextScale > 4.0) nextScale = 4.0;
+                    if (nextScale > 5.0) nextScale = 5.0;
                     this.previewImageModal.scale = nextScale;
                     if (nextScale <= 1.0) {
                         this.previewImageModal.translateX = 0;
@@ -980,6 +990,48 @@
                     this.previewImageModal.scale = 1.0;
                     this.previewImageModal.translateX = 0;
                     this.previewImageModal.translateY = 0;
+                    this.previewImageModal.isDragging = false;
+                },
+
+                toggleZoom() {
+                    if (this.previewImageModal.scale > 1.0) {
+                        this.resetPreviewZoom();
+                    } else {
+                        this.zoomPreview(1.0); // Jump to 200%
+                    }
+                },
+
+                startDrag(e) {
+                    if (this.previewImageModal.scale <= 1.0) return;
+                    this.previewImageModal.isDragging = true;
+                    this.previewImageModal.startX = e.clientX - this.previewImageModal.translateX;
+                    this.previewImageModal.startY = e.clientY - this.previewImageModal.translateY;
+                    e.preventDefault();
+                },
+
+                onDrag(e) {
+                    if (!this.previewImageModal.isDragging) return;
+                    this.previewImageModal.translateX = e.clientX - this.previewImageModal.startX;
+                    this.previewImageModal.translateY = e.clientY - this.previewImageModal.startY;
+                },
+
+                stopDrag() {
+                    this.previewImageModal.isDragging = false;
+                },
+
+                onTouchStart(e) {
+                    if (e.touches.length === 1 && this.previewImageModal.scale > 1.0) {
+                        this.previewImageModal.isDragging = true;
+                        this.previewImageModal.startX = e.touches[0].clientX - this.previewImageModal.translateX;
+                        this.previewImageModal.startY = e.touches[0].clientY - this.previewImageModal.translateY;
+                    }
+                },
+
+                onTouchMove(e) {
+                    if (this.previewImageModal.isDragging && e.touches.length === 1) {
+                        this.previewImageModal.translateX = e.touches[0].clientX - this.previewImageModal.startX;
+                        this.previewImageModal.translateY = e.touches[0].clientY - this.previewImageModal.startY;
+                    }
                 },
 
                 showHoverPreview(e, src) {

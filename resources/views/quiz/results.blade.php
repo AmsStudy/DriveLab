@@ -873,13 +873,14 @@
                 </button>
             </div>
 
-            {{-- Image Box with Zoom --}}
-            <div class="rounded-2xl overflow-hidden border border-emerald-500/30 bg-[#0A0F0D] lightbox-card shadow-[0_0_50px_rgba(0,0,0,0.9),0_0_25px_rgba(16,185,129,0.2)] p-2 max-w-full max-h-[82vh] flex items-center justify-center"
+            {{-- Image Box with Zoom and Pan --}}
+            <div id="cyber-lightbox-stage"
+                 class="w-[92vw] max-w-5xl h-[78vh] sm:h-[82vh] rounded-2xl overflow-hidden border border-emerald-500/30 bg-[#0A0F0D] lightbox-card shadow-[0_0_50px_rgba(0,0,0,0.9),0_0_25px_rgba(16,185,129,0.2)] p-2 relative flex items-center justify-center select-none"
                  onwheel="handleCyberLightboxWheel(event)">
-                <div class="overflow-hidden flex items-center justify-center">
+                <div id="cyber-lightbox-canvas" class="w-full h-full flex items-center justify-center overflow-hidden relative">
                     <img id="cyber-lightbox-img" src="" alt="Pratinjau Gambar"
-                         class="max-w-full max-h-[80vh] w-auto h-auto object-contain rounded-xl transition-transform duration-100 ease-out select-none cursor-grab active:cursor-grabbing"
-                         style="transform: scale(1);"
+                         class="max-w-full max-h-full object-contain select-none transition-transform duration-75 ease-out rounded-lg cursor-zoom-in"
+                         style="transform: translate(0px, 0px) scale(1);"
                          draggable="false">
                 </div>
             </div>
@@ -892,6 +893,28 @@
     {{-- Trigger Confetti Celebration & Lightbox JS --}}
     <script>
         let currentCyberLightboxScale = 1.0;
+        let currentCyberLightboxTranslateX = 0;
+        let currentCyberLightboxTranslateY = 0;
+        let isCyberLightboxDragging = false;
+        let cyberLightboxDragStartX = 0;
+        let cyberLightboxDragStartY = 0;
+
+        function updateCyberLightboxTransform() {
+            const img = document.getElementById('cyber-lightbox-img');
+            const zoomLbl = document.getElementById('cyber-lightbox-zoom-label');
+            if (!img) return;
+
+            if (currentCyberLightboxScale <= 1.0) {
+                currentCyberLightboxTranslateX = 0;
+                currentCyberLightboxTranslateY = 0;
+                img.style.cursor = 'zoom-in';
+            } else {
+                img.style.cursor = isCyberLightboxDragging ? 'grabbing' : 'grab';
+            }
+
+            img.style.transform = `translate(${currentCyberLightboxTranslateX}px, ${currentCyberLightboxTranslateY}px) scale(${currentCyberLightboxScale})`;
+            if (zoomLbl) zoomLbl.textContent = `${Math.round(currentCyberLightboxScale * 100)}%`;
+        }
 
         window.openCyberLightbox = function(src, caption = '') {
             const lb = document.getElementById('cyber-image-lightbox');
@@ -901,10 +924,23 @@
 
             window.hideCyberHoverBubble();
             currentCyberLightboxScale = 1.0;
+            currentCyberLightboxTranslateX = 0;
+            currentCyberLightboxTranslateY = 0;
+            isCyberLightboxDragging = false;
+
+            img.onerror = function() {
+                if (cap) {
+                    cap.textContent = (caption ? caption + ' — ' : '') + 'Gambar belum tersedia di server (pastikan `php artisan storage:link` aktif)';
+                    cap.style.color = '#F59E0B';
+                }
+            };
+            img.onload = function() {
+                if (cap) {
+                    cap.style.color = '';
+                }
+            };
             img.src = src;
-            img.style.transform = 'scale(1)';
-            const zoomLbl = document.getElementById('cyber-lightbox-zoom-label');
-            if (zoomLbl) zoomLbl.textContent = '100%';
+            updateCyberLightboxTransform();
 
             if (cap) {
                 cap.textContent = caption || 'Pratinjau Gambar';
@@ -921,36 +957,99 @@
             lb.classList.add('hidden');
             if (img) {
                 img.src = '';
-                img.style.transform = 'scale(1)';
+                img.style.transform = 'translate(0px, 0px) scale(1)';
             }
             currentCyberLightboxScale = 1.0;
+            currentCyberLightboxTranslateX = 0;
+            currentCyberLightboxTranslateY = 0;
+            isCyberLightboxDragging = false;
             document.body.style.overflow = '';
         };
 
         window.adjustCyberLightboxZoom = function(delta) {
             let nextScale = Math.round((currentCyberLightboxScale + delta) * 10) / 10;
             if (nextScale < 0.5) nextScale = 0.5;
-            if (nextScale > 4.0) nextScale = 4.0;
+            if (nextScale > 5.0) nextScale = 5.0;
             currentCyberLightboxScale = nextScale;
-
-            const img = document.getElementById('cyber-lightbox-img');
-            const zoomLbl = document.getElementById('cyber-lightbox-zoom-label');
-            if (img) img.style.transform = `scale(${nextScale})`;
-            if (zoomLbl) zoomLbl.textContent = `${Math.round(nextScale * 100)}%`;
+            if (currentCyberLightboxScale <= 1.0) {
+                currentCyberLightboxTranslateX = 0;
+                currentCyberLightboxTranslateY = 0;
+            }
+            updateCyberLightboxTransform();
         };
 
         window.resetCyberLightboxZoom = function() {
             currentCyberLightboxScale = 1.0;
-            const img = document.getElementById('cyber-lightbox-img');
-            const zoomLbl = document.getElementById('cyber-lightbox-zoom-label');
-            if (img) img.style.transform = 'scale(1)';
-            if (zoomLbl) zoomLbl.textContent = '100%';
+            currentCyberLightboxTranslateX = 0;
+            currentCyberLightboxTranslateY = 0;
+            isCyberLightboxDragging = false;
+            updateCyberLightboxTransform();
         };
 
         window.handleCyberLightboxWheel = function(e) {
             e.preventDefault();
-            window.adjustCyberLightboxZoom(e.deltaY < 0 ? 0.15 : -0.15);
+            window.adjustCyberLightboxZoom(e.deltaY < 0 ? 0.2 : -0.2);
         };
+
+        // Pan & Drag event bindings for Results Lightbox
+        document.addEventListener('DOMContentLoaded', function() {
+            const stage = document.getElementById('cyber-lightbox-stage');
+            const img = document.getElementById('cyber-lightbox-img');
+            if (!stage || !img) return;
+
+            stage.addEventListener('mousedown', function(e) {
+                if (currentCyberLightboxScale <= 1.0) return;
+                isCyberLightboxDragging = true;
+                cyberLightboxDragStartX = e.clientX - currentCyberLightboxTranslateX;
+                cyberLightboxDragStartY = e.clientY - currentCyberLightboxTranslateY;
+                updateCyberLightboxTransform();
+                e.preventDefault();
+            });
+
+            window.addEventListener('mousemove', function(e) {
+                if (!isCyberLightboxDragging) return;
+                currentCyberLightboxTranslateX = e.clientX - cyberLightboxDragStartX;
+                currentCyberLightboxTranslateY = e.clientY - cyberLightboxDragStartY;
+                updateCyberLightboxTransform();
+            });
+
+            window.addEventListener('mouseup', function() {
+                if (isCyberLightboxDragging) {
+                    isCyberLightboxDragging = false;
+                    updateCyberLightboxTransform();
+                }
+            });
+
+            stage.addEventListener('touchstart', function(e) {
+                if (e.touches.length === 1 && currentCyberLightboxScale > 1.0) {
+                    isCyberLightboxDragging = true;
+                    cyberLightboxDragStartX = e.touches[0].clientX - currentCyberLightboxTranslateX;
+                    cyberLightboxDragStartY = e.touches[0].clientY - currentCyberLightboxTranslateY;
+                }
+            }, { passive: true });
+
+            stage.addEventListener('touchmove', function(e) {
+                if (isCyberLightboxDragging && e.touches.length === 1) {
+                    currentCyberLightboxTranslateX = e.touches[0].clientX - cyberLightboxDragStartX;
+                    currentCyberLightboxTranslateY = e.touches[0].clientY - cyberLightboxDragStartY;
+                    updateCyberLightboxTransform();
+                }
+            }, { passive: true });
+
+            stage.addEventListener('touchend', function() {
+                isCyberLightboxDragging = false;
+                updateCyberLightboxTransform();
+            });
+
+            img.addEventListener('dblclick', function(e) {
+                e.stopPropagation();
+                if (currentCyberLightboxScale > 1.0) {
+                    window.resetCyberLightboxZoom();
+                } else {
+                    window.adjustCyberLightboxZoom(1.0); // jump directly to 200%
+                }
+            });
+        });
 
         // ── Instant Hover Preview Bubble ──
         window.showCyberHoverBubble = function(e, src) {
