@@ -350,15 +350,15 @@
             </div>
 
             {{-- Template Download Showcase Card --}}
-            <div class="my-5 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#122219] to-[#0D1812] border border-emerald-500/30 relative overflow-hidden">
+            <div class="import-template-card my-5 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50/60 to-emerald-100/50 dark:from-[#122219] dark:to-[#0D1812] border border-emerald-200 dark:border-emerald-500/30 relative overflow-hidden shadow-sm">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-2 mb-1">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-300">Format Template Resmi (Excel & CSV)</span>
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse"></span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">Format Template Resmi (Excel & CSV)</span>
                         </div>
-                        <p class="text-xs text-gray-300 leading-relaxed">
-                            Dilengkapi <strong>Dropdown Otomatis</strong> pada kolom <em>Tipe Soal</em> & <em>Kunci Jawaban</em> (tinggal klik & pilih tanpa ketik manual), serta contoh nyata blok kode C++, Pilihan Jamak, dan Benar/Salah.
+                        <p class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">
+                            Dilengkapi <strong class="text-gray-900 dark:text-white font-bold">Dropdown Otomatis</strong> pada kolom <em class="text-emerald-900 dark:text-emerald-300 not-italic font-semibold">Tipe Soal</em> &amp; <em class="text-emerald-900 dark:text-emerald-300 not-italic font-semibold">Kunci Jawaban</em> (tinggal klik &amp; pilih tanpa ketik manual), serta contoh nyata blok kode C++, Pilihan Jamak, dan Benar/Salah.
                         </p>
                     </div>
 
@@ -367,7 +367,7 @@
                         {{-- Excel Template with Native Dropdowns (.XLSX) --}}
                         <a href="{{ route('admin.quizzes.questions.template', [$quiz, 'format' => 'excel']) }}"
                            title="Rekomendasi Utama: Template resmi Microsoft Excel (.xlsx) dengan pilihan dropdown otomatis pada kolom pilihan"
-                           class="px-3.5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-md shadow-emerald-500/20 group">
+                           class="px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-md shadow-emerald-600/20 group">
                             <svg class="w-4 h-4 text-emerald-100 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                             <span>Unduh Excel (Dropdown)</span>
                         </a>
@@ -375,8 +375,8 @@
                         {{-- Standard CSV (Comma) --}}
                         <a href="{{ route('admin.quizzes.questions.template', [$quiz, 'format' => 'csv']) }}"
                            title="Format teks murni CSV untuk Google Sheets, WPS Office, LibreOffice, atau Text Editor"
-                           class="px-3.5 py-2.5 rounded-xl bg-[#142019] hover:bg-[#1C2E24] border border-[#1E3327] hover:border-emerald-500/40 text-gray-300 hover:text-white font-semibold text-xs transition-all flex items-center gap-1.5">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                           class="px-3.5 py-2.5 rounded-xl bg-white hover:bg-emerald-50/80 border border-emerald-300/80 hover:border-emerald-500 text-emerald-800 hover:text-emerald-950 dark:bg-[#142019] dark:hover:bg-[#1C2E24] dark:border-[#1E3327] dark:hover:border-emerald-500/40 dark:text-gray-300 dark:hover:text-white font-semibold text-xs transition-all flex items-center gap-1.5 shadow-sm">
+                            <svg class="w-4 h-4 text-emerald-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                             <span>CSV Standar (Koma)</span>
                         </a>
                     </div>
@@ -398,7 +398,7 @@
 
                 {{-- Modern Drag & Drop Zone --}}
                 <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-2 uppercase tracking-wider">
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">
                         Pilih File Spreadsheet:
                     </label>
 
@@ -408,40 +408,40 @@
                          @drop.prevent="handleDrop($event)"
                          @click="$refs.importFileInput.click()"
                          class="relative border-2 border-dashed rounded-2xl p-6 sm:p-7 text-center cursor-pointer transition-all duration-200 group"
-                         :class="isDraggingFile ? 'border-emerald-400 bg-emerald-500/15 scale-[1.01]' : (importFile ? 'border-emerald-500/50 bg-[#122219]' : 'border-[#1E3327] hover:border-emerald-500/40 bg-[#090D0B] hover:bg-[#0c1410]')">
+                         :class="isDraggingFile ? 'border-emerald-500 bg-emerald-500/15 scale-[1.01]' : (importFile ? 'border-emerald-500/60 bg-emerald-50/80 dark:bg-[#122219]' : 'border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/50 bg-white dark:bg-[#090D0B] hover:bg-emerald-50/30 dark:hover:bg-[#0c1410]')">
 
                         {{-- State 1: No file chosen --}}
                         <template x-if="!importFile">
                             <div>
-                                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-3 transition-transform group-hover:scale-110">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3 transition-transform group-hover:scale-110 shadow-sm">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                                 </div>
-                                <p class="text-sm font-bold text-white mb-1">
-                                    <span class="text-emerald-400 underline decoration-emerald-500/40 underline-offset-4">Klik untuk memilih file</span> atau seret file ke sini
+                                <p class="text-sm font-bold text-gray-900 dark:text-white mb-1">
+                                    <span class="text-emerald-600 dark:text-emerald-400 underline decoration-emerald-500/40 underline-offset-4">Klik untuk memilih file</span> atau seret file ke sini
                                 </p>
-                                <p class="text-xs text-gray-400">
-                                    Mendukung format <strong class="text-gray-200">.XLSX</strong> (Excel) dan <strong class="text-gray-200">.CSV</strong> (Maksimal 10 MB)
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    Mendukung format <strong class="text-gray-800 dark:text-gray-200">.XLSX</strong> (Excel) dan <strong class="text-gray-800 dark:text-gray-200">.CSV</strong> (Maksimal 10 MB)
                                 </p>
                             </div>
                         </template>
 
                         {{-- State 2: File Selected with Details --}}
                         <template x-if="importFile">
-                            <div class="flex items-center justify-between gap-3 text-left p-3.5 rounded-xl bg-[#090D0B] border border-emerald-500/40">
+                            <div class="flex items-center justify-between gap-3 text-left p-3.5 rounded-xl bg-emerald-50/90 dark:bg-[#090D0B] border border-emerald-300 dark:border-emerald-500/40 shadow-sm">
                                 <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-500/25 to-teal-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-mono font-bold text-xs uppercase flex-shrink-0">
+                                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-500/20 to-teal-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300/80 dark:border-emerald-500/40 flex items-center justify-center font-mono font-bold text-xs uppercase flex-shrink-0">
                                         <span x-text="importFileExt || 'FILE'"></span>
                                     </div>
                                     <div class="min-w-0">
                                         <div class="flex items-center gap-1.5">
-                                            <p class="text-sm font-bold text-white truncate" x-text="importFileName"></p>
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 flex-shrink-0">Siap Diimpor</span>
+                                            <p class="text-sm font-bold text-gray-900 dark:text-white truncate" x-text="importFileName"></p>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 flex-shrink-0">Siap Diimpor</span>
                                         </div>
-                                        <p class="text-xs text-gray-400 font-mono mt-0.5" x-text="importFileSize + ' • Klik untuk ganti file'"></p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5" x-text="importFileSize + ' • Klik untuk ganti file'"></p>
                                     </div>
                                 </div>
                                 <button type="button" @click.stop="clearImportFile()"
-                                        class="p-2 text-gray-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors flex-shrink-0"
+                                        class="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors flex-shrink-0"
                                         title="Hapus file ini">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
@@ -451,74 +451,74 @@
                 </div>
 
                 {{-- Interactive Collapsible Guide: Panduan Kolom Spreadsheet --}}
-                <div class="rounded-2xl bg-[#090D0B] border border-[#1A2820] overflow-hidden">
+                <div class="rounded-2xl bg-gray-50/90 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] overflow-hidden shadow-sm">
                     <button type="button" @click="showGuideTable = !showGuideTable"
-                            class="w-full px-4 py-3 text-left flex items-center justify-between text-xs font-semibold text-gray-300 hover:text-emerald-400 transition-colors">
+                            class="w-full px-4 py-3 text-left flex items-center justify-between text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
                         <span class="flex items-center gap-2">
                             <span>💡</span>
                             <span>Panduan Format Kolom Spreadsheet (RFC 4180)</span>
                         </span>
-                        <div class="flex items-center gap-1.5 text-[11px] text-gray-400">
+                        <div class="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
                             <span x-text="showGuideTable ? 'Sembunyikan' : 'Lihat Detail Kolom'"></span>
                             <svg class="w-4 h-4 transition-transform duration-200"
-                                 :class="showGuideTable ? 'rotate-180 text-emerald-400' : ''"
+                                 :class="showGuideTable ? 'rotate-180 text-emerald-600 dark:text-emerald-400' : ''"
                                  fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </div>
                     </button>
 
-                    <div x-show="showGuideTable" x-collapse class="border-t border-[#1A2820] p-4 text-xs space-y-2.5">
+                    <div x-show="showGuideTable" x-collapse class="border-t border-gray-200 dark:border-[#1A2820] p-4 text-xs space-y-2.5 bg-white dark:bg-transparent">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-[11px] border-collapse">
                                 <thead>
-                                    <tr class="border-b border-[#1A2820] text-gray-400 font-semibold uppercase tracking-wider">
+                                    <tr class="border-b border-gray-200 dark:border-[#1A2820] text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider">
                                         <th class="py-2 pr-3">Kolom</th>
                                         <th class="py-2 px-3">Status</th>
                                         <th class="py-2 px-3">Tipe Data / Pilihan</th>
                                         <th class="py-2 pl-3">Contoh Nilai</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-[#1A2820] text-gray-300 font-mono">
+                                <tbody class="divide-y divide-gray-100 dark:divide-[#1A2820] text-gray-700 dark:text-gray-300 font-mono">
                                     <tr>
-                                        <td class="py-2 pr-3 font-bold text-white">Pertanyaan</td>
-                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-sans font-bold text-[10px]">Wajib</span></td>
-                                        <td class="py-2 px-3 font-sans">Teks biasa atau blok kode Markdown</td>
-                                        <td class="py-2 pl-3 text-gray-400 font-sans">Perhatikan kode <code>```cpp int x; ```</code></td>
+                                        <td class="py-2 pr-3 font-bold text-gray-900 dark:text-white">Pertanyaan</td>
+                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 font-sans font-bold text-[10px]">Wajib</span></td>
+                                        <td class="py-2 px-3 font-sans text-gray-600 dark:text-gray-300">Teks biasa atau blok kode Markdown</td>
+                                        <td class="py-2 pl-3 text-gray-500 dark:text-gray-400 font-sans">Perhatikan kode <code>```cpp int x; ```</code></td>
                                     </tr>
                                     <tr>
-                                        <td class="py-2 pr-3 font-bold text-white">Tipe_Soal</td>
+                                        <td class="py-2 pr-3 font-bold text-gray-900 dark:text-white">Tipe_Soal</td>
                                         <td class="py-2 px-3">
-                                            <span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-sans font-bold text-[10px]">Wajib</span>
-                                            <span class="px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 font-sans font-bold text-[10px]">Dropdown</span>
+                                            <span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 font-sans font-bold text-[10px]">Wajib</span>
+                                            <span class="px-1.5 py-0.5 rounded bg-sky-100 dark:bg-sky-500/15 text-sky-800 dark:text-sky-300 font-sans font-bold text-[10px]">Dropdown</span>
                                         </td>
-                                        <td class="py-2 px-3 text-sky-300">multiple_choice | multi_select | true_false</td>
-                                        <td class="py-2 pl-3 text-gray-400">multiple_choice</td>
+                                        <td class="py-2 px-3 text-sky-700 dark:text-sky-300">multiple_choice | multi_select | true_false</td>
+                                        <td class="py-2 pl-3 text-gray-500 dark:text-gray-400">multiple_choice</td>
                                     </tr>
                                     <tr>
-                                        <td class="py-2 pr-3 font-bold text-white">Poin</td>
-                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-400 font-sans text-[10px]">Opsional</span></td>
-                                        <td class="py-2 px-3 font-sans">Angka bulat positif (default: 10)</td>
-                                        <td class="py-2 pl-3 text-amber-400">10</td>
+                                        <td class="py-2 pr-3 font-bold text-gray-900 dark:text-white">Poin</td>
+                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-sans text-[10px]">Opsional</span></td>
+                                        <td class="py-2 px-3 font-sans text-gray-600 dark:text-gray-300">Angka bulat positif (default: 10)</td>
+                                        <td class="py-2 pl-3 text-amber-600 dark:text-amber-400 font-bold">10</td>
                                     </tr>
                                     <tr>
-                                        <td class="py-2 pr-3 font-bold text-white">Pilihan_A s/d E</td>
-                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-sans font-bold text-[10px]">A & B Wajib</span></td>
-                                        <td class="py-2 px-3 font-sans">Teks pilihan jawaban (C s/d E opsional)</td>
-                                        <td class="py-2 pl-3 text-gray-400 font-sans">A: malloc(), B: free()</td>
+                                        <td class="py-2 pr-3 font-bold text-gray-900 dark:text-white">Pilihan_A s/d E</td>
+                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 font-sans font-bold text-[10px]">A & B Wajib</span></td>
+                                        <td class="py-2 px-3 font-sans text-gray-600 dark:text-gray-300">Teks pilihan jawaban (C s/d E opsional)</td>
+                                        <td class="py-2 pl-3 text-gray-500 dark:text-gray-400 font-sans">A: malloc(), B: free()</td>
                                     </tr>
                                     <tr>
-                                        <td class="py-2 pr-3 font-bold text-white">Kunci_Jawaban</td>
+                                        <td class="py-2 pr-3 font-bold text-gray-900 dark:text-white">Kunci_Jawaban</td>
                                         <td class="py-2 px-3">
-                                            <span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-sans font-bold text-[10px]">Wajib</span>
-                                            <span class="px-1.5 py-0.5 rounded bg-teal-500/15 text-teal-300 font-sans font-bold text-[10px]">Dropdown</span>
+                                            <span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 font-sans font-bold text-[10px]">Wajib</span>
+                                            <span class="px-1.5 py-0.5 rounded bg-teal-100 dark:bg-teal-500/15 text-teal-800 dark:text-teal-300 font-sans font-bold text-[10px]">Dropdown</span>
                                         </td>
-                                        <td class="py-2 px-3 font-sans">Huruf kunci jawaban benar</td>
-                                        <td class="py-2 pl-3 text-emerald-400">A (atau "A, C" untuk jamak)</td>
+                                        <td class="py-2 px-3 font-sans text-teal-700 dark:text-teal-300 font-bold">Huruf kunci jawaban benar</td>
+                                        <td class="py-2 pl-3 text-emerald-600 dark:text-emerald-400 font-bold">A (atau "A, C" untuk jamak)</td>
                                     </tr>
                                     <tr>
-                                        <td class="py-2 pr-3 font-bold text-white">Pembahasan</td>
-                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-gray-800 text-gray-400 font-sans text-[10px]">Opsional</span></td>
-                                        <td class="py-2 px-3 font-sans">Penjelasan kunci untuk mahasiswa</td>
-                                        <td class="py-2 pl-3 text-gray-400 font-sans">malloc bertugas di heap...</td>
+                                        <td class="py-2 pr-3 font-bold text-gray-900 dark:text-white">Pembahasan</td>
+                                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-sans text-[10px]">Opsional</span></td>
+                                        <td class="py-2 px-3 font-sans text-gray-600 dark:text-gray-300">Penjelasan kunci untuk mahasiswa</td>
+                                        <td class="py-2 pl-3 text-gray-500 dark:text-gray-400 font-sans">malloc bertugas di heap...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -527,14 +527,28 @@
                 </div>
 
                 {{-- Modal Action Footer --}}
-                <div class="pt-4 border-t border-[#1A2820] flex items-center justify-between gap-3">
+                <div class="pt-4 border-t border-gray-200 dark:border-[#1A2820] flex items-center justify-between gap-3">
                     <button type="button" @click="showImportModal = false"
-                            class="px-5 py-2.5 rounded-xl border border-[#1A2820] hover:bg-gray-800 text-gray-300 text-xs sm:text-sm font-semibold transition-colors">
+                            class="px-5 py-2.5 rounded-xl border border-gray-200 dark:border-[#1A2820] bg-white dark:bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-semibold transition-colors shadow-sm">
                         Batal
                     </button>
 
                     <button type="submit" :disabled="!importFile || isSubmittingImport"
-                            class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 disabled:opacity-40 disabled:pointer-events-none text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                            class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 disabled:opacity-50 disabled:from-gray-200 disabled:to-gray-200 disabled:text-gray-400 disabled:border disabled:border-gray-300 dark:disabled:from-emerald-950 dark:disabled:to-teal-950 dark:disabled:text-emerald-300/40 disabled:cursor-not-allowed disabled:shadow-none text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                        <template x-if="!isSubmittingImport">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                <span>Mulai Import Soal Sekarang</span>
+                            </span>
+                        </template>
+                        <template x-if="isSubmittingImport">
+                            <span class="flex items-center gap-2">
+                                <svg class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                <span>Memproses & Menyimpan Soal...</span>
+                            </span>
+                        </template>
+                    </button>
+                </div>
                         <template x-if="!isSubmittingImport">
                             <span class="flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>

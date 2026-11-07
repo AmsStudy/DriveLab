@@ -790,6 +790,35 @@
             color: #047857 !important;
             box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15) !important;
         }
+
+        /* ─── Import Modal Light Theme Enhancements ─── */
+        html:not(.dark) .import-template-card {
+            background: linear-gradient(135deg, #ECFDF5 0%, #E6F4EA 100%) !important;
+            border-color: #A7F3D0 !important;
+            box-shadow: 0 1px 3px rgba(16, 185, 129, 0.08) !important;
+        }
+        html:not(.dark) .import-template-card p {
+            color: #064E3B !important;
+        }
+        html:not(.dark) .import-template-card span.text-emerald-800,
+        html:not(.dark) .import-template-card span.text-emerald-300 {
+            color: #065F46 !important;
+        }
+        html:not(.dark) .import-template-card strong {
+            color: #022C22 !important;
+        }
+        html:not(.dark) .quiz-modal-card button[type="submit"]:disabled {
+            background: #E5E7EB !important;
+            color: #9CA3AF !important;
+            border: 1px solid #D1D5DB !important;
+            box-shadow: none !important;
+            cursor: not-allowed !important;
+            opacity: 1 !important;
+        }
+        html:not(.dark) .quiz-modal-card button[type="submit"]:disabled svg,
+        html:not(.dark) .quiz-modal-card button[type="submit"]:disabled span {
+            color: #9CA3AF !important;
+        }
         .cyber-hover-preview-bubble.is-active {
             opacity: 1;
             transform: scale(1) translateY(0);
