@@ -121,8 +121,13 @@
                                         onmousemove="updateCyberHoverBubblePos(event)"
                                         onmouseleave="hideCyberHoverBubble()"
                                         onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIndex] ?? '' }}')"
-                                        class="block group relative cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-white/10 bg-black/50 hover:border-emerald-500/40 p-1 transition-all">
-                                    <img src="{{ $opt->image_url }}" alt="Opsi {{ $labels[$optIndex] ?? '' }}" class="max-h-24 w-auto object-contain group-hover:scale-105 transition-transform" loading="lazy">
+                                        class="block group relative cursor-zoom-in focus:outline-none rounded-lg overflow-hidden border border-gray-300 dark:border-white/10 bg-white/70 dark:bg-black/50 hover:border-emerald-500/40 p-1 transition-all">
+                                    <img src="{{ $opt->image_url }}" alt="Opsi {{ $labels[$optIndex] ?? '' }}"
+                                         onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='inline-flex';"
+                                         class="max-h-24 w-auto object-contain group-hover:scale-105 transition-transform" loading="lazy">
+                                    <span class="hidden items-center gap-1 text-[11px] font-mono text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">
+                                        ⚠ Gambar Opsi belum tersedia di storage
+                                    </span>
                                 </button>
                             </div>
                         @endif

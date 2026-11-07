@@ -660,19 +660,19 @@
             opacity: 0;
             transform: scale(0.92) translateY(8px);
             transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-            max-width: min(440px, 90vw);
-            max-height: min(340px, 60vh);
-            border-radius: 16px;
+            max-width: min(620px, 92vw);
+            max-height: min(520px, 75vh);
+            border-radius: 18px;
             overflow: hidden;
-            border: 1px solid rgba(16, 185, 129, 0.4);
+            border: 1px solid rgba(16, 185, 129, 0.5);
             background: #0A0F0D;
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(16, 185, 129, 0.25);
-            padding: 6px;
+            box-shadow: 0 25px 55px rgba(0, 0, 0, 0.9), 0 0 35px rgba(16, 185, 129, 0.3);
+            padding: 8px;
         }
         html:not(.dark) .cyber-hover-preview-bubble {
             background: #FFFFFF !important;
-            border-color: #A7F3D0 !important;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18), 0 0 20px rgba(16, 185, 129, 0.15) !important;
+            border-color: #34D399 !important;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22), 0 0 25px rgba(16, 185, 129, 0.2) !important;
         }
         /* Light mode overrides for custom cyber dropdowns and selects */
         html:not(.dark) .cyber-select {
@@ -871,7 +871,7 @@
         .cyber-hover-preview-bubble img {
             width: 100%;
             height: auto;
-            max-height: calc(min(340px, 60vh) - 12px);
+            max-height: calc(min(520px, 75vh) - 16px);
             object-fit: contain;
             border-radius: 12px;
             display: block;
@@ -1764,8 +1764,8 @@
         if (!bubble || !bubble.classList.contains('is-active')) return;
 
         const pad = 16;
-        const previewW = Math.min(420, window.innerWidth * 0.85);
-        const previewH = Math.min(320, window.innerHeight * 0.55);
+        const previewW = Math.min(600, window.innerWidth * 0.9);
+        const previewH = Math.min(480, window.innerHeight * 0.75);
 
         let posX = e.clientX + pad;
         let posY = e.clientY - (previewH / 2);
