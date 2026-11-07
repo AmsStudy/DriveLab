@@ -26,8 +26,8 @@
 
         <div class="flex items-center gap-2 flex-wrap">
             <a href="{{ route('admin.quizzes.monitor', $quiz) }}"
-               class="px-4 py-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-sm font-semibold transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/10">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+               class="px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/15 dark:hover:bg-emerald-500/25 border border-emerald-300 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-white text-sm font-semibold transition-all flex items-center gap-2 shadow-xs dark:shadow-lg dark:shadow-emerald-500/10">
+                <span class="w-2 h-2 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse"></span>
                 Live Monitor Ujian
             </a>
 

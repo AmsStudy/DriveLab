@@ -33,10 +33,10 @@
 
         <div class="flex items-center gap-2 flex-wrap">
             <a href="{{ route('admin.quizzes.monitor', $quiz) }}"
-               class="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500/15 to-teal-500/15 border border-emerald-500/40 hover:border-emerald-500 text-emerald-300 hover:text-white text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 shadow-sm">
+               class="px-3.5 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/15 dark:hover:bg-emerald-500/25 border border-emerald-300 dark:border-emerald-500/40 hover:border-emerald-500 text-emerald-800 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-white text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 shadow-xs">
                 <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600 dark:bg-emerald-500"></span>
                 </span>
                 <span>Live Monitor</span>
             </a>
