@@ -1835,7 +1835,6 @@ function initKodeUnikChecker(config) {
         });
     }
 }
-}
 
 // Drag & drop support on modal drop zone
 document.addEventListener('DOMContentLoaded', () => {
