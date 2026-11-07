@@ -6,16 +6,12 @@
 @section('header-actions')
 <div class="flex items-center gap-1.5 sm:gap-2">
     <a href="{{ route('soal.access', $soal->slug ?: $soal->unique_token) }}" target="_blank" rel="noopener noreferrer"
-       class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-300 hover:text-white transition-all flex items-center gap-1.5 border"
-       style="background:#0F1713;border-color:#1A2820;"
-       onmouseover="this.style.borderColor='rgba(16,185,129,.4)'"
-       onmouseout="this.style.borderColor='#1A2820'">
-        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+       class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-[#0F1713] border border-gray-300 dark:border-[#1A2820] text-gray-700 dark:text-gray-300 hover:text-emerald-700 dark:hover:text-white hover:bg-emerald-50 dark:hover:bg-[#142019] hover:border-emerald-400 dark:hover:border-emerald-500/40 transition-all flex items-center gap-1.5 shadow-xs">
+        <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
         <span>Pratinjau<span class="hidden sm:inline"> Mahasiswa</span></span>
     </a>
     <button type="button" onclick="openEditModal()"
-       class="px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white transition-all flex items-center gap-1.5 shadow-md shadow-emerald-500/20 cursor-pointer"
-       style="background:linear-gradient(135deg,#10B981,#0D9488);">
+       class="px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white transition-all flex items-center gap-1.5 shadow-md shadow-emerald-500/20 cursor-pointer bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
         <span>Edit<span class="hidden sm:inline"> Dokumen</span></span>
     </button>
@@ -27,10 +23,7 @@
 {{-- Back nav --}}
 <div class="mb-5">
     <a href="{{ route('admin.soal.index') }}"
-       class="inline-flex items-center gap-2 text-sm font-medium transition-colors"
-       style="color:#4B8C6A;"
-       onmouseover="this.style.color='#10B981'"
-       onmouseout="this.style.color='#4B8C6A'">
+       class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
@@ -39,9 +32,8 @@
 </div>
 
 {{-- ─── TOP DOCUMENT SUMMARY BANNER ─── --}}
-<div class="rounded-2xl p-4 sm:p-6 mb-6 shadow-xl relative overflow-hidden"
-     style="background:radial-gradient(circle at top right, rgba(16,185,129,0.06), transparent 55%), #0F1713; border:1px solid #1A2820;">
-    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6" style="border-bottom:1px solid #1A2820;">
+<div class="rounded-2xl p-4 sm:p-6 mb-6 shadow-sm dark:shadow-xl relative overflow-hidden bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820]">
+    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6 border-b border-gray-200 dark:border-[#1A2820]">
         <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2 mb-3 flex-wrap">
                 @if($soal->category)
