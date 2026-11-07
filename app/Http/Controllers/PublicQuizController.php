@@ -216,8 +216,15 @@ class PublicQuizController extends Controller
             return redirect()->route('quiz.lobby', ['token' => $token])->with('error', 'Sesi kuis telah dihentikan / ditutup oleh pengawas.');
         }
 
-        $attempt->update(['last_heartbeat_at' => now()]);
-        $waitingCount = $quiz->attempts()->whereNull('completed_at')->count();
+        // Throttle heartbeat database write to once every 10 seconds per attempt to save database I/O
+        if (!$attempt->last_heartbeat_at || now()->diffInSeconds($attempt->last_heartbeat_at) >= 10) {
+            $attempt->update(['last_heartbeat_at' => now()]);
+        }
+
+        // Cache waiting count for 3 seconds so 300 polling users don't trigger 150 COUNT(*) queries per second
+        $waitingCount = cache()->remember("quiz_{$quiz->id}_waiting_count", 3, function () use ($quiz) {
+            return $quiz->attempts()->whereNull('completed_at')->count();
+        });
 
         return view('quiz.waiting', compact('quiz', 'attempt', 'waitingCount'));
     }
@@ -227,8 +234,15 @@ class PublicQuizController extends Controller
         $quiz = $this->findQuizByIdentifier($token);
         $this->validateAttemptAccess($quiz, $attempt);
 
-        $attempt->update(['last_heartbeat_at' => now()]);
-        $waitingCount = $quiz->attempts()->whereNull('completed_at')->count();
+        // Throttle heartbeat database write to once every 10 seconds per attempt to save database I/O
+        if (!$attempt->last_heartbeat_at || now()->diffInSeconds($attempt->last_heartbeat_at) >= 10) {
+            $attempt->update(['last_heartbeat_at' => now()]);
+        }
+
+        // Cache waiting count for 3 seconds so 300 polling users don't trigger 150 COUNT(*) queries per second
+        $waitingCount = cache()->remember("quiz_{$quiz->id}_waiting_count", 3, function () use ($quiz) {
+            return $quiz->attempts()->whereNull('completed_at')->count();
+        });
 
         if ($quiz->isSessionStarted()) {
             return response()->json([

@@ -218,10 +218,11 @@
             pollTimer: null,
 
             initWaiting() {
-                // Poll every 2 seconds to check if instructor has started the quiz
+                // Poll every ~2.5s with slight jitter to smoothly distribute server load across 300+ concurrent students
+                const jitter = Math.floor(Math.random() * 600) - 300; // 2200ms - 2800ms
                 this.pollTimer = setInterval(() => {
                     this.checkStatus();
-                }, 2000);
+                }, 2500 + jitter);
             },
 
             async checkStatus() {
