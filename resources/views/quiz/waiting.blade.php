@@ -34,10 +34,6 @@
         html:not(.dark) body {
             color: #0F1F17 !important;
         }
-        html:not(.dark) .glow-card {
-            background: #FFFFFF !important;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05) !important;
-        }
         .heading-font {
             font-family: 'Outfit', sans-serif;
         }
@@ -45,22 +41,45 @@
             background: radial-gradient(circle at top left, rgba(16,185,129,0.08), transparent 70%), #0F1713;
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
         }
+        html:not(.dark) .glow-card {
+            background: radial-gradient(circle at top left, rgba(16,185,129,0.06), transparent 70%), #FFFFFF !important;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05) !important;
+        }
 
-        /* Radar Scanning Animation */
-        @keyframes radarSweep {
+        /* Ambient Glow & Grid Pattern */
+        .ambient-grid {
+            background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        html:not(.dark) .ambient-grid {
+            background-image: radial-gradient(rgba(16, 185, 129, 0.12) 1px, transparent 1px);
+        }
+
+        /* Radar Pulse Animation */
+        @keyframes pulseRingOuter {
+            0% { transform: scale(0.85); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 0; }
+            100% { transform: scale(0.85); opacity: 0; }
+        }
+        @keyframes pulseRingInner {
+            0% { transform: scale(0.9); opacity: 0.9; }
+            50% { transform: scale(1.15); opacity: 0.3; }
+            100% { transform: scale(0.9); opacity: 0.9; }
+        }
+        .pulse-ring-outer {
+            animation: pulseRingOuter 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .pulse-ring-inner {
+            animation: pulseRingInner 2.2s ease-in-out infinite;
+        }
+
+        /* Subtle Sweep Animation */
+        @keyframes sweepRotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .radar-sweep {
-            animation: radarSweep 3s linear infinite;
-        }
-        @keyframes pulseRing {
-            0% { transform: scale(0.9); opacity: 0.8; }
-            50% { transform: scale(1.15); opacity: 0.2; }
-            100% { transform: scale(0.9); opacity: 0.8; }
-        }
-        .pulse-ring {
-            animation: pulseRing 2.4s ease-in-out infinite;
+        .sweep-effect {
+            animation: sweepRotate 4s linear infinite;
         }
     </style>
 </head>
@@ -111,93 +130,139 @@
     </div>
 
     {{-- Main Content --}}
-    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-8 md:py-12 flex flex-col justify-center">
+    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-8 md:py-12 flex flex-col justify-center relative">
 
         <div class="space-y-6">
 
             {{-- Main Hero Waiting Card --}}
-            <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-3xl p-6 md:p-10 glow-card relative overflow-hidden text-center shadow-lg">
-                <div class="absolute -right-16 -top-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-3xl p-6 sm:p-10 glow-card relative overflow-hidden text-center shadow-xl">
+                {{-- Decorative Ambient Glows --}}
+                <div class="absolute -right-20 -top-20 w-72 h-72 bg-emerald-500/15 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-20 -bottom-20 w-72 h-72 bg-teal-500/10 dark:bg-teal-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
                 {{-- Status Chip --}}
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-6">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-7 shadow-xs">
                     <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
                     <span>Ruang Tunggu Ujian Aktif</span>
                 </div>
 
-                {{-- Radar / Pulse Visualizer --}}
-                <div class="relative w-28 h-28 mx-auto mb-6 flex items-center justify-center">
-                    <div class="absolute inset-0 rounded-full border border-emerald-500/20 pulse-ring"></div>
-                    <div class="absolute inset-2 rounded-full border border-emerald-500/30"></div>
-                    <div class="absolute inset-6 rounded-full border border-emerald-500/40"></div>
-                    <div class="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-md">
-                        <svg class="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{-- Enhanced Radar / Pulse Visualizer --}}
+                <div class="relative w-32 h-32 mx-auto mb-7 flex items-center justify-center">
+                    {{-- Outer pulsing radar circles --}}
+                    <div class="absolute inset-0 rounded-full border-2 border-emerald-500/25 pulse-ring-outer"></div>
+                    <div class="absolute inset-2.5 rounded-full border border-emerald-500/30 pulse-ring-inner"></div>
+                    <div class="absolute inset-5 rounded-full border border-dashed border-emerald-500/40"></div>
+                    
+                    {{-- Rotating Sweep Beam Effect --}}
+                    <div class="absolute inset-2 rounded-full overflow-hidden pointer-events-none opacity-40 dark:opacity-30">
+                        <div class="w-full h-full sweep-effect origin-center bg-gradient-to-tr from-transparent via-transparent to-emerald-400/30"></div>
+                    </div>
+
+                    {{-- Core Icon Box --}}
+                    <div class="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-[#14231B] dark:to-[#0D1812] border-2 border-emerald-400/50 dark:border-emerald-500/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-lg shadow-emerald-500/20">
+                        <svg class="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                     </div>
                 </div>
 
-                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white heading-font mb-2 tracking-tight">
+                {{-- Quiz Title --}}
+                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white heading-font mb-3 tracking-tight">
                     {{ $quiz->title }}
                 </h1>
 
-                <p class="text-sm text-gray-600 dark:text-gray-400 max-w-lg mx-auto mb-6 leading-relaxed">
-                    Data Anda telah terverifikasi. Anda saat ini berada di ruang tunggu ujian laboratorium. 
-                    <strong class="text-emerald-700 dark:text-emerald-400 font-semibold block mt-1">
-                        Halaman ini akan otomatis beralih sendiri ke soal begitu pengawas memulai kuis. Anda tidak perlu me-refresh browser.
-                    </strong>
+                {{-- Status Descriptions --}}
+                <p class="text-sm text-gray-600 dark:text-gray-300 max-w-lg mx-auto mb-6 leading-relaxed">
+                    Data Anda telah terverifikasi dan siap mengikuti ujian.
+                    <span class="text-emerald-700 dark:text-emerald-400 font-semibold block mt-1.5 text-xs sm:text-sm">
+                        Halaman ini akan otomatis beralih sendiri ke lembar soal saat pengawas menekan tombol <strong>Mulai</strong>. Anda tidak perlu me-refresh browser.
+                    </span>
                 </p>
 
-                {{-- Waiting Room Stats Pill --}}
-                <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-gray-50 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1E3327] shadow-inner mb-6">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span class="text-xs text-gray-600 dark:text-gray-400">Peserta di Ruang Tunggu:</span>
-                    <span class="font-mono font-bold text-sm text-emerald-700 dark:text-emerald-400" x-text="waitingCount + ' Mahasiswa'">{{ $waitingCount }} Mahasiswa</span>
+                {{-- Waiting Room Live Participants Pill --}}
+                <div class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-emerald-50/70 dark:bg-[#090D0B] border border-emerald-200 dark:border-[#1E3327] shadow-xs mb-7">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">Peserta di Ruang Tunggu:</span>
+                    <span class="font-mono font-bold text-sm text-emerald-800 dark:text-emerald-400" x-text="waitingCount + ' Mahasiswa'">{{ $waitingCount }} Mahasiswa</span>
                 </div>
 
                 {{-- Student Identity Info Card --}}
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-xl mx-auto pt-6 border-t border-gray-100 dark:border-[#1A2820] text-left">
-                    <div class="p-3 rounded-2xl bg-gray-50 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820]">
-                        <span class="text-[10px] text-gray-500 uppercase tracking-wider block font-semibold">Nama Mahasiswa</span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-xl mx-auto pt-6 border-t border-gray-100 dark:border-[#1A2820] text-left">
+                    <div class="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#090D0B] border border-gray-200/80 dark:border-[#1A2820] hover:border-emerald-500/30 transition-colors">
+                        <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider block font-bold">Nama Mahasiswa</span>
                         <span class="text-xs font-bold text-gray-900 dark:text-white mt-0.5 block truncate">{{ $attempt->student_name }}</span>
                     </div>
-                    <div class="p-3 rounded-2xl bg-gray-50 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820]">
-                        <span class="text-[10px] text-gray-500 uppercase tracking-wider block font-semibold">NIM</span>
-                        <span class="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5 block">{{ $attempt->nim }}</span>
+                    <div class="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#090D0B] border border-gray-200/80 dark:border-[#1A2820] hover:border-emerald-500/30 transition-colors">
+                        <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider block font-bold">NIM</span>
+                        <span class="text-xs font-bold font-mono text-emerald-700 dark:text-emerald-400 mt-0.5 block">{{ $attempt->nim }}</span>
                     </div>
-                    <div class="p-3 rounded-2xl bg-gray-50 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820]">
-                        <span class="text-[10px] text-gray-500 uppercase tracking-wider block font-semibold">Kelas & Status</span>
+                    <div class="p-3.5 rounded-2xl bg-gray-50/80 dark:bg-[#090D0B] border border-gray-200/80 dark:border-[#1A2820] hover:border-emerald-500/30 transition-colors">
+                        <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider block font-bold">Kelas & Status</span>
                         <span class="text-xs font-bold text-gray-900 dark:text-gray-200 mt-0.5 block">
-                            {{ $attempt->kelas ? 'Kelas ' . $attempt->kelas : 'Reguler' }} &bull; <span class="text-emerald-600 dark:text-emerald-400 font-semibold">Siap</span>
+                            {{ $attempt->kelas ? 'Kelas ' . $attempt->kelas : 'Reguler' }} &bull; <span class="text-emerald-700 dark:text-emerald-400 font-bold">Siap</span>
                         </span>
                     </div>
                 </div>
             </div>
 
             {{-- Exam Integrity & Instructions Card --}}
-            <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-3xl p-6 shadow-sm">
-                <div class="flex items-center gap-2 mb-3">
-                    <span class="text-emerald-600 dark:text-emerald-400 text-lg">💡</span>
+            <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-3xl p-6 sm:p-7 shadow-sm">
+                <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-gray-100 dark:border-[#1A2820]">
+                    <div class="w-7 h-7 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-sm text-amber-500">
+                        💡
+                    </div>
                     <h4 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">Petunjuk Selama Menunggu</h4>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-600 dark:text-gray-400">
-                    <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 dark:bg-[#090D0B]/60 border border-gray-100 dark:border-[#1A2820]">
-                        <span class="text-emerald-500 font-bold">•</span>
-                        <span><strong>Hitungan Mundur:</strong> Waktu ujian ({{ $quiz->time_limit_minutes > 0 ? $quiz->time_limit_minutes . ' menit' : 'tanpa batas' }}) akan mulai berjalan saat pengawas menekan tombol Mulai.</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-600 dark:text-gray-300">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/70 dark:bg-[#090D0B]/70 border border-gray-100 dark:border-[#1A2820] hover:border-emerald-500/30 transition-all">
+                        <div class="w-6 h-6 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                            ⏱️
+                        </div>
+                        <div class="leading-relaxed">
+                            <strong class="text-gray-900 dark:text-white block mb-0.5">Hitungan Mundur Waktu</strong>
+                            Waktu ujian ({{ $quiz->time_limit_minutes > 0 ? $quiz->time_limit_minutes . ' menit' : 'tanpa batas' }}) akan mulai berjalan serentak begitu pengawas menekan tombol Mulai.
+                        </div>
                     </div>
-                    <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 dark:bg-[#090D0B]/60 border border-gray-100 dark:border-[#1A2820]">
-                        <span class="text-emerald-500 font-bold">•</span>
-                        <span><strong>Anti-Cheat CBT:</strong> Jangan beralih tab atau aplikasi setelah ujian dimulai untuk menghindari sanksi penguncian otomatis.</span>
+
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/70 dark:bg-[#090D0B]/70 border border-gray-100 dark:border-[#1A2820] hover:border-emerald-500/30 transition-all">
+                        <div class="w-6 h-6 rounded-lg bg-rose-500/10 dark:bg-rose-500/20 border border-rose-500/30 text-rose-600 dark:text-rose-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                            🛡️
+                        </div>
+                        <div class="leading-relaxed">
+                            <strong class="text-gray-900 dark:text-white block mb-0.5">Sistem Anti-Cheat CBT</strong>
+                            Dilarang berpindah tab, membuka jendela lain, atau keluar dari layar penuh guna mencegah sanksi pembekuan dan penguncian ujian otomatis.
+                        </div>
                     </div>
-                    <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 dark:bg-[#090D0B]/60 border border-gray-100 dark:border-[#1A2820]">
-                        <span class="text-emerald-500 font-bold">•</span>
-                        <span><strong>Auto-Save Real-time:</strong> Setiap jawaban yang Anda klik akan otomatis tersimpan ke server pengawas.</span>
+
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/70 dark:bg-[#090D0B]/70 border border-gray-100 dark:border-[#1A2820] hover:border-emerald-500/30 transition-all">
+                        <div class="w-6 h-6 rounded-lg bg-teal-500/10 dark:bg-teal-500/20 border border-teal-500/30 text-teal-600 dark:text-teal-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                            💾
+                        </div>
+                        <div class="leading-relaxed">
+                            <strong class="text-gray-900 dark:text-white block mb-0.5">Penyimpanan Otomatis</strong>
+                            Setiap pilihan jawaban otomatis tersimpan di cache lokal browser dan disinkronkan ke server pengawas secara berkala.
+                        </div>
                     </div>
-                    <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 dark:bg-[#090D0B]/60 border border-gray-100 dark:border-[#1A2820]">
-                        <span class="text-emerald-500 font-bold">•</span>
-                        <span><strong>Selesai Tepat Waktu:</strong> Pengawas dapat menghentikan ujian dari monitor utama kapan saja sesuai arahan instruktur.</span>
+
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/70 dark:bg-[#090D0B]/70 border border-gray-100 dark:border-[#1A2820] hover:border-emerald-500/30 transition-all">
+                        <div class="w-6 h-6 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                            🔔
+                        </div>
+                        <div class="leading-relaxed">
+                            <strong class="text-gray-900 dark:text-white block mb-0.5">Kontrol Penuh Pengawas</strong>
+                            Pengawas dapat menyesuaikan waktu tambahan atau mengakhiri sesi kapan saja sesuai arahan instruktur laboratorium.
+                        </div>
                     </div>
                 </div>
             </div>
+
+        </div>
+
+    </main>
 
         </div>
 
