@@ -534,7 +534,7 @@ class SoalController extends Controller
                 $konten = match ($sub->submission_type) {
                     'link'  => $sub->link_url,
                     'text'  => $sub->text_content,
-                    default => $sub->file_original_name,
+                    default => $sub->file_original_name ?: ($sub->file_path ? basename($sub->file_path) : '-'),
                 };
 
                 // Sanitasi setiap kolom terhadap Formula Injection (CWE-1236)

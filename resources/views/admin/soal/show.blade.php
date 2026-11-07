@@ -468,15 +468,13 @@
 
             {{-- Filter & Search Bar --}}
             @if(!$submissions->isEmpty())
-            <div class="px-5 md:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 relative z-10"
-                 style="background:rgba(9,13,11,.6);border-bottom:1px solid #1A2820;">
+            <div class="px-5 md:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 relative z-10 bg-gray-50/70 dark:bg-[#090D0B]/60 border-b border-gray-200 dark:border-[#1A2820]">
                 <div class="flex items-center gap-2.5 w-full sm:w-auto flex-1">
                     <div class="relative w-full sm:w-64">
                         <input type="text" id="submissionSearchInput" onkeyup="filterSubmissions()"
                                placeholder="Cari NIM atau Nama..."
-                               class="w-full border rounded-xl pl-9 pr-3.5 py-2 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
-                               style="background:#090D0B;border-color:#1A2820;">
-                        <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                               class="w-full border border-gray-300 dark:border-[#1A2820] rounded-xl pl-9 pr-3.5 py-2 text-xs text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-[#090D0B] focus:outline-none focus:border-emerald-500 transition-colors shadow-sm">
+                        <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </div>
 
                     @if($soal->hasClasses())
@@ -495,20 +493,16 @@
                 {{-- Type Filter Pills --}}
                 <div class="flex items-center gap-1.5 self-start sm:self-auto text-xs flex-wrap" id="typeFilterPills">
                     <button type="button" onclick="setSubFilter('all')"
-                            class="sub-filter-pill active px-3 py-1.5 rounded-lg font-medium transition-colors"
-                            style="background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3);"
+                            class="sub-filter-pill active px-3 py-1.5 rounded-lg font-medium transition-colors bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30"
                             data-type="all">Semua ({{ $submissions->count() }})</button>
                     <button type="button" onclick="setSubFilter('file')"
-                            class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-400 hover:text-white border"
-                            style="background:#090D0B;border-color:#1A2820;"
+                            class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#090D0B] border border-gray-300 dark:border-[#1A2820]"
                             data-type="file">File ({{ $submissions->where('submission_type', 'file')->count() }})</button>
                     <button type="button" onclick="setSubFilter('link')"
-                            class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-400 hover:text-white border"
-                            style="background:#090D0B;border-color:#1A2820;"
+                            class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#090D0B] border border-gray-300 dark:border-[#1A2820]"
                             data-type="link">Link ({{ $submissions->where('submission_type', 'link')->count() }})</button>
                     <button type="button" onclick="setSubFilter('text')"
-                            class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-400 hover:text-white border"
-                            style="background:#090D0B;border-color:#1A2820;"
+                            class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#090D0B] border border-gray-300 dark:border-[#1A2820]"
                             data-type="text">Teks ({{ $submissions->where('submission_type', 'text')->count() }})</button>
                 </div>
             </div>
@@ -517,37 +511,35 @@
             {{-- Table Content --}}
             @if($submissions->isEmpty())
                 <div class="py-20 text-center text-gray-500">
-                    <div class="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center" style="background:rgba(16,185,129,.08);color:#10B981;">
+                    <div class="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </div>
-                    <p class="text-base font-semibold text-gray-200">Belum ada tugas yang dikumpulkan</p>
+                    <p class="text-base font-semibold text-gray-800 dark:text-gray-200">Belum ada tugas yang dikumpulkan</p>
                     <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Ketika mahasiswa mengirimkan file, link, atau teks jawaban, data mereka akan otomatis ditampilkan di sini.</p>
                 </div>
             @else
                 <div class="overflow-x-auto overflow-y-auto rounded-b-2xl relative z-0" style="max-height: 700px; overflow-y: auto; scrollbar-width: thin;">
-                    <table class="w-full text-sm min-w-[620px]" id="submissionsTable">
-                        <thead class="text-xs text-gray-400 uppercase tracking-wider sticky top-0 z-10 shadow-sm" style="background:#090D0B;border-bottom:1px solid #1A2820;">
+                    <table class="w-full text-sm min-w-[580px]" id="submissionsTable">
+                        <thead class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider sticky top-0 z-10 shadow-sm bg-gray-50/90 dark:bg-[#090D0B] border-b border-gray-200 dark:border-[#1A2820] backdrop-blur-sm">
                             <tr>
                                 <th class="px-6 py-3.5 text-left font-semibold">Mahasiswa</th>
                                 <th class="px-4 py-3.5 text-left font-semibold">Kelas</th>
                                 <th class="px-4 py-3.5 text-left font-semibold">Tipe</th>
-                                <th class="px-4 py-3.5 text-left font-semibold">Berkas / Jawaban</th>
                                 <th class="px-4 py-3.5 text-left font-semibold">Waktu Pengumpulan</th>
                                 <th class="px-4 py-3.5 text-center font-semibold">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y" style="border-color:#1A2820;" id="submissionsTableBody">
+                        <tbody class="divide-y divide-gray-100 dark:divide-[#1A2820]" id="submissionsTableBody">
                             @foreach($submissions as $sub)
-                            <tr class="hover:bg-emerald-950/10 transition-colors submission-row" style="border-color:#1A2820;" data-type="{{ $sub->submission_type ?: 'file' }}" data-kelas="{{ $sub->kelas ?? '' }}">
+                            <tr class="hover:bg-emerald-500/5 dark:hover:bg-emerald-950/10 transition-colors submission-row border-b border-gray-100 dark:border-[#1A2820]" data-type="{{ $sub->submission_type ?: 'file' }}" data-kelas="{{ $sub->kelas ?? '' }}">
                                 {{-- Mahasiswa Identity --}}
                                 <td class="px-6 py-3.5">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs uppercase flex-shrink-0"
-                                             style="background:rgba(16,185,129,.12);color:#34D399;border:1px solid rgba(16,185,129,.25);">
+                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs uppercase flex-shrink-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
                                             {{ substr($sub->nama, 0, 1) }}
                                         </div>
                                         <div class="min-w-0">
-                                            <p class="text-sm font-semibold text-gray-200 truncate sub-nama">{{ $sub->nama }}</p>
+                                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate sub-nama">{{ $sub->nama }}</p>
                                             <p class="text-xs font-mono text-gray-500 sub-nim">{{ $sub->nim }}</p>
                                         </div>
                                     </div>
@@ -556,52 +548,29 @@
                                 {{-- Kelas Badge --}}
                                 <td class="px-4 py-3.5 text-xs">
                                     @if($sub->kelas)
-                                        <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold inline-block"
-                                              style="background:rgba(16,185,129,.12);color:#34D399;border:1px solid rgba(16,185,129,.25);">
+                                        <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold inline-block bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
                                             {{ preg_replace('/^kelas\s+/i', '', trim($sub->kelas)) }}
                                         </span>
                                     @else
-                                        <span class="text-gray-500 font-mono text-xs">-</span>
+                                        <span class="text-gray-400 dark:text-gray-500 font-mono text-xs">-</span>
                                     @endif
                                 </td>
 
                                 {{-- Submission Type Badge --}}
                                 <td class="px-4 py-3.5 text-xs">
                                     @if($sub->isLink())
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-teal-500/15 text-teal-400 border border-teal-500/30">Link</span>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/30">Link</span>
                                     @elseif($sub->isText())
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">Teks</span>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">Teks</span>
                                     @else
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">File</span>
-                                    @endif
-                                </td>
-
-                                {{-- Jawaban Content --}}
-                                <td class="px-4 py-3.5 text-xs">
-                                    @if($sub->isLink())
-                                        <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer"
-                                           class="text-teal-400 hover:text-teal-300 hover:underline max-w-xs truncate inline-flex items-center gap-1 font-mono">
-                                            {{ Str::limit($sub->link_url, 40) }}
-                                            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                        </a>
-                                    @elseif($sub->isText())
-                                        <button type="button"
-                                                data-nama="{{ $sub->nama }}"
-                                                data-nim="{{ $sub->nim }}"
-                                                data-content="{{ $sub->text_content }}"
-                                                onclick="showTextModal(this.dataset.nama, this.dataset.nim, this.dataset.content)"
-                                                class="text-amber-400 hover:text-amber-300 font-mono text-xs max-w-xs truncate text-left block hover:underline">
-                                            {{ Str::limit($sub->text_content, 45) }}
-                                        </button>
-                                    @else
-                                        <span class="text-gray-300 font-medium">{{ $sub->file_original_name }}</span>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">File</span>
                                     @endif
                                 </td>
 
                                 {{-- Waktu --}}
-                                <td class="px-4 py-3.5 text-xs text-gray-400 whitespace-nowrap">
-                                    <p class="font-medium text-gray-200">{{ $sub->created_at->format('d M Y, H:i') }}</p>
-                                    <p class="text-[11px] text-gray-500 mt-0.5 font-mono">{{ $sub->created_at->diffForHumans() }}</p>
+                                <td class="px-4 py-3.5 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                                    <p class="font-medium text-gray-800 dark:text-gray-200">{{ $sub->created_at->format('d M Y, H:i') }}</p>
+                                    <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 font-mono">{{ $sub->created_at->diffForHumans() }}</p>
                                 </td>
 
                                 {{-- Aksi --}}
@@ -609,7 +578,7 @@
                                     <div class="flex items-center justify-center gap-1">
                                         @if($sub->isLink())
                                             <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer"
-                                               class="p-2 text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block" title="Buka Link Tautan">
+                                               class="p-2 text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block" title="Buka Link Tautan">
                                                 <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                             </a>
                                         @elseif($sub->isText())
@@ -618,7 +587,7 @@
                                                     data-nim="{{ $sub->nim }}"
                                                     data-content="{{ $sub->text_content }}"
                                                     onclick="showTextModal(this.dataset.nama, this.dataset.nim, this.dataset.content)"
-                                                    class="p-2 text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Baca Teks Lengkap">
+                                                    class="p-2 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Baca Teks Lengkap">
                                                 <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                             </button>
                                         @else
@@ -628,13 +597,13 @@
                                             @if($isImgOrPdf)
                                                 <button type="button"
                                                         onclick="showFilePreviewModal('{{ route('admin.soal.submission.preview', $sub->id) }}', '{{ addslashes($sub->file_original_name ?: 'tugas') }}', '{{ addslashes($sub->nama) }} ({{ $sub->nim }})', '{{ strtolower($sub->file_extension ?? '') }}')"
-                                                        class="p-2 text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Lihat Berkas Langsung">
+                                                        class="p-2 text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Lihat Berkas Langsung">
                                                     <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                                 </button>
                                             @endif
 
                                             <a href="{{ route('admin.soal.download-submissions', $sub->id) }}"
-                                               class="p-2 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors inline-block" title="Unduh File Mahasiswa">
+                                               class="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors inline-block" title="Unduh File Mahasiswa ({{ $sub->file_original_name }})">
                                                 <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                             </a>
                                         @endif
@@ -643,7 +612,7 @@
                                         <form method="POST" action="{{ route('admin.soal.submission.destroy', $sub->id) }}" class="inline"
                                               onsubmit="confirmAction(event, 'Hapus pengumpulan tugas mahasiswa {{ addslashes($sub->nama) }} ({{ $sub->nim }})? Berkas akan dihapus permanen dan mahasiswa dapat mengumpulkan ulang.', 'Ya, Hapus Pengumpulan', true)">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="p-2 text-gray-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Hapus / Reset Pengumpulan">
+                                            <button type="submit" class="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Hapus / Reset Pengumpulan">
                                                 <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                             </button>
                                         </form>
@@ -1412,15 +1381,15 @@ function setSubFilter(type) {
     document.querySelectorAll('.sub-filter-pill').forEach(btn => {
         const isActive = btn.getAttribute('data-type') === type;
         if (isActive) {
-            btn.className = 'sub-filter-pill active px-3 py-1.5 rounded-lg font-medium transition-colors';
-            btn.style.background = 'rgba(16,185,129,.15)';
-            btn.style.color = '#34D399';
-            btn.style.borderColor = 'rgba(16,185,129,.3)';
+            btn.className = 'sub-filter-pill active px-3 py-1.5 rounded-lg font-medium transition-colors bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30';
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.style.borderColor = '';
         } else {
-            btn.className = 'sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-400 hover:text-white border';
-            btn.style.background = '#090D0B';
-            btn.style.color = '#9CA3AF';
-            btn.style.borderColor = '#1A2820';
+            btn.className = 'sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#090D0B] border border-gray-300 dark:border-[#1A2820]';
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.style.borderColor = '';
         }
     });
     filterSubmissions();
