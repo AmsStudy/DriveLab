@@ -55,18 +55,18 @@
     {{-- ─── LIVE EXAM SESSION CONTROL BANNER (START / END / WAITING ROOM) ─── --}}
     <div class="rounded-2xl p-4 sm:p-5 border transition-all duration-300 shadow-sm"
          :class="{
-             'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-amber-500/30': sessionStatus === 'waiting',
-             'bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-500/30': sessionStatus === 'started',
-             'bg-gradient-to-r from-rose-500/10 via-rose-500/5 to-transparent border-rose-500/30': sessionStatus === 'ended'
+             'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-amber-300 dark:border-amber-500/30': sessionStatus === 'waiting',
+             'bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-300 dark:border-emerald-500/30': sessionStatus === 'started',
+             'bg-gradient-to-r from-rose-500/10 via-rose-500/5 to-transparent border-rose-300 dark:border-rose-500/30': sessionStatus === 'ended'
          }">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-start sm:items-center gap-3.5">
                 {{-- Status Icon --}}
                 <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm"
                      :class="{
-                         'bg-amber-500/20 text-amber-400 border border-amber-500/40': sessionStatus === 'waiting',
-                         'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40': sessionStatus === 'started',
-                         'bg-rose-500/20 text-rose-400 border border-rose-500/40': sessionStatus === 'ended'
+                         'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-500/40': sessionStatus === 'waiting',
+                         'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/40': sessionStatus === 'started',
+                         'bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-300 dark:border-rose-500/40': sessionStatus === 'ended'
                      }">
                     <template x-if="sessionStatus === 'waiting'">
                         <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -83,9 +83,9 @@
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full"
                               :class="{
-                                  'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30': sessionStatus === 'waiting',
-                                  'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30': sessionStatus === 'started',
-                                  'bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-500/30': sessionStatus === 'ended'
+                                  'bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30': sessionStatus === 'waiting',
+                                  'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30': sessionStatus === 'started',
+                                  'bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30': sessionStatus === 'ended'
                               }"
                               x-text="sessionStatus === 'waiting' ? '⏳ Ruang Tunggu Aktif (Lobby)' : (sessionStatus === 'started' ? '🟢 Ujian Sedang Berlangsung' : '⛔ Ujian Telah Selesai')">
                         </span>
