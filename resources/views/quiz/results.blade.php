@@ -725,32 +725,50 @@
 
                             @if($ans->is_correct)
                                 {{-- MAHASISWA MENJAWAB BENAR --}}
-                                <div class="review-explanation-box mt-4 p-4 rounded-xl border text-xs">
-                                    <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
-                                        <div class="flex items-center gap-2 font-bold exp-title text-xs sm:text-sm">
-                                            <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-xs">✓</span>
-                                            <span>Jawaban Anda Benar:</span>
-                                            <span class="font-semibold">{{ $correctAnswerDisplay }}</span>
+                                @if($canRevealCorrect)
+                                    {{-- ADMIN MENGIJINKAN LIHAT KUNCI BENAR: Tampilkan Kunci & Pembahasan --}}
+                                    <div class="review-explanation-box mt-4 p-4 rounded-xl border text-xs">
+                                        <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                                            <div class="flex items-center gap-2 font-bold exp-title text-xs sm:text-sm">
+                                                <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-xs">✓</span>
+                                                <span>Jawaban Anda Benar:</span>
+                                                <span class="font-semibold">{{ $correctAnswerDisplay }}</span>
+                                            </div>
+
+                                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
+                                                Tepat (+ {{ $ans->points_earned ?: 0 }} Poin)
+                                            </span>
                                         </div>
 
-                                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
-                                            Tepat (+ {{ $ans->points_earned ?: 0 }} Poin)
-                                        </span>
-                                    </div>
-
-                                    @if(!empty($ans->question->explanation))
-                                        <div class="pt-2 border-t border-emerald-500/20">
-                                            <div class="flex items-start gap-2">
-                                                <span class="font-bold shrink-0 flex items-center gap-1 exp-title">
-                                                    <span>💡</span> Pembahasan:
-                                                </span>
-                                                <div class="leading-relaxed exp-text flex-1">
-                                                    {!! App\Helpers\RichTextHelper::format($ans->question->explanation) !!}
+                                        @if(!empty($ans->question->explanation))
+                                            <div class="pt-2 border-t border-emerald-500/20">
+                                                <div class="flex items-start gap-2">
+                                                    <span class="font-bold shrink-0 flex items-center gap-1 exp-title">
+                                                        <span>💡</span> Pembahasan:
+                                                    </span>
+                                                    <div class="leading-relaxed exp-text flex-1">
+                                                        {!! App\Helpers\RichTextHelper::format($ans->question->explanation) !!}
+                                                    </div>
                                                 </div>
                                             </div>
+                                        @endif
+                                    </div>
+                                @else
+                                    {{-- ADMIN TIDAK MENGIJINKAN LIHAT KUNCI: HANYA TAMPILKAN STATUS BENAR TANPA PEMBAHASAN / KUNCI --}}
+                                    <div class="mt-4 p-4 rounded-xl border border-emerald-500/30 bg-emerald-50/70 dark:bg-[#07130C] text-xs">
+                                        <div class="flex items-center justify-between gap-2 flex-wrap">
+                                            <div class="flex items-center gap-2 font-medium text-gray-800 dark:text-gray-200 text-xs sm:text-sm">
+                                                <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-700 dark:text-emerald-400 text-xs font-bold">✓</span>
+                                                <span>Evaluasi:</span>
+                                                <span class="text-emerald-700 dark:text-emerald-400 font-bold">Jawaban Anda Benar</span>
+                                            </div>
+
+                                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
+                                                + {{ $ans->points_earned ?: 0 }} Poin
+                                            </span>
                                         </div>
-                                    @endif
-                                </div>
+                                    </div>
+                                @endif
                             @elseif($canRevealCorrect)
                                 {{-- MAHASISWA SALAH, TAPI ADMIN MENGIJINKAN LIHAT KUNCI BENAR --}}
                                 <div class="review-explanation-box mt-4 p-4 rounded-xl border text-xs">

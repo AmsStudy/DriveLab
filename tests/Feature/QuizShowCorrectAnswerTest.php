@@ -221,6 +221,64 @@ class QuizShowCorrectAnswerTest extends TestCase
         $res->assertSee('Kunci jawaban yang benar disembunyikan oleh instruktur sesuai kebijakan kuis ini.');
     }
 
+    public function test_student_answering_correctly_cannot_see_explanation_when_show_correct_answer_disabled(): void
+    {
+        $quiz = Quiz::create([
+            'user_id'             => $this->admin->id,
+            'title'               => 'Ujian Tertutup',
+            'access_code'         => 'TUTUP-101',
+            'is_active'           => true,
+            'session_status'      => 'started',
+            'show_review'         => true,
+            'show_correct_answer' => false, // DISABLED!
+        ]);
+
+        $question = $quiz->questions()->create([
+            'question_text' => 'Berapa hasil 5 + 5?',
+            'question_type' => 'multiple_choice',
+            'points'        => 10,
+            'order_num'     => 1,
+            'explanation'   => 'Penjelasan rahasia: 5 + 5 menghasilkan 10.',
+        ]);
+
+        $optA = $question->options()->create(['option_text' => '10', 'is_correct' => true, 'order_num' => 1]);
+        $optB = $question->options()->create(['option_text' => '20', 'is_correct' => false, 'order_num' => 2]);
+
+        $attempt = QuizAttempt::create([
+            'quiz_id'               => $quiz->id,
+            'nim'                   => '77889900',
+            'student_name'          => 'Budi Santoso',
+            'score'                 => 100.0,
+            'total_points_earned'   => 10,
+            'total_points_possible' => 10,
+            'correct_answers_count' => 1,
+            'wrong_answers_count'   => 0,
+            'duration_seconds'      => 45,
+            'completed_at'          => now(),
+        ]);
+
+        // Student chose Opt A (CORRECT!)
+        $attempt->answers()->create([
+            'quiz_question_id'   => $question->id,
+            'selected_option_id' => $optA->id,
+            'is_correct'         => true,
+            'points_earned'      => 10,
+        ]);
+
+        $res = $this->withSession(['quiz_attempt_' . $quiz->id => $attempt->id])
+            ->get(route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]));
+
+        $res->assertStatus(200);
+
+        // Student sees they answered correctly
+        $res->assertSee('Jawaban Anda Benar');
+        $res->assertSee('+ 10 Poin');
+
+        // BUT they must NOT see the explanation or the explicit "Jawaban Anda Benar: [A] 10" answer key summary
+        $res->assertDontSee('Penjelasan rahasia: 5 + 5 menghasilkan 10.');
+        $res->assertDontSee('Kunci Jawaban Benar:');
+    }
+
     public function test_instructor_previewing_results_can_always_see_correct_answer_even_if_disabled(): void
     {
         $quiz = Quiz::create([
