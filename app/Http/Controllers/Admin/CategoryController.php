@@ -18,7 +18,7 @@ class CategoryController extends Controller
 
     public function create()
     {
-        return view('admin.category.create');
+        return redirect()->route('admin.categories.index', ['open_create' => 1]);
     }
 
     public function store(Request $request)
@@ -33,7 +33,7 @@ class CategoryController extends Controller
             'name'        => $validated['name'],
             'slug'        => Str::slug($validated['name']),
             'description' => $validated['description'] ?? null,
-            'color'       => $validated['color'] ?? '#6366f1',
+            'color'       => $validated['color'] ?? '#10b981',
             'created_by'  => auth()->id(),
         ]);
 
@@ -43,7 +43,7 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
-        return view('admin.category.edit', compact('category'));
+        return redirect()->route('admin.categories.index', ['open_edit' => $category->id]);
     }
 
     public function update(Request $request, Category $category)
