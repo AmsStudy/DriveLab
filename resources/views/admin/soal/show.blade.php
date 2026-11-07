@@ -381,13 +381,10 @@
                             {{-- Dropdown Unduh ZIP per Kelas --}}
                             <div class="relative inline-block text-left" x-data="{ open: false }">
                                 <button @click="open = !open" @click.away="open = false" type="button"
-                                        class="px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-300 transition-colors flex items-center gap-1.5 border cursor-pointer"
-                                        style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);"
-                                        onmouseover="this.style.background='rgba(16,185,129,.2)'"
-                                        onmouseout="this.style.background='rgba(16,185,129,.12)'">
-                                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                        class="px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/12 dark:hover:bg-emerald-500/20 border border-emerald-300 dark:border-emerald-500/30 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm">
+                                    <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                     <span>Unduh ZIP</span>
-                                    <svg class="w-3.5 h-3.5 ml-0.5 text-emerald-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                    <svg class="w-3.5 h-3.5 ml-0.5 text-emerald-600 dark:text-emerald-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                 </button>
                                 <div x-show="open" x-cloak
                                      x-transition:enter="transition ease-out duration-150"
@@ -396,33 +393,29 @@
                                      x-transition:leave="transition ease-in duration-100"
                                      x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
                                      x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
-                                     class="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl py-2 z-50 border backdrop-blur-md"
-                                     style="min-width:220px;width:220px;background:rgba(15,23,19,0.98);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
+                                     class="absolute right-0 mt-2 w-60 min-w-[220px] rounded-2xl shadow-xl shadow-gray-200/60 dark:shadow-[0_20px_30px_-10px_rgba(0,0,0,0.8),0_0_15px_rgba(16,185,129,0.08)] py-2 z-50 border border-gray-200/90 dark:border-emerald-500/25 bg-white/95 dark:bg-[#0F1713]/98 backdrop-blur-md">
                                     <a href="{{ route('admin.soal.download-submissions-zip', $soal) }}"
-                                       class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-emerald-400 hover:bg-emerald-500/10 font-semibold transition-colors"
+                                       class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-semibold transition-colors"
                                        style="gap:1rem;">
                                         <span>Semua Kelas</span>
-                                        <span class="text-[11px] font-mono font-bold {{ $submissions->count() > 0 ? 'text-emerald-400' : 'text-gray-600' }} ml-auto pl-2">{{ $submissions->count() }}</span>
+                                        <span class="text-[11px] font-mono font-bold {{ $submissions->count() > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $submissions->count() }}</span>
                                     </a>
-                                    <div class="border-t my-1.5" style="border-color:#1A2820;"></div>
+                                    <div class="border-t border-gray-100 dark:border-[#1A2820] my-1.5"></div>
                                     @foreach($soal->getClassesList() as $cls)
                                         @php $cCount = $submissions->where('kelas', $cls)->count(); @endphp
                                         <a href="{{ route('admin.soal.download-submissions-zip', [$soal, 'kelas' => $cls]) }}"
-                                           class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-gray-300 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors"
+                                           class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-500/10 transition-colors"
                                            style="gap:1rem;">
                                             <span>Kelas {{ $cls }}</span>
-                                            <span class="text-[11px] font-mono font-bold {{ $cCount > 0 ? 'text-emerald-400' : 'text-gray-600' }} ml-auto pl-2">{{ $cCount }}</span>
+                                            <span class="text-[11px] font-mono font-bold {{ $cCount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $cCount }}</span>
                                         </a>
                                     @endforeach
                                 </div>
                             </div>
                         @else
                             <a href="{{ route('admin.soal.download-submissions-zip', $soal) }}"
-                               class="px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-300 transition-colors flex items-center gap-1.5 border"
-                               style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);"
-                               onmouseover="this.style.background='rgba(16,185,129,.2)'"
-                               onmouseout="this.style.background='rgba(16,185,129,.12)'">
-                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                               class="px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/12 dark:hover:bg-emerald-500/20 border border-emerald-300 dark:border-emerald-500/30 transition-colors flex items-center gap-1.5 shadow-sm">
+                                <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                 Unduh Semua (ZIP)
                             </a>
                         @endif
@@ -432,11 +425,8 @@
                         {{-- Dropdown Export CSV per Kelas --}}
                         <div class="relative inline-block text-left" x-data="{ open: false }">
                             <button @click="open = !open" @click.away="open = false" type="button"
-                                    class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-200 transition-colors flex items-center gap-1.5 border cursor-pointer"
-                                    style="background:#090D0B;border-color:#1A2820;"
-                                    onmouseover="this.style.borderColor='rgba(16,185,129,.4)';this.style.color='#10B981'"
-                                    onmouseout="this.style.borderColor='#1A2820';this.style.color='#E5E7EB'">
-                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-emerald-600 dark:hover:text-emerald-400 bg-white hover:bg-gray-50 dark:bg-[#090D0B] dark:hover:bg-[#142019] border border-gray-300 dark:border-[#1A2820] hover:border-emerald-500/40 dark:hover:border-emerald-500/40 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
+                                <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 <span>Export CSV</span>
                                 <svg class="w-3.5 h-3.5 ml-0.5 text-gray-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                             </button>
@@ -447,33 +437,29 @@
                                  x-transition:leave="transition ease-in duration-100"
                                  x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
                                  x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
-                                 class="absolute right-0 mt-2 w-60 rounded-2xl shadow-2xl py-2 z-50 border backdrop-blur-md"
-                                 style="min-width:220px;width:220px;background:rgba(15,23,19,0.98);border-color:rgba(16,185,129,0.25);box-shadow:0 20px 30px -10px rgba(0,0,0,0.8), 0 0 15px rgba(16,185,129,0.08);">
+                                 class="absolute right-0 mt-2 w-60 min-w-[220px] rounded-2xl shadow-xl shadow-gray-200/60 dark:shadow-[0_20px_30px_-10px_rgba(0,0,0,0.8),0_0_15px_rgba(16,185,129,0.08)] py-2 z-50 border border-gray-200/90 dark:border-emerald-500/25 bg-white/95 dark:bg-[#0F1713]/98 backdrop-blur-md">
                                 <a href="{{ route('admin.soal.export-submissions', $soal) }}"
-                                   class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-emerald-400 hover:bg-emerald-500/10 font-semibold transition-colors"
+                                   class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-semibold transition-colors"
                                    style="gap:1rem;">
                                     <span>Semua Kelas</span>
-                                    <span class="text-[11px] font-mono font-bold {{ $submissions->count() > 0 ? 'text-emerald-400' : 'text-gray-600' }} ml-auto pl-2">{{ $submissions->count() }}</span>
+                                    <span class="text-[11px] font-mono font-bold {{ $submissions->count() > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $submissions->count() }}</span>
                                 </a>
-                                <div class="border-t my-1.5" style="border-color:#1A2820;"></div>
+                                <div class="border-t border-gray-100 dark:border-[#1A2820] my-1.5"></div>
                                 @foreach($soal->getClassesList() as $cls)
                                     @php $cCount = $submissions->where('kelas', $cls)->count(); @endphp
                                     <a href="{{ route('admin.soal.export-submissions', [$soal, 'kelas' => $cls]) }}"
-                                       class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-gray-300 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors"
+                                       class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-500/10 transition-colors"
                                        style="gap:1rem;">
                                         <span>Kelas {{ $cls }}</span>
-                                        <span class="text-[11px] font-mono font-bold {{ $cCount > 0 ? 'text-emerald-400' : 'text-gray-600' }} ml-auto pl-2">{{ $cCount }}</span>
+                                        <span class="text-[11px] font-mono font-bold {{ $cCount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $cCount }}</span>
                                     </a>
                                 @endforeach
                             </div>
                         </div>
                     @else
                         <a href="{{ route('admin.soal.export-submissions', $soal) }}"
-                           class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-200 transition-colors flex items-center gap-1.5 border"
-                           style="background:#090D0B;border-color:#1A2820;"
-                           onmouseover="this.style.borderColor='rgba(16,185,129,.4)';this.style.color='#10B981'"
-                           onmouseout="this.style.borderColor='#1A2820';this.style.color='#E5E7EB'">
-                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                           class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-emerald-600 dark:hover:text-emerald-400 bg-white hover:bg-gray-50 dark:bg-[#090D0B] dark:hover:bg-[#142019] border border-gray-300 dark:border-[#1A2820] hover:border-emerald-500/40 dark:hover:border-emerald-500/40 shadow-sm transition-all flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             Export Rekap (CSV)
                         </a>
                     @endif

@@ -296,13 +296,13 @@
                                 {{-- Trigger Button --}}
                                 <button @click="toggleMenu()" type="button"
                                         id="action-menu-button-{{ $soal->id }}"
-                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-300 hover:text-white bg-[#142019] hover:bg-[#1C2E24] border border-[#1E3327] hover:border-emerald-500/40 transition-all shadow-sm group cursor-pointer focus:outline-none"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-white hover:bg-gray-50 dark:bg-[#142019] dark:hover:bg-[#1C2E24] border border-gray-300 dark:border-[#1E3327] hover:border-emerald-500/40 dark:hover:border-emerald-500/40 transition-all shadow-sm group cursor-pointer focus:outline-none"
                                         title="Menu Aksi">
-                                    <svg class="w-3.5 h-3.5 text-emerald-400/80 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400/80 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
                                     </svg>
                                     <span>Aksi</span>
-                                    <svg class="w-3 h-3 text-gray-400 group-hover:text-gray-300 transition-transform duration-200" :class="open ? 'rotate-180 text-emerald-400' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3 h-3 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-transform duration-200" :class="open ? 'rotate-180 text-emerald-600 dark:text-emerald-400' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
@@ -315,19 +315,18 @@
                                      x-transition:leave="transition ease-in duration-100"
                                      x-transition:leave-start="transform opacity-100 scale-100"
                                      x-transition:leave-end="transform opacity-0 scale-95"
-                                     class="absolute right-0 w-56 rounded-2xl shadow-2xl py-1.5 z-50 border text-left backdrop-blur-xl"
-                                     :class="openUp ? 'bottom-full mb-2' : 'top-full mt-2'"
-                                     style="background:rgba(15,23,19,0.98);border-color:rgba(16,185,129,0.22);box-shadow:0 20px 35px -10px rgba(0,0,0,0.85), 0 0 18px rgba(16,185,129,0.08);">
+                                     class="absolute right-0 w-56 rounded-2xl shadow-xl shadow-gray-200/60 dark:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.85),0_0_18px_rgba(16,185,129,0.08)] py-1.5 z-50 border border-gray-200 dark:border-emerald-500/22 bg-white/95 dark:bg-[#0F1713]/98 text-left backdrop-blur-xl"
+                                     :class="openUp ? 'bottom-full mb-2' : 'top-full mt-2'">
 
                                     {{-- Section 1: Navigasi & Detail --}}
-                                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-400 border-b border-[#1A2820]/80">
+                                    <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-[#1A2820]/80">
                                         Navigasi & Pratinjau
                                     </div>
 
                                     {{-- 1. Detail & Pengumpulan --}}
                                     <a href="{{ route('admin.soal.show', $soal) }}"
                                        id="show-soal-{{ $soal->id }}"
-                                       class="flex items-center gap-2.5 px-3 py-2 text-xs text-gray-200 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors group">
+                                       class="flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 dark:text-gray-200 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-500/10 transition-colors group">
                                         <div class="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -336,10 +335,10 @@
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <p class="font-semibold truncate">Detail & Pengumpulan</p>
-                                            <p class="text-[10px] text-gray-400 truncate">Kelola kiriman tugas</p>
+                                            <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate">Kelola kiriman tugas</p>
                                         </div>
                                         @if($soal->is_submission_enabled)
-                                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 font-bold">
+                                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-600 dark:text-teal-300 font-bold">
                                                 {{ $soal->submissions_count ?? $soal->submissions->count() }}
                                             </span>
                                         @endif
@@ -349,7 +348,7 @@
                                     <button type="button"
                                             onclick="openEditModalForSoal({{ $soal->id }}); open = false;"
                                             id="edit-soal-{{ $soal->id }}"
-                                            class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-gray-200 hover:text-amber-300 hover:bg-amber-500/10 transition-colors group cursor-pointer">
+                                            class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 dark:text-gray-200 hover:text-amber-600 dark:hover:text-amber-300 hover:bg-amber-50/70 dark:hover:bg-amber-500/10 transition-colors group cursor-pointer">
                                         <div class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -357,14 +356,14 @@
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <p class="font-semibold truncate">Edit Dokumen</p>
-                                            <p class="text-[10px] text-gray-400 truncate">Ubah judul, akses & berkas</p>
+                                            <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate">Ubah judul, akses & berkas</p>
                                         </div>
                                     </button>
 
                                     {{-- 3. Simulasi Mahasiswa (Preview) --}}
                                     <a href="{{ route('admin.soal.preview', $soal) }}" target="_blank"
                                        id="preview-soal-{{ $soal->id }}"
-                                       class="flex items-center gap-2.5 px-3 py-2 text-xs text-gray-200 hover:text-green-300 hover:bg-green-500/10 transition-colors group">
+                                       class="flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-green-300 hover:bg-green-50/70 dark:hover:bg-green-500/10 transition-colors group">
                                         <div class="w-7 h-7 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
@@ -373,9 +372,9 @@
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <p class="font-semibold truncate">Simulasi Mahasiswa</p>
-                                            <p class="text-[10px] text-gray-400 truncate">Buka pratinjau publik</p>
+                                            <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate">Buka pratinjau publik</p>
                                         </div>
-                                        <svg class="w-3 h-3 text-gray-400 group-hover:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-3 h-3 text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                                         </svg>
                                     </a>
@@ -384,7 +383,7 @@
                                     <button type="button"
                                             onclick="copyLink('{{ route('soal.access', $soal->slug ?: $soal->unique_token) }}'); open = false;"
                                             id="copy-link-{{ $soal->id }}"
-                                            class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-gray-200 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors group cursor-pointer">
+                                            class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 dark:text-gray-200 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-500/10 transition-colors group cursor-pointer">
                                         <div class="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
@@ -392,19 +391,19 @@
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <p class="font-semibold truncate">Salin Link Akses</p>
-                                            <p class="text-[10px] text-gray-400 truncate">URL portal mahasiswa</p>
+                                            <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate">URL portal mahasiswa</p>
                                         </div>
                                     </button>
 
                                     {{-- Section 2: Kontrol Status & Bahaya --}}
-                                    <div class="border-t my-1 border-[#1A2820]"></div>
+                                    <div class="border-t my-1 border-gray-100 dark:border-[#1A2820]"></div>
 
                                     {{-- 5. Toggle Active --}}
                                     <form method="POST" action="{{ route('admin.soal.toggle', $soal) }}" class="block m-0">
                                         @csrf @method('PATCH')
                                         <button type="submit"
                                                 id="toggle-soal-{{ $soal->id }}"
-                                                class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs transition-colors group cursor-pointer {{ $soal->is_active ? 'text-gray-200 hover:text-orange-300 hover:bg-orange-500/10' : 'text-gray-200 hover:text-green-300 hover:bg-green-500/10' }}">
+                                                class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs transition-colors group cursor-pointer {{ $soal->is_active ? 'text-gray-700 dark:text-gray-200 hover:text-orange-600 dark:hover:text-orange-300 hover:bg-orange-50/70 dark:hover:bg-orange-500/10' : 'text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-green-300 hover:bg-green-50/70 dark:hover:bg-green-500/10' }}">
                                             <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform {{ $soal->is_active ? 'bg-orange-500/10 border border-orange-500/20 text-orange-400' : 'bg-green-500/10 border border-green-500/20 text-green-400' }}">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $soal->is_active ? 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' }}"/>
@@ -412,7 +411,7 @@
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <p class="font-semibold truncate">{{ $soal->is_active ? 'Nonaktifkan Dokumen' : 'Aktifkan Dokumen' }}</p>
-                                                <p class="text-[10px] text-gray-400 truncate">{{ $soal->is_active ? 'Kunci akses mahasiswa' : 'Buka akses mahasiswa' }}</p>
+                                                <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate">{{ $soal->is_active ? 'Kunci akses mahasiswa' : 'Buka akses mahasiswa' }}</p>
                                             </div>
                                         </button>
                                     </form>
@@ -423,7 +422,7 @@
                                         @csrf @method('DELETE')
                                         <button type="submit"
                                                 id="delete-soal-{{ $soal->id }}"
-                                                class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-rose-300 hover:text-rose-200 hover:bg-rose-500/15 transition-colors group cursor-pointer">
+                                                class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-rose-600 dark:text-rose-300 hover:text-rose-700 dark:hover:text-rose-200 hover:bg-rose-50/70 dark:hover:bg-rose-500/15 transition-colors group cursor-pointer">
                                             <div class="w-7 h-7 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -431,7 +430,7 @@
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <p class="font-semibold truncate">Hapus Dokumen</p>
-                                                <p class="text-[10px] text-rose-400/70 truncate">Pindahkan ke tong sampah</p>
+                                                <p class="text-[10px] text-rose-500/80 dark:text-rose-400/70 truncate">Pindahkan ke tong sampah</p>
                                             </div>
                                         </button>
                                     </form>
