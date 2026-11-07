@@ -32,7 +32,7 @@
 
     /* Cyber Select & Dropdown Design System */
     .cyber-select,
-    select:not([multiple]) {
+    select:not([multiple]):not(.no-cyber-select) {
         -webkit-appearance: none !important;
         -moz-appearance: none !important;
         appearance: none !important;
@@ -51,14 +51,14 @@
     }
 
     .cyber-select:hover,
-    select:not([multiple]):hover {
+    select:not([multiple]):not(.no-cyber-select):hover {
         background-color: #0D1512 !important;
         border-color: rgba(16, 185, 129, 0.5) !important;
         box-shadow: 0 0 12px rgba(16, 185, 129, 0.18), inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
     }
 
     .cyber-select:focus,
-    select:not([multiple]):focus {
+    select:not([multiple]):not(.no-cyber-select):focus {
         background-color: #070C09 !important;
         border-color: #10B981 !important;
         outline: none !important;
@@ -66,15 +66,31 @@
     }
 
     .cyber-select option,
-    select:not([multiple]) option {
+    select:not([multiple]):not(.no-cyber-select) option {
         background-color: #0F1713 !important;
         color: #F3F4F6 !important;
         padding: 10px 14px !important;
     }
 
     .cyber-select option:disabled,
-    select:not([multiple]) option:disabled {
+    select:not([multiple]):not(.no-cyber-select) option:disabled {
         color: #6B7280 !important;
+    }
+
+    /* Minimal / Unstyled select for badge & compact inline controls */
+    .no-cyber-select {
+        background-color: transparent !important;
+        background-image: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding-right: 0 !important;
+        padding-left: 0.15rem !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
     }
 
     /* Cyber File Input Design System */
@@ -546,27 +562,33 @@ html:not(.dark) input[type="radio"]:checked {
 
 /* Cyber Select & Dropdown Design System in Light Mode */
 html:not(.dark) .cyber-select,
-html:not(.dark) select:not([multiple]) {
+html:not(.dark) select:not([multiple]):not(.no-cyber-select) {
     background-color: #FFFFFF !important;
     border-color: #D1DCD6 !important;
     color: #111827 !important;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
 }
 html:not(.dark) .cyber-select:hover,
-html:not(.dark) select:not([multiple]):hover {
+html:not(.dark) select:not([multiple]):not(.no-cyber-select):hover {
     background-color: #F8FAF9 !important;
     border-color: rgba(16, 185, 129, 0.5) !important;
 }
 html:not(.dark) .cyber-select:focus,
-html:not(.dark) select:not([multiple]):focus {
+html:not(.dark) select:not([multiple]):not(.no-cyber-select):focus {
     background-color: #FFFFFF !important;
     border-color: #10B981 !important;
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
 }
 html:not(.dark) .cyber-select option,
-html:not(.dark) select:not([multiple]) option {
+html:not(.dark) select:not([multiple]):not(.no-cyber-select) option {
     background-color: #FFFFFF !important;
     color: #111827 !important;
+}
+html:not(.dark) .no-cyber-select {
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 /* Dynamic Cyber Dropdowns */

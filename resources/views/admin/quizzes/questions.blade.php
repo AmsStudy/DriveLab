@@ -768,7 +768,28 @@
         };
     }
 
-    function changeQuestionOrder(selectEl, url, currentNum) {
+    async function getFreshCsrfToken() {
+        try {
+            const res = await fetch('{{ route('csrf.refresh') }}', {
+                headers: { 'Accept': 'application/json' }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.csrf_token) {
+                    const meta = document.querySelector('meta[name="csrf-token"]');
+                    if (meta) {
+                        meta.setAttribute('content', data.csrf_token);
+                    }
+                    return data.csrf_token;
+                }
+            }
+        } catch (e) {
+            console.warn('Gagal memuat token CSRF baru:', e);
+        }
+        return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    }
+
+    async function changeQuestionOrder(selectEl, url, currentNum) {
         const newNum = parseInt(selectEl.value, 10);
         if (!newNum || newNum === currentNum) return;
 
@@ -790,30 +811,49 @@
             });
         }
 
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        if (!csrfToken) {
+            csrfToken = await getFreshCsrfToken();
+        }
 
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({ order: newNum })
-        })
-        .then(res => {
-            if (!res.ok) {
-                return res.json().then(data => { throw new Error(data.message || 'Gagal mengubah urutan'); });
+        const sendPayload = async (token) => {
+            return fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({
+                    order: newNum,
+                    _token: token
+                })
+            });
+        };
+
+        try {
+            let res = await sendPayload(csrfToken);
+
+            // Jika status 419 (CSRF token kadaluarsa), segarkan token & coba kirim ulang 1x otomatis
+            if (res.status === 419) {
+                const freshToken = await getFreshCsrfToken();
+                if (freshToken) {
+                    res = await sendPayload(freshToken);
+                }
             }
-            return res.json();
-        })
-        .then(data => {
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || 'Gagal mengubah urutan');
+            }
+
             if (window.Swal) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil Disimpan!',
-                    text: data.message || `Soal berhasil dipindahkan ke nomor #${newNum}!`,
-                    timer: 850,
+                    text: data.message || `Soal berhasil dipindahkan ke nomor #${newNum}! Urutan soal lainnya otomatis bergeser.`,
+                    timer: 900,
                     showConfirmButton: false,
                     background: '#0F1713',
                     color: '#F3F4F6'
@@ -823,8 +863,7 @@
             } else {
                 window.location.reload();
             }
-        })
-        .catch(err => {
+        } catch (err) {
             selectEl.value = currentNum;
             selectEl.disabled = false;
             if (badge) badge.classList.remove('opacity-50', 'pointer-events-none');
@@ -839,7 +878,12 @@
             } else {
                 alert(err.message || 'Gagal mengubah urutan.');
             }
-        });
+        }
     }
+
+    // Refresh token CSRF secara berkala di latar belakang (tiap 10 menit)
+    setInterval(() => {
+        getFreshCsrfToken();
+    }, 10 * 60 * 1000);
 </script>
 @endsection

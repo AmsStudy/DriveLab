@@ -922,4 +922,54 @@ class QuizFeatureTest extends TestCase
         $this->assertEquals([$q4->id, $q2->id, $q3->id, $q1->id], $ordered2);
         $this->assertEquals([1, 2, 3, 4], $quiz->questions()->get()->pluck('order_num')->all());
     }
+
+    public function test_admin_reordering_shifts_numbers_automatically_for_q2_to_q1_and_last_to_first(): void
+    {
+        $quiz = Quiz::create([
+            'title'       => 'Kuis Pergeseran Urutan Soal',
+            'user_id'     => $this->admin->id,
+            'is_active'   => true,
+            'access_code' => 'SHIFT-01',
+        ]);
+
+        $createdQuestions = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $createdQuestions[$i] = $quiz->questions()->create([
+                'question_text' => "Soal #{$i}",
+                'points'        => 10,
+                'order_num'     => $i,
+            ]);
+        }
+
+        // Scenario 1: Ubah soal ke-2 menjadi nomor 1 -> soal 1 bergeser ke 2
+        $res1 = $this->actingAs($this->admin)->postJson(route('admin.quizzes.questions.reorder', [$quiz, $createdQuestions[2]]), [
+            'order' => 1,
+        ]);
+        $res1->assertOk()->assertJson(['success' => true]);
+
+        $orderAfterScenario1 = $quiz->questions()->get();
+        // Index 0 harus Soal #2 dengan order_num = 1
+        $this->assertEquals($createdQuestions[2]->id, $orderAfterScenario1[0]->id);
+        $this->assertEquals(1, $orderAfterScenario1[0]->order_num);
+        // Index 1 harus Soal #1 dengan order_num = 2 (otomatis bergeser!)
+        $this->assertEquals($createdQuestions[1]->id, $orderAfterScenario1[1]->id);
+        $this->assertEquals(2, $orderAfterScenario1[1]->order_num);
+        // Seluruh order_num harus 1 s/d 10 urut
+        $this->assertEquals(range(1, 10), $orderAfterScenario1->pluck('order_num')->all());
+
+        // Scenario 2: Ubah soal paling terakhir (soal ke-10) menjadi nomor 1 -> seluruh soal 1-9 bergeser turun
+        $lastQuestion = $orderAfterScenario1->last();
+        $res2 = $this->actingAs($this->admin)->postJson(route('admin.quizzes.questions.reorder', [$quiz, $lastQuestion]), [
+            'order' => 1,
+        ]);
+        $res2->assertOk()->assertJson(['success' => true]);
+
+        $orderAfterScenario2 = $quiz->questions()->get();
+        // Soal terakhir sekarang ada di urutan pertama (#1)
+        $this->assertEquals($lastQuestion->id, $orderAfterScenario2->first()->id);
+        $this->assertEquals(1, $orderAfterScenario2->first()->order_num);
+        // Seluruh soal lainnya bergeser urut 1 s/d 10
+        $this->assertEquals(range(1, 10), $orderAfterScenario2->pluck('order_num')->all());
+        $this->assertCount(10, $orderAfterScenario2);
+    }
 }

@@ -12,20 +12,20 @@
                 @if(isset($totalQuestions) && $totalQuestions > 1)
                     {{-- Dropdown Ubah Nomor Urut Soal (Otomatis Tersimpan) --}}
                     <div class="relative inline-flex items-center group/order" title="Klik untuk mengubah nomor urut soal (otomatis tersimpan)">
-                        <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 hover:border-emerald-500 text-emerald-400 font-bold text-xs transition-colors shadow-sm">
+                        <label class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 hover:border-emerald-500 text-emerald-400 font-bold text-xs transition-colors shadow-sm cursor-pointer">
                             <span class="text-emerald-500/80 font-mono text-[11px]">No.</span>
                             <select onchange="changeQuestionOrder(this, '{{ route('admin.quizzes.questions.reorder', [$quiz, $q]) }}', {{ $qNum }})"
-                                    class="bg-transparent text-emerald-300 font-mono font-bold text-xs cursor-pointer focus:outline-none pr-1 py-0 border-0 appearance-none text-center">
+                                    class="no-cyber-select bg-transparent text-emerald-300 font-mono font-bold text-xs cursor-pointer focus:outline-none py-0 pl-0.5 pr-0 border-0 appearance-none text-center">
                                 @for($i = 1; $i <= $totalQuestions; $i++)
                                     <option value="{{ $i }}" class="bg-[#0F1713] text-gray-200" {{ $i === $qNum ? 'selected' : '' }}>
                                         #{{ $i }}
                                     </option>
                                 @endfor
                             </select>
-                            <svg class="w-3 h-3 text-emerald-400/80 pointer-events-none -ml-0.5 group-hover/order:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-3 h-3 text-emerald-400 pointer-events-none group-hover/order:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
                             </svg>
-                        </div>
+                        </label>
                     </div>
                 @else
                     <span class="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-xs flex items-center justify-center">
