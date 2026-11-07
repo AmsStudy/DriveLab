@@ -267,6 +267,63 @@ class PublicQuizController extends Controller
         ]);
     }
 
+    public function sessionCheck(string $token, QuizAttempt $attempt)
+    {
+        $quiz = $this->findQuizByIdentifier($token);
+        $this->validateAttemptAccess($quiz, $attempt);
+
+        // Throttle heartbeat database write to once every 10 seconds per attempt to save database I/O
+        if (!$attempt->last_heartbeat_at || now()->diffInSeconds($attempt->last_heartbeat_at) >= 10) {
+            $attempt->update(['last_heartbeat_at' => now()]);
+        }
+
+        // Cache session status for 2 seconds to eliminate database load for 300 polling students
+        $sessionStatus = cache()->remember("quiz_{$quiz->id}_status", 2, function () use ($quiz) {
+            return $quiz->fresh()->session_status;
+        });
+
+        if ($attempt->isCompleted() || $attempt->is_force_submitted || $sessionStatus === 'ended' || $quiz->isSessionEnded()) {
+            if (!$attempt->isCompleted()) {
+                $attempt->update(['is_force_submitted' => true]);
+                QuizScoringService::finalize($attempt, $attempt->draft_answers ?? []);
+            }
+            return response()->json([
+                'status'       => 'ended',
+                'is_ended'     => true,
+                'redirect'     => route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]),
+                'message'      => 'Sesi ujian telah diakhiri oleh pengawas lab.',
+            ]);
+        }
+
+        // Calculate remaining time
+        $totalAllowedMinutes = $quiz->time_limit_minutes + ($attempt->extra_time_minutes ?? 0);
+        $timeRemaining = null;
+        if ($totalAllowedMinutes > 0) {
+            $elapsedSeconds = abs((int) now()->diffInSeconds($attempt->started_at));
+            $totalSeconds = (int) ($totalAllowedMinutes * 60);
+            $timeRemaining = (int) max(0, $totalSeconds - $elapsedSeconds);
+            if ($timeRemaining <= 0) {
+                if (!$attempt->isCompleted()) {
+                    QuizScoringService::finalize($attempt, $attempt->draft_answers ?? []);
+                }
+                return response()->json([
+                    'status'       => 'ended',
+                    'is_ended'     => true,
+                    'redirect'     => route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]),
+                    'message'      => 'Waktu pengerjaan kuis telah habis.',
+                ]);
+            }
+        }
+
+        return response()->json([
+            'status'             => 'active',
+            'is_ended'           => false,
+            'is_locked'          => (bool) $attempt->is_locked,
+            'time_remaining'     => $timeRemaining,
+            'extra_time_minutes' => (int) ($attempt->extra_time_minutes ?? 0),
+        ]);
+    }
+
     public function play(string $token, QuizAttempt $attempt)
     {
         $quiz = $this->findQuizByIdentifier($token);
@@ -502,6 +559,7 @@ class PublicQuizController extends Controller
             }
             return response()->json([
                 'success'      => false,
+                'is_ended'     => true,
                 'is_completed' => true,
                 'redirect'     => route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]),
                 'message'      => $attempt->is_force_submitted ? 'Ujian telah dikumpulkan oleh pengawas lab.' : 'Sesi kuis telah selesai.',

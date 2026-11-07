@@ -233,6 +233,16 @@ class QuizWaitingRoomAndSessionTest extends TestCase
         $this->assertTrue((bool)$att2->is_force_submitted);
         $this->assertEquals(0.0, (float)$att2->score);
 
+        // Mahasiswa yang sedang di arena play memantau status sesi via session-check otomatis menerima is_ended = true
+        $sessionCheckRes = $this->withSession(['quiz_attempt_' . $quiz->id => $att1->id])
+            ->getJson(route('quiz.session.check', ['token' => $quiz->unique_token, 'attempt' => $att1->id]));
+        $sessionCheckRes->assertStatus(200);
+        $sessionCheckRes->assertJson([
+            'status'   => 'ended',
+            'is_ended' => true,
+            'redirect' => route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $att1->id]),
+        ]);
+
         // Mahasiswa yang melakukan autosave otomatis mendapat signal redirect ke results
         $autosaveRes = $this->withSession(['quiz_attempt_' . $quiz->id => $att1->id])
             ->postJson(route('quiz.autosave', ['token' => $quiz->unique_token, 'attempt' => $att1->id]), [
@@ -241,6 +251,7 @@ class QuizWaitingRoomAndSessionTest extends TestCase
 
         $autosaveRes->assertStatus(200);
         $autosaveRes->assertJson([
+            'is_ended'     => true,
             'is_completed' => true,
             'redirect'     => route('quiz.results', ['token' => $quiz->unique_token, 'attempt' => $att1->id]),
         ]);

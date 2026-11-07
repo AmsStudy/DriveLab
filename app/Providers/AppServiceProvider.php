@@ -45,6 +45,13 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(120)->by($key);
         });
 
+        RateLimiter::for('quiz-session-check', function (Request $request) {
+            $attemptParam = $request->route('attempt');
+            $attemptId = is_object($attemptParam) ? ($attemptParam->id ?? null) : $attemptParam;
+            $key = 'quiz_sc_' . ($attemptId ?: ($request->session()->getId() ?: $request->ip()));
+            return Limit::perMinute(120)->by($key);
+        });
+
         RateLimiter::for('quiz-submit', function (Request $request) {
             $attemptParam = $request->route('attempt');
             $attemptId = is_object($attemptParam) ? ($attemptParam->id ?? null) : $attemptParam;

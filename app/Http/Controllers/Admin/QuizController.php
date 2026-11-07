@@ -912,6 +912,10 @@ class QuizController extends Controller
             'ends_at'        => now(),
         ]);
 
+        // Segera perbarui cache status agar seluruh browser mahasiswa langsung mendeteksi seketika
+        cache()->put("quiz_{$quiz->id}_status", 'ended', 120);
+        cache()->forget("quiz_{$quiz->id}_waiting_count");
+
         // Kumpulkan dan finalisasi seluruh attempt aktif yang belum selesai
         $activeAttempts = $quiz->attempts()->whereNull('completed_at')->get();
         foreach ($activeAttempts as $attempt) {

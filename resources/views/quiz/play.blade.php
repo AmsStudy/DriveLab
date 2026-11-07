@@ -848,6 +848,9 @@
                         this.initPenaltyCountdown();
                     }
 
+                    // Setup realtime session heartbeat (deteksi otomatis jika admin mengakhiri sesi kuis)
+                    this.startSessionHeartbeat();
+
                     // Setup background heartbeat sync every 15 seconds so supervisor Live Monitor stays online
                     this.heartbeatInterval = setInterval(() => {
                         if (!this.isSubmitting && !this.isLocked) {
@@ -1093,14 +1096,14 @@
                             return res.json();
                         })
                         .then(data => {
+                            // Cek jika sesi diakhiri oleh pengawas atau attempt di-force submit terlepas dari flag success
+                            if (data.is_ended || data.is_completed || data.is_force_submitted || data.redirect) {
+                                this.handleSessionEnded(data.redirect, data.message);
+                                return;
+                            }
+
                             if (data.success) {
                                 this.syncStatus = 'synced';
-
-                                // Check if supervisor force submitted this attempt
-                                if (data.is_force_submitted || data.redirect) {
-                                    window.location.href = data.redirect || '{{ route('quiz.results', [$quiz->unique_token, $attempt->id]) }}';
-                                    return;
-                                }
 
                                 // Check if supervisor adjusted/added extra time
                                 if (data.time_remaining !== undefined && data.time_remaining !== null) {
@@ -1128,6 +1131,79 @@
                             this.syncStatus = 'offline';
                         });
                     }, 400);
+                },
+
+                startSessionHeartbeat() {
+                    if (this.sessionHeartbeatInterval) clearInterval(this.sessionHeartbeatInterval);
+
+                    const poll = () => {
+                        if (this.isSubmitting) return;
+
+                        fetch('{{ route('quiz.session.check', [$quiz->unique_token, $attempt->id]) }}', {
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.is_ended || data.status === 'ended' || data.redirect) {
+                                this.handleSessionEnded(data.redirect, data.message);
+                                return;
+                            }
+
+                            // Sync adjusted extra time
+                            if (data.time_remaining !== undefined && data.time_remaining !== null) {
+                                const newTime = Math.max(0, Math.floor(Number(data.time_remaining)));
+                                if (this.remainingSeconds !== null && Math.abs(this.remainingSeconds - newTime) > 60) {
+                                    this.remainingSeconds = newTime;
+                                }
+                            }
+
+                            // Sync remote lock state
+                            if (data.is_locked !== undefined && data.is_locked !== this.isLocked) {
+                                this.isLocked = data.is_locked;
+                            }
+                        })
+                        .catch(() => {});
+                    };
+
+                    // Polling status kuis tiap 3 detik (dengan variasi acak agar tidak bentrok)
+                    this.sessionHeartbeatInterval = setInterval(poll, 3000 + Math.floor(Math.random() * 800));
+                },
+
+                handleSessionEnded(redirectUrl, message) {
+                    if (this.isSubmitting) return;
+                    this.isSubmitting = true;
+
+                    // Langsung hentikan seluruh timer dan scanner di browser
+                    if (this.timerInterval) clearInterval(this.timerInterval);
+                    if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
+                    if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
+                    if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
+                    if (this.sessionHeartbeatInterval) clearInterval(this.sessionHeartbeatInterval);
+
+                    const targetUrl = redirectUrl || '{{ route('quiz.results', [$quiz->unique_token, $attempt->id]) }}';
+                    const noticeText = message || 'Sesi kuis telah diakhiri oleh pengawas lab. Jawaban Anda telah dikumpulkan dan dinilai secara otomatis.';
+
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Ujian Telah Selesai',
+                            text: noticeText,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+                            timer: 2200,
+                            background: '#0F1713',
+                            color: '#F3F4F6',
+                            customClass: { popup: 'border border-amber-500/40 rounded-2xl' }
+                        }).then(() => {
+                            window.location.href = targetUrl;
+                        });
+                    } else {
+                        alert(noticeText);
+                        window.location.href = targetUrl;
+                    }
                 },
 
                 initPenaltyCountdown() {

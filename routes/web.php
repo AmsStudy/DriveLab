@@ -60,6 +60,9 @@ Route::prefix('quiz')->name('quiz.')->group(function () {
         ->name('start');
     Route::get('/{token}/waiting/{attempt}', [PublicQuizController::class, 'waitingRoom'])->name('waiting');
     Route::get('/{token}/waiting-status/{attempt}', [PublicQuizController::class, 'waitingStatus'])->name('waiting.status');
+    Route::get('/{token}/session-check/{attempt}', [PublicQuizController::class, 'sessionCheck'])
+        ->middleware('throttle:quiz-session-check')
+        ->name('session.check');
     Route::get('/{token}/play/{attempt}', [PublicQuizController::class, 'play'])->name('play');
     Route::post('/{token}/attempt/{attempt}/tab-switch', [PublicQuizController::class, 'recordTabSwitch'])
         ->middleware('throttle:quiz-tab-switch')
