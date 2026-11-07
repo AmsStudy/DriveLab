@@ -30,13 +30,10 @@
             background-color: var(--bg);
             color: #f3f4f6;
             min-height: 100vh;
+            overflow-x: hidden;
         }
         html:not(.dark) body {
             color: #0F1F17 !important;
-        }
-        html:not(.dark) .glow-card {
-            background: #FFFFFF !important;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05) !important;
         }
         .heading-font {
             font-family: 'Outfit', sans-serif;
@@ -45,50 +42,189 @@
             background: radial-gradient(circle at top left, rgba(16,185,129,0.08), transparent 70%), #0F1713;
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
         }
+        html:not(.dark) .glow-card {
+            background: radial-gradient(circle at top left, rgba(16,185,129,0.06), transparent 70%), #FFFFFF !important;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05) !important;
+        }
 
-        /* Radar Scanning Animation */
-        @keyframes radarSweep {
+        /* ─── Cyber Quantum Reactor Spinner (Ultra "Wah" & Futuristik) ─── */
+        @keyframes orbitCW {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .radar-sweep {
-            animation: radarSweep 3s linear infinite;
+        @keyframes orbitCCW {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
         }
-        @keyframes pulseRing {
-            0% { transform: scale(0.9); opacity: 0.8; }
-            50% { transform: scale(1.15); opacity: 0.2; }
-            100% { transform: scale(0.9); opacity: 0.8; }
+        @keyframes pulseGlowWave {
+            0%, 100% {
+                transform: scale(0.92);
+                box-shadow: 0 0 15px rgba(16, 185, 129, 0.3), inset 0 0 10px rgba(16, 185, 129, 0.2);
+            }
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 0 35px rgba(52, 211, 153, 0.7), 0 0 60px rgba(16, 185, 129, 0.4), inset 0 0 18px rgba(52, 211, 153, 0.4);
+            }
         }
-        .pulse-ring {
-            animation: pulseRing 2.4s ease-in-out infinite;
+        @keyframes floatingOrb {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(180deg); }
         }
 
-        /* Ambient Orbs */
-        @keyframes orbFloat {
+        .quantum-reactor {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.75rem;
+        }
+
+        /* Ring 1 - Outermost Multi-Segment Ring with Glowing Orbits */
+        .reactor-ring-outer {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px dashed rgba(16, 185, 129, 0.25);
+            animation: orbitCW 18s linear infinite;
+        }
+        .reactor-ring-outer::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #34D399;
+            box-shadow: 0 0 12px #34D399, 0 0 20px #10B981;
+        }
+        .reactor-ring-outer::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #06B6D4;
+            box-shadow: 0 0 12px #06B6D4;
+        }
+
+        /* Ring 2 - Tech Circuit Gradient Ring */
+        .reactor-ring-mid {
+            position: absolute;
+            inset: 14px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top: 3px solid #10B981;
+            border-right: 3px solid #34D399;
+            border-bottom: 3px solid transparent;
+            border-left: 3px solid rgba(16, 185, 129, 0.3);
+            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.6));
+            animation: orbitCW 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        /* Ring 3 - Counter Rotating Segment */
+        .reactor-ring-inner {
+            position: absolute;
+            inset: 28px;
+            border-radius: 50%;
+            border: 2.5px solid transparent;
+            border-bottom: 2.5px solid #06B6D4;
+            border-left: 2.5px solid #10B981;
+            filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5));
+            animation: orbitCCW 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        /* Ring 4 - Ambient Particle Track */
+        .reactor-ring-dotted {
+            position: absolute;
+            inset: 40px;
+            border-radius: 50%;
+            border: 2px dotted rgba(52, 211, 153, 0.45);
+            animation: orbitCW 7s linear infinite;
+        }
+
+        /* Center Glowing Core */
+        .reactor-core {
+            position: relative;
+            width: 58px;
+            height: 58px;
+            border-radius: 20px;
+            background: radial-gradient(circle at 35% 35%, #10B981 0%, #064E3B 100%);
+            border: 2px solid rgba(52, 211, 153, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            animation: pulseGlowWave 2s ease-in-out infinite alternate;
+        }
+        html:not(.dark) .reactor-core {
+            background: radial-gradient(circle at 35% 35%, #059669 0%, #047857 100%);
+            border: 2px solid rgba(16, 185, 129, 0.6);
+            box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35);
+        }
+
+        /* Light Mode Specific Overrides for Reactor Rings */
+        html:not(.dark) .reactor-ring-outer {
+            border-color: rgba(5, 150, 105, 0.3);
+        }
+        html:not(.dark) .reactor-ring-outer::before {
+            background: #059669;
+            box-shadow: 0 0 10px rgba(5, 150, 105, 0.7);
+        }
+        html:not(.dark) .reactor-ring-outer::after {
+            background: #0891B2;
+            box-shadow: 0 0 10px rgba(8, 145, 178, 0.7);
+        }
+        html:not(.dark) .reactor-ring-mid {
+            border-top-color: #059669;
+            border-right-color: #10B981;
+            border-left-color: rgba(5, 150, 105, 0.35);
+            filter: drop-shadow(0 2px 8px rgba(5, 150, 105, 0.4));
+        }
+        html:not(.dark) .reactor-ring-inner {
+            border-bottom-color: #0891B2;
+            border-left-color: #059669;
+            filter: drop-shadow(0 2px 6px rgba(8, 145, 178, 0.35));
+        }
+        html:not(.dark) .reactor-ring-dotted {
+            border-color: rgba(5, 150, 105, 0.4);
+        }
+
+        /* Dynamic Digital Equalizer / Activity Bars */
+        .audio-wave-bar {
+            width: 3px;
+            border-radius: 9999px;
+            background: #10B981;
+            animation: audioWave 1.2s ease-in-out infinite alternate;
+        }
+        html:not(.dark) .audio-wave-bar {
+            background: #059669;
+        }
+        @keyframes audioWave {
+            0% { height: 6px; opacity: 0.4; }
+            100% { height: 22px; opacity: 1; }
+        }
+
+        /* Background Moving Gradient Orbs */
+        @keyframes floatBackdrop1 {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(15px, -15px) scale(1.08); }
+            50% { transform: translate(25px, -20px) scale(1.1); }
         }
-        .orb-float-1 { animation: orbFloat 8s ease-in-out infinite; }
-        .orb-float-2 { animation: orbFloat 10s ease-in-out infinite reverse; }
-
-        /* Custom Card Styles strictly tailored to dark & light mode */
-        .info-pill-item {
-            background-color: #F9FAFB;
-            border: 1px solid #E5E7EB;
-            color: #4B5563;
+        @keyframes floatBackdrop2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-30px, 25px) scale(1.15); }
         }
-        html.dark .info-pill-item,
-        :root[class~="dark"] .info-pill-item {
-            background-color: rgba(9, 13, 11, 0.75) !important;
-            border: 1px solid #1A2820 !important;
-            color: #9CA3AF !important;
+        .backdrop-orb-1 {
+            animation: floatBackdrop1 10s ease-in-out infinite;
         }
-        .info-pill-item-title {
-            color: #111827;
-        }
-        html.dark .info-pill-item-title,
-        :root[class~="dark"] .info-pill-item-title {
-            color: #F9FAFB !important;
+        .backdrop-orb-2 {
+            animation: floatBackdrop2 12s ease-in-out infinite;
         }
     </style>
 </head>
@@ -139,112 +275,154 @@
     </div>
 
     {{-- Main Content --}}
-    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-8 md:py-12 flex flex-col justify-center">
+    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-8 md:py-12 flex flex-col justify-center relative">
 
-        <div class="space-y-6">
+        {{-- Background Ambient Gradient Orbs --}}
+        <div class="absolute -top-12 -left-16 w-80 h-80 rounded-full bg-emerald-500/10 dark:bg-emerald-500/5 blur-3xl pointer-events-none backdrop-orb-1"></div>
+        <div class="absolute -bottom-12 -right-16 w-80 h-80 rounded-full bg-teal-500/10 dark:bg-teal-500/5 blur-3xl pointer-events-none backdrop-orb-2"></div>
+
+        <div class="space-y-6 relative z-10">
 
             {{-- Main Hero Waiting Card --}}
-            <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-3xl p-6 md:p-10 glow-card relative overflow-hidden text-center shadow-lg">
-                <div class="absolute -right-16 -top-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-3xl p-6 sm:p-10 glow-card relative overflow-hidden text-center shadow-xl">
+                {{-- Decorative Ambient Glows inside card --}}
+                <div class="absolute -right-24 -top-24 w-80 h-80 bg-emerald-500/15 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-24 -bottom-24 w-80 h-80 bg-teal-500/10 dark:bg-teal-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
-                {{-- Status Chip --}}
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-6">
-                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                {{-- Status Chip with Glowing Aura --}}
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-8 shadow-xs relative">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
                     <span>Ruang Tunggu Ujian Aktif</span>
                 </div>
 
-                {{-- Radar / Pulse Visualizer --}}
-                <div class="relative w-28 h-28 mx-auto mb-6 flex items-center justify-center">
-                    <div class="absolute inset-0 rounded-full border border-emerald-500/20 pulse-ring"></div>
-                    <div class="absolute inset-2 rounded-full border border-emerald-500/30"></div>
-                    <div class="absolute inset-6 rounded-full border border-emerald-500/40"></div>
-                    <div class="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-md">
-                        <svg class="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{-- ─── QUANTUM REACTOR SPINNER ("WAH" & FUTURISTIC ANIMATION) ─── --}}
+                <div class="quantum-reactor">
+                    {{-- Outer dashed counter-spinning orbit ring with twin satellites --}}
+                    <div class="reactor-ring-outer"></div>
+
+                    {{-- Middle cyber glowing arc ring --}}
+                    <div class="reactor-ring-mid"></div>
+
+                    {{-- Inner high-speed counter-rotating cyan/emerald ring --}}
+                    <div class="reactor-ring-inner"></div>
+
+                    {{-- Particle dotted track --}}
+                    <div class="reactor-ring-dotted"></div>
+
+                    {{-- Center Pulsing Glowing Core with Tech Icon --}}
+                    <div class="reactor-core shadow-2xl">
+                        <svg class="w-7 h-7 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                     </div>
                 </div>
 
-                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white heading-font mb-2 tracking-tight">
+                {{-- Interactive Live Radar Sweep Signal Bar --}}
+                <div class="flex items-center justify-center gap-1.5 mb-5 opacity-80">
+                    <span class="audio-wave-bar" style="animation-delay: 0.1s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.3s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.5s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.2s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.4s;"></span>
+                    <span class="text-[11px] font-mono font-bold tracking-widest uppercase text-emerald-600 dark:text-emerald-400 mx-2">
+                        STANDBY &bull; SYNCING
+                    </span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.2s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.4s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.1s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.5s;"></span>
+                    <span class="audio-wave-bar" style="animation-delay: 0.3s;"></span>
+                </div>
+
+                {{-- Quiz Title --}}
+                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white heading-font mb-3 tracking-tight">
                     {{ $quiz->title }}
                 </h1>
 
-                <p class="text-sm text-gray-600 dark:text-gray-400 max-w-lg mx-auto mb-6 leading-relaxed">
-                    Data Anda telah terverifikasi. Anda saat ini berada di ruang tunggu ujian laboratorium. 
-                    <strong class="text-emerald-700 dark:text-emerald-400 font-semibold block mt-1">
-                        Halaman ini akan otomatis beralih sendiri ke soal begitu pengawas memulai kuis. Anda tidak perlu me-refresh browser.
-                    </strong>
+                {{-- Status Descriptions --}}
+                <p class="text-sm text-gray-600 dark:text-gray-300 max-w-lg mx-auto mb-6 leading-relaxed">
+                    Data Anda telah terverifikasi dan siap mengikuti ujian laboratorium.
+                    <span class="text-emerald-700 dark:text-emerald-400 font-semibold block mt-1.5 text-xs sm:text-sm">
+                        Halaman ini akan otomatis beralih sendiri ke lembar soal saat pengawas menekan tombol <strong>Mulai</strong>. Anda tidak perlu me-refresh browser.
+                    </span>
                 </p>
 
-                {{-- Waiting Room Stats Pill --}}
-                <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-gray-50 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1E3327] shadow-inner mb-6">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span class="text-xs text-gray-600 dark:text-gray-400">Peserta di Ruang Tunggu:</span>
-                    <span class="font-mono font-bold text-sm text-emerald-700 dark:text-emerald-400" x-text="waitingCount + ' Mahasiswa'">{{ $waitingCount }} Mahasiswa</span>
+                {{-- Waiting Room Live Participants Pill with Pulse --}}
+                <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-emerald-50/90 dark:bg-[#090D0B] border border-emerald-300 dark:border-[#1E3327] shadow-xs mb-8">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600 dark:bg-emerald-500"></span>
+                    </span>
+                    <span class="text-xs text-gray-700 dark:text-gray-300 font-medium">Peserta di Ruang Tunggu:</span>
+                    <span class="font-mono font-bold text-sm text-emerald-800 dark:text-emerald-400" x-text="waitingCount + ' Mahasiswa'">{{ $waitingCount }} Mahasiswa</span>
                 </div>
 
                 {{-- Student Identity Info Card --}}
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-xl mx-auto pt-6 border-t border-gray-100 dark:border-[#1A2820] text-left">
-                    <div class="p-3 rounded-2xl bg-gray-50 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820]">
-                        <span class="text-[10px] text-gray-500 uppercase tracking-wider block font-semibold">Nama Mahasiswa</span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-xl mx-auto pt-6 border-t border-gray-200 dark:border-[#1A2820] text-left">
+                    <div class="p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] hover:border-emerald-500/40 transition-colors">
+                        <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider block font-bold">Nama Mahasiswa</span>
                         <span class="text-xs font-bold text-gray-900 dark:text-white mt-0.5 block truncate">{{ $attempt->student_name }}</span>
                     </div>
-                    <div class="p-3 rounded-2xl bg-gray-50 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820]">
-                        <span class="text-[10px] text-gray-500 uppercase tracking-wider block font-semibold">NIM</span>
-                        <span class="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5 block">{{ $attempt->nim }}</span>
+                    <div class="p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] hover:border-emerald-500/40 transition-colors">
+                        <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider block font-bold">NIM</span>
+                        <span class="text-xs font-bold font-mono text-emerald-700 dark:text-emerald-400 mt-0.5 block">{{ $attempt->nim }}</span>
                     </div>
-                    <div class="p-3 rounded-2xl bg-gray-50 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820]">
-                        <span class="text-[10px] text-gray-500 uppercase tracking-wider block font-semibold">Kelas & Status</span>
+                    <div class="p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] hover:border-emerald-500/40 transition-colors">
+                        <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider block font-bold">Kelas & Status</span>
                         <span class="text-xs font-bold text-gray-900 dark:text-gray-200 mt-0.5 block">
-                            {{ $attempt->kelas ? 'Kelas ' . $attempt->kelas : 'Reguler' }} &bull; <span class="text-emerald-600 dark:text-emerald-400 font-semibold">Siap</span>
+                            {{ $attempt->kelas ? 'Kelas ' . $attempt->kelas : 'Reguler' }} &bull; <span class="text-emerald-700 dark:text-emerald-400 font-bold">Siap</span>
                         </span>
                     </div>
                 </div>
             </div>
 
             {{-- Exam Integrity & Instructions Card --}}
-            <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-3xl p-6 shadow-sm">
-                <div class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100 dark:border-[#1A2820]">
-                    <span class="text-amber-500 text-lg">💡</span>
+            <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-3xl p-6 sm:p-7 shadow-sm">
+                <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-gray-100 dark:border-[#1A2820]">
+                    <div class="w-7 h-7 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-sm text-amber-600 dark:text-amber-400">
+                        💡
+                    </div>
                     <h4 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">Petunjuk Selama Menunggu</h4>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <div class="flex items-start gap-3 p-3.5 rounded-2xl info-pill-item transition-all">
-                        <div class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-500/15 border border-emerald-300 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-600 dark:text-gray-300">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#121B16] border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 transition-all">
+                        <div class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-300 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
                             ⏱️
                         </div>
                         <div class="leading-relaxed">
-                            <strong class="info-pill-item-title block mb-0.5">Hitungan Mundur Waktu</strong>
-                            <span>Waktu ujian ({{ $quiz->time_limit_minutes > 0 ? $quiz->time_limit_minutes . ' menit' : 'tanpa batas' }}) akan mulai berjalan saat pengawas menekan tombol Mulai.</span>
+                            <strong class="text-gray-900 dark:text-white block mb-0.5">Hitungan Mundur Waktu</strong>
+                            <span class="text-gray-600 dark:text-gray-300">Waktu ujian ({{ $quiz->time_limit_minutes > 0 ? $quiz->time_limit_minutes . ' menit' : 'tanpa batas' }}) akan mulai berjalan serentak begitu pengawas menekan tombol Mulai.</span>
                         </div>
                     </div>
 
-                    <div class="flex items-start gap-3 p-3.5 rounded-2xl info-pill-item transition-all">
-                        <div class="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-500/15 border border-rose-300 dark:border-rose-500/30 text-rose-700 dark:text-rose-400 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-xs">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#121B16] border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 transition-all">
+                        <div class="w-6 h-6 rounded-lg bg-rose-100 dark:bg-rose-500/20 border border-rose-300 dark:border-rose-500/30 text-rose-700 dark:text-rose-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
                             🛡️
                         </div>
                         <div class="leading-relaxed">
-                            <strong class="info-pill-item-title block mb-0.5">Sistem Anti-Cheat CBT</strong>
-                            <span>Jangan beralih tab atau aplikasi setelah ujian dimulai untuk menghindari sanksi penguncian otomatis.</span>
+                            <strong class="text-gray-900 dark:text-white block mb-0.5">Sistem Anti-Cheat CBT</strong>
+                            <span class="text-gray-600 dark:text-gray-300">Dilarang berpindah tab, membuka jendela lain, atau keluar dari layar penuh guna mencegah sanksi pembekuan dan penguncian ujian otomatis.</span>
                         </div>
                     </div>
 
-                    <div class="flex items-start gap-3 p-3.5 rounded-2xl info-pill-item transition-all">
-                        <div class="w-7 h-7 rounded-lg bg-teal-100 dark:bg-teal-500/15 border border-teal-300 dark:border-teal-500/30 text-teal-700 dark:text-teal-400 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-xs">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#121B16] border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 transition-all">
+                        <div class="w-6 h-6 rounded-lg bg-teal-100 dark:bg-teal-500/20 border border-teal-300 dark:border-teal-500/30 text-teal-700 dark:text-teal-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
                             💾
                         </div>
                         <div class="leading-relaxed">
-                            <strong class="info-pill-item-title block mb-0.5">Penyimpanan Otomatis</strong>
-                            <span>Setiap jawaban yang Anda klik akan otomatis tersimpan ke server pengawas.</span>
+                            <strong class="text-gray-900 dark:text-white block mb-0.5">Penyimpanan Otomatis</strong>
+                            <span class="text-gray-600 dark:text-gray-300">Setiap pilihan jawaban otomatis tersimpan di cache lokal browser dan disinkronkan ke server pengawas secara berkala.</span>
                         </div>
                     </div>
 
-                    <div class="flex items-start gap-3 p-3.5 rounded-2xl info-pill-item transition-all">
-                        <div class="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-500/15 border border-amber-300 dark:border-amber-500/30 text-amber-700 dark:text-amber-400 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-xs">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#121B16] border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 transition-all">
+                        <div class="w-6 h-6 rounded-lg bg-amber-100 dark:bg-amber-500/20 border border-amber-300 dark:border-amber-500/30 text-amber-700 dark:text-amber-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
                             🔔
                         </div>
                         <div class="leading-relaxed">
-                            <strong class="info-pill-item-title block mb-0.5">Selesai Tepat Waktu</strong>
-                            <span>Pengawas dapat menghentikan ujian dari monitor utama kapan saja sesuai arahan instruktur.</span>
+                            <strong class="text-gray-900 dark:text-white block mb-0.5">Kontrol Penuh Pengawas</strong>
+                            <span class="text-gray-600 dark:text-gray-300">Pengawas dapat menyesuaikan waktu tambahan atau mengakhiri sesi kapan saja sesuai arahan instruktur laboratorium.</span>
                         </div>
                     </div>
                 </div>
