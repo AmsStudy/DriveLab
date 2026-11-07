@@ -254,3 +254,4 @@ class QuizWaitingRoomAndSessionTest extends TestCase
         $this->assertTrue($quiz->isSessionWaiting());
     }
 }
+

@@ -122,6 +122,7 @@ class QuizController extends Controller
             'shuffle_options'    => 'nullable|boolean',
             'show_leaderboard'   => 'nullable|boolean',
             'show_review'        => 'nullable|boolean',
+            'show_correct_answer' => 'nullable|boolean',
             'allow_open_book'    => 'nullable|boolean',
             'admin_unlock_password' => 'nullable|string|max:50',
             'max_attempts'       => 'nullable|integer|min:1|max:20',
@@ -154,6 +155,7 @@ class QuizController extends Controller
         $quiz->shuffle_options       = $request->boolean('shuffle_options', true);
         $quiz->show_leaderboard      = $request->boolean('show_leaderboard', true);
         $quiz->show_review           = $request->boolean('show_review', true);
+        $quiz->show_correct_answer   = $request->boolean('show_correct_answer', false);
         $quiz->allow_open_book       = $request->boolean('allow_open_book', false);
         $quiz->admin_unlock_password = $request->filled('admin_unlock_password') ? trim($request->admin_unlock_password) : null;
         $quiz->max_attempts          = $validated['max_attempts'] ?? 1;
@@ -203,6 +205,7 @@ class QuizController extends Controller
             'shuffle_options'    => 'nullable|boolean',
             'show_leaderboard'   => 'nullable|boolean',
             'show_review'        => 'nullable|boolean',
+            'show_correct_answer' => 'nullable|boolean',
             'allow_open_book'    => 'nullable|boolean',
             'admin_unlock_password' => 'nullable|string|max:50',
             'max_attempts'       => 'nullable|integer|min:1|max:20',
@@ -232,6 +235,7 @@ class QuizController extends Controller
         $quiz->shuffle_options       = $request->boolean('shuffle_options', false);
         $quiz->show_leaderboard      = $request->boolean('show_leaderboard', false);
         $quiz->show_review           = $request->boolean('show_review', false);
+        $quiz->show_correct_answer   = $request->boolean('show_correct_answer', false);
         $quiz->allow_open_book       = $request->boolean('allow_open_book', false);
         $quiz->admin_unlock_password = $request->filled('admin_unlock_password') ? trim($request->admin_unlock_password) : null;
         $quiz->max_attempts          = $validated['max_attempts'] ?? 1;

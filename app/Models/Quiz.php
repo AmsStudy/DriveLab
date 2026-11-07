@@ -31,6 +31,7 @@ class Quiz extends Model
         'session_status',
         'show_leaderboard',
         'show_review',
+        'show_correct_answer',
         'allow_open_book',
         'admin_unlock_password',
         'max_attempts',
@@ -47,6 +48,7 @@ class Quiz extends Model
         'is_active'          => 'boolean',
         'show_leaderboard'   => 'boolean',
         'show_review'        => 'boolean',
+        'show_correct_answer' => 'boolean',
         'allow_open_book'    => 'boolean',
         'max_attempts'       => 'integer',
         'classes'            => 'array',
@@ -176,5 +178,10 @@ class Quiz extends Model
     public function isSessionEnded(): bool
     {
         return ($this->session_status ?? 'waiting') === 'ended';
+    }
+
+    public function canShowCorrectAnswer(): bool
+    {
+        return (bool) $this->show_correct_answer;
     }
 }

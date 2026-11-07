@@ -524,14 +524,17 @@
 
         {{-- Review Answers & Explanations (if quiz allows show_review) --}}
         @if($quiz->show_review && $reviewAnswers)
+            @php
+                $canRevealCorrect = (bool)($quiz->show_correct_answer ?? false) || (auth()->check() && (auth()->user()->isSuperAdmin() || $quiz->user_id === auth()->id()));
+            @endphp
             <div class="results-card bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8 space-y-5">
                 <div class="flex items-center gap-3 pb-3 border-b border-gray-200 dark:border-[#1A2820]">
                     <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-500 text-lg shadow-sm">
                         💡
                     </div>
                     <div>
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-white heading-font">Pembahasan & Kunci Jawaban</h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Tinjau evaluasi butir soal, kunci jawaban yang tepat, dan catatan pembahasan instruktur</p>
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white heading-font">{{ $canRevealCorrect ? 'Pembahasan & Kunci Jawaban' : 'Evaluasi Lembar Jawaban' }}</h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $canRevealCorrect ? 'Tinjau evaluasi butir soal, kunci jawaban yang tepat, dan catatan pembahasan instruktur' : 'Tinjau evaluasi hasil pengerjaan soal Anda (kunci jawaban disembunyikan oleh instruktur)' }}</p>
                     </div>
                 </div>
 
@@ -652,27 +655,58 @@
                                             </div>
                                         @endif
                                     @else
-                                        {{-- OPSI LAIN (NETRAL) --}}
-                                        <div class="review-option-neutral p-3 rounded-xl border border-gray-200 dark:border-[#1A2820] flex items-start gap-2.5">
-                                            <span class="review-opt-badge w-6 h-6 rounded-lg font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                {{ $labels[$optIdx] ?? ($optIdx + 1) }}
-                                            </span>
-                                            <div class="min-w-0">
-                                                @if($opt->image_path)
-                                                    <div class="review-opt-img-box mb-1.5 max-h-24 overflow-hidden rounded-lg border p-1">
-                                                        <button type="button"
-                                                                onmouseenter="showCyberHoverBubble(event, '{{ $opt->image_url }}')"
-                                                                onmousemove="updateCyberHoverBubblePos(event)"
-                                                                onmouseleave="hideCyberHoverBubble()"
-                                                                onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIdx] ?? '' }}')"
-                                                                class="block group cursor-zoom-in focus:outline-none">
-                                                            <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform" loading="lazy">
-                                                        </button>
+                                        {{-- BUKAN PILIHAN MAHASISWA --}}
+                                        @if(!$ans->is_correct && $isCorrectOption && $canRevealCorrect)
+                                            {{-- KUNCI JAWABAN BENAR (HANYA MUNCUL JIKA JAWABAN MAHASISWA SALAH & ADMIN MENGIJINKAN) --}}
+                                            <div class="review-option-correct p-3 rounded-xl border-2 border-emerald-500 bg-[#0E2018] flex items-start justify-between gap-2 shadow-sm shadow-emerald-500/10">
+                                                <div class="flex items-start gap-2.5 min-w-0">
+                                                    <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                        {{ $labels[$optIdx] ?? ($optIdx + 1) }}
+                                                    </span>
+                                                    <div class="min-w-0">
+                                                        @if($opt->image_path)
+                                                            <div class="mb-1.5 inline-block">
+                                                                <button type="button"
+                                                                        onmouseenter="showCyberHoverBubble(event, '{{ $opt->image_url }}')"
+                                                                        onmousemove="updateCyberHoverBubblePos(event)"
+                                                                        onmouseleave="hideCyberHoverBubble()"
+                                                                        onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIdx] ?? '' }}')"
+                                                                        class="review-opt-img-box block group cursor-zoom-in focus:outline-none rounded-lg border hover:border-emerald-500/40 p-1 transition-all">
+                                                                    <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform" loading="lazy">
+                                                                </button>
+                                                            </div>
+                                                        @endif
+                                                        <div class="font-semibold block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
                                                     </div>
-                                                @endif
-                                                <div class="font-normal block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
+                                                </div>
+                                                <span class="text-[10px] bg-emerald-600 text-white font-bold px-2 py-0.5 rounded-md flex-shrink-0 flex items-center gap-1 shadow-sm">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                    Kunci Benar
+                                                </span>
                                             </div>
-                                        </div>
+                                        @else
+                                            {{-- OPSI LAIN (NETRAL) --}}
+                                            <div class="review-option-neutral p-3 rounded-xl border border-gray-200 dark:border-[#1A2820] flex items-start gap-2.5">
+                                                <span class="review-opt-badge w-6 h-6 rounded-lg font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    {{ $labels[$optIdx] ?? ($optIdx + 1) }}
+                                                </span>
+                                                <div class="min-w-0">
+                                                    @if($opt->image_path)
+                                                        <div class="review-opt-img-box mb-1.5 max-h-24 overflow-hidden rounded-lg border p-1">
+                                                            <button type="button"
+                                                                    onmouseenter="showCyberHoverBubble(event, '{{ $opt->image_url }}')"
+                                                                    onmousemove="updateCyberHoverBubblePos(event)"
+                                                                    onmouseleave="hideCyberHoverBubble()"
+                                                                    onclick="openCyberLightbox('{{ $opt->image_url }}', 'Gambar Opsi {{ $labels[$optIdx] ?? '' }}')"
+                                                                    class="block group cursor-zoom-in focus:outline-none">
+                                                                <img src="{{ $opt->image_url }}" alt="Gambar Opsi" class="max-h-20 w-auto object-contain group-hover:scale-105 transition-transform" loading="lazy">
+                                                            </button>
+                                                        </div>
+                                                    @endif
+                                                    <div class="font-normal block leading-snug">{!! App\Helpers\RichTextHelper::format($opt->option_text) !!}</div>
+                                                </div>
+                                            </div>
+                                        @endif
                                     @endif
                                 @endforeach
                             </div>
@@ -689,42 +723,85 @@
                                 $correctAnswerDisplay = implode(', ', $correctTextArray);
                             @endphp
 
-                            <div class="review-explanation-box mt-4 p-4 rounded-xl border text-xs">
-                                <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
-                                    @if($ans->is_correct)
+                            @if($ans->is_correct)
+                                {{-- MAHASISWA MENJAWAB BENAR --}}
+                                <div class="review-explanation-box mt-4 p-4 rounded-xl border text-xs">
+                                    <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
                                         <div class="flex items-center gap-2 font-bold exp-title text-xs sm:text-sm">
                                             <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-xs">✓</span>
                                             <span>Jawaban Anda Benar:</span>
                                             <span class="font-semibold">{{ $correctAnswerDisplay }}</span>
                                         </div>
-                                    @else
+
+                                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
+                                            Tepat (+ {{ $ans->points_earned ?: 0 }} Poin)
+                                        </span>
+                                    </div>
+
+                                    @if(!empty($ans->question->explanation))
+                                        <div class="pt-2 border-t border-emerald-500/20">
+                                            <div class="flex items-start gap-2">
+                                                <span class="font-bold shrink-0 flex items-center gap-1 exp-title">
+                                                    <span>💡</span> Pembahasan:
+                                                </span>
+                                                <div class="leading-relaxed exp-text flex-1">
+                                                    {!! App\Helpers\RichTextHelper::format($ans->question->explanation) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            @elseif($canRevealCorrect)
+                                {{-- MAHASISWA SALAH, TAPI ADMIN MENGIJINKAN LIHAT KUNCI BENAR --}}
+                                <div class="review-explanation-box mt-4 p-4 rounded-xl border text-xs">
+                                    <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
                                         <div class="flex items-center gap-2 font-bold exp-title text-xs sm:text-sm">
                                             <span class="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 text-xs">🔑</span>
                                             <span>Kunci Jawaban Benar:</span>
                                             <span class="font-semibold">{{ $correctAnswerDisplay }}</span>
                                         </div>
-                                    @endif
 
-                                    <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
-                                        {{ $ans->is_correct ? 'Tepat (+ ' . ($ans->points_earned ?: 0) . ' Poin)' : 'Kunci Tepat' }}
-                                    </span>
-                                </div>
-
-                                <div class="pt-2 border-t border-emerald-500/20">
-                                    <div class="flex items-start gap-2">
-                                        <span class="font-bold shrink-0 flex items-center gap-1 exp-title">
-                                            <span>💡</span> Pembahasan:
+                                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
+                                            Kunci Tepat
                                         </span>
-                                        <div class="leading-relaxed exp-text flex-1">
-                                            @if(!empty($ans->question->explanation))
-                                                {!! App\Helpers\RichTextHelper::format($ans->question->explanation) !!}
-                                            @else
-                                                <span class="italic text-gray-500 dark:text-gray-400">{{ $ans->is_correct ? 'Jawaban Anda sudah tepat sesuai materi praktikum.' : 'Tidak ada catatan pembahasan tambahan untuk soal ini.' }}</span>
-                                            @endif
+                                    </div>
+
+                                    <div class="pt-2 border-t border-emerald-500/20">
+                                        <div class="flex items-start gap-2">
+                                            <span class="font-bold shrink-0 flex items-center gap-1 exp-title">
+                                                <span>💡</span> Pembahasan:
+                                            </span>
+                                            <div class="leading-relaxed exp-text flex-1">
+                                                @if(!empty($ans->question->explanation))
+                                                    {!! App\Helpers\RichTextHelper::format($ans->question->explanation) !!}
+                                                @else
+                                                    <span class="italic text-gray-500 dark:text-gray-400">Tidak ada catatan pembahasan tambahan untuk soal ini.</span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            @else
+                                {{-- MAHASISWA SALAH & ADMIN TIDAK MENGIJINKAN LIHAT KUNCI BENAR --}}
+                                <div class="mt-4 p-4 rounded-xl border border-gray-200 dark:border-[#1A2820] bg-gray-50/80 dark:bg-[#070B09] text-xs">
+                                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                                        <div class="flex items-center gap-2 font-medium text-gray-800 dark:text-gray-200 text-xs sm:text-sm">
+                                            <span class="w-5 h-5 rounded-full bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-500 text-xs font-bold">✕</span>
+                                            <span>Evaluasi:</span>
+                                            <span class="text-rose-600 dark:text-rose-400 font-semibold">Jawaban Anda belum tepat</span>
+                                        </div>
+
+                                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                                            0 Poin
+                                        </span>
+                                    </div>
+
+                                    <div class="pt-2 mt-2 border-t border-gray-200 dark:border-[#16221B] text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                        <span>Kunci jawaban yang benar disembunyikan oleh instruktur sesuai kebijakan kuis ini.</span>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     @endforeach
                 </div>

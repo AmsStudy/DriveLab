@@ -234,8 +234,18 @@
                     <input type="checkbox" name="show_review" value="1" {{ old('show_review', '1') ? 'checked' : '' }}
                            class="mt-0.5 rounded text-emerald-500 focus:ring-emerald-500">
                     <div>
-                        <span class="text-xs font-bold text-white block">Tampilkan Kunci & Pembahasan Soal</span>
-                        <span class="text-[11px] text-gray-400">Mahasiswa dapat meninjau jawaban benar dan catatan penjelasan.</span>
+                        <span class="text-xs font-bold text-white block">Tampilkan Review Lembar Jawaban</span>
+                        <span class="text-[11px] text-gray-400">Mahasiswa dapat meninjau butir pertanyaan dan jawaban yang dipilih setelah selesai.</span>
+                    </div>
+                </label>
+
+                {{-- Izinkan Lihat Kunci Jawaban Benar --}}
+                <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#090D0B] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
+                    <input type="checkbox" name="show_correct_answer" value="1" {{ old('show_correct_answer') ? 'checked' : '' }}
+                           class="mt-0.5 rounded text-emerald-500 focus:ring-emerald-500">
+                    <div>
+                        <span class="text-xs font-bold text-white block">Izinkan Lihat Kunci Jawaban Benar</span>
+                        <span class="text-[11px] text-gray-400">Jika dicentang, mahasiswa dapat melihat jawaban benar saat jawabannya salah. Jika tidak, kunci jawaban disembunyikan.</span>
                     </div>
                 </label>
 

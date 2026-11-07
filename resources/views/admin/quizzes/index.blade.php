@@ -243,6 +243,11 @@
                             @if($quiz->show_leaderboard)
                                 <span class="px-2 py-0.5 rounded-md bg-[#131E17] border border-[#1A2820]">🏆 Leaderboard</span>
                             @endif
+                            @if($quiz->show_correct_answer)
+                                <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">🔑 Kunci Terbuka</span>
+                            @else
+                                <span class="px-2 py-0.5 rounded-md bg-[#131E17] border border-[#1A2820] text-gray-400">🔒 Kunci Ditutup</span>
+                            @endif
                         </div>
                     </div>
 
@@ -545,8 +550,17 @@
                             <input type="checkbox" name="show_review" value="1" {{ (old('_method') !== 'PUT' && old('show_review', '1')) ? 'checked' : 'checked' }}
                                    class="mt-0.5 rounded text-emerald-500 focus:ring-emerald-500">
                             <div>
-                                <span class="text-xs font-bold text-white block">Tampilkan Pembahasan Soal</span>
-                                <span class="text-[11px] text-gray-400">Mahasiswa dapat meninjau pembahasan jawaban yang tepat.</span>
+                                <span class="text-xs font-bold text-white block">Tampilkan Review Lembar Jawaban</span>
+                                <span class="text-[11px] text-gray-400">Mahasiswa dapat meninjau butir pertanyaan dan lembar jawaban setelah selesai.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
+                            <input type="checkbox" name="show_correct_answer" value="1" {{ (old('_method') !== 'PUT' && old('show_correct_answer')) ? 'checked' : '' }}
+                                   class="mt-0.5 rounded text-emerald-500 focus:ring-emerald-500">
+                            <div>
+                                <span class="text-xs font-bold text-white block">Izinkan Lihat Kunci Jawaban Benar</span>
+                                <span class="text-[11px] text-gray-400">Jika dicentang, mahasiswa dapat melihat jawaban benar saat jawabannya salah.</span>
                             </div>
                         </label>
 
@@ -878,8 +892,17 @@
                             <input type="checkbox" name="show_review" id="edit_quiz_show_review" value="1"
                                    class="mt-0.5 rounded text-emerald-500 focus:ring-emerald-500">
                             <div>
-                                <span class="text-xs font-bold text-white block">Tampilkan Pembahasan Soal</span>
-                                <span class="text-[11px] text-gray-400">Mahasiswa dapat meninjau pembahasan jawaban yang tepat.</span>
+                                <span class="text-xs font-bold text-white block">Tampilkan Review Lembar Jawaban</span>
+                                <span class="text-[11px] text-gray-400">Mahasiswa dapat meninjau butir pertanyaan dan lembar jawaban setelah selesai.</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
+                            <input type="checkbox" name="show_correct_answer" id="edit_quiz_show_correct_answer" value="1"
+                                   class="mt-0.5 rounded text-emerald-500 focus:ring-emerald-500">
+                            <div>
+                                <span class="text-xs font-bold text-white block">Izinkan Lihat Kunci Jawaban Benar</span>
+                                <span class="text-[11px] text-gray-400">Jika dicentang, mahasiswa dapat melihat jawaban benar saat jawabannya salah.</span>
                             </div>
                         </label>
 
@@ -988,6 +1011,7 @@
             'shuffle_options' => (bool)$q->shuffle_options,
             'show_leaderboard' => (bool)$q->show_leaderboard,
             'show_review' => (bool)$q->show_review,
+            'show_correct_answer' => (bool)$q->show_correct_answer,
             'allow_open_book' => (string)($q->allow_open_book ? '1' : '0'),
             'admin_unlock_password' => $q->admin_unlock_password ?? '',
             'classes' => is_array($q->classes) ? implode(', ', $q->classes) : ($q->classes ?? ''),
@@ -1082,6 +1106,7 @@
         document.getElementById('edit_quiz_shuffle_options').checked = quiz.shuffle_options;
         document.getElementById('edit_quiz_show_leaderboard').checked = quiz.show_leaderboard;
         document.getElementById('edit_quiz_show_review').checked = quiz.show_review;
+        document.getElementById('edit_quiz_show_correct_answer').checked = quiz.show_correct_answer;
         document.getElementById('edit_quiz_is_active').checked = quiz.is_active;
 
         const rad0 = document.getElementById('edit_allow_open_book_0');
