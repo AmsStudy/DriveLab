@@ -196,6 +196,29 @@
             border-color: rgba(5, 150, 105, 0.4);
         }
 
+        /* Direct Styling for Instruction Cards (Immune to Tailwind cascade / cache bugs) */
+        .waiting-rule-box {
+            background-color: #F9FAFB !important;
+            border: 1px solid #E5E7EB !important;
+        }
+        .waiting-rule-title {
+            color: #111827 !important;
+        }
+        .waiting-rule-desc {
+            color: #4B5563 !important;
+        }
+
+        html.dark .waiting-rule-box {
+            background-color: #0D1612 !important;
+            border: 1px solid #1E3327 !important;
+        }
+        html.dark .waiting-rule-title {
+            color: #F9FAFB !important;
+        }
+        html.dark .waiting-rule-desc {
+            color: #9CA3AF !important;
+        }
+
         /* Dynamic Digital Equalizer / Activity Bars */
         .audio-wave-bar {
             width: 3px;
@@ -385,44 +408,44 @@
                     <h4 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">Petunjuk Selama Menunggu</h4>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-600 dark:text-gray-300">
-                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#121B16] border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 transition-all">
-                        <div class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-300 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl waiting-rule-box transition-all">
+                        <div class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-500/15 border border-emerald-300 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-xs">
                             ⏱️
                         </div>
                         <div class="leading-relaxed">
-                            <strong class="text-gray-900 dark:text-white block mb-0.5">Hitungan Mundur Waktu</strong>
-                            <span class="text-gray-600 dark:text-gray-300">Waktu ujian ({{ $quiz->time_limit_minutes > 0 ? $quiz->time_limit_minutes . ' menit' : 'tanpa batas' }}) akan mulai berjalan serentak begitu pengawas menekan tombol Mulai.</span>
+                            <strong class="waiting-rule-title block mb-0.5">Hitungan Mundur Waktu</strong>
+                            <span class="waiting-rule-desc">Waktu ujian ({{ $quiz->time_limit_minutes > 0 ? $quiz->time_limit_minutes . ' menit' : 'tanpa batas' }}) akan mulai berjalan serentak begitu pengawas menekan tombol Mulai.</span>
                         </div>
                     </div>
 
-                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#121B16] border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 transition-all">
-                        <div class="w-6 h-6 rounded-lg bg-rose-100 dark:bg-rose-500/20 border border-rose-300 dark:border-rose-500/30 text-rose-700 dark:text-rose-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl waiting-rule-box transition-all">
+                        <div class="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-500/15 border border-rose-300 dark:border-rose-500/30 text-rose-700 dark:text-rose-400 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-xs">
                             🛡️
                         </div>
                         <div class="leading-relaxed">
-                            <strong class="text-gray-900 dark:text-white block mb-0.5">Sistem Anti-Cheat CBT</strong>
-                            <span class="text-gray-600 dark:text-gray-300">Dilarang berpindah tab, membuka jendela lain, atau keluar dari layar penuh guna mencegah sanksi pembekuan dan penguncian ujian otomatis.</span>
+                            <strong class="waiting-rule-title block mb-0.5">Sistem Anti-Cheat CBT</strong>
+                            <span class="waiting-rule-desc">Dilarang berpindah tab, membuka jendela lain, atau keluar dari layar penuh guna mencegah sanksi pembekuan dan penguncian ujian otomatis.</span>
                         </div>
                     </div>
 
-                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#121B16] border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 transition-all">
-                        <div class="w-6 h-6 rounded-lg bg-teal-100 dark:bg-teal-500/20 border border-teal-300 dark:border-teal-500/30 text-teal-700 dark:text-teal-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl waiting-rule-box transition-all">
+                        <div class="w-7 h-7 rounded-lg bg-teal-100 dark:bg-teal-500/15 border border-teal-300 dark:border-teal-500/30 text-teal-700 dark:text-teal-400 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-xs">
                             💾
                         </div>
                         <div class="leading-relaxed">
-                            <strong class="text-gray-900 dark:text-white block mb-0.5">Penyimpanan Otomatis</strong>
-                            <span class="text-gray-600 dark:text-gray-300">Setiap pilihan jawaban otomatis tersimpan di cache lokal browser dan disinkronkan ke server pengawas secara berkala.</span>
+                            <strong class="waiting-rule-title block mb-0.5">Penyimpanan Otomatis</strong>
+                            <span class="waiting-rule-desc">Setiap pilihan jawaban otomatis tersimpan di cache lokal browser dan disinkronkan ke server pengawas secara berkala.</span>
                         </div>
                     </div>
 
-                    <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/90 dark:bg-[#121B16] border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 transition-all">
-                        <div class="w-6 h-6 rounded-lg bg-amber-100 dark:bg-amber-500/20 border border-amber-300 dark:border-amber-500/30 text-amber-700 dark:text-amber-400 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                    <div class="flex items-start gap-3 p-3.5 rounded-2xl waiting-rule-box transition-all">
+                        <div class="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-500/15 border border-amber-300 dark:border-amber-500/30 text-amber-700 dark:text-amber-400 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-xs">
                             🔔
                         </div>
                         <div class="leading-relaxed">
-                            <strong class="text-gray-900 dark:text-white block mb-0.5">Kontrol Penuh Pengawas</strong>
-                            <span class="text-gray-600 dark:text-gray-300">Pengawas dapat menyesuaikan waktu tambahan atau mengakhiri sesi kapan saja sesuai arahan instruktur laboratorium.</span>
+                            <strong class="waiting-rule-title block mb-0.5">Kontrol Penuh Pengawas</strong>
+                            <span class="waiting-rule-desc">Pengawas dapat menyesuaikan waktu tambahan atau mengakhiri sesi kapan saja sesuai arahan instruktur laboratorium.</span>
                         </div>
                     </div>
                 </div>
