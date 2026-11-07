@@ -28,6 +28,7 @@ class Quiz extends Model
         'shuffle_questions',
         'shuffle_options',
         'is_active',
+        'session_status',
         'show_leaderboard',
         'show_review',
         'allow_open_book',
@@ -160,5 +161,20 @@ class Quiz extends Model
             return [];
         }
         return array_values(array_filter(array_map('trim', $this->classes)));
+    }
+
+    public function isSessionWaiting(): bool
+    {
+        return ($this->session_status ?? 'waiting') === 'waiting';
+    }
+
+    public function isSessionStarted(): bool
+    {
+        return ($this->session_status ?? 'waiting') === 'started';
+    }
+
+    public function isSessionEnded(): bool
+    {
+        return ($this->session_status ?? 'waiting') === 'ended';
     }
 }

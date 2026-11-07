@@ -230,18 +230,23 @@
                     <div class="absolute -right-16 -top-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
                     <div class="flex flex-wrap items-center gap-2 mb-4">
-                        @if($isExpired)
+                        @if($isExpired || $quiz->isSessionEnded())
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30">
-                                ⛔ Akses Kuis Ditutup
+                                ⛔ Sesi Ujian Ditutup
                             </span>
                         @elseif($isUpcoming)
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">
                                 ⏳ Menunggu Jadwal Mulai
                             </span>
+                        @elseif($quiz->isSessionWaiting())
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                                ⏳ Ruang Tunggu Terbuka
+                            </span>
                         @else
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                                Sesi Kuis Terbuka
+                                Sesi Ujian Sedang Berlangsung
                             </span>
                         @endif
 
@@ -468,25 +473,39 @@
                             @endif
 
                             <div class="pt-3">
+                                @php
+                                    $isEnded = $quiz->isSessionEnded();
+                                    $isWaiting = $quiz->isSessionWaiting();
+                                @endphp
                                 <button type="submit"
-                                        :disabled="isUpcoming || isExpired"
-                                        :class="(isUpcoming || isExpired) ? 'opacity-50 cursor-not-allowed bg-gray-800 text-gray-500' : 'glow-button text-white'"
+                                        :disabled="isUpcoming || isExpired || {{ $isEnded ? 'true' : 'false' }}"
+                                        :class="(isUpcoming || isExpired || {{ $isEnded ? 'true' : 'false' }}) ? 'opacity-50 cursor-not-allowed bg-gray-800 text-gray-500' : 'glow-button text-white'"
                                         class="w-full py-3.5 px-6 rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all">
                                     <template x-if="isUpcoming">
                                         <span class="flex items-center gap-2">
                                             <span>⏳ Menunggu Jadwal Kuis...</span>
                                         </span>
                                     </template>
-                                    <template x-if="isExpired">
-                                        <span>⛔ Akses Kuis Telah Berakhir</span>
+                                    <template x-if="isExpired || {{ $isEnded ? 'true' : 'false' }}">
+                                        <span>⛔ Sesi Ujian Telah Ditutup</span>
                                     </template>
-                                    <template x-if="!isUpcoming && !isExpired">
+                                    <template x-if="!isUpcoming && !isExpired && !{{ $isEnded ? 'true' : 'false' }}">
                                         <span class="flex items-center gap-2">
-                                            <span>🚀 Masuk ke Arena Kuis</span>
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                            @if($isWaiting)
+                                                <span>⏳ Masuk ke Ruang Tunggu</span>
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                            @else
+                                                <span>🚀 Masuk ke Arena Kuis</span>
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                            @endif
                                         </span>
                                     </template>
                                 </button>
+                                @if($isWaiting)
+                                    <p class="text-[11px] text-gray-400 dark:text-gray-500 text-center mt-2">
+                                        Setelah menekan tombol di atas, Anda akan menunggu di Ruang Tunggu hingga pengawas memulai ujian.
+                                    </p>
+                                @endif
                             </div>
                         </form>
                     </div>

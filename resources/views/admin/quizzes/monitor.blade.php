@@ -52,13 +52,106 @@
         </div>
     </div>
 
+    {{-- ─── LIVE EXAM SESSION CONTROL BANNER (START / END / WAITING ROOM) ─── --}}
+    <div class="rounded-2xl p-4 sm:p-5 border transition-all duration-300 shadow-sm"
+         :class="{
+             'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-amber-500/30': sessionStatus === 'waiting',
+             'bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-500/30': sessionStatus === 'started',
+             'bg-gradient-to-r from-rose-500/10 via-rose-500/5 to-transparent border-rose-500/30': sessionStatus === 'ended'
+         }">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-start sm:items-center gap-3.5">
+                {{-- Status Icon --}}
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                     :class="{
+                         'bg-amber-500/20 text-amber-400 border border-amber-500/40': sessionStatus === 'waiting',
+                         'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40': sessionStatus === 'started',
+                         'bg-rose-500/20 text-rose-400 border border-rose-500/40': sessionStatus === 'ended'
+                     }">
+                    <template x-if="sessionStatus === 'waiting'">
+                        <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </template>
+                    <template x-if="sessionStatus === 'started'">
+                        <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </template>
+                    <template x-if="sessionStatus === 'ended'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+                    </template>
+                </div>
+
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full"
+                              :class="{
+                                  'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30': sessionStatus === 'waiting',
+                                  'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30': sessionStatus === 'started',
+                                  'bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-500/30': sessionStatus === 'ended'
+                              }"
+                              x-text="sessionStatus === 'waiting' ? '⏳ Ruang Tunggu Aktif (Lobby)' : (sessionStatus === 'started' ? '🟢 Ujian Sedang Berlangsung' : '⛔ Ujian Telah Selesai')">
+                        </span>
+                        <span class="text-xs font-mono text-gray-500 dark:text-gray-400"
+                              x-show="sessionStatus === 'waiting'"
+                              x-text="'(' + summary.total_active + ' Mahasiswa Siap di Ruang Tunggu)'"></span>
+                    </div>
+
+                    <h4 class="text-base font-bold text-gray-900 dark:text-white mt-1">
+                        <span x-show="sessionStatus === 'waiting'">Menunggu Pengawas Membuka Pengerjaan Soal</span>
+                        <span x-show="sessionStatus === 'started'">Akses Soal Terbuka & Hitungan Mundur Waktu Berjalan</span>
+                        <span x-show="sessionStatus === 'ended'">Akses Pengerjaan Ditutup & Nilai Telah Direkap</span>
+                    </h4>
+
+                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                        <span x-show="sessionStatus === 'waiting'">Mahasiswa yang mengisi NIM berkumpul di Ruang Tunggu. Tekan tombol hijau di samping untuk memulai ujian serentak.</span>
+                        <span x-show="sessionStatus === 'started'">Mahasiswa sedang aktif menjawab. Tekan tombol merah di samping jika Anda ingin menghentikan ujian sewaktu-waktu.</span>
+                        <span x-show="sessionStatus === 'ended'">Seluruh pengerjaan aktif telah dikumpulkan dan dinilai. Anda dapat membuka kembali ruang tunggu jika ada sesi susulan.</span>
+                    </p>
+                </div>
+            </div>
+
+            {{-- Action Buttons --}}
+            <div class="flex items-center gap-2.5 flex-wrap sm:flex-nowrap flex-shrink-0">
+                {{-- Button START (When Waiting) --}}
+                <button type="button"
+                        x-show="sessionStatus === 'waiting'"
+                        @click="confirmStartSession()"
+                        :disabled="isSessionProcessing"
+                        class="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Mulai Kuis Sekarang</span>
+                </button>
+
+                {{-- Button END (When Started) --}}
+                <button type="button"
+                        x-show="sessionStatus === 'started'"
+                        @click="confirmEndSession()"
+                        :disabled="isSessionProcessing"
+                        class="px-5 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-sm shadow-lg shadow-rose-500/25 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+                    <span>Hentikan Kuis</span>
+                </button>
+
+                {{-- Button RESET (When Ended) --}}
+                <button type="button"
+                        x-show="sessionStatus === 'ended'"
+                        @click="confirmResetSession()"
+                        :disabled="isSessionProcessing"
+                        class="px-4 py-2.5 rounded-xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold text-xs flex items-center gap-2 transition-all cursor-pointer">
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    <span>Buka Ruang Tunggu Baru</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     {{-- Stats KPI Bar --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {{-- Sedang Mengerjakan --}}
+        {{-- Sedang Mengerjakan / Di Ruang Tunggu --}}
         <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-2xl p-4 relative overflow-hidden shadow-xs">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sedang Mengerjakan</span>
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse"></span>
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                      x-text="sessionStatus === 'waiting' ? 'Di Ruang Tunggu' : 'Sedang Mengerjakan'">Sedang Mengerjakan</span>
+                <span class="w-2.5 h-2.5 rounded-full"
+                      :class="sessionStatus === 'waiting' ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500 animate-pulse'"></span>
             </div>
             <div class="flex items-baseline gap-2 mt-2">
                 <span class="text-2xl font-bold text-gray-900 dark:text-white" x-text="summary.total_active">0</span>
@@ -99,7 +192,7 @@
             <button type="button" @click="activeTab = 'active'"
                     class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
                     :class="activeTab === 'active' ? 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30 shadow-xs' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'">
-                <span>Peserta Aktif</span>
+                <span x-text="sessionStatus === 'waiting' ? 'Mahasiswa di Ruang Tunggu' : 'Peserta Aktif Mengerjakan'">Peserta Aktif</span>
                 <span class="px-1.5 py-0.5 text-xs rounded-md bg-gray-100 dark:bg-[#090D0B] text-gray-700 dark:text-gray-300 font-bold" x-text="filteredActive.length">0</span>
             </button>
             <button type="button" @click="activeTab = 'completed'"
@@ -385,6 +478,8 @@
 function liveExamMonitor(quizId) {
     return {
         quizId: quizId,
+        sessionStatus: '{{ $quiz->session_status ?? 'waiting' }}',
+        isSessionProcessing: false,
         activeTab: 'active',
         statusFilter: 'all',
         searchQuery: '',
@@ -445,6 +540,9 @@ function liveExamMonitor(quizId) {
                 const res = await fetch(`{{ url('admin/quizzes/' . $quiz->id . '/monitor/data') }}`);
                 const data = await res.json();
                 if (data.success) {
+                    if (data.session_status) {
+                        this.sessionStatus = data.session_status;
+                    }
                     this.summary = data.summary;
                     this.activeAttempts = data.active;
                     this.completedAttempts = data.completed;
@@ -457,6 +555,156 @@ function liveExamMonitor(quizId) {
                 this.isFetching = false;
                 if (manual) this.isLoading = false;
             }
+        },
+
+        confirmStartSession() {
+            const isDark = document.documentElement.classList.contains('dark');
+            Swal.fire({
+                title: 'Mulai Kuis Sekarang?',
+                html: `<p class="text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}">Apakah Anda yakin ingin membuka akses soal untuk kuis <strong>{{ $quiz->title }}</strong>?</p><p class="text-xs ${isDark ? 'text-emerald-400' : 'text-emerald-700'} mt-2.5 font-semibold">Seluruh mahasiswa di Ruang Tunggu akan otomatis dialihkan ke lembar ujian, dan hitungan mundur waktu akan mulai berjalan serentak.</p>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10B981',
+                cancelButtonColor: isDark ? '#374151' : '#6B7280',
+                confirmButtonText: '🚀 Ya, Mulai Kuis!',
+                cancelButtonText: 'Batal',
+                background: isDark ? '#0F1713' : '#FFFFFF',
+                color: isDark ? '#F3F4F6' : '#111827',
+                customClass: {
+                    popup: isDark ? 'border border-emerald-500/40 rounded-2xl shadow-2xl' : 'border border-emerald-200 rounded-2xl shadow-2xl'
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    this.isSessionProcessing = true;
+                    try {
+                        const res = await fetch(`{{ route('admin.quizzes.session.start', $quiz) }}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            this.sessionStatus = 'started';
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Kuis Berhasil Dimulai!',
+                                text: data.message,
+                                timer: 2500,
+                                showConfirmButton: false,
+                                background: isDark ? '#0F1713' : '#FFFFFF',
+                                color: isDark ? '#34D399' : '#059669',
+                                customClass: { popup: isDark ? 'border border-emerald-500/40 rounded-xl' : 'border border-emerald-200 rounded-xl' }
+                            });
+                            this.fetchData(true);
+                        } else {
+                            Swal.fire('Gagal', data.message || 'Gagal memulai kuis.', 'error');
+                        }
+                    } catch (err) {
+                        Swal.fire('Gagal', 'Terjadi kesalahan sistem saat memulai kuis.', 'error');
+                    } finally {
+                        this.isSessionProcessing = false;
+                    }
+                }
+            });
+        },
+
+        confirmEndSession() {
+            const isDark = document.documentElement.classList.contains('dark');
+            Swal.fire({
+                title: 'Hentikan / Akhiri Kuis?',
+                html: `<p class="text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}">Apakah Anda yakin ingin menghentikan sesi kuis <strong>{{ $quiz->title }}</strong> sekarang?</p><p class="text-xs ${isDark ? 'text-rose-400' : 'text-rose-700'} mt-2.5 font-semibold">Akses pengerjaan akan segera ditutup. Seluruh lembar ujian mahasiswa yang masih aktif akan otomatis dikumpulkan dan dinilai.</p>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                cancelButtonColor: isDark ? '#374151' : '#6B7280',
+                confirmButtonText: '⛔ Ya, Hentikan Kuis!',
+                cancelButtonText: 'Batal',
+                background: isDark ? '#0F1713' : '#FFFFFF',
+                color: isDark ? '#F3F4F6' : '#111827',
+                customClass: {
+                    popup: isDark ? 'border border-rose-500/40 rounded-2xl shadow-2xl' : 'border border-rose-200 rounded-2xl shadow-2xl'
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    this.isSessionProcessing = true;
+                    try {
+                        const res = await fetch(`{{ route('admin.quizzes.session.end', $quiz) }}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            this.sessionStatus = 'ended';
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Kuis Telah Dihentikan!',
+                                text: data.message,
+                                timer: 3000,
+                                showConfirmButton: false,
+                                background: isDark ? '#0F1713' : '#FFFFFF',
+                                color: isDark ? '#34D399' : '#059669',
+                                customClass: { popup: isDark ? 'border border-emerald-500/40 rounded-xl' : 'border border-emerald-200 rounded-xl' }
+                            });
+                            this.fetchData(true);
+                        } else {
+                            Swal.fire('Gagal', data.message || 'Gagal menghentikan kuis.', 'error');
+                        }
+                    } catch (err) {
+                        Swal.fire('Gagal', 'Terjadi kesalahan sistem saat menghentikan kuis.', 'error');
+                    } finally {
+                        this.isSessionProcessing = false;
+                    }
+                }
+            });
+        },
+
+        confirmResetSession() {
+            const isDark = document.documentElement.classList.contains('dark');
+            Swal.fire({
+                title: 'Buka Kembali Ruang Tunggu?',
+                html: `<p class="text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}">Status sesi kuis akan dikembalikan ke <strong>Ruang Tunggu</strong> sehingga peserta baru dapat bergabung kembali.</p>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10B981',
+                cancelButtonColor: isDark ? '#374151' : '#6B7280',
+                confirmButtonText: 'Ya, Buka Ruang Tunggu',
+                cancelButtonText: 'Batal',
+                background: isDark ? '#0F1713' : '#FFFFFF',
+                color: isDark ? '#F3F4F6' : '#111827',
+                customClass: {
+                    popup: isDark ? 'border border-[#1A2820] rounded-2xl shadow-2xl' : 'border border-gray-200 rounded-2xl shadow-2xl'
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    this.isSessionProcessing = true;
+                    try {
+                        const res = await fetch(`{{ route('admin.quizzes.session.reset', $quiz) }}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            this.sessionStatus = 'waiting';
+                            this.fetchData(true);
+                        }
+                    } catch (err) {
+                        Swal.fire('Gagal', 'Terjadi kesalahan.', 'error');
+                    } finally {
+                        this.isSessionProcessing = false;
+                    }
+                }
+            });
         },
 
         async remoteUnlock(item) {

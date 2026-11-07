@@ -854,8 +854,10 @@ class QuizController extends Controller
         }
 
         return response()->json([
-            'success'   => true,
+            'success'        => true,
+            'session_status' => $quiz->session_status ?? 'waiting',
             'summary'   => [
+                'session_status'  => $quiz->session_status ?? 'waiting',
                 'total_active'    => count($activeAttempts),
                 'total_completed' => count($completedAttempts),
                 'total_locked'    => count(array_filter($activeAttempts, fn($a) => $a['is_locked'])),
@@ -865,6 +867,87 @@ class QuizController extends Controller
             'active'    => $activeAttempts,
             'completed' => $completedAttempts,
         ]);
+    }
+
+    public function startSession(Request $request, Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+
+        $quiz->update([
+            'session_status' => 'started',
+            'starts_at'      => $quiz->starts_at ?? now(),
+        ]);
+
+        // Atur started_at untuk seluruh attempt yang sedang menunggu agar timer mereka mulai dari detik ini
+        $quiz->attempts()
+            ->whereNull('completed_at')
+            ->update([
+                'started_at'        => now(),
+                'last_heartbeat_at' => now(),
+            ]);
+
+        $msg = 'Kuis berhasil dimulai! Seluruh mahasiswa di ruang tunggu kini dapat mengerjakan soal secara serentak.';
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success'        => true,
+                'session_status' => 'started',
+                'message'        => $msg,
+            ]);
+        }
+
+        return back()->with('success', $msg);
+    }
+
+    public function endSession(Request $request, Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+
+        $quiz->update([
+            'session_status' => 'ended',
+            'ends_at'        => now(),
+        ]);
+
+        // Kumpulkan dan finalisasi seluruh attempt aktif yang belum selesai
+        $activeAttempts = $quiz->attempts()->whereNull('completed_at')->get();
+        foreach ($activeAttempts as $attempt) {
+            $attempt->update(['is_force_submitted' => true]);
+            \App\Services\QuizScoringService::finalize($attempt, $attempt->draft_answers ?? []);
+        }
+
+        $msg = 'Kuis telah berhasil dihentikan. Seluruh lembar ujian mahasiswa yang sedang aktif telah dikumpulkan dan dinilai secara otomatis.';
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success'         => true,
+                'session_status'  => 'ended',
+                'message'         => $msg,
+                'finalized_count' => $activeAttempts->count(),
+            ]);
+        }
+
+        return back()->with('success', $msg);
+    }
+
+    public function resetSession(Request $request, Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+
+        $quiz->update([
+            'session_status' => 'waiting',
+        ]);
+
+        $msg = 'Sesi kuis berhasil direset kembali ke status Ruang Tunggu.';
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success'        => true,
+                'session_status' => 'waiting',
+                'message'        => $msg,
+            ]);
+        }
+
+        return back()->with('success', $msg);
     }
 
     public function addTimeAttempt(Request $request, Quiz $quiz, QuizAttempt $attempt)

@@ -88,6 +88,11 @@ class PublicQuizController extends Controller
             return back()->with('error', 'Kuis saat ini tidak aktif atau telah ditutup.');
         }
 
+        // Check if session has already ended by instructor
+        if ($quiz->isSessionEnded()) {
+            return back()->with('error', 'Sesi kuis ini telah dihentikan / selesai oleh pengawas laboratorium. Akses pengerjaan ditutup.')->withInput();
+        }
+
         // 1. Check schedule: Expired
         if ($quiz->isScheduleExpired()) {
             return back()->with('error', 'Batas waktu akses kuis telah berakhir. Soal tidak dapat diakses lagi.')->withInput();
@@ -149,10 +154,16 @@ class PublicQuizController extends Controller
                     QuizScoringService::finalize($ongoing, $ongoing->draft_answers ?? []);
                 } else {
                     session(['quiz_attempt_' . $quiz->id => $ongoing->id]);
+                    if ($quiz->isSessionWaiting()) {
+                        return redirect()->route('quiz.waiting', ['token' => $token, 'attempt' => $ongoing->id]);
+                    }
                     return redirect()->route('quiz.play', ['token' => $token, 'attempt' => $ongoing->id]);
                 }
             } else {
                 session(['quiz_attempt_' . $quiz->id => $ongoing->id]);
+                if ($quiz->isSessionWaiting()) {
+                    return redirect()->route('quiz.waiting', ['token' => $token, 'attempt' => $ongoing->id]);
+                }
                 return redirect()->route('quiz.play', ['token' => $token, 'attempt' => $ongoing->id]);
             }
         }
@@ -181,7 +192,65 @@ class PublicQuizController extends Controller
 
         session(['quiz_attempt_' . $quiz->id => $attempt->id]);
 
+        if ($quiz->isSessionWaiting()) {
+            return redirect()->route('quiz.waiting', ['token' => $token, 'attempt' => $attempt->id]);
+        }
+
         return redirect()->route('quiz.play', ['token' => $token, 'attempt' => $attempt->id]);
+    }
+
+    public function waitingRoom(string $token, QuizAttempt $attempt)
+    {
+        $quiz = $this->findQuizByIdentifier($token);
+        $this->validateAttemptAccess($quiz, $attempt);
+
+        if ($attempt->isCompleted()) {
+            return redirect()->route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]);
+        }
+
+        if ($quiz->isSessionStarted()) {
+            return redirect()->route('quiz.play', ['token' => $token, 'attempt' => $attempt->id]);
+        }
+
+        if ($quiz->isSessionEnded()) {
+            return redirect()->route('quiz.lobby', ['token' => $token])->with('error', 'Sesi kuis telah dihentikan / ditutup oleh pengawas.');
+        }
+
+        $attempt->update(['last_heartbeat_at' => now()]);
+        $waitingCount = $quiz->attempts()->whereNull('completed_at')->count();
+
+        return view('quiz.waiting', compact('quiz', 'attempt', 'waitingCount'));
+    }
+
+    public function waitingStatus(string $token, QuizAttempt $attempt)
+    {
+        $quiz = $this->findQuizByIdentifier($token);
+        $this->validateAttemptAccess($quiz, $attempt);
+
+        $attempt->update(['last_heartbeat_at' => now()]);
+        $waitingCount = $quiz->attempts()->whereNull('completed_at')->count();
+
+        if ($quiz->isSessionStarted()) {
+            return response()->json([
+                'session_status' => 'started',
+                'redirect'       => route('quiz.play', ['token' => $token, 'attempt' => $attempt->id]),
+                'waiting_count'  => $waitingCount,
+            ]);
+        }
+
+        if ($quiz->isSessionEnded()) {
+            return response()->json([
+                'session_status' => 'ended',
+                'redirect'       => route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]),
+                'waiting_count'  => 0,
+            ]);
+        }
+
+        return response()->json([
+            'session_status' => 'waiting',
+            'redirect'       => null,
+            'waiting_count'  => $waitingCount,
+        ]);
     }
 
     public function play(string $token, QuizAttempt $attempt)
@@ -190,6 +259,20 @@ class PublicQuizController extends Controller
         $this->validateAttemptAccess($quiz, $attempt);
 
         if ($attempt->isCompleted()) {
+            return redirect()->route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]);
+        }
+
+        // If quiz is still in waiting room, redirect back to waiting room!
+        if ($quiz->isSessionWaiting()) {
+            return redirect()->route('quiz.waiting', ['token' => $token, 'attempt' => $attempt->id]);
+        }
+
+        // If quiz session was ended by instructor, finalize and redirect to results
+        if ($quiz->isSessionEnded()) {
+            if (!$attempt->isCompleted()) {
+                $attempt->update(['is_force_submitted' => true]);
+                QuizScoringService::finalize($attempt, $attempt->draft_answers ?? []);
+            }
             return redirect()->route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]);
         }
 
@@ -398,7 +481,11 @@ class PublicQuizController extends Controller
         $quiz = $this->findQuizByIdentifier($token);
         $this->validateAttemptAccess($quiz, $attempt);
 
-        if ($attempt->isCompleted() || $attempt->is_force_submitted) {
+        if ($attempt->isCompleted() || $attempt->is_force_submitted || $quiz->isSessionEnded()) {
+            if (!$attempt->isCompleted()) {
+                $attempt->update(['is_force_submitted' => true]);
+                QuizScoringService::finalize($attempt, $attempt->draft_answers ?? []);
+            }
             return response()->json([
                 'success'      => false,
                 'is_completed' => true,

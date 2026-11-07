@@ -49,8 +49,9 @@ class QuizClassFeatureTest extends TestCase
             'title'        => 'Kuis Algoritma',
             'access_code'  => 'ALGO-1',
             'classes'      => ['A1'],
-            'max_attempts' => 1,
-            'is_active'    => true,
+            'max_attempts'   => 1,
+            'is_active'      => true,
+            'session_status' => 'started',
         ]);
 
         $this->actingAs($this->admin)->put(route('admin.quizzes.update', $quiz), [
@@ -73,8 +74,9 @@ class QuizClassFeatureTest extends TestCase
             'access_code'  => 'BD-01',
             'unique_token' => 'token-bd-01',
             'classes'      => ['A1', 'A2'],
-            'max_attempts' => 1,
-            'is_active'    => true,
+            'max_attempts'   => 1,
+            'is_active'      => true,
+            'session_status' => 'started',
         ]);
 
         // Attempt without class should fail validation
@@ -95,8 +97,9 @@ class QuizClassFeatureTest extends TestCase
             'access_code'  => 'PW-01',
             'unique_token' => 'token-pw-01',
             'classes'      => ['A1', 'A2'],
-            'max_attempts' => 1,
-            'is_active'    => true,
+            'max_attempts'   => 1,
+            'is_active'      => true,
+            'session_status' => 'started',
         ]);
 
         QuizQuestion::create([
@@ -132,8 +135,9 @@ class QuizClassFeatureTest extends TestCase
             'slug'         => 'kuis-multimedia',
             'unique_token' => 'token-mm-01',
             'classes'      => ['A1', 'A2'],
-            'max_attempts' => 1,
-            'is_active'    => true,
+            'max_attempts'   => 1,
+            'is_active'      => true,
+            'session_status' => 'started',
         ]);
 
         QuizAttempt::create([

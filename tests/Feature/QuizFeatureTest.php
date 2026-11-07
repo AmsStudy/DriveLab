@@ -168,6 +168,7 @@ class QuizFeatureTest extends TestCase
             'title'              => 'Kuis Arena Mahasiswa',
             'time_limit_minutes' => 10,
             'is_active'          => true,
+            'session_status'     => 'started',
             'max_attempts'       => 1,
         ]);
 
@@ -408,9 +409,10 @@ class QuizFeatureTest extends TestCase
     public function test_autosave_answers_and_fullscreen_violation_reason(): void
     {
         $quiz = Quiz::create([
-            'user_id'   => $this->admin->id,
-            'title'     => 'Kuis Autosave Test',
-            'is_active' => true,
+            'user_id'        => $this->admin->id,
+            'title'          => 'Kuis Autosave Test',
+            'is_active'      => true,
+            'session_status' => 'started',
         ]);
 
         $q1 = $quiz->questions()->create(['question_text' => 'Q1', 'question_type' => 'multiple_choice', 'points' => 100]);
@@ -478,6 +480,7 @@ class QuizFeatureTest extends TestCase
             'title'              => 'Kuis Uji IDOR & Keamanan',
             'time_limit_minutes' => 5,
             'is_active'          => true,
+            'session_status'     => 'started',
             'max_attempts'       => 1,
         ]);
 

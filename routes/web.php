@@ -58,6 +58,8 @@ Route::prefix('quiz')->name('quiz.')->group(function () {
     Route::post('/{token}/start', [PublicQuizController::class, 'start'])
         ->middleware('throttle:quiz-start')
         ->name('start');
+    Route::get('/{token}/waiting/{attempt}', [PublicQuizController::class, 'waitingRoom'])->name('waiting');
+    Route::get('/{token}/waiting-status/{attempt}', [PublicQuizController::class, 'waitingStatus'])->name('waiting.status');
     Route::get('/{token}/play/{attempt}', [PublicQuizController::class, 'play'])->name('play');
     Route::post('/{token}/attempt/{attempt}/tab-switch', [PublicQuizController::class, 'recordTabSwitch'])
         ->middleware('throttle:quiz-tab-switch')
@@ -126,6 +128,9 @@ Route::prefix('admin')
         // Live Exam Monitoring & Proctoring
         Route::get('quizzes/{quiz}/monitor', [QuizController::class, 'liveMonitor'])->name('quizzes.monitor');
         Route::get('quizzes/{quiz}/monitor/data', [QuizController::class, 'liveMonitorData'])->name('quizzes.monitor.data');
+        Route::post('quizzes/{quiz}/session/start', [QuizController::class, 'startSession'])->name('quizzes.session.start');
+        Route::post('quizzes/{quiz}/session/end', [QuizController::class, 'endSession'])->name('quizzes.session.end');
+        Route::post('quizzes/{quiz}/session/reset', [QuizController::class, 'resetSession'])->name('quizzes.session.reset');
         Route::post('quizzes/{quiz}/attempts/{attempt}/add-time', [QuizController::class, 'addTimeAttempt'])->name('quizzes.attempts.add-time');
         Route::post('quizzes/{quiz}/attempts/{attempt}/force-submit', [QuizController::class, 'forceSubmitAttempt'])->name('quizzes.attempts.force-submit');
 
