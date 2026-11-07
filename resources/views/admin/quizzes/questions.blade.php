@@ -233,7 +233,7 @@
                                             <input type="checkbox" name="correct_indices[]" :value="idx"
                                                    :checked="isCorrect(idx)"
                                                    @change="toggleCorrect(idx)"
-                                                   class="rounded text-purple-500 focus:ring-purple-500 bg-gray-900 border-gray-700 w-4 h-4">
+                                                   class="rounded text-purple-500 focus:ring-purple-500 w-4 h-4">
                                             <span class="text-xs font-bold font-mono"
                                                   :class="isCorrect(idx) ? 'text-purple-300' : 'text-gray-400'"
                                                   x-text="getOptionLabel(idx)"></span>
@@ -245,7 +245,7 @@
                                             <input type="radio" name="correct_index" :value="idx"
                                                    :checked="parseInt(formData.correct_index) === idx"
                                                    @change="formData.correct_index = idx"
-                                                   class="text-emerald-500 focus:ring-emerald-500 bg-gray-900 border-gray-700 w-4 h-4">
+                                                   class="text-emerald-500 focus:ring-emerald-500 w-4 h-4">
                                             <span class="text-xs font-bold font-mono"
                                                   :class="parseInt(formData.correct_index) === idx ? 'text-emerald-400' : 'text-gray-400'"
                                                   x-text="getOptionLabel(idx)"></span>

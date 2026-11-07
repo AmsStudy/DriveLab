@@ -234,7 +234,7 @@
                 {{-- Acak Soal --}}
                 <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#090D0B] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
                     <input type="checkbox" name="shuffle_questions" value="1" {{ old('shuffle_questions', $quiz->shuffle_questions) ? 'checked' : '' }}
-                           class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                           class="mt-0.5 rounded text-emerald-500 focus:ring-emerald-500">
                     <div>
                         <span class="text-xs font-bold text-white block">Acak Urutan Soal (Shuffle Questions)</span>
                         <span class="text-[11px] text-gray-400">Setiap mahasiswa menerima urutan soal yang berbeda-beda.</span>
@@ -244,7 +244,7 @@
                 {{-- Acak Opsi --}}
                 <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#090D0B] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
                     <input type="checkbox" name="shuffle_options" value="1" {{ old('shuffle_options', $quiz->shuffle_options) ? 'checked' : '' }}
-                           class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                           class="mt-0.5 rounded text-emerald-500 focus:ring-emerald-500">
                     <div>
                         <span class="text-xs font-bold text-white block">Acak Pilihan Jawaban (Shuffle Options)</span>
                         <span class="text-[11px] text-gray-400">Urutan pilihan A, B, C, D diacak secara otomatis.</span>
@@ -254,7 +254,7 @@
                 {{-- Tampilkan Leaderboard --}}
                 <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#090D0B] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
                     <input type="checkbox" name="show_leaderboard" value="1" {{ old('show_leaderboard', $quiz->show_leaderboard) ? 'checked' : '' }}
-                           class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                           class="mt-0.5 rounded text-emerald-500 focus:ring-emerald-500">
                     <div>
                         <span class="text-xs font-bold text-white block">Tampilkan Podium / Leaderboard</span>
                         <span class="text-[11px] text-gray-400">Mahasiswa dapat melihat peringkat mereka setelah selesai.</span>
@@ -264,7 +264,7 @@
                 {{-- Tampilkan Pembahasan --}}
                 <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#090D0B] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors">
                     <input type="checkbox" name="show_review" value="1" {{ old('show_review', $quiz->show_review) ? 'checked' : '' }}
-                           class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                           class="mt-0.5 rounded text-emerald-500 focus:ring-emerald-500">
                     <div>
                         <span class="text-xs font-bold text-white block">Tampilkan Kunci & Pembahasan Soal</span>
                         <span class="text-[11px] text-gray-400">Mahasiswa dapat meninjau jawaban benar dan catatan penjelasan.</span>
@@ -274,7 +274,7 @@
                 {{-- Status Aktif Kuis --}}
                 <label class="flex items-start gap-3 p-3.5 rounded-xl bg-[#090D0B] border border-[#1A2820] hover:border-emerald-500/30 cursor-pointer transition-colors md:col-span-2">
                     <input type="checkbox" name="is_active" value="1" {{ old('is_active', $quiz->is_active) ? 'checked' : '' }}
-                           class="mt-0.5 rounded border-gray-700 text-emerald-500 focus:ring-emerald-500 bg-gray-900">
+                           class="mt-0.5 rounded text-emerald-500 focus:ring-emerald-500">
                     <div>
                         <span class="text-xs font-bold text-emerald-400 block">Status Kuis Aktif</span>
                         <span class="text-[11px] text-gray-400">Jika dinonaktifkan, mahasiswa tidak dapat masuk atau mengerjakan kuis ini.</span>
@@ -306,7 +306,7 @@
                     <label class="relative flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all"
                            :class="openBook === '0' ? 'bg-emerald-500/10 border-emerald-500/40 ring-1 ring-emerald-500/30' : 'bg-[#090D0B] border-[#1A2820] hover:border-gray-700'">
                         <input type="radio" name="allow_open_book" value="0" x-model="openBook"
-                               class="mt-1 text-emerald-500 focus:ring-emerald-500 bg-gray-900 border-gray-700">
+                               class="mt-1 text-emerald-500 focus:ring-emerald-500">
                         <div class="flex-1">
                             <div class="flex items-center gap-2">
                                 <span class="text-xs font-bold text-white">Mode Ujian Ketat (Anti-Cheat Aktif)</span>
@@ -327,7 +327,7 @@
                     <label class="relative flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all"
                            :class="openBook === '1' ? 'bg-sky-500/10 border-sky-500/40 ring-1 ring-sky-500/30' : 'bg-[#090D0B] border-[#1A2820] hover:border-gray-700'">
                         <input type="radio" name="allow_open_book" value="1" x-model="openBook"
-                               class="mt-1 text-sky-500 focus:ring-sky-500 bg-gray-900 border-gray-700">
+                               class="mt-1 text-sky-500 focus:ring-sky-500">
                         <div class="flex-1">
                             <div class="flex items-center gap-2">
                                 <span class="text-xs font-bold text-white">Bisa Lihat Modul (Open Book)</span>
