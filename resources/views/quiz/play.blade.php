@@ -484,30 +484,16 @@
                 ⚠️
             </div>
 
-            <template x-if="tabSwitchCount <= 1 || strike === 1">
-                <div>
-                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 mb-2">
-                        Peringatan 1 dari 3: Sanksi 1 Menit
-                    </span>
-                    <h3 class="text-xl font-bold text-white heading-font">Terdeteksi Berpindah Tab / Layar!</h3>
-                    <p class="text-xs text-gray-400 mt-2">
-                        Anda terdeteksi meninggalkan halaman kuis. Sebagai sanksi, layar kuis dibekukan selama <strong class="text-amber-400">1 Menit (60 detik)</strong>.
-                    </p>
-                </div>
-            </template>
-
-            <template x-if="tabSwitchCount >= 2 && strike >= 2">
-                <div>
-                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/30 mb-2">
-                        Peringatan 2 dari 3: Sanksi 1.5 Menit
-                    </span>
-                    <h3 class="text-xl font-bold text-white heading-font">Pelanggaran Berulang Terdeteksi!</h3>
-                    <p class="text-xs text-gray-400 mt-2">
-                        Sanksi bertambah kelipatan menjadi <strong class="text-rose-400">1 Menit 30 Detik (90s)</strong>.
-                        <br><span class="text-rose-300 font-semibold">PERINGATAN: 1x lagi terdeteksi, kuis Anda akan TERKUNCI TOTAL!</span>
-                    </p>
-                </div>
-            </template>
+            <div>
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/30 mb-2">
+                    Peringatan 2 dari 3: Sanksi Pembekuan 1 Menit
+                </span>
+                <h3 class="text-xl font-bold text-white heading-font">Pelanggaran Kedua Terdeteksi!</h3>
+                <p class="text-xs text-gray-400 mt-2">
+                    Anda telah melewati batas peringatan pertama. Sebagai sanksi, layar kuis dibekukan selama <strong class="text-rose-400">1 Menit (60 detik)</strong>.
+                    <br><span class="text-rose-300 font-semibold mt-1 inline-block">PERINGATAN TERAKHIR: 1x lagi berpindah, kuis Anda akan TERKUNCI TOTAL!</span>
+                </p>
+            </div>
 
             {{-- Big Timer Countdown --}}
             <div class="my-6 p-4 rounded-2xl bg-[#090D0B] border transition-colors duration-200"
@@ -1337,15 +1323,30 @@
                             } else if (data.penalty_seconds > 0) {
                                 this.penaltySeconds = data.penalty_seconds;
                                 this.initPenaltyCountdown();
+                            } else if (data.tab_switch_count === 1) {
+                                // Peringatan 1 dari 3: Kartu Kuning (Layar TIDAK dibekukan)
+                                if (window.Swal) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Peringatan 1 dari 3: Terdeteksi Berpindah Layar!',
+                                        text: data.message || 'Ini adalah kesempatan pertama Anda. Jika Anda berpindah sekali lagi, layar kuis akan DIBEKUKAN selama 1 menit!',
+                                        confirmButtonColor: '#F59E0B',
+                                        confirmButtonText: 'Saya Mengerti, Lanjutkan Ujian',
+                                        background: '#0F1713',
+                                        color: '#F3F4F6',
+                                        customClass: { popup: 'border border-amber-500/50 rounded-2xl' }
+                                    });
+                                } else {
+                                    alert(data.message);
+                                }
                             }
                         })
                         .catch(err => console.error('Violation record error:', err));
                     };
 
-                    // Deteksi penekanan tombol sistem (Alt, Windows Key, Ctrl+Tab/W/T)
-                    // Tombol ini HANYA ditekan oleh jari manusia saat sengaja berpindah aplikasi / Alt+Tab.
-                    // Proses background OS (antivirus, Veyon agent, NetSupport) TIDAK PERNAH memicu event keydown!
-                    let lastSystemKeyTime = 0;
+                    // Deteksi penekanan tombol Alt untuk menangkap jalan pintas Alt+Tab secara spesifik.
+                    // Tombol Windows dan Ctrl sengaja tidak dideteksi agar tidak menghukum ketidaksengajaan.
+                    let lastAltKeyTime = 0;
                     let blurStartTime = 0;
                     let recentQuickSwitches = [];
 
@@ -1353,14 +1354,11 @@
                         if (
                             e.key === 'Alt' ||
                             e.altKey ||
-                            e.key === 'Meta' ||
                             e.code === 'AltLeft' ||
                             e.code === 'AltRight' ||
-                            e.code === 'MetaLeft' ||
-                            e.code === 'MetaRight' ||
-                            (e.ctrlKey && (e.key === 'Tab' || e.key === 't' || e.key === 'w' || e.key === 'n'))
+                            (e.key === 'Tab' && e.altKey)
                         ) {
-                            lastSystemKeyTime = Date.now();
+                            lastAltKeyTime = Date.now();
                         }
                     }, true);
 
@@ -1371,12 +1369,12 @@
                         }
 
                         if (document.hidden) {
-                            const isKeySwitch = (Date.now() - lastSystemKeyTime) < 1500;
+                            const isAltTab = (Date.now() - lastAltKeyTime) < 1500;
 
                             // KASUS A: Mahasiswa sedang dalam masa sanksi pembekuan (penaltySeconds > 0)
                             if (this.penaltySeconds > 0) {
                                 this.isPenaltyPaused = true;
-                                if (isKeySwitch) {
+                                if (isAltTab) {
                                     // Alt+Tab saat sedang dihukum -> Langsung eskalasi sanksi!
                                     this.reportViolation('penalty_evasion');
                                 } else {
@@ -1392,14 +1390,14 @@
                             }
 
                             // KASUS B: Ujian berjalan normal (penaltySeconds === 0)
-                            if (isKeySwitch) {
-                                // Tombol Alt/Meta ditekan sebelum tab hilang -> 100% Alt+Tab sengaja!
+                            if (isAltTab) {
+                                // Tombol Alt ditekan sebelum tab hilang -> 100% Alt+Tab sengaja!
                                 // Toleransi 0 detik (eksekusi seketika, celah Alt+Tab cepat ditutup)!
                                 this.reportViolation('alt_tab_switch');
                                 return;
                             }
 
-                            // Hilang visibilitas pasif (tanpa tombol Alt/Meta) -> Toleransi 2.5 detik untuk cegah false-positive
+                            // Hilang visibilitas pasif (tanpa tombol Alt) -> Toleransi 2.5 detik untuk cegah false-positive
                             if (blurStartTime === 0) blurStartTime = Date.now();
                             if (this.visibilityLossTimer) clearTimeout(this.visibilityLossTimer);
                             this.visibilityLossTimer = setTimeout(() => {
@@ -1443,12 +1441,12 @@
                             return;
                         }
 
-                        const isKeySwitch = (Date.now() - lastSystemKeyTime) < 1500;
+                        const isAltTab = (Date.now() - lastAltKeyTime) < 1500;
 
                         // KASUS A: Sedang dalam masa sanksi beku
                         if (this.penaltySeconds > 0) {
                             this.isPenaltyPaused = true;
-                            if (isKeySwitch) {
+                            if (isAltTab) {
                                 this.reportViolation('penalty_evasion');
                             } else {
                                 if (this.penaltyEvasionTimer) clearTimeout(this.penaltyEvasionTimer);
@@ -1462,8 +1460,8 @@
                         }
 
                         // KASUS B: Ujian normal
-                        if (isKeySwitch) {
-                            // Alt+Tab / Win key terdeteksi -> Langsung sanksi tanpa ampun (0s grace period)
+                        if (isAltTab) {
+                            // Alt+Tab terdeteksi -> Langsung rekam tanpa ampun (0s grace period)
                             this.reportViolation('alt_tab_switch');
                             return;
                         }

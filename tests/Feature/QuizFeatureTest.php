@@ -202,10 +202,10 @@ class QuizFeatureTest extends TestCase
 
         // Test anti-cheat tab switch tracking
         $tabRes = $this->post(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]));
-        $tabRes->assertJson(['success' => true, 'tab_switch_count' => 1, 'strike' => 1, 'penalty_seconds' => 60]);
+        $tabRes->assertJson(['success' => true, 'tab_switch_count' => 1, 'strike' => 1, 'penalty_seconds' => 0]);
         $attempt->refresh();
         $this->assertEquals(1, $attempt->tab_switch_count);
-        $this->assertNotNull($attempt->penalty_end_time);
+        $this->assertNull($attempt->penalty_end_time);
     }
 
     public function test_anti_cheat_three_strikes_and_unlock_mechanisms(): void
@@ -227,23 +227,23 @@ class QuizFeatureTest extends TestCase
             'tab_switch_count'      => 0,
         ]);
 
-        // Strike 1: 1 menit (60s) penalty
+        // Strike 1: Peringatan pertama (0s penalty)
         $res1 = $this->post(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]));
         $res1->assertJson([
             'success'          => true,
             'tab_switch_count' => 1,
             'strike'           => 1,
-            'penalty_seconds'  => 60,
+            'penalty_seconds'  => 0,
             'is_locked'        => false,
         ]);
 
-        // Strike 2: 1.5 menit (90s) penalty
+        // Strike 2: 1 menit (60s) penalty freeze
         $res2 = $this->post(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]));
         $res2->assertJson([
             'success'          => true,
             'tab_switch_count' => 2,
             'strike'           => 2,
-            'penalty_seconds'  => 90,
+            'penalty_seconds'  => 60,
             'is_locked'        => false,
         ]);
 
@@ -467,7 +467,7 @@ class QuizFeatureTest extends TestCase
         $exitRes->assertJson([
             'success'          => true,
             'strike'           => 1,
-            'penalty_seconds'  => 60,
+            'penalty_seconds'  => 0,
         ]);
         $attempt2->refresh();
         $this->assertEquals('fullscreen_exit', $attempt2->violations_log[0]['type']);
@@ -1059,7 +1059,7 @@ class QuizFeatureTest extends TestCase
             'tab_switch_count'      => 0,
         ]);
 
-        // 1. First violation with intentional alt_tab_switch
+        // 1. First violation with intentional alt_tab_switch (Yellow card warning, 0s penalty)
         $res1 = $this->postJson(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]), [
             'reason' => 'alt_tab_switch',
         ]);
@@ -1067,12 +1067,12 @@ class QuizFeatureTest extends TestCase
             'success'          => true,
             'tab_switch_count' => 1,
             'strike'           => 1,
-            'penalty_seconds'  => 60,
+            'penalty_seconds'  => 0,
             'is_locked'        => false,
         ]);
         $this->assertStringContainsString('Alt+Tab', $res1->json('message'));
 
-        // 2. Second violation with penalty_evasion (attempting to leave during punishment)
+        // 2. Second violation with penalty_evasion (Strike 2, 60s freeze penalty)
         $res2 = $this->postJson(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]), [
             'reason' => 'penalty_evasion',
         ]);
@@ -1080,7 +1080,7 @@ class QuizFeatureTest extends TestCase
             'success'          => true,
             'tab_switch_count' => 2,
             'strike'           => 2,
-            'penalty_seconds'  => 90,
+            'penalty_seconds'  => 60,
             'is_locked'        => false,
         ]);
         $this->assertStringContainsString('mencoba meninggalkan layar', $res2->json('message'));

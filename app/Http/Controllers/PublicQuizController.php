@@ -455,23 +455,23 @@ class PublicQuizController extends Controller
         $reasonLabel = match ($reason) {
             'fullscreen_exit'     => 'keluar dari layar penuh (kiosk)',
             'penalty_evasion'     => 'mencoba meninggalkan layar saat masa sanksi beku',
-            'alt_tab_switch'      => 'jalan pintas berpindah aplikasi (Alt+Tab / Windows)',
+            'alt_tab_switch'      => 'jalan pintas berpindah aplikasi (Alt+Tab)',
             'rapid_window_switch' => 'berpindah-pindah jendela secara cepat',
             default               => 'perpindahan tab/aplikasi',
         };
 
         if ($count === 1) {
-            // Punishment 1: 1 menit (60 detik)
+            // Peringatan 1/3: Peringatan pertama tanpa pembekuan layar (0 detik)
+            $penaltySeconds = 0;
+            $attempt->penalty_end_time = null;
+            $message = "Peringatan 1/3: Terdeteksi {$reasonLabel}. Ini adalah kesempatan pertama Anda. Jika Anda berpindah sekali lagi, layar kuis akan DIBEKUKAN selama 1 menit!";
+        } elseif ($count === 2) {
+            // Sanksi 2/3: Layar kuis dibekukan selama 1 menit (60 detik)
             $penaltySeconds = 60;
             $attempt->penalty_end_time = now()->addSeconds(60);
-            $message = "Peringatan 1/3: Terdeteksi {$reasonLabel}. Layar kuis terkunci selama 1 menit.";
-        } elseif ($count === 2) {
-            // Punishment 2: 1.30 menit (90 detik)
-            $penaltySeconds = 90;
-            $attempt->penalty_end_time = now()->addSeconds(90);
-            $message = "Peringatan 2/3: Pelanggaran kedua ({$reasonLabel})! Pinalti waktu berlipat 1.5 menit. Pelanggaran berikutnya akan mengunci kuis total.";
+            $message = "Peringatan 2/3: Pelanggaran kedua ({$reasonLabel})! Layar kuis dibekukan selama 1 menit. Pelanggaran berikutnya akan mengunci kuis total.";
         } else {
-            // Punishment 3: Kunci total sampai admin membuka dengan password
+            // Sanksi 3/3: Kunci total sampai admin membuka dengan password
             $isLocked = true;
             $attempt->is_locked = true;
             $attempt->lock_reason = "Terdeteksi 3x pelanggaran CBT ({$reasonLabel})";
