@@ -112,6 +112,14 @@
 
         {{-- Right: Interactive Controls --}}
         <div class="flex items-center gap-2 shrink-0">
+            {{-- Link back to monitor --}}
+            <a href="{{ route('admin.quizzes.monitor', $quiz) }}"
+               class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 text-xs font-bold transition-all flex items-center gap-1.5 hover:scale-105 active:scale-95"
+               title="Kembali ke Panel Pengawasan Admin">
+                <span>🗗</span>
+                <span class="hidden md:inline">Panel Monitor</span>
+            </a>
+
             {{-- SFX Toggle --}}
             <button type="button" @click="toggleSfx()"
                     :class="sfxEnabled ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-white/5 text-gray-400 border-white/10'"
@@ -465,6 +473,18 @@
                     document.addEventListener('fullscreenchange', () => {
                         this.isFullscreen = !!document.fullscreenElement;
                     });
+
+                    // Unlock Web Audio API on first user interaction anywhere on the screen
+                    document.addEventListener('click', () => {
+                        this.initAudioContext();
+                    }, { once: true });
+
+                    // Session keep-alive heartbeat: cegah session timeout saat ujian 1-3 jam
+                    setInterval(async () => {
+                        try {
+                            await fetch('{{ route('csrf.refresh') }}');
+                        } catch (e) {}
+                    }, 5 * 60 * 1000);
                 },
 
                 get syncCounterText() {
@@ -726,3 +746,4 @@
     </script>
 </body>
 </html>
+
