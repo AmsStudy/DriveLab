@@ -461,10 +461,10 @@ class PublicQuizController extends Controller
         };
 
         if ($count === 1) {
-            // Peringatan 1/3: Peringatan pertama tanpa pembekuan layar (0 detik)
+            // Peringatan pertama tanpa pembekuan layar (0 detik)
             $penaltySeconds = 0;
             $attempt->penalty_end_time = null;
-            $message = "Peringatan 1/3: Terdeteksi {$reasonLabel}. Ini adalah kesempatan pertama Anda. Jika Anda berpindah sekali lagi, layar kuis akan DIBEKUKAN selama 1 menit!";
+            $message = "Terdeteksi {$reasonLabel}. Ini adalah kesempatan pertama Anda. Jika Anda berpindah sekali lagi, layar kuis akan DIBEKUKAN!";
         } elseif ($count === 2) {
             // Sanksi 2/3: Layar kuis dibekukan selama 1 menit (60 detik)
             $penaltySeconds = 60;

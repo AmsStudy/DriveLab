@@ -1324,12 +1324,12 @@
                                 this.penaltySeconds = data.penalty_seconds;
                                 this.initPenaltyCountdown();
                             } else if (data.tab_switch_count === 1) {
-                                // Peringatan 1 dari 3: Kartu Kuning (Layar TIDAK dibekukan)
+                                // Peringatan Pertama: Kartu Kuning (Layar TIDAK dibekukan)
                                 if (window.Swal) {
                                     Swal.fire({
                                         icon: 'warning',
-                                        title: 'Peringatan 1 dari 3: Terdeteksi Berpindah Layar!',
-                                        text: data.message || 'Ini adalah kesempatan pertama Anda. Jika Anda berpindah sekali lagi, layar kuis akan DIBEKUKAN selama 1 menit!',
+                                        title: 'Terdeteksi Berpindah Layar!',
+                                        text: data.message || 'Ini adalah kesempatan pertama Anda. Jika Anda berpindah sekali lagi, layar kuis akan DIBEKUKAN!',
                                         confirmButtonColor: '#F59E0B',
                                         confirmButtonText: 'Saya Mengerti, Lanjutkan Ujian',
                                         background: '#0F1713',
