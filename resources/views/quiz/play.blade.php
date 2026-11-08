@@ -510,14 +510,29 @@
             </template>
 
             {{-- Big Timer Countdown --}}
-            <div class="my-6 p-4 rounded-2xl bg-[#090D0B] border border-amber-500/30">
-                <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-1">Layar Terbuka Otomatis Dalam:</div>
-                <div class="text-4xl sm:text-5xl font-mono font-extrabold text-amber-400 tracking-wider animate-pulse"
+            <div class="my-6 p-4 rounded-2xl bg-[#090D0B] border transition-colors duration-200"
+                 :class="isPenaltyPaused ? 'border-rose-500/60 bg-rose-950/20' : 'border-amber-500/30'">
+                <div class="text-[11px] font-semibold uppercase tracking-widest mb-1"
+                     :class="isPenaltyPaused ? 'text-rose-300' : 'text-gray-400'">
+                    <span x-show="!isPenaltyPaused">Layar Terbuka Otomatis Dalam:</span>
+                    <span x-show="isPenaltyPaused" class="flex items-center justify-center gap-1.5 text-rose-300 font-bold">
+                        <span>⏸️</span> HITUNGAN SANKSI DIJEDA
+                    </span>
+                </div>
+                <div class="text-4xl sm:text-5xl font-mono font-extrabold tracking-wider"
+                     :class="isPenaltyPaused ? 'text-rose-400' : 'text-amber-400 animate-pulse'"
                      x-text="formatTime(penaltySeconds)"></div>
+
+                {{-- Status Paused Indicator --}}
+                <div x-show="isPenaltyPaused" class="mt-3 px-3 py-1.5 rounded-lg bg-rose-500/20 border border-rose-500/40 text-xs font-semibold text-rose-300 flex items-center justify-center gap-2 animate-bounce">
+                    <span>⚠️ Layar dijeda karena Anda tidak fokus. Tetaplah di jendela ini!</span>
+                </div>
             </div>
 
-            <div class="p-3 rounded-xl bg-[#142019] border border-[#1E3327] text-[11px] text-gray-400 text-left">
-                💡 <strong>Catatan Integritas:</strong> Timer sanksi disimpan di server. Merefresh (F5) atau menutup browser tidak akan menghilangkan waktu tunggu ini.
+            <div class="p-3 rounded-xl bg-[#142019] border border-[#1E3327] text-[11px] text-gray-400 text-left space-y-1">
+                <div>💡 <strong>Aturan Ketat Masa Sanksi:</strong></div>
+                <div class="text-gray-300">1. Waktu sanksi <em>hanya berkurang</em> jika jendela ini tetap aktif & berfokus di layar Anda.</div>
+                <div class="text-rose-400 font-medium">2. Dilarang berpindah aplikasi (Alt+Tab)! Berpindah saat sanksi akan langsung menaikkan hukuman atau mengunci kuis permanen.</div>
             </div>
         </div>
     </div>
@@ -783,6 +798,8 @@
                 fullscreenToleranceInterval: null,
                 focusLossTimer: null,
                 visibilityLossTimer: null,
+                penaltyEvasionTimer: null,
+                isPenaltyPaused: false,
                 unlockImmunityUntil: Date.now() + 10000, // 10 detik proteksi awal saat kuis dimuat
                 previewImageModal: {
                     open: false,
@@ -1236,12 +1253,21 @@
 
                 initPenaltyCountdown() {
                     if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
+                    this.isPenaltyPaused = false;
                     this.penaltyTimerInterval = setInterval(() => {
+                        // Jeda sanksi jika tab di-minimize atau mahasiswa keluar dari jendela
+                        if (document.hidden || !document.hasFocus()) {
+                            this.isPenaltyPaused = true;
+                            return; // Freeze! Jangan kurangi detik jika tab ditinggalkan
+                        }
+                        this.isPenaltyPaused = false;
+
                         if (this.penaltySeconds > 0) {
                             this.penaltySeconds--;
                         } else {
                             clearInterval(this.penaltyTimerInterval);
                             this.penaltyTimerInterval = null;
+                            this.isPenaltyPaused = false;
                             Swal.fire({
                                 toast: true,
                                 position: 'top-end',
@@ -1272,14 +1298,16 @@
                             return;
                         }
 
-                        // Throttle rapid triggers dalam 3 detik
+                        // Throttle triggers: untuk penalty_evasion atau alt_tab beri toleransi 1.5s, lainnya 2.5s
                         const now = Date.now();
-                        if (now - lastReportedTime < 3000) return;
+                        const throttleMs = (reason === 'penalty_evasion' || reason === 'alt_tab_switch') ? 1500 : 2500;
+                        if (now - lastReportedTime < throttleMs) return;
                         lastReportedTime = now;
 
-                        // Bersihkan timer pending agar tidak memicu duplikat
+                        // Bersihkan seluruh timer pending agar tidak memicu duplikat
                         if (this.focusLossTimer) { clearTimeout(this.focusLossTimer); this.focusLossTimer = null; }
                         if (this.visibilityLossTimer) { clearTimeout(this.visibilityLossTimer); this.visibilityLossTimer = null; }
+                        if (this.penaltyEvasionTimer) { clearTimeout(this.penaltyEvasionTimer); this.penaltyEvasionTimer = null; }
 
                         fetch('{{ route('quiz.tab-switch', [$quiz->unique_token, $attempt->id]) }}', {
                             method: 'POST',
@@ -1301,9 +1329,11 @@
                             if (data.is_locked) {
                                 this.isLocked = true;
                                 this.penaltySeconds = 0;
+                                this.isPenaltyPaused = false;
                                 if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
                                 if (this.focusLossTimer) clearTimeout(this.focusLossTimer);
                                 if (this.visibilityLossTimer) clearTimeout(this.visibilityLossTimer);
+                                if (this.penaltyEvasionTimer) clearTimeout(this.penaltyEvasionTimer);
                             } else if (data.penalty_seconds > 0) {
                                 this.penaltySeconds = data.penalty_seconds;
                                 this.initPenaltyCountdown();
@@ -1312,35 +1342,140 @@
                         .catch(err => console.error('Violation record error:', err));
                     };
 
-                    // 1. Tab switch or window minimize (Visibility API dengan toleransi 3 detik anti-blip)
+                    // Deteksi penekanan tombol sistem (Alt, Windows Key, Ctrl+Tab/W/T)
+                    // Tombol ini HANYA ditekan oleh jari manusia saat sengaja berpindah aplikasi / Alt+Tab.
+                    // Proses background OS (antivirus, Veyon agent, NetSupport) TIDAK PERNAH memicu event keydown!
+                    let lastSystemKeyTime = 0;
+                    let blurStartTime = 0;
+                    let recentQuickSwitches = [];
+
+                    window.addEventListener('keydown', (e) => {
+                        if (
+                            e.key === 'Alt' ||
+                            e.altKey ||
+                            e.key === 'Meta' ||
+                            e.code === 'AltLeft' ||
+                            e.code === 'AltRight' ||
+                            e.code === 'MetaLeft' ||
+                            e.code === 'MetaRight' ||
+                            (e.ctrlKey && (e.key === 'Tab' || e.key === 't' || e.key === 'w' || e.key === 'n'))
+                        ) {
+                            lastSystemKeyTime = Date.now();
+                        }
+                    }, true);
+
+                    // 1. Tab switch or window minimize (Visibility API)
                     document.addEventListener('visibilitychange', () => {
+                        if (this.allowOpenBook || this.isLocked || this.isSubmitting || this.isEnteringFullscreen || Date.now() < this.unlockImmunityUntil) {
+                            return;
+                        }
+
                         if (document.hidden) {
+                            const isKeySwitch = (Date.now() - lastSystemKeyTime) < 1500;
+
+                            // KASUS A: Mahasiswa sedang dalam masa sanksi pembekuan (penaltySeconds > 0)
+                            if (this.penaltySeconds > 0) {
+                                this.isPenaltyPaused = true;
+                                if (isKeySwitch) {
+                                    // Alt+Tab saat sedang dihukum -> Langsung eskalasi sanksi!
+                                    this.reportViolation('penalty_evasion');
+                                } else {
+                                    // Hilang visibilitas pasif saat sanksi -> beri toleransi 2 detik
+                                    if (this.penaltyEvasionTimer) clearTimeout(this.penaltyEvasionTimer);
+                                    this.penaltyEvasionTimer = setTimeout(() => {
+                                        if (document.hidden && this.penaltySeconds > 0 && !this.isLocked) {
+                                            this.reportViolation('penalty_evasion');
+                                        }
+                                    }, 2000);
+                                }
+                                return;
+                            }
+
+                            // KASUS B: Ujian berjalan normal (penaltySeconds === 0)
+                            if (isKeySwitch) {
+                                // Tombol Alt/Meta ditekan sebelum tab hilang -> 100% Alt+Tab sengaja!
+                                // Toleransi 0 detik (eksekusi seketika, celah Alt+Tab cepat ditutup)!
+                                this.reportViolation('alt_tab_switch');
+                                return;
+                            }
+
+                            // Hilang visibilitas pasif (tanpa tombol Alt/Meta) -> Toleransi 2.5 detik untuk cegah false-positive
+                            if (blurStartTime === 0) blurStartTime = Date.now();
                             if (this.visibilityLossTimer) clearTimeout(this.visibilityLossTimer);
                             this.visibilityLossTimer = setTimeout(() => {
                                 if (document.hidden && !this.allowOpenBook && !this.isLocked && this.penaltySeconds === 0 && !this.isSubmitting && !this.isEnteringFullscreen && Date.now() >= this.unlockImmunityUntil) {
                                     this.reportViolation('tab_switch');
                                 }
-                            }, 3000);
+                            }, 2500);
                         } else {
+                            // Tab kembali terlihat aktif
                             if (this.visibilityLossTimer) {
                                 clearTimeout(this.visibilityLossTimer);
                                 this.visibilityLossTimer = null;
                             }
+                            if (this.penaltyEvasionTimer) {
+                                clearTimeout(this.penaltyEvasionTimer);
+                                this.penaltyEvasionTimer = null;
+                            }
+                            if (this.penaltySeconds > 0 && document.hasFocus()) {
+                                this.isPenaltyPaused = false;
+                            }
+
+                            // Deteksi micro-switch cepat berulang (akumulasi perpindahan cepat < 2.5s)
+                            if (blurStartTime > 0 && this.penaltySeconds === 0) {
+                                const awayDuration = Date.now() - blurStartTime;
+                                blurStartTime = 0;
+                                if (awayDuration >= 350 && awayDuration < 2500) {
+                                    recentQuickSwitches = recentQuickSwitches.filter(t => (Date.now() - t) < 60000);
+                                    recentQuickSwitches.push(Date.now());
+                                    if (recentQuickSwitches.length >= 2) {
+                                        this.reportViolation('rapid_window_switch');
+                                        recentQuickSwitches = [];
+                                    }
+                                }
+                            }
                         }
                     });
 
-                    // 2. Window loss of focus (dengan toleransi 4 detik untuk mencegah false-positive notifikasi OS / antivirus / Veyon / classroom agent)
+                    // 2. Window loss of focus (Blur event)
                     window.addEventListener('blur', () => {
-                        if (this.allowOpenBook || this.isLocked || this.penaltySeconds > 0 || this.isSubmitting || this.isEnteringFullscreen || Date.now() < this.unlockImmunityUntil) {
+                        if (this.allowOpenBook || this.isLocked || this.isSubmitting || this.isEnteringFullscreen || Date.now() < this.unlockImmunityUntil) {
                             return;
                         }
+
+                        const isKeySwitch = (Date.now() - lastSystemKeyTime) < 1500;
+
+                        // KASUS A: Sedang dalam masa sanksi beku
+                        if (this.penaltySeconds > 0) {
+                            this.isPenaltyPaused = true;
+                            if (isKeySwitch) {
+                                this.reportViolation('penalty_evasion');
+                            } else {
+                                if (this.penaltyEvasionTimer) clearTimeout(this.penaltyEvasionTimer);
+                                this.penaltyEvasionTimer = setTimeout(() => {
+                                    if (!document.hasFocus() && this.penaltySeconds > 0 && !this.isLocked) {
+                                        this.reportViolation('penalty_evasion');
+                                    }
+                                }, 2000);
+                            }
+                            return;
+                        }
+
+                        // KASUS B: Ujian normal
+                        if (isKeySwitch) {
+                            // Alt+Tab / Win key terdeteksi -> Langsung sanksi tanpa ampun (0s grace period)
+                            this.reportViolation('alt_tab_switch');
+                            return;
+                        }
+
+                        // Kehilangan fokus pasif (OS / background process) -> Toleransi 2.5 detik
+                        if (blurStartTime === 0) blurStartTime = Date.now();
                         if (this.focusLossTimer) clearTimeout(this.focusLossTimer);
                         this.focusLossTimer = setTimeout(() => {
-                            // Hanya vonis pelanggaran jika jendela masih belum fokus setelah 4 detik penuh
                             if (!document.hasFocus() && !this.allowOpenBook && !this.isLocked && this.penaltySeconds === 0 && !this.isSubmitting && !this.isEnteringFullscreen && Date.now() >= this.unlockImmunityUntil) {
                                 this.reportViolation('tab_switch');
                             }
-                        }, 4000);
+                        }, 2500);
                     });
 
                     // 3. Focus recovery listener: Batalkan timer pelanggaran seketika saat kursor / jendela kembali fokus
@@ -1352,6 +1487,27 @@
                         if (this.visibilityLossTimer && !document.hidden) {
                             clearTimeout(this.visibilityLossTimer);
                             this.visibilityLossTimer = null;
+                        }
+                        if (this.penaltyEvasionTimer) {
+                            clearTimeout(this.penaltyEvasionTimer);
+                            this.penaltyEvasionTimer = null;
+                        }
+                        if (this.penaltySeconds > 0 && !document.hidden) {
+                            this.isPenaltyPaused = false;
+                        }
+
+                        // Deteksi micro-switch cepat berulang lewat blur
+                        if (blurStartTime > 0 && this.penaltySeconds === 0) {
+                            const awayDuration = Date.now() - blurStartTime;
+                            blurStartTime = 0;
+                            if (awayDuration >= 350 && awayDuration < 2500) {
+                                recentQuickSwitches = recentQuickSwitches.filter(t => (Date.now() - t) < 60000);
+                                recentQuickSwitches.push(Date.now());
+                                if (recentQuickSwitches.length >= 2) {
+                                    this.reportViolation('rapid_window_switch');
+                                    recentQuickSwitches = [];
+                                }
+                            }
                         }
                     });
 
@@ -1394,9 +1550,11 @@
                             this.tabSwitchCount = body.tab_switch_count || 2;
                             this.strike = 2;
                             this.unlockImmunityUntil = Date.now() + 15000; // Imunitas 15 detik dari false-positive setelah dibuka
+                            this.isPenaltyPaused = false;
                             if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
                             if (this.focusLossTimer) clearTimeout(this.focusLossTimer);
                             if (this.visibilityLossTimer) clearTimeout(this.visibilityLossTimer);
+                            if (this.penaltyEvasionTimer) clearTimeout(this.penaltyEvasionTimer);
                             if (!this.isFullscreen && !this.allowOpenBook) {
                                 this.enterFullscreen();
                             }
@@ -1706,6 +1864,8 @@
                     this.isSubmitting = true;
                     if (this.focusLossTimer) clearTimeout(this.focusLossTimer);
                     if (this.visibilityLossTimer) clearTimeout(this.visibilityLossTimer);
+                    if (this.penaltyEvasionTimer) clearTimeout(this.penaltyEvasionTimer);
+                    if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
                     if (this.fullscreenToleranceInterval) clearInterval(this.fullscreenToleranceInterval);
                     if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
 

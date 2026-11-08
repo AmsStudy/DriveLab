@@ -452,7 +452,13 @@ class PublicQuizController extends Controller
             'timestamp' => now()->toIso8601String(),
         ];
 
-        $reasonLabel = ($reason === 'fullscreen_exit') ? 'keluar dari layar penuh (kiosk)' : 'perpindahan tab/aplikasi';
+        $reasonLabel = match ($reason) {
+            'fullscreen_exit'     => 'keluar dari layar penuh (kiosk)',
+            'penalty_evasion'     => 'mencoba meninggalkan layar saat masa sanksi beku',
+            'alt_tab_switch'      => 'jalan pintas berpindah aplikasi (Alt+Tab / Windows)',
+            'rapid_window_switch' => 'berpindah-pindah jendela secara cepat',
+            default               => 'perpindahan tab/aplikasi',
+        };
 
         if ($count === 1) {
             // Punishment 1: 1 menit (60 detik)
@@ -470,7 +476,7 @@ class PublicQuizController extends Controller
             $attempt->is_locked = true;
             $attempt->lock_reason = "Terdeteksi 3x pelanggaran CBT ({$reasonLabel})";
             $attempt->penalty_end_time = null;
-            $message = "Kuis Terkunci Total: Anda telah melanggar aturan pengawas kuis (3x switch). Panggil Asisten Lab / Dosen untuk membuka kunci kuis Anda.";
+            $message = "Kuis Terkunci Total: Anda telah melanggar aturan pengawas kuis (3x pelanggaran: {$reasonLabel}). Panggil Asisten Lab / Dosen untuk membuka kunci kuis Anda.";
         }
 
         $attempt->violations_log = $logs;

@@ -1039,4 +1039,69 @@ class QuizFeatureTest extends TestCase
         $this->assertEquals('13020210089', $json['completed'][0]['nim']);
         $this->assertEquals(50, $json['completed'][0]['score']);
     }
+
+    public function test_anti_cheat_logs_specific_violation_reasons_and_escalates(): void
+    {
+        $quiz = Quiz::create([
+            'user_id'                => $this->admin->id,
+            'title'                  => 'Ujian Integritas Anti-Cheat',
+            'is_active'              => true,
+            'allow_open_book'        => false,
+            'admin_unlock_password'  => 'LABRAHASIA2026',
+        ]);
+
+        $attempt = QuizAttempt::create([
+            'quiz_id'               => $quiz->id,
+            'nim'                   => '220101777',
+            'student_name'          => 'Peserta Cek Anti-Cheat',
+            'total_points_possible' => 100,
+            'started_at'            => now(),
+            'tab_switch_count'      => 0,
+        ]);
+
+        // 1. First violation with intentional alt_tab_switch
+        $res1 = $this->postJson(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]), [
+            'reason' => 'alt_tab_switch',
+        ]);
+        $res1->assertJson([
+            'success'          => true,
+            'tab_switch_count' => 1,
+            'strike'           => 1,
+            'penalty_seconds'  => 60,
+            'is_locked'        => false,
+        ]);
+        $this->assertStringContainsString('Alt+Tab', $res1->json('message'));
+
+        // 2. Second violation with penalty_evasion (attempting to leave during punishment)
+        $res2 = $this->postJson(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]), [
+            'reason' => 'penalty_evasion',
+        ]);
+        $res2->assertJson([
+            'success'          => true,
+            'tab_switch_count' => 2,
+            'strike'           => 2,
+            'penalty_seconds'  => 90,
+            'is_locked'        => false,
+        ]);
+        $this->assertStringContainsString('mencoba meninggalkan layar', $res2->json('message'));
+
+        // 3. Third violation with rapid_window_switch -> triggers full lockout
+        $res3 = $this->postJson(route('quiz.tab-switch', ['token' => $quiz->unique_token, 'attempt' => $attempt->id]), [
+            'reason' => 'rapid_window_switch',
+        ]);
+        $res3->assertJson([
+            'success'          => true,
+            'tab_switch_count' => 3,
+            'strike'           => 3,
+            'is_locked'        => true,
+        ]);
+        $this->assertStringContainsString('berpindah-pindah jendela', $res3->json('message'));
+
+        $attempt->refresh();
+        $this->assertTrue($attempt->is_locked);
+        $this->assertCount(3, $attempt->violations_log);
+        $this->assertEquals('alt_tab_switch', $attempt->violations_log[0]['type']);
+        $this->assertEquals('penalty_evasion', $attempt->violations_log[1]['type']);
+        $this->assertEquals('rapid_window_switch', $attempt->violations_log[2]['type']);
+    }
 }
