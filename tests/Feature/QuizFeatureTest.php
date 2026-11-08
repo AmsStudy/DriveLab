@@ -1104,4 +1104,99 @@ class QuizFeatureTest extends TestCase
         $this->assertEquals('penalty_evasion', $attempt->violations_log[1]['type']);
         $this->assertEquals('rapid_window_switch', $attempt->violations_log[2]['type']);
     }
+
+    public function test_admin_can_access_projector_leaderboard_and_fetches_realtime_data_without_leaking_scores(): void
+    {
+        $quiz = Quiz::create([
+            'user_id'         => $this->admin->id,
+            'title'           => 'Kompetisi Pemrograman Web Arena',
+            'is_active'       => true,
+            'session_status'  => 'started',
+        ]);
+
+        // Q1: Single choice, 10 pts
+        $q1 = $quiz->questions()->create([
+            'question_text' => 'Apa itu CSS?',
+            'question_type' => 'multiple_choice',
+            'points'        => 10,
+            'order_num'     => 1,
+        ]);
+        $opt1A = $q1->options()->create(['option_text' => 'Cascading Style Sheets', 'is_correct' => true, 'order_num' => 1]);
+        $opt1B = $q1->options()->create(['option_text' => 'Computer Style Software', 'is_correct' => false, 'order_num' => 2]);
+
+        // Q2: Single choice, 20 pts
+        $q2 = $quiz->questions()->create([
+            'question_text' => 'Apa itu HTML?',
+            'question_type' => 'multiple_choice',
+            'points'        => 20,
+            'order_num'     => 2,
+        ]);
+        $opt2A = $q2->options()->create(['option_text' => 'Hypertext Markup Language', 'is_correct' => true, 'order_num' => 1]);
+        $opt2B = $q2->options()->create(['option_text' => 'High Text Modern Lang', 'is_correct' => false, 'order_num' => 2]);
+
+        // Participant 1 (Ahmad): answered Q1 correctly, Q2 wrong in draft answers (10 pts)
+        $att1 = $quiz->attempts()->create([
+            'nim'                   => '220101001',
+            'student_name'          => 'Ahmad Fauzi',
+            'kelas'                 => 'TI-A',
+            'total_points_possible' => 30,
+            'started_at'            => now()->subMinutes(10),
+            'draft_answers'         => [
+                $q1->id => $opt1A->id,
+                $q2->id => $opt2B->id,
+            ],
+        ]);
+
+        // Participant 2 (Bunga): completed attempt with 30 pts earned (all correct)
+        $att2 = $quiz->attempts()->create([
+            'nim'                   => '220101002',
+            'student_name'          => 'Bunga Lestari',
+            'kelas'                 => 'TI-A',
+            'total_points_possible' => 30,
+            'total_points_earned'   => 30,
+            'score'                 => 100,
+            'correct_answers_count' => 2,
+            'wrong_answers_count'   => 0,
+            'started_at'            => now()->subMinutes(15),
+            'completed_at'          => now()->subMinutes(2),
+        ]);
+
+        // 1. Admin loads projector view
+        $viewRes = $this->actingAs($this->admin)->get(route('admin.quizzes.projector', $quiz));
+        $viewRes->assertOk();
+        $viewRes->assertSee('Live Arena Leaderboard', false);
+        $viewRes->assertSee('LIVE ARENA', false);
+        $viewRes->assertSee('projectorArena()', false);
+
+        // 2. Admin polls projector data endpoint
+        $dataRes = $this->actingAs($this->admin)->getJson(route('admin.quizzes.projector.data', $quiz));
+        $dataRes->assertOk();
+        $dataRes->assertJson([
+            'success'        => true,
+            'quiz_title'     => 'Kompetisi Pemrograman Web Arena',
+            'session_status' => 'started',
+            'total_students' => 2,
+            'total_completed' => 1,
+            'total_questions' => 2,
+        ]);
+
+        $json = $dataRes->json();
+        $this->assertCount(2, $json['leaderboard']);
+
+        // Rank #1 must be Bunga Lestari (30 pts > 10 pts)
+        $this->assertEquals(1, $json['leaderboard'][0]['rank']);
+        $this->assertEquals('Bunga Lestari', $json['leaderboard'][0]['student_name']);
+        $this->assertTrue($json['leaderboard'][0]['is_completed']);
+
+        // Rank #2 must be Ahmad Fauzi (10 pts)
+        $this->assertEquals(2, $json['leaderboard'][1]['rank']);
+        $this->assertEquals('Ahmad Fauzi', $json['leaderboard'][1]['student_name']);
+        $this->assertFalse($json['leaderboard'][1]['is_completed']);
+
+        // Assert strictly that numeric points and scores are NOT leaked in the payload
+        $rawJson = $dataRes->getContent();
+        $this->assertStringNotContainsString('"points"', $rawJson);
+        $this->assertStringNotContainsString('"score"', $rawJson);
+        $this->assertStringNotContainsString('"total_points_earned"', $rawJson);
+    }
 }

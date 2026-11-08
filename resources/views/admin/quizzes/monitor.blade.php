@@ -38,6 +38,13 @@
                 <span class="hidden sm:inline">Segarkan</span>
             </button>
 
+            <a href="{{ route('admin.quizzes.projector', $quiz) }}" target="_blank"
+               class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-600 hover:from-amber-600 hover:to-emerald-700 text-white text-sm font-bold transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98]">
+                <span class="text-base">🎮</span>
+                <span>Layar Proyektor Game</span>
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-black/30 text-amber-200 border border-white/20 uppercase tracking-wider font-extrabold">LIVE</span>
+            </a>
+
             <a href="{{ route('admin.quizzes.questions', $quiz) }}"
                class="px-4 py-2.5 rounded-xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] hover:border-emerald-500/40 text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 text-sm font-semibold transition-all flex items-center gap-2 shadow-xs">
                 <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>

@@ -131,6 +131,8 @@ Route::prefix('admin')
         // Live Exam Monitoring & Proctoring
         Route::get('quizzes/{quiz}/monitor', [QuizController::class, 'liveMonitor'])->name('quizzes.monitor');
         Route::get('quizzes/{quiz}/monitor/data', [QuizController::class, 'liveMonitorData'])->name('quizzes.monitor.data');
+        Route::get('quizzes/{quiz}/projector', [QuizController::class, 'projectorLeaderboard'])->name('quizzes.projector');
+        Route::get('quizzes/{quiz}/projector/data', [QuizController::class, 'projectorLeaderboardData'])->name('quizzes.projector.data');
         Route::post('quizzes/{quiz}/session/start', [QuizController::class, 'startSession'])->name('quizzes.session.start');
         Route::post('quizzes/{quiz}/session/end', [QuizController::class, 'endSession'])->name('quizzes.session.end');
         Route::post('quizzes/{quiz}/session/reset', [QuizController::class, 'resetSession'])->name('quizzes.session.reset');

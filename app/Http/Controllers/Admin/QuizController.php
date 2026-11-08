@@ -873,6 +873,143 @@ class QuizController extends Controller
         ]);
     }
 
+    public function projectorLeaderboard(Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+        $quiz->loadCount(['questions', 'attempts']);
+        return view('admin.quizzes.projector', compact('quiz'));
+    }
+
+    public function projectorLeaderboardData(Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+
+        $questions = $quiz->questions()->with('options')->get();
+        $totalQuestions = $questions->count();
+
+        // Index question configurations for fast in-memory scoring
+        $questionLookup = [];
+        foreach ($questions as $q) {
+            $isMulti = $q->isMultiSelect();
+            if ($isMulti) {
+                $correctOptionIds = $q->options->where('is_correct', true)->pluck('id')->map(fn($id) => (int)$id)->sort()->values()->all();
+            } else {
+                $correctOption = $q->options->firstWhere('is_correct', true);
+                $correctOptionIds = $correctOption ? (int) $correctOption->id : null;
+            }
+            $questionLookup[$q->id] = [
+                'is_multi'    => $isMulti,
+                'correct_ids' => $correctOptionIds,
+                'points'      => (int) ($q->points ?? 1),
+            ];
+        }
+
+        $attempts = $quiz->attempts()->latest('started_at')->get();
+        $rankedList = [];
+
+        foreach ($attempts as $att) {
+            $isCompleted = $att->isCompleted();
+            $points = 0;
+            $correctCount = 0;
+            $answeredCount = 0;
+
+            if ($isCompleted) {
+                $points = (int) ($att->total_points_earned ?? 0);
+                $correctCount = (int) ($att->correct_answers_count ?? 0);
+                $answeredCount = $totalQuestions;
+                $lastActivityTimestamp = $att->completed_at ? $att->completed_at->timestamp : 0;
+            } else {
+                $draft = $att->draft_answers ?? [];
+                unset($draft['__flagged']);
+                $answeredCount = count($draft);
+
+                foreach ($draft as $qId => $userAns) {
+                    if (isset($questionLookup[$qId])) {
+                        $cfg = $questionLookup[$qId];
+                        $isCorrect = false;
+
+                        if ($cfg['is_multi']) {
+                            $selected = is_array($userAns) ? array_map('intval', $userAns) : [];
+                            sort($selected);
+                            $isCorrect = ($selected === $cfg['correct_ids']);
+                        } else {
+                            $isCorrect = ($cfg['correct_ids'] !== null && (int) $userAns === (int) $cfg['correct_ids']);
+                        }
+
+                        if ($isCorrect) {
+                            $points += $cfg['points'];
+                            $correctCount++;
+                        }
+                    }
+                }
+
+                $lastActivityTimestamp = $att->last_heartbeat_at
+                    ? $att->last_heartbeat_at->timestamp
+                    : ($att->started_at ? $att->started_at->timestamp : 0);
+            }
+
+            $progressPercent = $totalQuestions > 0 ? round(($answeredCount / $totalQuestions) * 100) : 0;
+
+            $rankedList[] = [
+                'id'                      => $att->id,
+                'nim'                     => $att->nim,
+                'student_name'            => $att->student_name,
+                'kelas'                   => $att->kelas ?? '-',
+                'points'                  => $points, // Digunakan HANYA di server untuk perankingan!
+                'last_activity_timestamp' => $lastActivityTimestamp,
+                'answered_count'          => $answeredCount,
+                'correct_count'           => $correctCount,
+                'total_questions'         => $totalQuestions,
+                'progress_percent'        => $progressPercent,
+                'is_completed'            => $isCompleted,
+                'is_online'               => $att->isOnline(),
+            ];
+        }
+
+        // Sort participants:
+        // 1. Poin benar tertinggi
+        // 2. Waktu tercepat mencapai poin (timestamp lebih awal)
+        // 3. ID ASC (tie-breaker stabil)
+        usort($rankedList, function ($a, $b) {
+            if ($b['points'] !== $a['points']) {
+                return $b['points'] <=> $a['points'];
+            }
+            if ($a['last_activity_timestamp'] !== $b['last_activity_timestamp']) {
+                return $a['last_activity_timestamp'] <=> $b['last_activity_timestamp'];
+            }
+            return $a['id'] <=> $b['id'];
+        });
+
+        // Sanitasi payload: TIDAK menyertakan angka poin/skor demi privasi mahasiswa!
+        $sanitizedLeaderboard = [];
+        foreach ($rankedList as $idx => $item) {
+            $rank = $idx + 1;
+            $sanitizedLeaderboard[] = [
+                'id'               => $item['id'],
+                'rank'             => $rank,
+                'nim'              => $item['nim'],
+                'student_name'     => $item['student_name'],
+                'kelas'            => $item['kelas'],
+                'answered_count'   => $item['answered_count'],
+                'total_questions'  => $item['total_questions'],
+                'progress_percent' => $item['progress_percent'],
+                'is_completed'     => $item['is_completed'],
+                'is_online'        => $item['is_online'],
+            ];
+        }
+
+        return response()->json([
+            'success'         => true,
+            'quiz_title'      => $quiz->title,
+            'session_status'  => $quiz->session_status ?? 'waiting',
+            'total_students'  => count($sanitizedLeaderboard),
+            'total_completed' => count(array_filter($sanitizedLeaderboard, fn($x) => $x['is_completed'])),
+            'total_questions' => $totalQuestions,
+            'time_limit'      => $quiz->time_limit_minutes,
+            'leaderboard'     => $sanitizedLeaderboard,
+        ]);
+    }
+
     public function startSession(Request $request, Quiz $quiz)
     {
         $this->authorizeQuiz($quiz);
