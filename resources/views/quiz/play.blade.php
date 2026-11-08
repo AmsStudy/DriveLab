@@ -781,7 +781,9 @@
                 showFullscreenWarning: false,
                 fullscreenToleranceSeconds: 5,
                 fullscreenToleranceInterval: null,
-                focusCheckInterval: null,
+                focusLossTimer: null,
+                visibilityLossTimer: null,
+                unlockImmunityUntil: Date.now() + 10000, // 10 detik proteksi awal saat kuis dimuat
                 previewImageModal: {
                     open: false,
                     src: '',
@@ -1171,6 +1173,22 @@
                             // Sync remote lock state
                             if (data.is_locked !== undefined && data.is_locked !== this.isLocked) {
                                 this.isLocked = data.is_locked;
+                                if (!this.isLocked) {
+                                    // Kunci dibuka dari dashboard pengawas (remote unlock)
+                                    this.unlockImmunityUntil = Date.now() + 15000; // Imunitas 15 detik dari false-positive
+                                    this.penaltySeconds = 0;
+                                    if (data.tab_switch_count !== undefined) {
+                                        this.tabSwitchCount = data.tab_switch_count;
+                                        this.strike = Math.min(3, this.tabSwitchCount);
+                                    }
+                                    if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
+                                    if (this.focusLossTimer) clearTimeout(this.focusLossTimer);
+                                    if (this.visibilityLossTimer) clearTimeout(this.visibilityLossTimer);
+                                    if (!this.isFullscreen && !this.allowOpenBook) {
+                                        this.enterFullscreen();
+                                    }
+                                    window.focus();
+                                }
                             }
                         })
                         .catch(() => {});
@@ -1187,7 +1205,8 @@
                     // Langsung hentikan seluruh timer dan scanner di browser
                     if (this.timerInterval) clearInterval(this.timerInterval);
                     if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
-                    if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
+                    if (this.focusLossTimer) clearTimeout(this.focusLossTimer);
+                    if (this.visibilityLossTimer) clearTimeout(this.visibilityLossTimer);
                     if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
                     if (this.sessionHeartbeatInterval) clearInterval(this.sessionHeartbeatInterval);
 
@@ -1248,10 +1267,19 @@
                     this.reportViolation = (reason = 'tab_switch') => {
                         if (this.isLocked || this.isSubmitting || this.isEnteringFullscreen) return;
 
-                        // Throttle rapid triggers within 1.5 seconds
+                        // Imunitas pasca-unlock atau saat kuis baru dimuat (cegah langsung terkunci berulang)
+                        if (Date.now() < this.unlockImmunityUntil) {
+                            return;
+                        }
+
+                        // Throttle rapid triggers dalam 3 detik
                         const now = Date.now();
-                        if (now - lastReportedTime < 1500) return;
+                        if (now - lastReportedTime < 3000) return;
                         lastReportedTime = now;
+
+                        // Bersihkan timer pending agar tidak memicu duplikat
+                        if (this.focusLossTimer) { clearTimeout(this.focusLossTimer); this.focusLossTimer = null; }
+                        if (this.visibilityLossTimer) { clearTimeout(this.visibilityLossTimer); this.visibilityLossTimer = null; }
 
                         fetch('{{ route('quiz.tab-switch', [$quiz->unique_token, $attempt->id]) }}', {
                             method: 'POST',
@@ -1274,7 +1302,8 @@
                                 this.isLocked = true;
                                 this.penaltySeconds = 0;
                                 if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
-                                if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
+                                if (this.focusLossTimer) clearTimeout(this.focusLossTimer);
+                                if (this.visibilityLossTimer) clearTimeout(this.visibilityLossTimer);
                             } else if (data.penalty_seconds > 0) {
                                 this.penaltySeconds = data.penalty_seconds;
                                 this.initPenaltyCountdown();
@@ -1283,29 +1312,48 @@
                         .catch(err => console.error('Violation record error:', err));
                     };
 
-                    // 1. Tab switch or window minimize (Visibility API)
+                    // 1. Tab switch or window minimize (Visibility API dengan toleransi 3 detik anti-blip)
                     document.addEventListener('visibilitychange', () => {
                         if (document.hidden) {
-                            this.reportViolation('tab_switch');
-                        }
-                    });
-
-                    // 2. Window loss of focus (Clicking outside, opening another app, alt-tab)
-                    window.addEventListener('blur', () => {
-                        if (!this.allowOpenBook && !this.isLocked && this.penaltySeconds === 0 && !this.isSubmitting && !this.isEnteringFullscreen) {
-                            this.reportViolation('tab_switch');
-                        }
-                    });
-
-                    // 3. Heartbeat Focus Scanner:
-                    if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
-                    this.focusCheckInterval = setInterval(() => {
-                        if (!this.allowOpenBook && !this.isLocked && this.penaltySeconds === 0 && !this.isSubmitting && !this.isEnteringFullscreen && this.hasEnteredFullscreenOnce) {
-                            if (document.hidden || !document.hasFocus()) {
-                                this.reportViolation('tab_switch');
+                            if (this.visibilityLossTimer) clearTimeout(this.visibilityLossTimer);
+                            this.visibilityLossTimer = setTimeout(() => {
+                                if (document.hidden && !this.allowOpenBook && !this.isLocked && this.penaltySeconds === 0 && !this.isSubmitting && !this.isEnteringFullscreen && Date.now() >= this.unlockImmunityUntil) {
+                                    this.reportViolation('tab_switch');
+                                }
+                            }, 3000);
+                        } else {
+                            if (this.visibilityLossTimer) {
+                                clearTimeout(this.visibilityLossTimer);
+                                this.visibilityLossTimer = null;
                             }
                         }
-                    }, 750);
+                    });
+
+                    // 2. Window loss of focus (dengan toleransi 4 detik untuk mencegah false-positive notifikasi OS / antivirus / Veyon / classroom agent)
+                    window.addEventListener('blur', () => {
+                        if (this.allowOpenBook || this.isLocked || this.penaltySeconds > 0 || this.isSubmitting || this.isEnteringFullscreen || Date.now() < this.unlockImmunityUntil) {
+                            return;
+                        }
+                        if (this.focusLossTimer) clearTimeout(this.focusLossTimer);
+                        this.focusLossTimer = setTimeout(() => {
+                            // Hanya vonis pelanggaran jika jendela masih belum fokus setelah 4 detik penuh
+                            if (!document.hasFocus() && !this.allowOpenBook && !this.isLocked && this.penaltySeconds === 0 && !this.isSubmitting && !this.isEnteringFullscreen && Date.now() >= this.unlockImmunityUntil) {
+                                this.reportViolation('tab_switch');
+                            }
+                        }, 4000);
+                    });
+
+                    // 3. Focus recovery listener: Batalkan timer pelanggaran seketika saat kursor / jendela kembali fokus
+                    window.addEventListener('focus', () => {
+                        if (this.focusLossTimer) {
+                            clearTimeout(this.focusLossTimer);
+                            this.focusLossTimer = null;
+                        }
+                        if (this.visibilityLossTimer && !document.hidden) {
+                            clearTimeout(this.visibilityLossTimer);
+                            this.visibilityLossTimer = null;
+                        }
+                    });
 
                     // Anti-Cheat: Disable right click, copy, and devtools shortcuts in strict exam mode
                     document.addEventListener('contextmenu', (e) => {
@@ -1345,6 +1393,14 @@
                             this.adminPassword = '';
                             this.tabSwitchCount = body.tab_switch_count || 2;
                             this.strike = 2;
+                            this.unlockImmunityUntil = Date.now() + 15000; // Imunitas 15 detik dari false-positive setelah dibuka
+                            if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
+                            if (this.focusLossTimer) clearTimeout(this.focusLossTimer);
+                            if (this.visibilityLossTimer) clearTimeout(this.visibilityLossTimer);
+                            if (!this.isFullscreen && !this.allowOpenBook) {
+                                this.enterFullscreen();
+                            }
+                            window.focus();
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Kuis Berhasil Dibuka!',
@@ -1648,7 +1704,8 @@
                 submitQuiz() {
                     if (this.isSubmitting) return;
                     this.isSubmitting = true;
-                    if (this.focusCheckInterval) clearInterval(this.focusCheckInterval);
+                    if (this.focusLossTimer) clearTimeout(this.focusLossTimer);
+                    if (this.visibilityLossTimer) clearTimeout(this.visibilityLossTimer);
                     if (this.fullscreenToleranceInterval) clearInterval(this.fullscreenToleranceInterval);
                     if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
 
