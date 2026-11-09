@@ -530,7 +530,7 @@
                                 class="py-1.5 px-3 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-[#090D0B] dark:hover:bg-[#142019] border border-gray-200 dark:border-[#1A2820] text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium text-xs transition-colors flex items-center gap-1 shadow-xs"
                                 :class="{'flex-1': !item.is_locked}">
                             <svg class="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                            + Waktu
+                            Waktu
                         </button>
 
                         {{-- Force Submit Button --}}
