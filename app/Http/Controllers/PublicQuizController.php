@@ -144,26 +144,24 @@ class PublicQuizController extends Controller
             if ($kelas && empty($ongoing->kelas)) {
                 $ongoing->update(['kelas' => $kelas]);
             }
+            if ($quiz->isSessionWaiting()) {
+                session(['quiz_attempt_' . $quiz->id => $ongoing->id]);
+                return redirect()->route('quiz.waiting', ['token' => $token, 'attempt' => $ongoing->id]);
+            }
             // Check if ongoing has already expired based on time_limit_minutes + extra_time_minutes
             $totalAllowedMinutes = $quiz->time_limit_minutes + ($ongoing->extra_time_minutes ?? 0);
             if ($totalAllowedMinutes > 0) {
-                $elapsedSeconds = abs((int) now()->diffInSeconds($ongoing->started_at));
+                $elapsedSeconds = $ongoing->started_at ? abs((int) now()->diffInSeconds($ongoing->started_at)) : 0;
                 $allowedSeconds = $totalAllowedMinutes * 60;
-                if ($elapsedSeconds > $allowedSeconds + 30) {
+                if ($ongoing->started_at && $elapsedSeconds > $allowedSeconds + 30) {
                     // Mark as expired/completed, preserving draft answers
                     QuizScoringService::finalize($ongoing, $ongoing->draft_answers ?? []);
                 } else {
                     session(['quiz_attempt_' . $quiz->id => $ongoing->id]);
-                    if ($quiz->isSessionWaiting()) {
-                        return redirect()->route('quiz.waiting', ['token' => $token, 'attempt' => $ongoing->id]);
-                    }
                     return redirect()->route('quiz.play', ['token' => $token, 'attempt' => $ongoing->id]);
                 }
             } else {
                 session(['quiz_attempt_' . $quiz->id => $ongoing->id]);
-                if ($quiz->isSessionWaiting()) {
-                    return redirect()->route('quiz.waiting', ['token' => $token, 'attempt' => $ongoing->id]);
-                }
                 return redirect()->route('quiz.play', ['token' => $token, 'attempt' => $ongoing->id]);
             }
         }
@@ -282,6 +280,18 @@ class PublicQuizController extends Controller
             return $quiz->fresh()->session_status;
         });
 
+        // Calculate remaining time
+        $totalAllowedMinutes = $quiz->time_limit_minutes + ($attempt->extra_time_minutes ?? 0);
+
+        if ($sessionStatus === 'waiting' || $quiz->isSessionWaiting()) {
+            return response()->json([
+                'status'         => 'waiting',
+                'session_status' => 'waiting',
+                'redirect'       => route('quiz.waiting', ['token' => $token, 'attempt' => $attempt->id]),
+                'time_remaining' => $totalAllowedMinutes > 0 ? (int) ($totalAllowedMinutes * 60) : null,
+            ]);
+        }
+
         if ($attempt->isCompleted() || $attempt->is_force_submitted || $sessionStatus === 'ended' || $quiz->isSessionEnded()) {
             if (!$attempt->isCompleted()) {
                 $attempt->update(['is_force_submitted' => true]);
@@ -377,11 +387,16 @@ class PublicQuizController extends Controller
             return redirect()->route('quiz.results', ['token' => $token, 'attempt' => $attempt->id]);
         }
 
+        // Pastikan started_at terisi jika attempt baru berpindah dari waiting room ke play
+        if (!$attempt->started_at) {
+            $attempt->update(['started_at' => now()]);
+        }
+
         // Calculate time limit including any instructor extra time
         $totalAllowedMinutes = $quiz->time_limit_minutes + ($attempt->extra_time_minutes ?? 0);
         $timeRemaining = null;
         if ($totalAllowedMinutes > 0) {
-            $elapsedSeconds = abs((int) now()->diffInSeconds($attempt->started_at));
+            $elapsedSeconds = $attempt->started_at ? abs((int) now()->diffInSeconds($attempt->started_at)) : 0;
             $totalSeconds = (int) ($totalAllowedMinutes * 60);
             $timeRemaining = (int) max(0, $totalSeconds - $elapsedSeconds);
 

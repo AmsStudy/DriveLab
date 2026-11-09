@@ -264,5 +264,46 @@ class QuizWaitingRoomAndSessionTest extends TestCase
         $quiz->refresh();
         $this->assertTrue($quiz->isSessionWaiting());
     }
+
+    public function test_countdown_timer_does_not_run_while_in_waiting_room(): void
+    {
+        $quiz = Quiz::create([
+            'user_id'            => $this->admin->id,
+            'title'              => 'Kuis Praktikum Algoritma',
+            'session_status'     => 'waiting',
+            'time_limit_minutes' => 20,
+            'is_active'          => true,
+        ]);
+
+        $attempt = QuizAttempt::create([
+            'quiz_id'               => $quiz->id,
+            'nim'                   => '13020210088',
+            'student_name'          => 'Andi Pratama',
+            'total_points_possible' => 100,
+            'started_at'            => now()->subMinutes(15), // Gabung ruang tunggu 15 menit lalu
+        ]);
+
+        // 1. timeRemainingSeconds harus tetap utuh penuh (20 * 60 = 1200 detik), TIDAK berkurang karena kuis belum di-start
+        $this->assertEquals(20 * 60, $attempt->timeRemainingSeconds($quiz));
+
+        // 2. Di live monitor admin, sisa waktu berstatus siaga dan waktu mulai bertuliskan 'Menunggu Mulai'
+        $monitorRes = $this->actingAs($this->admin)->getJson(route('admin.quizzes.monitor.data', $quiz));
+        $monitorRes->assertStatus(200);
+        $data = $monitorRes->json();
+        $this->assertEquals(1200, $data['active'][0]['time_remaining_seconds']);
+        $this->assertStringContainsString('(Siaga)', $data['active'][0]['time_remaining_human']);
+        $this->assertEquals('Menunggu Mulai', $data['active'][0]['started_at_human']);
+
+        // 3. Setelah admin menekan start session, baru timer mulai berjalan
+        $this->actingAs($this->admin)->postJson(route('admin.quizzes.session.start', $quiz));
+        $attempt->refresh();
+        $quiz->refresh();
+
+        $monitorAfterStart = $this->actingAs($this->admin)->getJson(route('admin.quizzes.monitor.data', $quiz));
+        $monitorAfterStart->assertStatus(200);
+        $dataAfter = $monitorAfterStart->json();
+        $this->assertStringNotContainsString('(Siaga)', $dataAfter['active'][0]['time_remaining_human']);
+        $this->assertNotEquals('Menunggu Mulai', $dataAfter['active'][0]['started_at_human']);
+    }
 }
 

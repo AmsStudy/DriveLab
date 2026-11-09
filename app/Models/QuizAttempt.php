@@ -129,12 +129,19 @@ class QuizAttempt extends Model
             return null; // Unlimited
         }
         $totalMinutes = $quiz->time_limit_minutes + ($this->extra_time_minutes ?? 0);
+        $allowed = $totalMinutes * 60;
+
+        // Jika kuis masih di status Ruang Tunggu (waiting) atau belum dimulai oleh pengawas:
+        // Waktu hitung mundur belum berjalan sama sekali, sisa waktu masih utuh penuh.
+        if ($quiz->isSessionWaiting() || !$quiz->isSessionStarted() || !$this->started_at) {
+            return $allowed;
+        }
+
         if ($quiz->isSessionPaused() && $quiz->paused_at) {
             $elapsed = max(0, (int) ($quiz->paused_at->timestamp - $this->started_at->timestamp));
         } else {
             $elapsed = max(0, (int) (now()->timestamp - $this->started_at->timestamp));
         }
-        $allowed = $totalMinutes * 60;
         return max(0, $allowed - $elapsed);
     }
 }

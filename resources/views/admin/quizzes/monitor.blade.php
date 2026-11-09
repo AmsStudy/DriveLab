@@ -510,7 +510,9 @@
                     <div class="flex items-center justify-between text-xs pt-3 border-t border-gray-100 dark:border-[#1A2820] mb-4">
                         <span class="text-gray-500 dark:text-gray-400">Sisa Waktu:</span>
                         <div class="flex items-center gap-1.5 font-mono">
-                            <span class="font-bold text-amber-600 dark:text-amber-400 text-sm" x-text="item.time_remaining_human"></span>
+                            <span class="font-bold text-amber-600 dark:text-amber-400 text-sm"
+                                  :class="{'text-emerald-700 dark:text-emerald-400 font-semibold': sessionStatus === 'waiting'}"
+                                  x-text="item.time_remaining_human"></span>
                             <template x-if="item.extra_time_minutes > 0">
                                 <span class="text-[10px] bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 px-1 rounded font-bold"
                                       x-text="'+' + item.extra_time_minutes + 'm'"></span>
@@ -598,7 +600,9 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-3 text-center font-mono text-xs">
-                                    <span class="font-bold text-amber-600 dark:text-amber-400" x-text="item.time_remaining_human"></span>
+                                    <span class="font-bold text-amber-600 dark:text-amber-400"
+                                          :class="{'text-emerald-700 dark:text-emerald-400 font-semibold': sessionStatus === 'waiting'}"
+                                          x-text="item.time_remaining_human"></span>
                                     <template x-if="item.extra_time_minutes > 0">
                                         <span class="text-[10px] bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 px-1 rounded font-bold ml-1" x-text="'+' + item.extra_time_minutes + 'm'"></span>
                                     </template>

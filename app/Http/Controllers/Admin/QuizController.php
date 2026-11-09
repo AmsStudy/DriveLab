@@ -827,6 +827,7 @@ class QuizController extends Controller
             $answeredCount = $att->answeredQuestionsCount();
             $flaggedCount = $att->flaggedQuestionsCount();
             $timeRemainingSeconds = $att->timeRemainingSeconds($quiz);
+            $isWaiting = $quiz->isSessionWaiting() || !$quiz->isSessionStarted();
 
             $data = [
                 'id'                     => $att->id,
@@ -845,8 +846,10 @@ class QuizController extends Controller
                 'score'                  => $att->score,
                 'extra_time_minutes'     => (int) ($att->extra_time_minutes ?? 0),
                 'time_remaining_seconds' => $timeRemainingSeconds,
-                'time_remaining_human'   => $timeRemainingSeconds !== null ? gmdate('i\m s\s', max(0, $timeRemainingSeconds)) : 'Tanpa Batas',
-                'started_at_human'       => $att->started_at ? $att->started_at->format('H:i:s') : '-',
+                'time_remaining_human'   => $isWaiting
+                    ? ($timeRemainingSeconds !== null ? gmdate('i\m s\s', max(0, $timeRemainingSeconds)) . ' (Siaga)' : 'Tanpa Batas')
+                    : ($timeRemainingSeconds !== null ? gmdate('i\m s\s', max(0, $timeRemainingSeconds)) : 'Tanpa Batas'),
+                'started_at_human'       => ($isWaiting || !$att->started_at) ? 'Menunggu Mulai' : $att->started_at->format('H:i:s'),
                 'last_heartbeat_human'   => $att->last_heartbeat_at ? $att->last_heartbeat_at->diffForHumans() : 'Belum ada sinyal',
                 'is_force_submitted'     => (bool) $att->is_force_submitted,
             ];
@@ -1047,8 +1050,11 @@ class QuizController extends Controller
 
         $quiz->update([
             'session_status' => 'started',
-            'starts_at'      => $quiz->starts_at ?? now(),
+            'starts_at'      => now(),
         ]);
+
+        // Segera sinkronkan cache status agar seluruh browser mendeteksi instan
+        cache()->put("quiz_{$quiz->id}_status", 'started', 120);
 
         // Atur started_at untuk seluruh attempt yang sedang menunggu agar timer mereka mulai dari detik ini
         $quiz->attempts()
