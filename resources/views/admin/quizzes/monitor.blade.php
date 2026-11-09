@@ -150,6 +150,145 @@
         </div>
     </div>
 
+    {{-- ─── REAL-TIME BROADCAST CENTER (PENGUMUMAN & RALAT SOAL) ─── --}}
+    <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-2xl p-4 sm:p-5 shadow-xs transition-all">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-[#1A2820]/80">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500/20 to-emerald-500/20 border border-amber-500/30 flex items-center justify-center text-lg shadow-sm">
+                    📢
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h4 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white">Broadcast Pengumuman & Ralat Soal</h4>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 uppercase tracking-wider">Real-Time</span>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Pesan langsung muncul sebagai pop-up di layar seluruh mahasiswa yang sedang aktif ujian.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button type="button" @click="isBroadcastHistoryOpen = !isBroadcastHistoryOpen"
+                        class="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
+                    <span>📜 Riwayat Siaran</span>
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold" x-text="announcements.length">0</span>
+                </button>
+            </div>
+        </div>
+
+        {{-- Broadcast Form --}}
+        <div class="mt-4 space-y-3">
+            {{-- Type & Quick Preset Pills --}}
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                {{-- Type Selector --}}
+                <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] w-fit">
+                    <button type="button" @click="broadcastType = 'info'"
+                            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+                            :class="broadcastType === 'info' ? 'bg-sky-500 text-white shadow-xs' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'">
+                        <span>ℹ️ Info</span>
+                    </button>
+                    <button type="button" @click="broadcastType = 'warning'"
+                            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+                            :class="broadcastType === 'warning' ? 'bg-amber-500 text-white shadow-xs' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'">
+                        <span>⚠️ Ralat Soal</span>
+                    </button>
+                    <button type="button" @click="broadcastType = 'urgent'"
+                            class="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+                            :class="broadcastType === 'urgent' ? 'bg-rose-600 text-white shadow-xs' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'">
+                        <span>🚨 Darurat</span>
+                    </button>
+                </div>
+
+                {{-- Fast Presets --}}
+                <div class="flex items-center gap-1.5 flex-wrap text-[11px]">
+                    <span class="text-gray-400 text-xs hidden md:inline">Preset:</span>
+                    <button type="button" @click="setBroadcastPreset('Waktu pengerjaan kuis tersisa 15 menit. Silakan periksa kembali jawaban Anda.', 'info')"
+                            class="px-2 py-1 rounded-lg bg-gray-50 dark:bg-[#142019] border border-gray-200 dark:border-[#1E3327] text-gray-600 dark:text-gray-300 hover:border-emerald-500/40 hover:text-emerald-500 transition-all cursor-pointer">
+                        ⏰ Sisa 15 Menit
+                    </button>
+                    <button type="button" @click="setBroadcastPreset('Waktu tersisa 5 menit! Segera lengkapi jawaban sebelum lembar ujian tertutup otomatis.', 'warning')"
+                            class="px-2 py-1 rounded-lg bg-gray-50 dark:bg-[#142019] border border-gray-200 dark:border-[#1E3327] text-gray-600 dark:text-gray-300 hover:border-amber-500/40 hover:text-amber-500 transition-all cursor-pointer">
+                        ⏰ Sisa 5 Menit
+                    </button>
+                    <button type="button" @click="setBroadcastPreset('Ralat Soal No. ... : Silakan perhatikan opsi jawaban...', 'warning')"
+                            class="px-2 py-1 rounded-lg bg-gray-50 dark:bg-[#142019] border border-gray-200 dark:border-[#1E3327] text-gray-600 dark:text-gray-300 hover:border-amber-500/40 hover:text-amber-500 transition-all cursor-pointer">
+                        ⚠️ Ralat Soal
+                    </button>
+                    <button type="button" @click="setBroadcastPreset('Perhatian seluruh mahasiswa: Harap menjaga ketenangan dan tidak berbisik di dalam ruang lab.', 'info')"
+                            class="px-2 py-1 rounded-lg bg-gray-50 dark:bg-[#142019] border border-gray-200 dark:border-[#1E3327] text-gray-600 dark:text-gray-300 hover:border-sky-500/40 hover:text-sky-500 transition-all cursor-pointer">
+                        🔇 Harap Tenang
+                    </button>
+                </div>
+            </div>
+
+            {{-- Message Input & Send Button --}}
+            <div class="flex flex-col sm:flex-row items-stretch gap-2.5">
+                <div class="relative flex-1">
+                    <input type="text" x-model="broadcastMessage"
+                           @keydown.enter.prevent="sendBroadcast()"
+                           placeholder="Ketik pesan siaran pengumuman atau ralat soal... (Tekan Enter untuk kirim)"
+                           class="w-full px-4 py-2.5 bg-gray-50 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs sm:text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 shadow-xs transition-all">
+                </div>
+
+                <button type="button" @click="sendBroadcast()"
+                        :disabled="isSendingBroadcast || !broadcastMessage.trim()"
+                        class="px-5 py-2.5 rounded-xl text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                        :class="broadcastType === 'urgent' ? 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 shadow-rose-500/20' : (broadcastType === 'warning' ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-amber-500/20' : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/20')">
+                    <svg x-show="!isSendingBroadcast" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                    <svg x-show="isSendingBroadcast" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                    <span x-text="isSendingBroadcast ? 'Mengirim...' : 'Kirim Siaran'"></span>
+                </button>
+            </div>
+        </div>
+
+        {{-- Collapsible Broadcast History --}}
+        <div x-show="isBroadcastHistoryOpen" x-transition class="mt-4 pt-3 border-t border-gray-100 dark:border-[#1A2820]">
+            <h5 class="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center justify-between">
+                <span>Daftar Pengumuman Aktif Sesi Ini</span>
+                <span class="text-[11px] text-gray-400 font-normal">Mahasiswa dapat membuka kembali riwayat pengumuman ini di layar mereka</span>
+            </h5>
+
+            <template x-if="announcements.length === 0">
+                <div class="py-4 text-center text-xs text-gray-400 dark:text-gray-500 bg-gray-50/50 dark:bg-[#090D0B]/50 rounded-xl border border-dashed border-gray-200 dark:border-[#1A2820]">
+                    Belum ada pengumuman yang disiarkan pada sesi kuis ini.
+                </div>
+            </template>
+
+            <div x-show="announcements.length > 0" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+                <template x-for="item in announcements" :key="item.id">
+                    <div class="p-3 rounded-xl border flex items-start justify-between gap-3 transition-all"
+                         :class="{
+                             'bg-sky-50/60 dark:bg-sky-950/20 border-sky-200 dark:border-sky-500/30': item.type === 'info',
+                             'bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-500/30': item.type === 'warning',
+                             'bg-rose-50/60 dark:bg-rose-950/20 border-rose-200 dark:border-rose-500/30': item.type === 'urgent'
+                         }">
+                        <div class="flex items-start gap-2.5">
+                            <span class="text-base leading-none mt-0.5" x-text="item.type === 'urgent' ? '🚨' : (item.type === 'warning' ? '⚠️' : 'ℹ️')"></span>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                                          :class="{
+                                              'bg-sky-100 dark:bg-sky-500/20 text-sky-800 dark:text-sky-300': item.type === 'info',
+                                              'bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300': item.type === 'warning',
+                                              'bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-300': item.type === 'urgent'
+                                          }"
+                                          x-text="item.type === 'urgent' ? 'Darurat' : (item.type === 'warning' ? 'Ralat Soal' : 'Info')"></span>
+                                    <span class="text-[11px] text-gray-500 dark:text-gray-400 font-mono" x-text="item.time + ' (' + item.created_at_human + ')'"></span>
+                                </div>
+                                <p class="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mt-1" x-text="item.message"></p>
+                            </div>
+                        </div>
+
+                        <button type="button" @click="deleteAnnouncement(item.id)"
+                                class="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-all flex-shrink-0 cursor-pointer"
+                                title="Hapus pengumuman ini">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
     {{-- Stats KPI Bar --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         {{-- Sedang Mengerjakan / Di Ruang Tunggu --}}
@@ -603,6 +742,13 @@ function liveExamMonitor(quizId) {
         activeAttempts: [],
         completedAttempts: [],
 
+        // Broadcast Announcements
+        announcements: [],
+        broadcastMessage: '',
+        broadcastType: 'info',
+        isSendingBroadcast: false,
+        isBroadcastHistoryOpen: false,
+
         // Modal Add Time
         showAddTimeModal: false,
         targetStudent: null,
@@ -665,6 +811,9 @@ function liveExamMonitor(quizId) {
                 if (data.success) {
                     if (data.session_status) {
                         this.sessionStatus = data.session_status;
+                    }
+                    if (data.announcements) {
+                        this.announcements = data.announcements;
                     }
                     this.summary = data.summary;
                     this.activeAttempts = data.active;
@@ -946,6 +1095,110 @@ function liveExamMonitor(quizId) {
                     }
                 }
             });
+        },
+
+        setBroadcastPreset(text, type = null) {
+            this.broadcastMessage = text;
+            if (type) this.broadcastType = type;
+        },
+
+        async sendBroadcast() {
+            const msg = (this.broadcastMessage || '').trim();
+            if (!msg) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pesan Kosong',
+                    text: 'Silakan ketik pesan pengumuman sebelum mengirim.',
+                    background: document.documentElement.classList.contains('dark') ? '#0F1713' : '#FFFFFF',
+                    color: document.documentElement.classList.contains('dark') ? '#F3F4F6' : '#111827',
+                });
+                return;
+            }
+
+            this.isSendingBroadcast = true;
+            try {
+                const res = await fetch(`{{ route('admin.quizzes.announcements.store', $quiz) }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': this.getCsrfToken()
+                    },
+                    body: JSON.stringify({
+                        message: msg,
+                        type: this.broadcastType
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.broadcastMessage = '';
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Pengumuman berhasil disiarkan!',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        background: '#0F1713',
+                        color: '#34D399',
+                        customClass: { popup: 'border border-emerald-500/40 rounded-xl' }
+                    });
+                    this.fetchData();
+                } else {
+                    Swal.fire('Gagal Mengirim', data.message || 'Terjadi kesalahan.', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Gagal', 'Terjadi kesalahan jaringan.', 'error');
+            } finally {
+                this.isSendingBroadcast = false;
+            }
+        },
+
+        async deleteAnnouncement(announcementId) {
+            const isDark = document.documentElement.classList.contains('dark');
+            const result = await Swal.fire({
+                title: 'Hapus Pengumuman Ini?',
+                text: 'Pemberitahuan ini akan dihapus dari riwayat siaran.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                cancelButtonColor: isDark ? '#374151' : '#6B7280',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                background: isDark ? '#0F1713' : '#FFFFFF',
+                color: isDark ? '#F3F4F6' : '#111827',
+                customClass: { popup: isDark ? 'border border-[#1A2820] rounded-2xl' : 'border border-gray-200 rounded-2xl' }
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const res = await fetch(`{{ url('admin/quizzes/' . $quiz->id . '/announcements') }}/${announcementId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': this.getCsrfToken()
+                        }
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.announcements = this.announcements.filter(a => a.id !== announcementId);
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Pengumuman dihapus',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            background: '#0F1713',
+                            color: '#34D399',
+                            customClass: { popup: 'border border-emerald-500/40 rounded-xl' }
+                        });
+                    }
+                } catch (err) {
+                    Swal.fire('Gagal', 'Gagal menghapus pengumuman.', 'error');
+                }
+            }
         }
     };
 }

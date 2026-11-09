@@ -203,6 +203,18 @@
                     </template>
                 </div>
 
+                {{-- Live Announcements Drawer Button --}}
+                <button type="button" @click="isAnnouncementDrawerOpen = true"
+                        class="px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-medium transition-all relative cursor-pointer"
+                        :class="announcements.length > 0 ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25' : 'bg-[#142019] border-[#1E3327] text-gray-400 hover:text-white'"
+                        title="Lihat riwayat pengumuman & ralat soal dari pengawas lab">
+                    <span>📢</span>
+                    <span class="hidden sm:inline">Pengumuman</span>
+                    <template x-if="announcements.length > 0">
+                        <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-400 text-gray-950 font-extrabold" x-text="announcements.length"></span>
+                    </template>
+                </button>
+
                 @if($quiz->allow_open_book)
                     {{-- Fullscreen Toggle allowed in Open Book mode --}}
                     <button type="button" @click="toggleFullscreen()"
@@ -663,6 +675,155 @@
     </div>
 
     {{-- ========================================================================= --}}
+    {{-- BROADCAST PENGUMUMAN POPUP MODAL (REAL-TIME DARI PENGAWAS)                 --}}
+    {{-- ========================================================================= --}}
+    <div x-show="activeAnnouncementModal !== null"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-90"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-90"
+         class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
+         style="display: none;">
+        
+        <div @click.away="closeAnnouncementModal()"
+             class="w-full max-w-lg bg-[#0F1713] border rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden"
+             :class="{
+                 'border-sky-500/40 shadow-sky-500/10': activeAnnouncementModal && activeAnnouncementModal.type === 'info',
+                 'border-amber-500/50 shadow-amber-500/15': activeAnnouncementModal && activeAnnouncementModal.type === 'warning',
+                 'border-rose-500/60 shadow-rose-500/20': activeAnnouncementModal && activeAnnouncementModal.type === 'urgent'
+             }">
+            
+            {{-- Glowing ambient background light --}}
+            <div class="absolute -top-24 -left-24 w-48 h-48 rounded-full blur-3xl opacity-20 pointer-events-none"
+                 :class="{
+                     'bg-sky-500': activeAnnouncementModal && activeAnnouncementModal.type === 'info',
+                     'bg-amber-500': activeAnnouncementModal && activeAnnouncementModal.type === 'warning',
+                     'bg-rose-500': activeAnnouncementModal && activeAnnouncementModal.type === 'urgent'
+                 }"></div>
+
+            {{-- Header Badge & Time --}}
+            <div class="flex items-center justify-between gap-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-9 h-9 rounded-xl flex items-center justify-center text-lg shadow-sm"
+                          :class="{
+                              'bg-sky-500/20 text-sky-400 border border-sky-500/30': activeAnnouncementModal && activeAnnouncementModal.type === 'info',
+                              'bg-amber-500/20 text-amber-400 border border-amber-500/30': activeAnnouncementModal && activeAnnouncementModal.type === 'warning',
+                              'bg-rose-500/20 text-rose-400 border border-rose-500/30 animate-pulse': activeAnnouncementModal && activeAnnouncementModal.type === 'urgent'
+                          }">
+                        <span x-text="activeAnnouncementModal && activeAnnouncementModal.type === 'urgent' ? '🚨' : (activeAnnouncementModal && activeAnnouncementModal.type === 'warning' ? '⚠️' : '📢')"></span>
+                    </span>
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                              :class="{
+                                  'bg-sky-500/15 text-sky-400 border border-sky-500/30': activeAnnouncementModal && activeAnnouncementModal.type === 'info',
+                                  'bg-amber-500/15 text-amber-400 border border-amber-500/30': activeAnnouncementModal && activeAnnouncementModal.type === 'warning',
+                                  'bg-rose-500/15 text-rose-400 border border-rose-500/30': activeAnnouncementModal && activeAnnouncementModal.type === 'urgent'
+                              }"
+                              x-text="activeAnnouncementModal && activeAnnouncementModal.type === 'urgent' ? 'Perhatian Darurat' : (activeAnnouncementModal && activeAnnouncementModal.type === 'warning' ? 'Ralat / Klarifikasi Soal' : 'Pengumuman Pengawas')">
+                        </span>
+                    </div>
+                </div>
+
+                <span class="text-xs font-mono text-gray-400" x-text="activeAnnouncementModal ? (activeAnnouncementModal.time || 'Baru Saja') : ''"></span>
+            </div>
+
+            <h3 class="text-lg font-bold text-white mb-2">
+                <span x-show="activeAnnouncementModal && activeAnnouncementModal.type === 'warning'">Ada Ralat / Catatan Khusus Soal!</span>
+                <span x-show="activeAnnouncementModal && activeAnnouncementModal.type === 'urgent'">Peringatan Penting Pengawas Lab!</span>
+                <span x-show="activeAnnouncementModal && activeAnnouncementModal.type === 'info'">Pengumuman dari Pengawas Ujian</span>
+            </h3>
+
+            {{-- Message body --}}
+            <div class="p-4 rounded-2xl bg-black/40 border border-white/5 my-4">
+                <p class="text-sm sm:text-base text-gray-100 leading-relaxed whitespace-pre-line font-medium"
+                   x-text="activeAnnouncementModal ? activeAnnouncementModal.message : ''"></p>
+            </div>
+
+            <p class="text-[11px] text-gray-400 mb-5 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Anda dapat melihat kembali pengumuman ini kapan saja lewat tombol <strong class="text-gray-300">"📢 Pengumuman"</strong> di menu atas.</span>
+            </p>
+
+            <button type="button" @click="closeAnnouncementModal()"
+                    class="w-full py-3.5 rounded-xl text-white font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:scale-[1.01] active:scale-98"
+                    :class="{
+                        'bg-gradient-to-r from-sky-600 to-teal-600 hover:from-sky-500 hover:to-teal-500 shadow-sky-500/20': activeAnnouncementModal && activeAnnouncementModal.type === 'info',
+                        'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-amber-500/20': activeAnnouncementModal && activeAnnouncementModal.type === 'warning',
+                        'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 shadow-rose-500/20': activeAnnouncementModal && activeAnnouncementModal.type === 'urgent'
+                    }">
+                <span>Saya Mengerti, Lanjutkan Pengerjaan</span>
+            </button>
+        </div>
+    </div>
+
+    {{-- ========================================================================= --}}
+    {{-- ANNOUNCEMENTS HISTORY DRAWER (RIWAYAT PENGUMUMAN & RALAT SOAL)             --}}
+    {{-- ========================================================================= --}}
+    <div x-show="isAnnouncementDrawerOpen"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-[115] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+         style="display: none;">
+        
+        <div @click.away="isAnnouncementDrawerOpen = false"
+             class="w-full max-w-lg bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
+            
+            <div class="flex items-center justify-between pb-4 border-b border-[#1A2820]">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xl">📢</span>
+                    <h3 class="text-base font-bold text-white">Riwayat Pengumuman Pengawas</h3>
+                </div>
+                <button type="button" @click="isAnnouncementDrawerOpen = false"
+                        class="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto py-4 space-y-3 pr-1">
+                <template x-if="announcements.length === 0">
+                    <div class="py-8 text-center text-xs text-gray-400">
+                        Belum ada pengumuman atau ralat soal dari pengawas lab.
+                    </div>
+                </template>
+
+                <template x-for="item in announcements" :key="item.id">
+                    <div class="p-4 rounded-2xl border"
+                         :class="{
+                             'bg-sky-500/10 border-sky-500/30': item.type === 'info',
+                             'bg-amber-500/10 border-amber-500/30': item.type === 'warning',
+                             'bg-rose-500/10 border-rose-500/30': item.type === 'urgent'
+                         }">
+                        <div class="flex items-center justify-between gap-2 mb-1.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                                  :class="{
+                                      'bg-sky-500/20 text-sky-300': item.type === 'info',
+                                      'bg-amber-500/20 text-amber-300': item.type === 'warning',
+                                      'bg-rose-500/20 text-rose-300': item.type === 'urgent'
+                                  }"
+                                  x-text="item.type === 'urgent' ? '🚨 Darurat' : (item.type === 'warning' ? '⚠️ Ralat Soal' : 'ℹ️ Info')"></span>
+                            <span class="text-[11px] font-mono text-gray-400" x-text="item.time"></span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-gray-200 leading-relaxed font-medium" x-text="item.message"></p>
+                    </div>
+                </template>
+            </div>
+
+            <div class="pt-3 border-t border-[#1A2820]">
+                <button type="button" @click="isAnnouncementDrawerOpen = false"
+                        class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs transition-colors cursor-pointer">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- ========================================================================= --}}
     {{-- HOVER PREVIEW POPUP (INSTANT PREVIEW SAAT KURSOR MENDEKAT)                --}}
     {{-- ========================================================================= --}}
     <div class="cyber-hover-preview-bubble"
@@ -774,6 +935,12 @@
                 unlockError: '',
                 showDrawer: false,
                 isSubmitting: false,
+
+                // Announcements & Real-Time Broadcasts
+                announcements: @json($initialAnnouncements ?? []),
+                activeAnnouncementModal: null,
+                isAnnouncementDrawerOpen: false,
+                lastSeenAnnouncementId: parseInt(localStorage.getItem('quiz_seen_announcement_{{ $attempt->id }}') || '0'),
                 timerInterval: null,
                 penaltyTimerInterval: null,
                 isFullscreen: false,
@@ -855,6 +1022,14 @@
 
                     // Setup realtime session heartbeat (deteksi otomatis jika admin mengakhiri sesi kuis)
                     this.startSessionHeartbeat();
+
+                    // Initialize seen announcement tracking
+                    if (this.lastSeenAnnouncementId === 0 && this.announcements.length > 0) {
+                        this.lastSeenAnnouncementId = Number(this.announcements[0].id);
+                        try {
+                            localStorage.setItem('quiz_seen_announcement_{{ $attempt->id }}', String(this.lastSeenAnnouncementId));
+                        } catch (e) {}
+                    }
 
                     // Setup background heartbeat sync every 15 seconds so supervisor Live Monitor stays online
                     this.heartbeatInterval = setInterval(() => {
@@ -1193,12 +1368,69 @@
                                     window.focus();
                                 }
                             }
+
+                            // Sync announcements from exam supervisor
+                            if (data.announcements && Array.isArray(data.announcements)) {
+                                this.announcements = data.announcements;
+                            }
+
+                            if (data.latest_announcement && Number(data.latest_announcement.id) > this.lastSeenAnnouncementId) {
+                                this.lastSeenAnnouncementId = Number(data.latest_announcement.id);
+                                try {
+                                    localStorage.setItem('quiz_seen_announcement_{{ $attempt->id }}', String(this.lastSeenAnnouncementId));
+                                } catch (e) {}
+                                this.activeAnnouncementModal = data.latest_announcement;
+                                this.playAnnouncementChime(data.latest_announcement.type);
+                            }
                         })
                         .catch(() => {});
                     };
 
                     // Polling status kuis tiap 3 detik (dengan variasi acak agar tidak bentrok)
                     this.sessionHeartbeatInterval = setInterval(poll, 3000 + Math.floor(Math.random() * 800));
+                },
+
+                playAnnouncementChime(type = 'info') {
+                    try {
+                        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                        if (!AudioCtx) return;
+                        const ctx = new AudioCtx();
+                        if (ctx.state === 'suspended') {
+                            ctx.resume();
+                        }
+                        const now = ctx.currentTime;
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+
+                        if (type === 'urgent') {
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(880, now);
+                            osc.frequency.setValueAtTime(1046, now + 0.15);
+                            osc.frequency.setValueAtTime(1318, now + 0.3);
+                        } else if (type === 'warning') {
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(587.33, now); // D5
+                            osc.frequency.setValueAtTime(880, now + 0.18); // A5
+                        } else {
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(523.25, now); // C5
+                            osc.frequency.setValueAtTime(659.25, now + 0.15); // E5
+                        }
+
+                        gain.gain.setValueAtTime(0.18, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(now);
+                        osc.stop(now + 0.55);
+                    } catch (e) {
+                        // Audio context fallback
+                    }
+                },
+
+                closeAnnouncementModal() {
+                    this.activeAnnouncementModal = null;
                 },
 
                 handleSessionEnded(redirectUrl, message) {

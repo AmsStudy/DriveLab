@@ -448,6 +448,7 @@
                 lastSyncTime: '',
                 syncSecondsLeft: 4,
                 audioCtx: null,
+                lastAnnouncementId: null,
                 marqueeText: 'Menyambungkan ke Live Arena... Persaingan peringkat berjalan secara dinamis!',
                 pollingInterval: null,
                 countdownInterval: null,
@@ -512,6 +513,13 @@
                             this.totalQuestions = data.total_questions;
 
                             this.processLeaderboardDeltas(data.leaderboard);
+
+                            if (data.latest_announcement && (!this.lastAnnouncementId || data.latest_announcement.id > this.lastAnnouncementId)) {
+                                this.lastAnnouncementId = data.latest_announcement.id;
+                                const prefix = data.latest_announcement.type === 'warning' ? '⚠️ [RALAT SOAL PENGAWAS]' : (data.latest_announcement.type === 'urgent' ? '🚨 [PERHATIAN DARURAT]' : '📢 [PENGUMUMAN PENGAWAS]');
+                                this.updateMarquee(`${prefix}: "${data.latest_announcement.message}" (${data.latest_announcement.time})`);
+                            }
+
                             this.lastSyncTime = new Date().toLocaleTimeString('id-ID');
                             this.syncSecondsLeft = 4;
                         }

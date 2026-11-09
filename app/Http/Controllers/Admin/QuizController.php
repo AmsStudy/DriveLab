@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quiz;
+use App\Models\QuizAnnouncement;
 use App\Models\QuizAttempt;
 use App\Models\QuizOption;
 use App\Models\QuizQuestion;
@@ -857,6 +858,19 @@ class QuizController extends Controller
             }
         }
 
+        $announcements = $quiz->announcements()
+            ->where('is_active', true)
+            ->latest()
+            ->take(15)
+            ->get()
+            ->map(fn($a) => [
+                'id'               => $a->id,
+                'message'          => $a->message,
+                'type'             => $a->type,
+                'time'             => $a->created_at->format('H:i'),
+                'created_at_human' => $a->created_at->diffForHumans(),
+            ]);
+
         return response()->json([
             'success'        => true,
             'session_status' => $quiz->session_status ?? 'waiting',
@@ -868,8 +882,9 @@ class QuizController extends Controller
                 'total_online'    => count(array_filter($activeAttempts, fn($a) => $a['is_online'])),
                 'quiz_time_limit' => $quiz->time_limit_minutes,
             ],
-            'active'    => $activeAttempts,
-            'completed' => $completedAttempts,
+            'announcements' => $announcements,
+            'active'        => $activeAttempts,
+            'completed'     => $completedAttempts,
         ]);
     }
 
@@ -998,15 +1013,26 @@ class QuizController extends Controller
             ];
         }
 
+        $latestAnnouncement = $quiz->announcements()
+            ->where('is_active', true)
+            ->latest()
+            ->first();
+
         return response()->json([
-            'success'         => true,
-            'quiz_title'      => $quiz->title,
-            'session_status'  => $quiz->session_status ?? 'waiting',
-            'total_students'  => count($sanitizedLeaderboard),
-            'total_completed' => count(array_filter($sanitizedLeaderboard, fn($x) => $x['is_completed'])),
-            'total_questions' => $totalQuestions,
-            'time_limit'      => $quiz->time_limit_minutes,
-            'leaderboard'     => $sanitizedLeaderboard,
+            'success'             => true,
+            'quiz_title'          => $quiz->title,
+            'session_status'      => $quiz->session_status ?? 'waiting',
+            'total_students'      => count($sanitizedLeaderboard),
+            'total_completed'     => count(array_filter($sanitizedLeaderboard, fn($x) => $x['is_completed'])),
+            'total_questions'     => $totalQuestions,
+            'time_limit'          => $quiz->time_limit_minutes,
+            'leaderboard'         => $sanitizedLeaderboard,
+            'latest_announcement' => $latestAnnouncement ? [
+                'id'      => $latestAnnouncement->id,
+                'message' => $latestAnnouncement->message,
+                'type'    => $latestAnnouncement->type,
+                'time'    => $latestAnnouncement->created_at->format('H:i'),
+            ] : null,
         ]);
     }
 
@@ -1093,6 +1119,70 @@ class QuizController extends Controller
         }
 
         return back()->with('success', $msg);
+    }
+
+    public function broadcastAnnouncement(Request $request, Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+
+        $validated = $request->validate([
+            'message' => 'required|string|min:2|max:1000',
+            'type'    => ['required', 'string', Rule::in(['info', 'warning', 'urgent'])],
+        ], [
+            'message.required' => 'Pesan pengumuman tidak boleh kosong.',
+            'message.min'      => 'Pesan pengumuman minimal 2 karakter.',
+            'message.max'      => 'Pesan pengumuman maksimal 1000 karakter.',
+            'type.in'          => 'Tipe pengumuman tidak valid.',
+        ]);
+
+        $announcement = $quiz->announcements()->create([
+            'user_id'   => auth()->id(),
+            'message'   => trim($validated['message']),
+            'type'      => $validated['type'],
+            'is_active' => true,
+        ]);
+
+        // Invalidate cache so all students receive it on their next 3-second heartbeat
+        cache()->forget("quiz_{$quiz->id}_announcements");
+
+        $data = [
+            'id'               => $announcement->id,
+            'message'          => $announcement->message,
+            'type'             => $announcement->type,
+            'time'             => $announcement->created_at->format('H:i'),
+            'created_at_human' => $announcement->created_at->diffForHumans(),
+        ];
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success'      => true,
+                'message'      => 'Pengumuman berhasil disiarkan ke seluruh mahasiswa!',
+                'announcement' => $data,
+            ]);
+        }
+
+        return back()->with('success', 'Pengumuman berhasil disiarkan ke seluruh mahasiswa!');
+    }
+
+    public function destroyAnnouncement(Request $request, Quiz $quiz, QuizAnnouncement $announcement)
+    {
+        $this->authorizeQuiz($quiz);
+
+        if ($announcement->quiz_id !== $quiz->id) {
+            abort(404);
+        }
+
+        $announcement->delete();
+        cache()->forget("quiz_{$quiz->id}_announcements");
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pengumuman berhasil dihapus.',
+            ]);
+        }
+
+        return back()->with('success', 'Pengumuman berhasil dihapus.');
     }
 
     public function addTimeAttempt(Request $request, Quiz $quiz, QuizAttempt $attempt)

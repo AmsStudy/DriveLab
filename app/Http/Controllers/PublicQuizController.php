@@ -315,12 +315,33 @@ class PublicQuizController extends Controller
             }
         }
 
+        // Cached active announcements for instant broadcast with minimal DB queries
+        $announcements = cache()->remember("quiz_{$quiz->id}_announcements", 2, function () use ($quiz) {
+            return $quiz->announcements()
+                ->where('is_active', true)
+                ->latest()
+                ->take(10)
+                ->get()
+                ->map(fn($a) => [
+                    'id'               => $a->id,
+                    'message'          => $a->message,
+                    'type'             => $a->type,
+                    'time'             => $a->created_at->format('H:i'),
+                    'created_at_human' => $a->created_at->diffForHumans(),
+                ])
+                ->all();
+        });
+
+        $latestAnnouncement = !empty($announcements) ? $announcements[0] : null;
+
         return response()->json([
-            'status'             => 'active',
-            'is_ended'           => false,
-            'is_locked'          => (bool) $attempt->is_locked,
-            'time_remaining'     => $timeRemaining,
-            'extra_time_minutes' => (int) ($attempt->extra_time_minutes ?? 0),
+            'status'              => 'active',
+            'is_ended'            => false,
+            'is_locked'           => (bool) $attempt->is_locked,
+            'time_remaining'      => $timeRemaining,
+            'extra_time_minutes'  => (int) ($attempt->extra_time_minutes ?? 0),
+            'announcements'       => $announcements,
+            'latest_announcement' => $latestAnnouncement,
         ]);
     }
 
@@ -406,13 +427,28 @@ class PublicQuizController extends Controller
 
         $savedAnswers = $attempt->draft_answers ?? [];
 
+        $initialAnnouncements = $quiz->announcements()
+            ->where('is_active', true)
+            ->latest()
+            ->take(10)
+            ->get()
+            ->map(fn($a) => [
+                'id'               => $a->id,
+                'message'          => $a->message,
+                'type'             => $a->type,
+                'time'             => $a->created_at->format('H:i'),
+                'created_at_human' => $a->created_at->diffForHumans(),
+            ])
+            ->all();
+
         return view('quiz.play', compact(
             'quiz',
             'attempt',
             'clientQuestions',
             'timeRemaining',
             'penaltyRemainingSeconds',
-            'savedAnswers'
+            'savedAnswers',
+            'initialAnnouncements'
         ));
     }
 

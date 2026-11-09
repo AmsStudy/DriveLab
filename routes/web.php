@@ -136,6 +136,8 @@ Route::prefix('admin')
         Route::post('quizzes/{quiz}/session/start', [QuizController::class, 'startSession'])->name('quizzes.session.start');
         Route::post('quizzes/{quiz}/session/end', [QuizController::class, 'endSession'])->name('quizzes.session.end');
         Route::post('quizzes/{quiz}/session/reset', [QuizController::class, 'resetSession'])->name('quizzes.session.reset');
+        Route::post('quizzes/{quiz}/announcements', [QuizController::class, 'broadcastAnnouncement'])->name('quizzes.announcements.store');
+        Route::delete('quizzes/{quiz}/announcements/{announcement}', [QuizController::class, 'destroyAnnouncement'])->name('quizzes.announcements.destroy');
         Route::post('quizzes/{quiz}/attempts/{attempt}/add-time', [QuizController::class, 'addTimeAttempt'])->name('quizzes.attempts.add-time');
         Route::post('quizzes/{quiz}/attempts/{attempt}/force-submit', [QuizController::class, 'forceSubmitAttempt'])->name('quizzes.attempts.force-submit');
 

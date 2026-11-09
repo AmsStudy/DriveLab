@@ -121,6 +121,11 @@ class Quiz extends Model
         return $this->hasMany(QuizAttempt::class);
     }
 
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(QuizAnnouncement::class)->latest();
+    }
+
     public function totalPoints(): int
     {
         return (int) $this->questions()->sum('points');
