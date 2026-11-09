@@ -1456,7 +1456,7 @@ footer{
                         <div>
                             <strong style="color:var(--emerald);">Data Tugas Sebelumnya Ditemukan</strong>
                             <div id="existing-submission-info" style="color:var(--text2);font-size:12px;margin-top:2px;"></div>
-                            <div style="font-size:11px;color:var(--text3);margin-top:2px;">Kirimkan kembali form di bawah ini jika ingin mengganti/memperbarui versi tugas Anda.</div>
+                            <div style="font-size:11px;color:#EF4444;margin-top:3px;font-weight:600;">⚠️ Perhatian: Pengiriman ulang akan menimpa dan menggantikan seluruh berkas sebelumnya.</div>
                         </div>
                     </div>
 
@@ -1881,8 +1881,11 @@ function renderSelectedFilesUI() {
 
 // ─── Real-time Submission Check & Auto-Remember ───
 let checkNimTimeout = null;
+let currentExistingSubmission = null;
+
 function checkExistingSubmission(nim) {
     if (!nim || nim.length < 3) {
+        currentExistingSubmission = null;
         const banner = document.getElementById('existing-submission-banner');
         if (banner) banner.style.display = 'none';
         btnLabel.textContent = 'Kirim Tugas Sekarang';
@@ -1898,6 +1901,8 @@ function checkExistingSubmission(nim) {
         const banner = document.getElementById('existing-submission-banner');
         const info = document.getElementById('existing-submission-info');
         if (data && data.has_submitted) {
+            data.nim = nim;
+            currentExistingSubmission = data;
             if (banner) banner.style.display = 'flex';
             if (info) {
                 const subTipe = data.submission_type === 'link' ? 'Tautan' : (data.submission_type === 'text' ? 'Jawaban Teks' : 'Berkas File');
@@ -1910,6 +1915,7 @@ function checkExistingSubmission(nim) {
             }
             btnLabel.textContent = 'Perbarui Tugas Sekarang';
         } else {
+            currentExistingSubmission = null;
             if (banner) banner.style.display = 'none';
             btnLabel.textContent = 'Kirim Tugas Sekarang';
         }
@@ -2080,6 +2086,78 @@ document.getElementById('submission-form').addEventListener('submit', async func
         if (!textVal) {
             showAlert('error', 'Silakan ketikkan jawaban teks terlebih dahulu.');
             return;
+        }
+    }
+
+    // ─── Konfirmasi Pengumpulan Ulang (Peringatan Timpa Berkas) ───
+    let existingData = (currentExistingSubmission && currentExistingSubmission.has_submitted && currentExistingSubmission.nim === nimVal)
+        ? currentExistingSubmission
+        : null;
+
+    if (!existingData && nimVal.length === 11) {
+        try {
+            const checkUrl = '{{ route('soal.checkSubmission', ['token' => $soal->slug ?: $soal->unique_token], false) }}?nim=' + encodeURIComponent(nimVal);
+            const r = await fetch(checkUrl, { headers: { 'Accept': 'application/json' } });
+            const res = await r.json();
+            if (res && res.has_submitted) {
+                res.nim = nimVal;
+                existingData = res;
+                currentExistingSubmission = res;
+            }
+        } catch (err) {}
+    }
+
+    if (existingData && existingData.has_submitted) {
+        const isDark = document.documentElement.classList.contains('dark');
+        const prevTime = existingData.submitted_at || '-';
+        const prevId = existingData.identifier || 'berkas sebelumnya';
+        const studentLabel = existingData.nama ? `${existingData.nama} (${nimVal})` : `NIM ${nimVal}`;
+
+        if (window.Swal) {
+            const confirmResult = await Swal.fire({
+                icon: 'warning',
+                title: 'Konfirmasi Pengumpulan Ulang',
+                html: `
+                    <div style="text-align: left; font-size: 13px; line-height: 1.6; color: ${isDark ? '#E5E7EB' : '#374151'};">
+                        <p style="margin-bottom: 8px;">
+                            Mahasiswa atas nama <strong>${studentLabel}</strong> terdeteksi <strong>sudah pernah mengumpulkan tugas</strong> sebelumnya:
+                        </p>
+                        <div style="background: ${isDark ? 'rgba(255,255,255,0.05)' : '#F3F4F6'}; border: 1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}; padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; font-family: monospace; font-size: 12px;">
+                            <div style="margin-bottom: 4px;">📅 Waktu: <strong style="color: ${isDark ? '#34D399' : '#059669'};">${prevTime}</strong></div>
+                            <div>📦 Berkas: <strong style="color: ${isDark ? '#FCD34D' : '#D97706'};">${prevId}</strong></div>
+                        </div>
+                        <div style="background: ${isDark ? 'rgba(239, 68, 68, 0.15)' : '#FEF2F2'}; border-left: 4px solid #EF4444; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; color: ${isDark ? '#FCA5A5' : '#B91C1C'};">
+                            <strong style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">⚠️ PERINGATAN TIMPA BERKAS:</strong>
+                            Pengunggahan baru ini akan <strong>menimpa & menghapus seluruh berkas lama Anda</strong> secara permanen. Pastikan berkas yang Anda pilih saat ini sudah lengkap.
+                        </div>
+                        <p style="margin-bottom: 0;">Apakah Anda yakin ingin mengganti berkas lama dengan pengumpulan baru ini?</p>
+                    </div>
+                `,
+                background: isDark ? '#0F1713' : '#FFFFFF',
+                color: isDark ? '#F3F4F6' : '#111827',
+                backdrop: isDark ? 'rgba(9, 13, 11, 0.8)' : 'rgba(0, 0, 0, 0.5)',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Timpa & Kirim Sekarang',
+                cancelButtonText: 'Batal / Periksa Kembali',
+                focusCancel: true,
+                confirmButtonColor: '#EF4444',
+                cancelButtonColor: '#6B7280',
+                customClass: {
+                    popup: 'cyber-swal-popup border border-amber-500/40 rounded-2xl shadow-2xl',
+                    title: 'text-lg font-extrabold text-amber-500',
+                    confirmButton: 'px-5 py-2.5 rounded-xl font-bold text-sm shadow-md',
+                    cancelButton: 'px-5 py-2.5 rounded-xl font-medium text-sm'
+                }
+            });
+
+            if (!confirmResult.isConfirmed) {
+                return; // Batalkan kirim, beri kesempatan mahasiswa periksa berkasnya
+            }
+        } else {
+            const confirmed = confirm(`PERINGATAN TIMPA BERKAS:\n\nNIM ${nimVal} sudah pernah mengumpulkan tugas sebelumnya (${prevId} pada ${prevTime}).\n\nPengunggahan baru ini akan MENIMPA dan MENGGANTIKAN seluruh berkas lama Anda.\n\nApakah Anda yakin ingin melanjutkan?`);
+            if (!confirmed) {
+                return;
+            }
         }
     }
 

@@ -589,9 +589,11 @@ class SoalAccessController extends Controller
 
         return response()->json([
             'has_submitted'   => true,
+            'nim'             => $existing->nim,
             'nama'            => $existing->nama,
             'kelas'           => $existing->kelas,
             'submission_type' => $existing->submission_type,
+            'files_count'     => $existing->getFilesCount(),
             'identifier'      => $identifier,
             'submitted_at'    => $existing->updated_at ? $existing->updated_at->format('d M Y, H:i') : $existing->created_at->format('d M Y, H:i'),
         ]);
