@@ -139,6 +139,30 @@ html:not(.dark) .custom-cyber-menu-item.is-selected {
   border-color: rgba(16, 185, 129, 0.3) !important;
 }
 
+html:not(.dark) .instr-box {
+  background: #EFF6FF !important;
+  border-color: #BFDBFE !important;
+  color: #1E3A8A !important;
+}
+html:not(.dark) .instr-box strong {
+  color: #1D4ED8 !important;
+}
+html:not(.dark) .instr-box svg {
+  color: #2563EB !important;
+  opacity: 1 !important;
+}
+html:not(.dark) .deadline-passed-notice.preview-notice {
+  background: #EFF6FF !important;
+  border-color: #BFDBFE !important;
+  color: #1E40AF !important;
+}
+html:not(.dark) .custom-cyber-trigger .trigger-text {
+  color: #000000 !important;
+}
+html:not(.dark) .custom-cyber-trigger .trigger-chevron {
+  color: #059669 !important;
+}
+
 html:not(.dark) .cyber-swal-popup {
   background: rgba(255, 255, 255, 0.98) !important;
   border-color: #E2EAE5 !important;
@@ -1406,7 +1430,7 @@ footer{
                 @endif
 
                 @if(isset($isAdminPreview) && $isAdminPreview)
-                    <div class="deadline-passed-notice" style="border-color:rgba(59,130,246,0.25);color:#93C5FD;">
+                    <div class="deadline-passed-notice preview-notice" style="border-color:rgba(59,130,246,0.25);color:var(--blue);">
                         Mode preview admin — pengumpulan tugas tidak tersedia.
                     </div>
                 @elseif($isDeadlinePassed)
@@ -1414,7 +1438,7 @@ footer{
                         Maaf, batas waktu pengumpulan tugas telah berakhir.
                     </div>
                 @else
-                    <div class="instr-box" style="margin-bottom:16px;border-color:rgba(59,130,246,0.25);background:rgba(59,130,246,0.06);">
+                    <div class="instr-box" style="margin-bottom:16px;">
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
@@ -1458,7 +1482,6 @@ footer{
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                                     </svg>
                                 </div>
-                                <p id="sub_nim_hint" style="font-size:11px;margin-top:5px;display:none;"></p>
                             </div>
                             <div class="field-group">
                                 <label class="field-label">
@@ -1513,7 +1536,7 @@ footer{
                                             @click="open = !open" 
                                             class="custom-cyber-trigger"
                                             :class="{ 'is-open': open }">
-                                        <span class="trigger-text" x-text="selectedLabel" :style="selected ? 'color:#F1EEF6;font-weight:600;' : 'color:var(--text3);'"></span>
+                                        <span class="trigger-text font-medium" x-text="selectedLabel" :style="selected ? 'color:var(--text1);font-weight:600;' : 'color:var(--text3);'"></span>
                                         <svg class="trigger-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/>
                                         </svg>
@@ -1677,8 +1700,6 @@ footer{
                             </div>
                         @endif
 
-                        <div class="alert" id="sub-alert"></div>
-
                         <button type="submit" class="btn-submit" id="sub-btn">
                             <span id="btn-label">Kirim Tugas Sekarang</span>
                             <svg id="btn-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -1717,7 +1738,7 @@ document.addEventListener('keydown', e => {
 // ─── Polling: reload if admin changes access/download status ───
 @if(!isset($isAdminPreview) || !$isAdminPreview)
 setInterval(() => {
-    fetch('{{ route('soal.status', $soal->slug ?: $soal->unique_token) }}')
+    fetch('{{ route('soal.status', $soal->slug ?: $soal->unique_token, false) }}')
         .then(r => r.json())
         .then(data => {
             if (data.access_status !== 'active') {
@@ -1739,7 +1760,6 @@ const fileInput    = document.getElementById('sub_file');
 const dzEmpty      = document.getElementById('dz-empty');
 const dzSuccess    = document.getElementById('dz-success');
 const dzFilename   = document.getElementById('dz-filename');
-const subAlert     = document.getElementById('sub-alert');
 const subBtn       = document.getElementById('sub-btn');
 const btnLabel     = document.getElementById('btn-label');
 const subTypeInput = document.getElementById('sub_type');
@@ -1756,13 +1776,14 @@ function switchSubmissionType(type) {
 
 function showAlert(type, msg) {
     if (window.Swal) {
+        const isDark = document.documentElement.classList.contains('dark');
         Swal.fire({
             icon: type === 'success' ? 'success' : 'error',
             title: type === 'success' ? 'Tugas Berhasil Terkirim!' : 'Perhatian',
             text: msg,
-            background: '#0F1713',
-            color: '#F3F4F6',
-            backdrop: 'rgba(9, 13, 11, 0.75)',
+            background: isDark ? '#0F1713' : '#FFFFFF',
+            color: isDark ? '#F3F4F6' : '#111827',
+            backdrop: isDark ? 'rgba(9, 13, 11, 0.75)' : 'rgba(0, 0, 0, 0.45)',
             confirmButtonText: 'Oke, Mengerti',
             customClass: {
                 popup: 'cyber-swal-popup ' + (type === 'success' ? 'cyber-swal-success' : 'cyber-swal-error'),
@@ -1771,12 +1792,8 @@ function showAlert(type, msg) {
                 confirmButton: 'cyber-swal-btn ' + (type === 'success' ? 'cyber-swal-btn-success' : 'cyber-swal-btn-error')
             }
         });
-    }
-    if (subAlert) {
-        subAlert.className = 'alert alert-' + type;
-        subAlert.textContent = msg;
-        subAlert.style.display = 'block';
-        setTimeout(() => { if (subAlert) subAlert.style.display = 'none'; }, 6000);
+    } else {
+        alert(msg);
     }
 }
 
@@ -1797,11 +1814,19 @@ function handleFilesSelected(incomingFiles) {
         return;
     }
 
+    let totalBytes = 0;
     for (let f of list) {
+        totalBytes += f.size;
         if (f.size > 10 * 1024 * 1024) {
-            showAlert('error', `Berkas "${f.name}" (${formatFileSize(f.size)}) melebihi batas maksimal 10 MB!`);
+            showAlert('error', `Berkas "${f.name}" (${formatFileSize(f.size)}) melebihi batas maksimal 10 MB per berkas!`);
             return;
         }
+    }
+
+    const maxTotalBytes = 35 * 1024 * 1024;
+    if (totalBytes > maxTotalBytes) {
+        showAlert('error', `Total ukuran seluruh berkas (${formatFileSize(totalBytes)}) melebihi batas aman maksimal 35 MB. Silakan kompres atau pilih berkas yang lebih ringkas.`);
+        return;
     }
 
     selectedFiles = list;
@@ -1864,7 +1889,7 @@ function checkExistingSubmission(nim) {
         return;
     }
 
-    const checkUrl = '{{ route('soal.checkSubmission', ['token' => $soal->slug ?: $soal->unique_token]) }}?nim=' + encodeURIComponent(nim);
+    const checkUrl = '{{ route('soal.checkSubmission', ['token' => $soal->slug ?: $soal->unique_token], false) }}?nim=' + encodeURIComponent(nim);
     fetch(checkUrl, {
         headers: { 'Accept': 'application/json' }
     })
@@ -1907,7 +1932,6 @@ document.addEventListener('DOMContentLoaded', function() {
         inputEl.value = inputEl.value.replace(/\D/g, '').slice(0, 11);
         const len = inputEl.value.length;
         const badge = document.getElementById('sub_nim_badge');
-        const hint = document.getElementById('sub_nim_hint');
         if (badge) {
             badge.textContent = `${len}/11 digit`;
             if (len === 11) {
@@ -1916,19 +1940,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 badge.style.color = '#F59E0B';
             } else {
                 badge.style.color = 'var(--text3)';
-            }
-        }
-        if (hint) {
-            if (len === 11) {
-                hint.textContent = '✓ Format NIM valid (11 digit)';
-                hint.style.color = '#10B981';
-                hint.style.display = 'block';
-            } else if (len > 0) {
-                hint.textContent = `⚠️ Masukkan ${11 - len} digit lagi (harus tepat 11 digit angka 0-9)`;
-                hint.style.color = '#F59E0B';
-                hint.style.display = 'block';
-            } else {
-                hint.style.display = 'none';
             }
         }
     }
@@ -2084,15 +2095,15 @@ document.getElementById('submission-form').addEventListener('submit', async func
         }
     }
     setLoading(true);
-    subAlert.style.display = 'none';
 
     const activeCsrfToken = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
-    const submitUrl = '{{ route('soal.submitTask', ['token' => $soal->slug ?: $soal->unique_token]) }}';
+    const submitUrl = '{{ route('soal.submitTask', ['token' => $soal->slug ?: $soal->unique_token], false) }}';
 
     const xhr = new XMLHttpRequest();
     xhr.open('POST', submitUrl, true);
     xhr.setRequestHeader('X-CSRF-TOKEN', activeCsrfToken);
     xhr.setRequestHeader('Accept', 'application/json');
+    xhr.timeout = 180000; // 3 menit batas waktu maksimal unggahan
 
     if (xhr.upload && currentType === 'file') {
         xhr.upload.onprogress = function(e) {
@@ -2162,9 +2173,18 @@ document.getElementById('submission-form').addEventListener('submit', async func
         }
     };
 
+    xhr.ontimeout = function() {
+        setLoading(false);
+        showAlert('error', 'Waktu pengunggahan habis (timeout). Silakan periksa koneksi jaringan atau perkecil ukuran berkas.');
+    };
+
     xhr.onerror = function() {
         setLoading(false);
-        showAlert('error', 'Terjadi kesalahan jaringan atau koneksi terputus.');
+        if (!navigator.onLine) {
+            showAlert('error', 'Koneksi internet Anda terputus. Mohon periksa kembali sambungan jaringan/Wi-Fi Anda.');
+        } else {
+            showAlert('error', 'Gagal menghubungi server. Kemungkinan ukuran berkas melebihi kapasitas server atau koneksi terputus. Silakan coba beberapa saat lagi.');
+        }
     };
 
     xhr.send(formData);
@@ -2172,7 +2192,7 @@ document.getElementById('submission-form').addEventListener('submit', async func
 
 // Auto refresh CSRF token periodically while viewing task
 setInterval(() => {
-    fetch('{{ Route::has('csrf.refresh') ? route('csrf.refresh') : url('/csrf-refresh') }}')
+    fetch('{{ Route::has('csrf.refresh') ? route('csrf.refresh', [], false) : '/csrf-refresh' }}')
         .then(r => r.json())
         .then(data => {
             if (data && data.csrf_token) {
