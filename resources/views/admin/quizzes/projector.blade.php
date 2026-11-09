@@ -15,7 +15,7 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #060A08;
+            background-color: #050806;
             color: #F3F4F6;
             overflow-x: hidden;
         }
@@ -23,48 +23,158 @@
             font-family: 'Outfit', sans-serif;
         }
 
-        /* ─── STADIUM & ESPORTS GLOW EFFECTS ─── */
-        .glow-gold {
-            box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.45), 0 0 15px rgba(245, 158, 11, 0.2), inset 0 0 15px rgba(245, 158, 11, 0.2);
+        /* ─── 3D EMBOSSED METALLIC TYPOGRAPHY ─── */
+        .text-gold-3d {
+            background: linear-gradient(180deg, #FFFDF0 0%, #FDE047 30%, #F59E0B 65%, #92400E 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 10px rgba(245, 158, 11, 0.7));
         }
-        .glow-silver {
-            box-shadow: 0 0 30px -5px rgba(56, 189, 248, 0.35), 0 0 15px rgba(148, 163, 184, 0.2), inset 0 0 15px rgba(148, 163, 184, 0.15);
+        .text-silver-3d {
+            background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 30%, #94A3B8 65%, #334155 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 10px rgba(148, 163, 184, 0.7));
         }
-        .glow-bronze {
-            box-shadow: 0 0 30px -5px rgba(249, 115, 22, 0.35), 0 0 15px rgba(217, 119, 6, 0.2), inset 0 0 15px rgba(217, 119, 6, 0.15);
-        }
-
-        /* ─── PEDESTAL GLASS GRADIENTS ─── */
-        .pedestal-gold {
-            background: linear-gradient(180deg, rgba(245, 158, 11, 0.25) 0%, rgba(180, 83, 9, 0.2) 30%, rgba(15, 23, 19, 0.95) 100%);
-            border-top: 3px solid #FCD34D;
-            border-left: 1px solid rgba(245, 158, 11, 0.4);
-            border-right: 1px solid rgba(245, 158, 11, 0.4);
-        }
-        .pedestal-silver {
-            background: linear-gradient(180deg, rgba(56, 189, 248, 0.2) 0%, rgba(51, 65, 85, 0.25) 30%, rgba(15, 23, 19, 0.95) 100%);
-            border-top: 3px solid #94A3B8;
-            border-left: 1px solid rgba(148, 163, 184, 0.35);
-            border-right: 1px solid rgba(148, 163, 184, 0.35);
-        }
-        .pedestal-bronze {
-            background: linear-gradient(180deg, rgba(249, 115, 22, 0.2) 0%, rgba(124, 45, 18, 0.25) 30%, rgba(15, 23, 19, 0.95) 100%);
-            border-top: 3px solid #F97316;
-            border-left: 1px solid rgba(249, 115, 22, 0.35);
-            border-right: 1px solid rgba(249, 115, 22, 0.35);
+        .text-bronze-3d {
+            background: linear-gradient(180deg, #FFF7ED 0%, #FDBA74 30%, #EA580C 65%, #7C2D12 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 10px rgba(234, 88, 12, 0.7));
         }
 
-        /* ─── CARD HOVER & SHADOWS ─── */
-        .challenger-card {
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        /* ─── ROTATING SUNBURST HALO BEHIND CHAMPION ─── */
+        @keyframes spinHalo {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        .challenger-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.2);
-            border-color: rgba(16, 185, 129, 0.5);
+        .halo-spin-gold {
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(245, 158, 11, 0.45) 60deg, transparent 120deg, rgba(245, 158, 11, 0.45) 180deg, transparent 240deg, rgba(245, 158, 11, 0.45) 300deg, transparent 360deg);
+            animation: spinHalo 10s linear infinite;
+        }
+        .halo-spin-silver {
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(56, 189, 248, 0.35) 90deg, transparent 180deg, rgba(56, 189, 248, 0.35) 270deg, transparent 360deg);
+            animation: spinHalo 14s linear infinite;
+        }
+        .halo-spin-bronze {
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(249, 115, 22, 0.35) 90deg, transparent 180deg, rgba(249, 115, 22, 0.35) 270deg, transparent 360deg);
+            animation: spinHalo 14s linear infinite reverse;
         }
 
-        /* ─── TICKER MARQUEE ANIMATION ─── */
+        /* ─── FLOATING BOUNCE FOR CROWN ─── */
+        @keyframes floatBounce {
+            0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+            50% { transform: translateY(-7px) scale(1.05) rotate(2deg); }
+        }
+        .animate-float {
+            animation: floatBounce 2.5s ease-in-out infinite;
+        }
+
+        /* ─── RUNNING LASER BEAM ON PEDESTAL RIMS ─── */
+        @keyframes laserRun {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(200%); }
+        }
+        .laser-glow {
+            position: relative;
+            overflow: hidden;
+        }
+        .laser-glow::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 40%; height: 2px;
+            background: linear-gradient(90deg, transparent, #FFFFFF, transparent);
+            animation: laserRun 2.8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        /* ─── VOLUMETRIC ARENA SPOTLIGHTS ─── */
+        @keyframes spotlightLeft {
+            0%, 100% { transform: rotate(-22deg); }
+            50% { transform: rotate(-8deg); }
+        }
+        @keyframes spotlightRight {
+            0%, 100% { transform: rotate(22deg); }
+            50% { transform: rotate(8deg); }
+        }
+        .spotlight-left {
+            position: absolute;
+            top: -120px;
+            left: 20%;
+            width: 320px;
+            height: 750px;
+            background: linear-gradient(180deg, rgba(245, 158, 11, 0.16) 0%, rgba(245, 158, 11, 0.05) 50%, transparent 85%);
+            clip-path: polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%);
+            transform-origin: top center;
+            animation: spotlightLeft 9s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .spotlight-right {
+            position: absolute;
+            top: -120px;
+            right: 20%;
+            width: 320px;
+            height: 750px;
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.05) 50%, transparent 85%);
+            clip-path: polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%);
+            transform-origin: top center;
+            animation: spotlightRight 9s ease-in-out infinite 1.5s;
+            pointer-events: none;
+        }
+
+        /* ─── HOLOGRAPHIC SCANNER FOR EMPTY SLOTS ─── */
+        @keyframes holoScan {
+            0% { transform: translateY(-100%); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(200%); opacity: 0; }
+        }
+        .holo-scanline {
+            animation: holoScan 2.4s ease-in-out infinite;
+        }
+
+        /* ─── ENERGY PULSE FOR PROGRESS BARS ─── */
+        @keyframes energyPulse {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 3px rgba(245, 158, 11, 0.4)); }
+            50% { filter: brightness(1.3) drop-shadow(0 0 8px rgba(245, 158, 11, 0.8)); }
+        }
+        .energy-gold {
+            background: linear-gradient(90deg, #D97706 0%, #F59E0B 40%, #FEF08A 70%, #10B981 100%);
+            animation: energyPulse 2s ease-in-out infinite;
+        }
+        .energy-silver {
+            background: linear-gradient(90deg, #475569 0%, #38BDF8 40%, #A5F3FC 70%, #10B981 100%);
+            animation: energyPulse 2.2s ease-in-out infinite;
+        }
+        .energy-bronze {
+            background: linear-gradient(90deg, #7C2D12 0%, #EA580C 40%, #FED7AA 70%, #10B981 100%);
+            animation: energyPulse 2.2s ease-in-out infinite;
+        }
+
+        /* ─── CYBER PEDESTAL STYLING ─── */
+        .pedestal-gold-cyber {
+            background: linear-gradient(180deg, rgba(245, 158, 11, 0.28) 0%, rgba(146, 64, 14, 0.2) 30%, rgba(10, 16, 13, 0.98) 100%);
+            border-top: 3px solid #FDE047;
+            border-left: 1px solid rgba(245, 158, 11, 0.45);
+            border-right: 1px solid rgba(245, 158, 11, 0.45);
+            box-shadow: 0 0 40px -5px rgba(245, 158, 11, 0.35), inset 0 0 25px rgba(245, 158, 11, 0.15);
+        }
+        .pedestal-silver-cyber {
+            background: linear-gradient(180deg, rgba(56, 189, 248, 0.22) 0%, rgba(51, 65, 85, 0.22) 30%, rgba(10, 16, 13, 0.98) 100%);
+            border-top: 3px solid #38BDF8;
+            border-left: 1px solid rgba(148, 163, 184, 0.4);
+            border-right: 1px solid rgba(148, 163, 184, 0.4);
+            box-shadow: 0 0 30px -5px rgba(56, 189, 248, 0.25), inset 0 0 20px rgba(56, 189, 248, 0.1);
+        }
+        .pedestal-bronze-cyber {
+            background: linear-gradient(180deg, rgba(249, 115, 22, 0.22) 0%, rgba(124, 45, 18, 0.22) 30%, rgba(10, 16, 13, 0.98) 100%);
+            border-top: 3px solid #FB923C;
+            border-left: 1px solid rgba(249, 115, 22, 0.4);
+            border-right: 1px solid rgba(249, 115, 22, 0.4);
+            box-shadow: 0 0 30px -5px rgba(249, 115, 22, 0.25), inset 0 0 20px rgba(249, 115, 22, 0.1);
+        }
+
+        /* ─── TICKER & EQUALIZER ─── */
         @keyframes marquee {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -72,68 +182,62 @@
         .animate-marquee {
             display: inline-block;
             white-space: nowrap;
-            animation: marquee 28s linear infinite;
+            animation: marquee 26s linear infinite;
         }
         .animate-marquee:hover {
             animation-play-state: paused;
         }
 
-        /* ─── SHIMMER SWEEP ANIMATION ─── */
-        @keyframes sweep {
-            0% { transform: translateX(-100%); }
-            50%, 100% { transform: translateX(200%); }
-        }
-        .shimmer-sweep {
-            position: relative;
-            overflow: hidden;
-        }
-        .shimmer-sweep::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
-            animation: sweep 3.5s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-        /* ─── SOUND EQUALIZER ANIMATION ─── */
         @keyframes eqBar {
             0%, 100% { height: 4px; }
             50% { height: 14px; }
         }
-        .eq-bar-1 { animation: eqBar 0.8s ease-in-out infinite; }
-        .eq-bar-2 { animation: eqBar 0.6s ease-in-out infinite 0.2s; }
-        .eq-bar-3 { animation: eqBar 0.9s ease-in-out infinite 0.4s; }
+        .eq-bar-1 { animation: eqBar 0.7s ease-in-out infinite; }
+        .eq-bar-2 { animation: eqBar 0.5s ease-in-out infinite 0.2s; }
+        .eq-bar-3 { animation: eqBar 0.8s ease-in-out infinite 0.4s; }
+
+        /* ─── CHALLENGER CARDS HOVER ─── */
+        .challenger-card {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .challenger-card:hover {
+            transform: translateY(-3px) scale(1.01);
+            border-color: rgba(16, 185, 129, 0.6);
+            box-shadow: 0 10px 25px -4px rgba(16, 185, 129, 0.25);
+        }
     </style>
 </head>
-<body x-data="projectorArena()" x-init="initArena()" class="min-h-screen flex flex-col justify-between select-none relative bg-[#060A08] text-gray-100 antialiased">
+<body x-data="projectorArena()" x-init="initArena()" class="min-h-screen flex flex-col justify-between select-none relative bg-[#050806] text-gray-100 antialiased overflow-x-hidden">
 
-    {{-- Canvas Partikel Confetti (Offline Native Canvas) --}}
-    <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full"></canvas>
+    {{-- Canvas Partikel Ambient & Confetti (Offline Native 60fps Canvas) --}}
+    <canvas id="arena-canvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full"></canvas>
 
-    {{-- Background Ambient Lighting & Cyber Arena Mesh --}}
+    {{-- Volumetric Stage Spotlights --}}
+    <div class="spotlight-left"></div>
+    <div class="spotlight-right"></div>
+
+    {{-- Background Ambient Cyber Glow & Floor Mesh --}}
     <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {{-- Stadium Spotlight Atas --}}
-        <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-gradient-to-b from-emerald-500/15 via-amber-500/10 to-transparent blur-3xl rounded-full opacity-70"></div>
-        {{-- Left Blue Ambient --}}
-        <div class="absolute top-1/4 -left-48 w-96 h-96 bg-cyan-500/10 blur-3xl rounded-full"></div>
-        {{-- Right Gold Ambient --}}
-        <div class="absolute top-1/4 -right-48 w-96 h-96 bg-amber-500/10 blur-3xl rounded-full"></div>
+        {{-- Stadium Central Dome Glow --}}
+        <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[1100px] h-[550px] bg-gradient-to-b from-amber-500/15 via-emerald-500/10 to-transparent blur-3xl rounded-full opacity-80"></div>
+        {{-- Ambient Corner Lights --}}
+        <div class="absolute top-1/3 -left-48 w-[450px] h-[450px] bg-cyan-500/12 blur-3xl rounded-full"></div>
+        <div class="absolute top-1/3 -right-48 w-[450px] h-[450px] bg-amber-500/12 blur-3xl rounded-full"></div>
         {{-- Floor Grid Perspective Mesh --}}
-        <div class="absolute inset-0 opacity-25"
-             style="background-image: linear-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(16, 185, 129, 0.08) 1px, transparent 1px); background-size: 36px 36px;">
+        <div class="absolute inset-0 opacity-20"
+             style="background-image: linear-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(16, 185, 129, 0.1) 1px, transparent 1px); background-size: 38px 38px;">
         </div>
         {{-- Bottom Vignette --}}
-        <div class="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#060A08] to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#050806] via-[#050806]/80 to-transparent"></div>
     </div>
 
     {{-- ========================================================================= --}}
     {{-- TOP NAVBAR / HUD HEADER BAR                                               --}}
     {{-- ========================================================================= --}}
-    <header class="relative z-20 border-b border-[#1A2820]/90 bg-[#090F0C]/90 backdrop-blur-xl px-4 sm:px-8 py-3 flex items-center justify-between gap-4 shadow-xl">
+    <header class="relative z-20 border-b border-[#1A2820]/90 bg-[#090F0C]/90 backdrop-blur-xl px-4 sm:px-8 py-3 flex items-center justify-between gap-4 shadow-2xl">
         {{-- Left: Live Arena Title & Dynamic Status --}}
         <div class="flex items-center gap-3.5 min-w-0">
-            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 via-emerald-600 to-teal-700 flex items-center justify-center text-xl shadow-lg shadow-emerald-950/50 shrink-0 border border-white/20">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 via-emerald-600 to-teal-700 flex items-center justify-center text-xl shadow-lg shadow-emerald-950/60 shrink-0 border border-white/20">
                 🏆
             </div>
             <div class="min-w-0">
@@ -161,7 +265,7 @@
         </div>
 
         {{-- Center: Stats HUD Metrics Badges --}}
-        <div class="hidden lg:flex items-center gap-3 bg-black/40 px-4 py-1.5 rounded-2xl border border-white/10">
+        <div class="hidden lg:flex items-center gap-3 bg-black/50 px-4 py-1.5 rounded-2xl border border-white/10 shadow-inner">
             <div class="flex items-center gap-2 px-2">
                 <span class="text-base">👥</span>
                 <div class="text-left">
@@ -199,6 +303,14 @@
 
         {{-- Right: Quick Interactive Controls --}}
         <div class="flex items-center gap-2 shrink-0">
+            {{-- Celebrate Button (Manual Hype Confetti Burst) --}}
+            <button type="button" @click="celebrateHype()"
+                    class="px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold transition-all flex items-center gap-1 hover:scale-105 active:scale-95 shadow-sm"
+                    title="Picu Ledakan Konfeti & Selebrasi Musik Arena">
+                <span>🎉</span>
+                <span class="hidden sm:inline">Selebrasi</span>
+            </button>
+
             {{-- Link back to monitor --}}
             <a href="{{ route('admin.quizzes.monitor', $quiz) }}"
                class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-bold transition-all flex items-center gap-1.5 hover:scale-105 active:scale-95"
@@ -278,34 +390,41 @@
             {{-- ZONE 1: THE GRAND CHAMPIONS PODIUM (TOP 3 ESPORTS ARENA)          --}}
             {{-- ================================================================= --}}
             <div class="relative pt-2 pb-1">
-                {{-- Stage Spotlight Aura Behind Top 1 --}}
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-                <div class="grid grid-cols-3 gap-2 sm:gap-6 items-end max-w-4xl mx-auto relative z-10">
+                <div class="grid grid-cols-3 gap-2.5 sm:gap-6 items-end max-w-4xl mx-auto relative z-10">
 
                     {{-- 🥈 RANK #2: SILVER (LEFT) --}}
                     <div class="flex flex-col items-center">
                         <template x-if="leaderboard.length >= 2">
                             <div class="w-full flex flex-col items-center transition-all duration-500">
-                                {{-- Avatar & Medal --}}
-                                <div class="relative mb-2">
-                                    <div class="w-14 sm:w-20 h-14 sm:h-20 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-cyan-300 via-slate-300 to-slate-500 p-1 glow-silver flex items-center justify-center shadow-xl">
-                                        <div class="w-full h-full rounded-xl sm:rounded-2xl bg-[#0D1512] flex items-center justify-center font-black text-lg sm:text-2xl text-cyan-200">
+                                
+                                {{-- Silver Avatar & Aura --}}
+                                <div class="relative mb-2 flex flex-col items-center">
+                                    {{-- Rotating Cyan Halo --}}
+                                    <div class="absolute -inset-2.5 rounded-full halo-spin-silver blur-xs opacity-60 pointer-events-none"></div>
+
+                                    {{-- Avatar Shield --}}
+                                    <div class="w-16 sm:w-22 h-16 sm:h-22 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-cyan-300 via-slate-300 to-slate-500 p-1 shadow-[0_0_25px_rgba(56,189,248,0.4)] flex items-center justify-center relative z-10">
+                                        <div class="w-full h-full rounded-xl sm:rounded-2xl bg-[#0B1410] flex items-center justify-center font-mono font-black text-xl sm:text-2xl text-cyan-200">
                                             <span x-text="getInitials(leaderboard[1].student_name)"></span>
                                         </div>
                                     </div>
-                                    <span class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-slate-200 to-cyan-300 text-slate-950 border border-white shadow-md">
-                                        🥈 #2
-                                    </span>
+
+                                    {{-- Silver Badge Pill --}}
+                                    <div class="mt-2 relative z-10">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-slate-200 via-cyan-200 to-slate-300 text-slate-950 border border-white shadow-md">
+                                            🥈 #2 RUNNER-UP
+                                        </span>
+                                    </div>
                                 </div>
 
                                 {{-- Name & Info --}}
-                                <div class="text-center w-full px-1 mb-2.5 mt-1">
-                                    <div class="font-extrabold text-white text-xs sm:text-base truncate heading-font tracking-tight" x-text="leaderboard[1].student_name"></div>
-                                    <div class="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs text-cyan-300/80 font-semibold truncate mt-0.5">
+                                <div class="text-center w-full px-1 mb-2.5">
+                                    <div class="font-black text-white text-xs sm:text-base truncate heading-font tracking-tight" x-text="leaderboard[1].student_name"></div>
+                                    <div class="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs text-cyan-300 font-semibold truncate mt-0.5">
                                         <span x-text="'Kelas ' + (leaderboard[1].kelas || '-')"></span>
                                         <span>&bull;</span>
-                                        <span :class="leaderboard[1].is_completed ? 'text-emerald-400 font-bold' : 'text-gray-400'"
+                                        <span :class="leaderboard[1].is_completed ? 'text-emerald-400 font-bold' : 'text-cyan-200'"
                                               x-text="leaderboard[1].is_completed ? '🏁 Selesai' : (leaderboard[1].answered_count + '/' + leaderboard[1].total_questions)"></span>
                                     </div>
                                     
@@ -317,32 +436,44 @@
                                     </div>
                                 </div>
 
-                                {{-- Silver Pedestal Base --}}
-                                <div class="w-full h-32 sm:h-44 rounded-t-2xl sm:rounded-t-3xl pedestal-silver p-3 sm:p-4 flex flex-col justify-between text-center relative overflow-hidden shadow-2xl">
-                                    <div class="text-2xl sm:text-3xl font-black text-slate-300 font-mono tracking-wider drop-shadow-sm">2ND</div>
+                                {{-- Silver Cyber Pedestal Base --}}
+                                <div class="w-full h-36 sm:h-48 rounded-t-2xl sm:rounded-t-3xl pedestal-silver-cyber p-3 sm:p-4 flex flex-col justify-between text-center relative overflow-hidden laser-glow">
+                                    {{-- 3D Silver Rank Typography --}}
+                                    <div class="text-3xl sm:text-4xl font-black text-silver-3d font-mono tracking-wider">2ND</div>
+
+                                    {{-- Holographic Center Crest --}}
+                                    <div class="py-1 flex flex-col items-center justify-center">
+                                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-cyan-500/10 border border-cyan-400/30 flex items-center justify-center text-lg sm:text-xl shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+                                            ⚡
+                                        </div>
+                                    </div>
                                     
-                                    {{-- Energy Bar --}}
+                                    {{-- Progress Energy Bar --}}
                                     <div class="w-full">
                                         <div class="text-[9px] sm:text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1 flex justify-between">
-                                            <span>Progres</span>
-                                            <span x-text="leaderboard[1].progress_percent + '%'"></span>
+                                            <span>Progres Ujian</span>
+                                            <span class="font-mono text-cyan-300 font-black" x-text="leaderboard[1].progress_percent + '%'"></span>
                                         </div>
-                                        <div class="w-full h-2 rounded-full bg-black/60 overflow-hidden border border-white/10 p-0.5">
-                                            <div class="h-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all duration-500 rounded-full"
+                                        <div class="w-full h-2 rounded-full bg-black/60 overflow-hidden border border-cyan-400/30 p-0.5">
+                                            <div class="h-full energy-silver transition-all duration-500 rounded-full"
                                                  :style="'width: ' + leaderboard[1].progress_percent + '%'"></div>
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </template>
 
-                        {{-- Empty Placeholder for Silver (Jika hanya ada 1 peserta) --}}
+                        {{-- Holographic Teleporter Slot for Silver (Jika hanya ada 1 peserta) --}}
                         <template x-if="leaderboard.length < 2">
-                            <div class="w-full flex flex-col items-center opacity-40">
-                                <div class="w-14 sm:w-20 h-14 sm:h-20 rounded-2xl bg-slate-800/60 border border-dashed border-slate-600 flex items-center justify-center text-2xl mb-2">🥈</div>
-                                <div class="w-full h-32 rounded-t-2xl bg-slate-900/30 border-t border-slate-800 flex flex-col items-center justify-center text-xs text-slate-400 font-bold p-2 text-center">
-                                    <span>Slot #2 Terbuka</span>
-                                    <span class="text-[10px] text-slate-500 mt-1 font-normal">Menunggu penantang</span>
+                            <div class="w-full flex flex-col items-center">
+                                <div class="w-16 sm:w-22 h-16 sm:h-22 rounded-2xl sm:rounded-3xl border-2 border-dashed border-cyan-500/40 bg-cyan-950/20 flex items-center justify-center text-3xl mb-3 relative overflow-hidden animate-pulse">
+                                    <span class="opacity-50">🥈</span>
+                                    <div class="absolute inset-0 bg-gradient-to-b from-cyan-400/20 via-transparent to-transparent holo-scanline"></div>
+                                </div>
+                                <div class="w-full h-36 rounded-t-2xl bg-slate-900/40 border-t-2 border-dashed border-slate-700/60 p-4 flex flex-col items-center justify-center text-center">
+                                    <span class="text-xs font-mono font-bold text-cyan-400">SLOT #2 TERBUKA</span>
+                                    <span class="text-[10px] text-gray-500 mt-1">Siap Diperebutkan</span>
                                 </div>
                             </div>
                         </template>
@@ -352,53 +483,78 @@
                     <div class="flex flex-col items-center">
                         <template x-if="leaderboard.length >= 1">
                             <div class="w-full flex flex-col items-center transition-all duration-500">
-                                {{-- Floating Animated Crown & Avatar --}}
-                                <div class="relative mb-2">
-                                    <div class="text-3xl sm:text-4xl -mb-2.5 animate-bounce text-amber-400 filter drop-shadow-[0_4px_8px_rgba(245,158,11,0.5)]">👑</div>
-                                    <div class="w-18 sm:w-28 h-18 sm:h-28 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-yellow-300 via-amber-400 to-amber-600 p-1.5 glow-gold flex items-center justify-center shadow-2xl shimmer-sweep">
-                                        <div class="w-full h-full rounded-xl sm:rounded-2xl bg-[#0D1510] flex items-center justify-center font-black text-2xl sm:text-4xl text-amber-300">
+                                
+                                {{-- Animated Floating Crown & Golden Aura --}}
+                                <div class="relative mb-2 flex flex-col items-center">
+                                    {{-- Floating Crown with Sparkles --}}
+                                    <div class="text-3xl sm:text-4xl -mb-1 animate-float z-20 filter drop-shadow-[0_0_15px_rgba(245,158,11,0.9)]">
+                                        👑
+                                    </div>
+
+                                    {{-- Rotating Golden Halo Ring --}}
+                                    <div class="absolute top-6 -inset-3 rounded-full halo-spin-gold blur-xs opacity-80 pointer-events-none"></div>
+
+                                    {{-- Avatar Shield (Grand Champion) --}}
+                                    <div class="w-20 sm:w-28 h-20 sm:h-28 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-600 p-1.5 shadow-[0_0_35px_rgba(245,158,11,0.6)] flex items-center justify-center relative z-10">
+                                        <div class="w-full h-full rounded-xl sm:rounded-2xl bg-[#0B1410] flex items-center justify-center font-mono font-black text-2xl sm:text-4xl text-amber-300">
                                             <span x-text="getInitials(leaderboard[0].student_name)"></span>
                                         </div>
                                     </div>
-                                    <span class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-300 via-amber-400 to-yellow-500 text-slate-950 border border-white shadow-lg animate-pulse whitespace-nowrap">
-                                        🥇 #1 JUARA
-                                    </span>
+
+                                    {{-- Gold Champion Ribbon Pill --}}
+                                    <div class="mt-2 relative z-10">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 text-slate-950 shadow-lg border border-white whitespace-nowrap animate-pulse">
+                                            <span>🥇</span> #1 JUARA ARENA
+                                        </span>
+                                    </div>
                                 </div>
 
                                 {{-- Name & Info --}}
-                                <div class="text-center w-full px-1 mb-2.5 mt-1">
-                                    <div class="font-black text-white text-sm sm:text-xl truncate heading-font tracking-tight text-amber-100" x-text="leaderboard[0].student_name"></div>
-                                    <div class="flex items-center justify-center gap-1.5 text-xs sm:text-sm text-amber-300 font-bold truncate mt-0.5">
+                                <div class="text-center w-full px-1 mb-2.5">
+                                    <div class="font-black text-white text-sm sm:text-xl truncate heading-font tracking-tight text-amber-100 drop-shadow" x-text="leaderboard[0].student_name"></div>
+                                    <div class="flex items-center justify-center gap-1.5 text-xs sm:text-sm text-amber-300 font-extrabold truncate mt-0.5">
                                         <span x-text="'Kelas ' + (leaderboard[0].kelas || '-')"></span>
                                         <span>&bull;</span>
-                                        <span :class="leaderboard[0].is_completed ? 'text-emerald-400 font-extrabold' : 'text-amber-200'"
+                                        <span :class="leaderboard[0].is_completed ? 'text-emerald-400' : 'text-amber-200'"
                                               x-text="leaderboard[0].is_completed ? '🏁 Selesai' : (leaderboard[0].answered_count + '/' + leaderboard[0].total_questions + ' Soal')"></span>
                                     </div>
                                     
                                     {{-- Delta Movement --}}
                                     <div class="mt-1 flex items-center justify-center">
-                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-extrabold shadow-sm"
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-black shadow-sm"
                                               :class="getDeltaClass(leaderboard[0].delta)"
                                               x-html="getDeltaHtml(leaderboard[0].delta)"></span>
                                     </div>
                                 </div>
 
-                                {{-- Gold Pedestal Base --}}
-                                <div class="w-full h-44 sm:h-56 rounded-t-2xl sm:rounded-t-3xl pedestal-gold p-4 sm:p-5 flex flex-col justify-between text-center relative overflow-hidden shadow-2xl">
-                                    <div class="text-3xl sm:text-5xl font-black text-amber-300 font-mono tracking-tight drop-shadow-md">1ST</div>
+                                {{-- Gold Cyber Pedestal Base --}}
+                                <div class="w-full h-48 sm:h-60 rounded-t-2xl sm:rounded-t-3xl pedestal-gold-cyber p-4 sm:p-5 flex flex-col justify-between text-center relative overflow-hidden laser-glow shadow-2xl">
+                                    {{-- 3D Gold Rank Typography --}}
+                                    <div class="text-4xl sm:text-6xl font-black text-gold-3d font-mono tracking-tight">1ST</div>
+
+                                    {{-- Holographic Center Trophy Crest --}}
+                                    <div class="py-1 flex flex-col items-center justify-center">
+                                        <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-amber-400/15 border border-amber-400/40 flex items-center justify-center text-2xl sm:text-3xl shadow-[0_0_20px_rgba(245,158,11,0.3)]">
+                                            🏆
+                                        </div>
+                                        <span class="mt-1 text-[9px] font-mono font-black text-amber-300 uppercase tracking-widest bg-amber-950/70 px-2 py-0.5 rounded-full border border-amber-500/30">
+                                            PEMIMPIN
+                                        </span>
+                                    </div>
                                     
-                                    {{-- Energy Bar --}}
+                                    {{-- Progress Energy Bar --}}
                                     <div class="w-full">
                                         <div class="text-[10px] sm:text-xs font-black text-amber-200 uppercase tracking-wider mb-1 flex justify-between">
                                             <span>Progres Ujian</span>
-                                            <span x-text="leaderboard[0].progress_percent + '%'"></span>
+                                            <span class="font-mono text-amber-300 font-black" x-text="leaderboard[0].progress_percent + '%'"></span>
                                         </div>
-                                        <div class="w-full h-3 rounded-full bg-black/60 overflow-hidden border border-amber-400/40 p-0.5">
-                                            <div class="h-full bg-gradient-to-r from-amber-400 via-yellow-300 to-emerald-400 transition-all duration-500 rounded-full shadow-inner"
+                                        <div class="w-full h-3 rounded-full bg-black/70 overflow-hidden border border-amber-400/50 p-0.5 shadow-inner">
+                                            <div class="h-full energy-gold transition-all duration-500 rounded-full"
                                                  :style="'width: ' + leaderboard[0].progress_percent + '%'"></div>
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </template>
                     </div>
@@ -407,25 +563,34 @@
                     <div class="flex flex-col items-center">
                         <template x-if="leaderboard.length >= 3">
                             <div class="w-full flex flex-col items-center transition-all duration-500">
-                                {{-- Avatar & Medal --}}
-                                <div class="relative mb-2">
-                                    <div class="w-14 sm:w-20 h-14 sm:h-20 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-amber-500 via-orange-600 to-amber-800 p-1 glow-bronze flex items-center justify-center shadow-xl">
-                                        <div class="w-full h-full rounded-xl sm:rounded-2xl bg-[#0F1410] flex items-center justify-center font-black text-lg sm:text-2xl text-amber-300">
+                                
+                                {{-- Bronze Avatar & Aura --}}
+                                <div class="relative mb-2 flex flex-col items-center">
+                                    {{-- Rotating Bronze Halo --}}
+                                    <div class="absolute -inset-2.5 rounded-full halo-spin-bronze blur-xs opacity-60 pointer-events-none"></div>
+
+                                    {{-- Avatar Shield --}}
+                                    <div class="w-16 sm:w-22 h-16 sm:h-22 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-amber-500 via-orange-600 to-amber-800 p-1 shadow-[0_0_25px_rgba(249,115,22,0.4)] flex items-center justify-center relative z-10">
+                                        <div class="w-full h-full rounded-xl sm:rounded-2xl bg-[#0F1410] flex items-center justify-center font-mono font-black text-xl sm:text-2xl text-amber-300">
                                             <span x-text="getInitials(leaderboard[2].student_name)"></span>
                                         </div>
                                     </div>
-                                    <span class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-600 to-orange-500 text-white border border-white shadow-md">
-                                        🥉 #3
-                                    </span>
+
+                                    {{-- Bronze Badge Pill --}}
+                                    <div class="mt-2 relative z-10">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-600 via-orange-500 to-amber-700 text-white border border-white shadow-md">
+                                            🥉 #3 KONTENDER
+                                        </span>
+                                    </div>
                                 </div>
 
                                 {{-- Name & Info --}}
-                                <div class="text-center w-full px-1 mb-2.5 mt-1">
-                                    <div class="font-extrabold text-white text-xs sm:text-base truncate heading-font tracking-tight" x-text="leaderboard[2].student_name"></div>
-                                    <div class="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs text-amber-400/80 font-semibold truncate mt-0.5">
+                                <div class="text-center w-full px-1 mb-2.5">
+                                    <div class="font-black text-white text-xs sm:text-base truncate heading-font tracking-tight" x-text="leaderboard[2].student_name"></div>
+                                    <div class="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs text-amber-400 font-semibold truncate mt-0.5">
                                         <span x-text="'Kelas ' + (leaderboard[2].kelas || '-')"></span>
                                         <span>&bull;</span>
-                                        <span :class="leaderboard[2].is_completed ? 'text-emerald-400 font-bold' : 'text-gray-400'"
+                                        <span :class="leaderboard[2].is_completed ? 'text-emerald-400 font-bold' : 'text-amber-300'"
                                               x-text="leaderboard[2].is_completed ? '🏁 Selesai' : (leaderboard[2].answered_count + '/' + leaderboard[2].total_questions)"></span>
                                     </div>
                                     
@@ -437,32 +602,44 @@
                                     </div>
                                 </div>
 
-                                {{-- Bronze Pedestal Base --}}
-                                <div class="w-full h-28 sm:h-36 rounded-t-2xl sm:rounded-t-3xl pedestal-bronze p-3 sm:p-4 flex flex-col justify-between text-center relative overflow-hidden shadow-2xl">
-                                    <div class="text-xl sm:text-3xl font-black text-amber-400 font-mono tracking-wider drop-shadow-sm">3RD</div>
+                                {{-- Bronze Cyber Pedestal Base --}}
+                                <div class="w-full h-32 sm:h-40 rounded-t-2xl sm:rounded-t-3xl pedestal-bronze-cyber p-3 sm:p-4 flex flex-col justify-between text-center relative overflow-hidden laser-glow">
+                                    {{-- 3D Bronze Rank Typography --}}
+                                    <div class="text-2xl sm:text-3xl font-black text-bronze-3d font-mono tracking-wider">3RD</div>
+
+                                    {{-- Holographic Center Crest --}}
+                                    <div class="py-0.5 flex flex-col items-center justify-center">
+                                        <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-orange-500/10 border border-orange-400/30 flex items-center justify-center text-base sm:text-lg shadow-[0_0_15px_rgba(249,115,22,0.2)]">
+                                            🔥
+                                        </div>
+                                    </div>
                                     
-                                    {{-- Energy Bar --}}
+                                    {{-- Progress Energy Bar --}}
                                     <div class="w-full">
                                         <div class="text-[9px] sm:text-[10px] font-bold text-amber-300 uppercase tracking-wider mb-1 flex justify-between">
-                                            <span>Progres</span>
-                                            <span x-text="leaderboard[2].progress_percent + '%'"></span>
+                                            <span>Progres Ujian</span>
+                                            <span class="font-mono text-orange-300 font-black" x-text="leaderboard[2].progress_percent + '%'"></span>
                                         </div>
-                                        <div class="w-full h-2 rounded-full bg-black/60 overflow-hidden border border-white/10 p-0.5">
-                                            <div class="h-full bg-gradient-to-r from-orange-500 to-amber-400 transition-all duration-500 rounded-full"
+                                        <div class="w-full h-2 rounded-full bg-black/60 overflow-hidden border border-orange-400/30 p-0.5">
+                                            <div class="h-full energy-bronze transition-all duration-500 rounded-full"
                                                  :style="'width: ' + leaderboard[2].progress_percent + '%'"></div>
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </template>
 
-                        {{-- Empty Placeholder for Bronze (Jika < 3 peserta) --}}
+                        {{-- Holographic Teleporter Slot for Bronze (Jika < 3 peserta) --}}
                         <template x-if="leaderboard.length < 3">
-                            <div class="w-full flex flex-col items-center opacity-40">
-                                <div class="w-14 sm:w-20 h-14 sm:h-20 rounded-2xl bg-amber-950/40 border border-dashed border-amber-700/60 flex items-center justify-center text-2xl mb-2">🥉</div>
-                                <div class="w-full h-28 rounded-t-2xl bg-stone-900/30 border-t border-amber-900/50 flex flex-col items-center justify-center text-xs text-amber-500 font-bold p-2 text-center">
-                                    <span>Slot #3 Terbuka</span>
-                                    <span class="text-[10px] text-amber-600 mt-1 font-normal">Menunggu penantang</span>
+                            <div class="w-full flex flex-col items-center">
+                                <div class="w-16 sm:w-22 h-16 sm:h-22 rounded-2xl sm:rounded-3xl border-2 border-dashed border-orange-500/40 bg-orange-950/20 flex items-center justify-center text-3xl mb-3 relative overflow-hidden animate-pulse">
+                                    <span class="opacity-50">🥉</span>
+                                    <div class="absolute inset-0 bg-gradient-to-b from-orange-400/20 via-transparent to-transparent holo-scanline"></div>
+                                </div>
+                                <div class="w-full h-32 rounded-t-2xl bg-stone-900/40 border-t-2 border-dashed border-amber-900/60 p-4 flex flex-col items-center justify-center text-center">
+                                    <span class="text-xs font-mono font-bold text-orange-400">SLOT #3 TERBUKA</span>
+                                    <span class="text-[10px] text-gray-500 mt-1">Siap Diperebutkan</span>
                                 </div>
                             </div>
                         </template>
@@ -474,11 +651,11 @@
             {{-- ================================================================= --}}
             {{-- ZONE 2: PAPAN KLASEMEN TOP 15 (PERINGKAT 4 SAMPAI 15)              --}}
             {{-- ================================================================= --}}
-            <div class="rounded-3xl bg-[#090F0C]/80 border border-[#1A2820] p-4 sm:p-5 backdrop-blur-md shadow-2xl">
+            <div class="rounded-3xl bg-[#090F0C]/85 border border-[#1A2820] p-4 sm:p-5 backdrop-blur-md shadow-2xl relative overflow-hidden">
                 {{-- Section Title & Filter Info --}}
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-white/5">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-sm text-emerald-300">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-base text-emerald-300 shadow-sm">
                             ⚔️
                         </div>
                         <div>
@@ -486,13 +663,13 @@
                                 <h3 class="text-sm font-extrabold text-white uppercase tracking-wider heading-font">
                                     Papan Klasemen Top 15 (Peringkat 4 - 15)
                                 </h3>
-                                <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-black font-mono border border-emerald-500/30"
+                                <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-black font-mono border border-emerald-500/30"
                                       x-text="activeChallengersCount + ' Peserta'"></span>
                             </div>
                         </div>
                     </div>
                     <div class="text-[11px] text-gray-400 flex items-center gap-1.5 italic">
-                        <span>🔒</span> Skor angka dirahasiakan &bull; Diurutkan berdasarkan akurasi jawaban & waktu
+                        <span>🔒</span> Skor angka dirahasiakan &bull; Diurutkan otomatis berdasarkan akurasi & waktu
                     </div>
                 </div>
 
@@ -540,7 +717,7 @@
                 {{-- Tampilan saat peserta belum sampai peringkat 4 (Misal: 1 s/d 3 peserta saja) --}}
                 <template x-if="leaderboard.length <= 3">
                     <div class="py-8 px-4 text-center rounded-2xl bg-black/30 border border-dashed border-white/10">
-                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-2xl mb-3 text-emerald-400">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-2xl mb-3 text-emerald-400 animate-pulse">
                             🎯
                         </div>
                         <h4 class="text-sm font-bold text-white heading-font">Slot Papan Klasemen Top 15 Siap Bersaing</h4>
@@ -581,7 +758,7 @@
     </footer>
 
     {{-- ========================================================================= --}}
-    {{-- JAVASCRIPT ARENA LOGIC & SYNTHESIZER SFX                                  --}}
+    {{-- JAVASCRIPT ARENA LOGIC, 60FPS AMBIENT PARTICLES & SFX SYNTHESIZER         --}}
     {{-- ========================================================================= --}}
     <script>
         function projectorArena() {
@@ -603,9 +780,14 @@
                 marqueeText: 'Menyambungkan ke Live Arena... Persaingan peringkat berjalan secara dinamis!',
                 pollingInterval: null,
                 countdownInterval: null,
+                activeParticles: [],
+                ambientEmbers: [],
+                canvas: null,
+                ctx: null,
 
                 initArena() {
                     this.fetchLeaderboard(true);
+                    this.initCanvasEngine();
 
                     // Polling interval setiap 4 detik
                     this.pollingInterval = setInterval(() => {
@@ -700,7 +882,7 @@
                         let delta = 0; // 0 = sama, >0 = naik, <0 = turun
 
                         if (prevRank !== undefined) {
-                            delta = prevRank - item.rank; // misal prev 3, rank 1 => delta +2 (naik 2)
+                            delta = prevRank - item.rank;
                         }
 
                         // Deteksi pergantian juara 1
@@ -744,6 +926,12 @@
                     this.updateMarquee(`👑 PERGANTIAN PEMIMPIN! ${leaderName} berhasil merebut posisi Peringkat 1! • ⚡ Siapakah yang akan menandinginya?`);
                 },
 
+                celebrateHype() {
+                    this.fireConfetti();
+                    this.playLeaderTrumpetSfx();
+                    this.updateMarquee(`🎉 ARENA SELEBRASI AKTIF! Pertahankan performa terbaik hingga waktu ujian berakhir!`);
+                },
+
                 updateMarquee(text) {
                     this.marqueeText = text + ' • ' + this.marqueeText;
                 },
@@ -758,8 +946,8 @@
                 },
 
                 getDeltaClass(delta) {
-                    if (delta > 0) return 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
-                    if (delta < 0) return 'bg-rose-500/20 text-rose-300 border border-rose-500/30';
+                    if (delta > 0) return 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/40';
+                    if (delta < 0) return 'bg-rose-500/25 text-rose-300 border border-rose-500/40';
                     return 'bg-white/5 text-gray-400 border border-white/10';
                 },
 
@@ -808,7 +996,6 @@
                     const gain = this.audioCtx.createGain();
 
                     osc.type = 'triangle';
-                    // Arpeggio nada C5 -> E5 -> G5
                     osc.frequency.setValueAtTime(523.25, now);
                     osc.frequency.setValueAtTime(659.25, now + 0.08);
                     osc.frequency.setValueAtTime(783.99, now + 0.16);
@@ -829,7 +1016,6 @@
                     if (!this.audioCtx) return;
 
                     const now = this.audioCtx.currentTime;
-                    // Dual oscillator for rich brass fanfare
                     [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
                         const osc = this.audioCtx.createOscillator();
                         const gain = this.audioCtx.createGain();
@@ -850,24 +1036,93 @@
                 },
 
                 // =============================================================
-                // NATIVE CANVAS CONFETTI ENGINE (100% Offline & Ringan)
+                // 60FPS AMBIENT PARTICLES & CONFETTI ENGINE (Native Offline Canvas)
                 // =============================================================
+                initCanvasEngine() {
+                    this.canvas = document.getElementById('arena-canvas');
+                    if (!this.canvas) return;
+                    this.ctx = this.canvas.getContext('2d');
+
+                    const resize = () => {
+                        this.canvas.width = window.innerWidth;
+                        this.canvas.height = window.innerHeight;
+                    };
+                    resize();
+                    window.addEventListener('resize', resize);
+
+                    // Buat 35 partikel glowing ambient ember (mengambang terus menerus di stage)
+                    this.ambientEmbers = [];
+                    for (let i = 0; i < 35; i++) {
+                        this.ambientEmbers.push({
+                            x: Math.random() * this.canvas.width,
+                            y: Math.random() * this.canvas.height,
+                            radius: Math.random() * 2 + 1,
+                            vy: -(Math.random() * 0.4 + 0.2), // melayang ke atas lembut
+                            vx: (Math.random() - 0.5) * 0.3,
+                            alpha: Math.random() * 0.6 + 0.2,
+                            color: Math.random() > 0.4 ? 'rgba(245, 158, 11,' : 'rgba(16, 185, 129,'
+                        });
+                    }
+
+                    // Loop render animasi 60fps
+                    const loop = () => {
+                        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                        // 1. Gambar Ambient Embers
+                        this.ambientEmbers.forEach(e => {
+                            e.y += e.vy;
+                            e.x += e.vx + Math.sin(e.y * 0.01) * 0.2;
+                            if (e.y < 0) {
+                                e.y = this.canvas.height + 10;
+                                e.x = Math.random() * this.canvas.width;
+                            }
+                            this.ctx.beginPath();
+                            this.ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+                            this.ctx.fillStyle = e.color + e.alpha + ')';
+                            this.ctx.shadowBlur = 8;
+                            this.ctx.shadowColor = e.color + '0.8)';
+                            this.ctx.fill();
+                            this.ctx.shadowBlur = 0;
+                        });
+
+                        // 2. Gambar Active Confetti Particles (Jika ada)
+                        for (let i = this.activeParticles.length - 1; i >= 0; i--) {
+                            const p = this.activeParticles[i];
+                            p.x += p.vx;
+                            p.y += p.vy;
+                            p.vy += 0.32; // gravitasi
+                            p.rotation += p.rotationSpeed;
+                            p.opacity -= 0.008;
+
+                            if (p.opacity > 0) {
+                                this.ctx.save();
+                                this.ctx.translate(p.x, p.y);
+                                this.ctx.rotate((p.rotation * Math.PI) / 180);
+                                this.ctx.globalAlpha = Math.max(0, p.opacity);
+                                this.ctx.fillStyle = p.color;
+                                this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+                                this.ctx.restore();
+                            } else {
+                                this.activeParticles.splice(i, 1);
+                            }
+                        }
+
+                        requestAnimationFrame(loop);
+                    };
+
+                    requestAnimationFrame(loop);
+                },
+
                 fireConfetti() {
-                    const canvas = document.getElementById('confetti-canvas');
-                    if (!canvas) return;
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
+                    if (!this.canvas) return;
+                    const colors = ['#F59E0B', '#10B981', '#38BDF8', '#EC4899', '#8B5CF6', '#FCD34D'];
 
-                    const particles = [];
-                    const colors = ['#F59E0B', '#10B981', '#3B82F6', '#EC4899', '#8B5CF6', '#FCD34D'];
-
-                    for (let i = 0; i < 90; i++) {
-                        particles.push({
-                            x: canvas.width / 2,
-                            y: canvas.height * 0.3,
-                            vx: (Math.random() - 0.5) * 16,
-                            vy: (Math.random() - 0.8) * 16,
+                    for (let i = 0; i < 95; i++) {
+                        this.activeParticles.push({
+                            x: this.canvas.width / 2,
+                            y: this.canvas.height * 0.28,
+                            vx: (Math.random() - 0.5) * 18,
+                            vy: (Math.random() - 0.8) * 18,
                             size: Math.random() * 8 + 4,
                             color: colors[Math.floor(Math.random() * colors.length)],
                             rotation: Math.random() * 360,
@@ -875,40 +1130,6 @@
                             opacity: 1
                         });
                     }
-
-                    let animationFrame;
-                    const render = () => {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        let alive = false;
-
-                        particles.forEach(p => {
-                            p.x += p.vx;
-                            p.y += p.vy;
-                            p.vy += 0.35; // gravitasi
-                            p.rotation += p.rotationSpeed;
-                            p.opacity -= 0.009;
-
-                            if (p.opacity > 0) {
-                                alive = true;
-                                ctx.save();
-                                ctx.translate(p.x, p.y);
-                                ctx.rotate((p.rotation * Math.PI) / 180);
-                                ctx.globalAlpha = Math.max(0, p.opacity);
-                                ctx.fillStyle = p.color;
-                                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
-                                ctx.restore();
-                            }
-                        });
-
-                        if (alive) {
-                            animationFrame = requestAnimationFrame(render);
-                        } else {
-                            ctx.clearRect(0, 0, canvas.width, canvas.height);
-                            cancelAnimationFrame(animationFrame);
-                        }
-                    };
-
-                    render();
                 }
             };
         }
