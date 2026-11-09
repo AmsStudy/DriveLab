@@ -39,10 +39,14 @@
             </button>
 
             <a href="{{ route('admin.quizzes.projector', $quiz) }}" target="_blank"
-               class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-600 hover:from-amber-600 hover:to-emerald-700 text-white text-sm font-bold transition-all flex items-center gap-2 shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98]">
-                <span class="text-base">🎮</span>
-                <span>Layar Proyektor Game</span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-black/30 text-amber-200 border border-white/20 uppercase tracking-wider font-extrabold">LIVE</span>
+               class="px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:via-teal-500 hover:to-emerald-600 text-white text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 shadow-sm hover:shadow-md hover:shadow-emerald-500/20 border border-emerald-400/30 hover:scale-[1.02] active:scale-[0.98] group"
+               title="Buka Layar Proyektor Real-Time untuk Ditampilkan di Kelas / Lab">
+                <span class="text-sm transition-transform group-hover:scale-110">🎮</span>
+                <span class="tracking-tight">Layar Proyektor</span>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-black/35 text-emerald-200 border border-emerald-400/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    LIVE
+                </span>
             </a>
 
             <a href="{{ route('admin.quizzes.questions', $quiz) }}"
