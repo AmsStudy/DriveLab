@@ -1430,9 +1430,9 @@ footer{
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         <div>
-                            <strong style="color:#34D399;">Data Tugas Sebelumnya Ditemukan</strong>
-                            <div id="existing-submission-info" style="color:#D1D5DB;font-size:12px;margin-top:2px;"></div>
-                            <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">Kirimkan kembali form di bawah ini jika ingin mengganti/memperbarui versi tugas Anda.</div>
+                            <strong style="color:var(--emerald);">Data Tugas Sebelumnya Ditemukan</strong>
+                            <div id="existing-submission-info" style="color:var(--text2);font-size:12px;margin-top:2px;"></div>
+                            <div style="font-size:11px;color:var(--text3);margin-top:2px;">Kirimkan kembali form di bawah ini jika ingin mengganti/memperbarui versi tugas Anda.</div>
                         </div>
                     </div>
 
@@ -1622,7 +1622,7 @@ footer{
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                     </svg>
                                                 </div>
-                                                <span id="dz-files-summary" style="font-size:12px;font-weight:600;color:#34D399;"></span>
+                                                <span id="dz-files-summary" style="font-size:12px;font-weight:600;color:var(--emerald);"></span>
                                             </div>
                                             <span class="dz-change"
                                                   onclick="event.stopPropagation();document.getElementById('sub_file').click()">
@@ -1840,12 +1840,12 @@ function renderSelectedFilesUI() {
         listEl.innerHTML = '';
         selectedFiles.forEach((file, idx) => {
             const row = document.createElement('div');
-            row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(16,185,129,0.2);padding:6px 10px;border-radius:10px;font-size:12px;';
+            row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface2);border:1px solid var(--border-emerald);padding:6px 10px;border-radius:10px;font-size:12px;';
             row.innerHTML = `
                 <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
                     <span style="font-size:14px;flex-shrink:0;">📄</span>
-                    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#F3F4F6;font-weight:500;">${file.name}</span>
-                    <span style="color:#9CA3AF;font-family:monospace;font-size:11px;flex-shrink:0;">(${formatFileSize(file.size)})</span>
+                    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text1);font-weight:500;">${file.name}</span>
+                    <span style="color:var(--text3);font-family:monospace;font-size:11px;flex-shrink:0;">(${formatFileSize(file.size)})</span>
                 </div>
                 <button type="button" onclick="removeSelectedFile(${idx}, event)" style="background:none;border:none;color:#EF4444;cursor:pointer;padding:2px 6px;border-radius:6px;font-size:15px;line-height:1;font-weight:bold;" title="Hapus berkas ini">&times;</button>
             `;

@@ -16,8 +16,7 @@
             </svg>
             <input id="search-input" type="text" name="search" value="{{ request('search') }}"
                    placeholder="Cari judul dokumen..."
-                   class="w-full border text-gray-100 rounded-xl pr-3.5 py-2 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
-                   style="background-color:#090D0B;border-color:#1A2820;padding-left:2.5rem !important;">
+                   class="w-full bg-white dark:bg-[#090D0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl pl-10 pr-3.5 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors shadow-xs dark:shadow-none">
         </div>
 
         {{-- Category Select --}}
@@ -46,10 +45,7 @@
 
         @if(request()->hasAny(['search','category','status']))
             <a href="{{ route('admin.soal.index') }}"
-               class="px-3 py-2 rounded-xl text-sm font-medium transition-colors border flex-shrink-0"
-               style="background:#1A2820;border-color:#25382D;color:#9CA3AF;"
-               onmouseover="this.style.background='#25382D';this.style.color='#d1d5db'"
-               onmouseout="this.style.background='#1A2820';this.style.color='#9CA3AF'">
+               class="px-3.5 py-2 rounded-xl text-sm font-medium transition-colors border border-gray-300 dark:border-[#25382D] bg-white hover:bg-gray-100 dark:bg-[#1A2820] dark:hover:bg-[#25382D] text-gray-700 hover:text-gray-900 dark:text-[#9CA3AF] dark:hover:text-gray-200 flex-shrink-0 shadow-xs dark:shadow-none">
                 Reset
             </a>
         @endif
