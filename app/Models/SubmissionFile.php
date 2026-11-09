@@ -33,3 +33,4 @@ class SubmissionFile extends Model
         return $this->belongsTo(Submission::class);
     }
 }
+

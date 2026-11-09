@@ -75,9 +75,9 @@
                 @endif
             </div>
 
-            <h1 class="text-xl md:text-2xl font-extrabold text-white tracking-tight break-words">{{ $soal->title }}</h1>
+            <h1 class="text-xl md:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight break-words">{{ $soal->title }}</h1>
             @if($soal->description)
-                <p class="text-sm text-gray-400 mt-2 max-w-3xl leading-relaxed">{{ $soal->description }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 max-w-3xl leading-relaxed">{{ $soal->description }}</p>
             @endif
         </div>
     </div>
@@ -85,27 +85,27 @@
     {{-- KPI Highlights (Clean Metric Cards) --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 pt-5">
         {{-- Stat 1: Tugas Mahasiswa --}}
-        <div class="p-3.5 rounded-xl border flex items-start gap-3" style="background:#090D0B;border-color:#1A2820;">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(13,148,136,.15);color:#2DD4BF;">
+        <div class="p-3.5 rounded-xl border flex items-start gap-3 bg-gray-50/80 dark:bg-[#090D0B] border-gray-200 dark:border-[#1A2820]">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-teal-500/10 dark:bg-teal-500/15 text-teal-600 dark:text-[#2DD4BF]">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             </div>
             <div class="min-w-0">
-                <p class="text-[11px] font-medium text-gray-400">Tugas Terkumpul</p>
-                <p class="text-lg font-bold text-teal-300 leading-tight mt-0.5">
+                <p class="text-[11px] font-medium text-gray-500 dark:text-gray-400">Tugas Terkumpul</p>
+                <p class="text-lg font-bold text-teal-600 dark:text-teal-300 leading-tight mt-0.5">
                     {{ $submissions->count() }}
-                    <span class="text-xs font-normal text-gray-500">NIM</span>
+                    <span class="text-xs font-normal text-gray-400 dark:text-gray-500">NIM</span>
                 </p>
             </div>
         </div>
 
         {{-- Stat 2: Masa Berlaku --}}
-        <div class="p-3.5 rounded-xl border flex items-start gap-3" style="background:#090D0B;border-color:#1A2820;">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(52,211,153,.12);color:#34D399;">
+        <div class="p-3.5 rounded-xl border flex items-start gap-3 bg-gray-50/80 dark:bg-[#090D0B] border-gray-200 dark:border-[#1A2820]">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-600 dark:text-[#34D399]">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </div>
             <div class="min-w-0">
-                <p class="text-[11px] font-medium text-gray-400">Masa Berlaku Akses</p>
-                <p class="text-xs font-semibold text-gray-200 leading-tight mt-1 truncate">
+                <p class="text-[11px] font-medium text-gray-500 dark:text-gray-400">Masa Berlaku Akses</p>
+                <p class="text-xs font-semibold text-gray-800 dark:text-gray-200 leading-tight mt-1 truncate">
                     @if($soal->access_type === 'lifetime')
                         ∞ Selamanya (Lifetime)
                     @else
@@ -116,22 +116,22 @@
         </div>
 
         {{-- Stat 3: Batas Pengumpulan --}}
-        <div class="p-3.5 rounded-xl border flex items-start gap-3" style="background:#090D0B;border-color:#1A2820;">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:rgba(245,158,11,.12);color:#FBBF24;">
+        <div class="p-3.5 rounded-xl border flex items-start gap-3 bg-gray-50/80 dark:bg-[#090D0B] border-gray-200 dark:border-[#1A2820]">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-500/10 dark:bg-amber-500/15 text-amber-600 dark:text-[#FBBF24]">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
             <div class="min-w-0">
-                <p class="text-[11px] font-medium text-gray-400">Batas Pengumpulan</p>
+                <p class="text-[11px] font-medium text-gray-500 dark:text-gray-400">Batas Pengumpulan</p>
                 @if($soal->is_submission_enabled && $soal->deadline_at)
                     @php $isExpired = now()->greaterThan($soal->deadline_at); @endphp
-                    <p class="text-xs font-semibold {{ $isExpired ? 'text-red-400' : 'text-emerald-400' }} leading-tight mt-1 truncate">
+                    <p class="text-xs font-semibold {{ $isExpired ? 'text-red-500 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400' }} leading-tight mt-1 truncate">
                         {{ $soal->deadline_at->format('d M, H:i') }}
-                        <span class="text-[10px] text-gray-500 font-normal">({{ $isExpired ? 'Selesai' : $soal->deadline_at->diffForHumans() }})</span>
+                        <span class="text-[10px] text-gray-400 dark:text-gray-500 font-normal">({{ $isExpired ? 'Selesai' : $soal->deadline_at->diffForHumans() }})</span>
                     </p>
                 @elseif(!$soal->is_submission_enabled)
-                    <p class="text-xs font-medium text-gray-500 leading-tight mt-1">Nonaktif</p>
+                    <p class="text-xs font-medium text-gray-400 dark:text-gray-500 leading-tight mt-1">Nonaktif</p>
                 @else
-                    <p class="text-xs font-medium text-emerald-400 leading-tight mt-1">Tanpa Batas Waktu</p>
+                    <p class="text-xs font-medium text-emerald-600 dark:text-emerald-400 leading-tight mt-1">Tanpa Batas Waktu</p>
                 @endif
             </div>
         </div>
@@ -145,9 +145,9 @@
     <div class="lg:col-span-1 space-y-6">
 
         {{-- Card: Kode Akses & Kredensial --}}
-        <div class="rounded-2xl p-5 shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
-            <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(16,185,129,.12);color:#10B981;">
+        <div class="rounded-2xl p-5 shadow-sm dark:shadow-xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820]">
+            <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-4 flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                 </div>
                 Kode Akses & Keamanan
@@ -155,25 +155,25 @@
 
             <div class="space-y-3.5 text-xs">
                 {{-- Kode Akses --}}
-                <div class="p-3.5 rounded-xl border" style="background:#090D0B;border-color:#1A2820;">
-                    <div class="flex items-center justify-between text-gray-400 mb-1.5">
-                        <span class="text-[11px] font-medium text-gray-400">Kode Unik Dokumen</span>
+                <div class="p-3.5 rounded-xl border bg-gray-50/80 dark:bg-[#090D0B] border-gray-200 dark:border-[#1A2820]">
+                    <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 mb-1.5">
+                        <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400">Kode Unik Dokumen</span>
                         <button type="button" onclick="copyText('{{ $soal->kode_unik }}', 'Kode unik berhasil disalin!')"
-                                class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
+                                class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors cursor-pointer">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                             Salin
                         </button>
                     </div>
-                    <p class="font-mono text-base font-bold text-emerald-400 tracking-wider">{{ $soal->kode_unik }}</p>
+                    <p class="font-mono text-base font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">{{ $soal->kode_unik }}</p>
                 </div>
 
                 {{-- Password Akses Dokumen --}}
-                <div class="p-3.5 rounded-xl border" style="background:#090D0B;border-color:#1A2820;">
-                    <div class="flex items-center justify-between text-gray-400 mb-1.5">
-                        <span class="text-[11px] font-medium text-gray-400">Password Akses Dokumen</span>
+                <div class="p-3.5 rounded-xl border bg-gray-50/80 dark:bg-[#090D0B] border-gray-200 dark:border-[#1A2820]">
+                    <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 mb-1.5">
+                        <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400">Password Akses Dokumen</span>
                         @if(!empty($soal->plain_password))
                             <button type="button" onclick="copyText('{{ $soal->plain_password }}', 'Password akses berhasil disalin!')"
-                                    class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer">
+                                    class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                 Salin
                             </button>
@@ -181,15 +181,15 @@
                     </div>
                     @if(!empty($soal->plain_password))
                         <div class="flex items-center justify-between">
-                            <span id="passwordTextVal" class="font-mono text-base font-bold text-emerald-400 tracking-wider">••••••••</span>
-                            <button type="button" onclick="togglePasswordVisibility()" class="p-1 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer" title="Lihat / Sembunyikan Password">
+                            <span id="passwordTextVal" class="font-mono text-base font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">••••••••</span>
+                            <button type="button" onclick="togglePasswordVisibility()" class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors cursor-pointer" title="Lihat / Sembunyikan Password">
                                 <svg id="passwordEyeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </button>
                         </div>
                     @else
                         <div class="flex items-center justify-between">
-                            <span class="text-xs text-amber-400 font-mono">Tersimpan terenkripsi</span>
-                            <button type="button" onclick="openEditModal()" class="text-[11px] text-emerald-400 hover:underline cursor-pointer">
+                            <span class="text-xs text-amber-600 dark:text-amber-400 font-mono">Tersimpan terenkripsi</span>
+                            <button type="button" onclick="openEditModal()" class="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer">
                                 Atur Password
                             </button>
                         </div>
@@ -197,49 +197,49 @@
                 </div>
 
                 {{-- Link Akses Cepat --}}
-                <div class="p-3.5 rounded-xl border" style="background:#090D0B;border-color:#1A2820;">
-                    <div class="flex items-center justify-between text-gray-400 mb-1.5">
-                        <span class="text-[11px] font-medium text-gray-400">Tautan Akses Mahasiswa</span>
+                <div class="p-3.5 rounded-xl border bg-gray-50/80 dark:bg-[#090D0B] border-gray-200 dark:border-[#1A2820]">
+                    <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 mb-1.5">
+                        <span class="text-[11px] font-medium text-gray-500 dark:text-gray-400">Tautan Akses Mahasiswa</span>
                         <button type="button" onclick="copyText('{{ route('soal.access', $soal->slug ?: $soal->unique_token) }}', 'Tautan akses berhasil disalin!')"
-                                class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
+                                class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors cursor-pointer">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                             Salin
                         </button>
                     </div>
-                    <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-gray-300 font-mono text-[11px]" style="background:#0F1713;border-color:#1A2820;">
-                        <span class="truncate flex-1 select-all text-gray-300">{{ route('soal.access', $soal->slug ?: $soal->unique_token) }}</span>
+                    <div class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border bg-white dark:bg-[#0F1713] border-gray-200 dark:border-[#1A2820] text-gray-700 dark:text-gray-300 font-mono text-[11px]">
+                        <span class="truncate flex-1 select-all text-gray-700 dark:text-gray-300">{{ route('soal.access', $soal->slug ?: $soal->unique_token) }}</span>
                     </div>
                 </div>
 
                 {{-- Metadata Tambahan --}}
-                <div class="pt-3 space-y-2.5 text-gray-400" style="border-top:1px solid #1A2820;">
+                <div class="pt-3 space-y-2.5 text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-[#1A2820]">
                     <div class="flex justify-between items-center">
-                        <span class="text-gray-400">Admin Pembuat</span>
-                        <span class="text-gray-200 font-medium">{{ $soal->admin->name }}</span>
+                        <span class="text-gray-500 dark:text-gray-400">Admin Pembuat</span>
+                        <span class="text-gray-800 dark:text-gray-200 font-medium">{{ $soal->admin->name }}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-gray-400">Kategori</span>
-                        <span class="text-gray-200 font-medium">{{ $soal->category->name ?? '—' }}</span>
+                        <span class="text-gray-500 dark:text-gray-400">Kategori</span>
+                        <span class="text-gray-800 dark:text-gray-200 font-medium">{{ $soal->category->name ?? '—' }}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-gray-400">Dibuat Pada</span>
-                        <span class="text-gray-300 font-mono text-[11px]">{{ $soal->created_at->format('d M Y, H:i') }}</span>
+                        <span class="text-gray-500 dark:text-gray-400">Dibuat Pada</span>
+                        <span class="text-gray-700 dark:text-gray-300 font-mono text-[11px]">{{ $soal->created_at->format('d M Y, H:i') }}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-gray-400">Terakhir Update</span>
-                        <span class="text-gray-300 font-mono text-[11px]">{{ $soal->updated_at->diffForHumans() }}</span>
+                        <span class="text-gray-500 dark:text-gray-400">Terakhir Update</span>
+                        <span class="text-gray-700 dark:text-gray-300 font-mono text-[11px]">{{ $soal->updated_at->diffForHumans() }}</span>
                     </div>
                 </div>
 
                 {{-- Toggle Status --}}
-                <div class="pt-3" style="border-top:1px solid #1A2820;">
+                <div class="pt-3 border-t border-gray-200 dark:border-[#1A2820]">
                     <form method="POST" action="{{ route('admin.soal.toggle', $soal) }}" class="w-full">
                         @csrf @method('PATCH')
                         <button type="submit"
-                                class="w-full py-2.5 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 border
+                                class="w-full py-2.5 px-4 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 border cursor-pointer
                                 {{ $soal->is_active
-                                    ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
-                                    : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30' }}">
+                                    ? 'bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-500/30'
+                                    : 'bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
                             {{ $soal->is_active ? 'Nonaktifkan Akses Dokumen' : 'Aktifkan Akses Dokumen' }}
                         </button>
@@ -250,95 +250,88 @@
 
         {{-- Card: Teks Soal / Konten Langsung (Jika Ada) --}}
         @if($soal->content_text)
-        <div class="rounded-2xl p-5 shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
+        <div class="rounded-2xl p-5 shadow-sm dark:shadow-xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820]">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="font-bold text-white text-sm flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(13,148,136,.15);color:#2DD4BF;">
+                <h3 class="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-teal-500/10 dark:bg-teal-500/15 text-teal-600 dark:text-[#2DD4BF]">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </div>
-                    Teks / Soal Langsung
+                    <span>Teks / Soal Langsung</span>
                 </h3>
                 <button type="button"
                         data-copy="{{ $soal->content_text }}"
                         onclick="copyText(this.dataset.copy, 'Teks soal berhasil disalin!')"
-                        class="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
+                        class="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium transition-colors cursor-pointer">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                     Salin
                 </button>
             </div>
-            <div class="p-3.5 rounded-xl border text-xs text-gray-300 font-mono max-h-56 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text"
-                 style="background:#090D0B;border-color:#1A2820;">
+            <div class="p-3.5 rounded-xl border text-xs text-gray-800 dark:text-gray-300 font-mono max-h-56 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text bg-gray-50/80 dark:bg-[#090D0B] border-gray-200 dark:border-[#1A2820]">
 {{ $soal->content_text }}
             </div>
         </div>
         @endif
 
         {{-- Card: File Lampiran & Tautan (Maks. 15 Item) --}}
-        <div class="rounded-2xl p-5 shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
+        <div class="rounded-2xl p-5 shadow-sm dark:shadow-xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820]">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-white text-sm flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(16,185,129,.12);color:#10B981;">
+                <h3 class="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                     </div>
-                    Lampiran & Tautan
-                    <span class="text-xs px-2 py-0.5 rounded-full font-semibold" style="background:rgba(16,185,129,.12);color:#34D399;">
+                    <span>Lampiran & Tautan</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-500/20">
                         {{ $soal->attachments->count() }}
                     </span>
                 </h3>
-                <span class="text-[11px] text-gray-500 font-mono">Maks. 15 Item</span>
+                <span class="text-[11px] text-gray-500 dark:text-gray-400 font-mono">Maks. 15 Item</span>
             </div>
 
             @if($soal->attachments->isEmpty())
-                <div class="py-8 text-center text-gray-500 text-xs">
-                    <svg class="w-8 h-8 mx-auto mb-2 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <div class="py-8 text-center text-gray-500 dark:text-gray-400 text-xs">
+                    <svg class="w-8 h-8 mx-auto mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     Belum ada file atau tautan terlampir.
                 </div>
             @else
                 <div class="space-y-2.5 max-h-[365px] overflow-y-auto pr-1">
                     @foreach($soal->attachments as $attachment)
                         @if($attachment->isLink())
-                            <div class="flex items-center justify-between p-3 rounded-xl border transition-colors group"
-                                 style="background:#090D0B;border-color:#1A2820;"
-                                 onmouseover="this.style.borderColor='rgba(13,148,136,.4)'"
-                                 onmouseout="this.style.borderColor='#1A2820'">
+                            <div class="flex items-center justify-between p-3 rounded-xl border transition-colors group bg-gray-50/90 hover:bg-teal-50/50 dark:bg-[#090D0B] dark:hover:bg-[#142019] border-gray-200 dark:border-[#1A2820] hover:border-teal-400 dark:hover:border-teal-500/40">
                                 <div class="flex items-center gap-2.5 min-w-0">
-                                    <span class="text-[10px] font-bold text-teal-400 bg-teal-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-teal-500/20 font-mono">LINK</span>
+                                    <span class="text-[10px] font-bold text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-teal-200/80 dark:border-teal-500/20 font-mono">LINK</span>
                                     <div class="min-w-0">
-                                        <p class="text-xs font-semibold text-gray-200 truncate">{{ $attachment->file_original_name ?: 'Tautan Eksternal' }}</p>
-                                        <a href="{{ $attachment->link_url }}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-teal-400 hover:underline truncate block font-mono">
+                                        <p class="text-xs font-semibold text-gray-900 dark:text-gray-100 truncate">{{ $attachment->file_original_name ?: 'Tautan Eksternal' }}</p>
+                                        <a href="{{ $attachment->link_url }}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 hover:underline truncate block font-mono">
                                             {{ $attachment->link_url }}
                                         </a>
                                     </div>
                                 </div>
                                 <a href="{{ $attachment->link_url }}" target="_blank" rel="noopener noreferrer"
-                                   class="p-1.5 text-teal-400 hover:bg-teal-500/20 rounded-lg transition-colors flex-shrink-0 ml-2" title="Buka Link">
+                                   class="p-1.5 text-teal-600 hover:text-teal-700 hover:bg-teal-100/60 dark:text-teal-400 dark:hover:bg-teal-500/20 rounded-lg transition-colors flex-shrink-0 ml-2" title="Buka Link">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                 </a>
                             </div>
                         @else
                             {{-- File Lampiran --}}
-                            <div class="flex items-center justify-between p-3 rounded-xl border transition-colors group"
-                                 style="background:#090D0B;border-color:#1A2820;"
-                                 onmouseover="this.style.borderColor='rgba(16,185,129,.4)'"
-                                 onmouseout="this.style.borderColor='#1A2820'">
+                            <div class="flex items-center justify-between p-3 rounded-xl border transition-colors group bg-gray-50/90 hover:bg-emerald-50/50 dark:bg-[#090D0B] dark:hover:bg-[#142019] border-gray-200 dark:border-[#1A2820] hover:border-emerald-400 dark:hover:border-emerald-500/40">
                                 <div class="flex items-center gap-2.5 min-w-0">
-                                    <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md flex-shrink-0 uppercase font-mono border border-emerald-500/20">
+                                    <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded-md flex-shrink-0 uppercase font-mono border border-emerald-200/80 dark:border-emerald-500/20">
                                         {{ $attachment->file_type ?: 'FILE' }}
                                     </span>
                                     <div class="min-w-0">
-                                        <p class="text-xs font-semibold text-gray-200 truncate">{{ $attachment->file_original_name }}</p>
+                                        <p class="text-xs font-semibold text-gray-900 dark:text-gray-100 truncate">{{ $attachment->file_original_name }}</p>
                                         <div class="flex items-center gap-2 mt-0.5">
-                                            <span class="text-[10px] text-gray-500 font-mono">{{ $attachment->file_size_formatted }}</span>
+                                            <span class="text-[10px] text-gray-500 dark:text-gray-400 font-mono">{{ $attachment->file_size_formatted }}</span>
                                             @if($attachment->is_downloadable)
-                                                <span class="text-[9px] bg-emerald-500/15 text-emerald-400 px-1.5 py-0.5 rounded font-medium border border-emerald-500/20">Bisa Diunduh</span>
+                                                <span class="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/20 px-1.5 py-0.5 rounded font-medium">Bisa Diunduh</span>
                                             @else
-                                                <span class="text-[9px] bg-amber-500/15 text-amber-400 px-1.5 py-0.5 rounded font-medium border border-amber-500/20">Hanya Preview</span>
+                                                <span class="text-[9px] bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/20 px-1.5 py-0.5 rounded font-medium">Hanya Preview</span>
                                             @endif
                                         </div>
                                     </div>
                                 </div>
                                 <a href="{{ route('admin.soal.download', $attachment->id) }}"
-                                   class="p-1.5 text-emerald-400 hover:bg-emerald-500/20 rounded-lg transition-colors flex-shrink-0 ml-2" title="Unduh File Ini (Admin)">
+                                   class="p-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100/60 dark:text-emerald-400 dark:hover:bg-emerald-500/20 rounded-lg transition-colors flex-shrink-0 ml-2" title="Unduh File Ini (Admin)">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                 </a>
                             </div>
@@ -352,25 +345,25 @@
 
     {{-- RIGHT COLUMN: RIWAYAT PENGUMPULAN TUGAS (2 Cols) --}}
     <div class="lg:col-span-2">
-        <div class="rounded-2xl shadow-xl" style="background:#0F1713;border:1px solid #1A2820;">
+        <div class="rounded-2xl shadow-sm dark:shadow-xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820]">
 
             {{-- Header Pengumpulan Tugas --}}
-            <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-30" style="border-bottom:1px solid #1A2820;">
+            <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-30 border-b border-gray-200 dark:border-[#1A2820]">
                 <div>
                     <div class="flex items-center gap-2.5 flex-wrap">
-                        <h2 class="text-base font-bold text-white flex items-center gap-2.5">
-                            <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(13,148,136,.15);color:#2DD4BF;">
+                        <h2 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-teal-500/10 dark:bg-teal-500/15 text-teal-600 dark:text-[#2DD4BF]">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                             </div>
                             Riwayat Pengumpulan Tugas
                         </h2>
                         {{-- Live Auto-Refresh Badge Indicator --}}
-                        <span id="liveSubmissionsBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-xs transition-all duration-300" title="Pembaruan otomatis tiap 3 detik jika ada data baru">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span id="liveSubmissionsBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 shadow-xs transition-all duration-300" title="Pembaruan otomatis tiap 3 detik jika ada data baru">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse"></span>
                             <span>Live 3s</span>
                         </span>
                     </div>
-                    <p class="text-xs text-gray-400 mt-1">Satu baris per mahasiswa (pengumpulan ulang otomatis menimpa versi sebelumnya)</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Satu baris per mahasiswa (pengumpulan ulang otomatis menimpa versi sebelumnya)</p>
                 </div>
 
                 {{-- Action Buttons --}}
@@ -530,33 +523,28 @@
 
 {{-- ─── TEXT SUBMISSION PREVIEW MODAL ─── --}}
 <div id="textSubmissionModal" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm p-4 items-center justify-center" style="z-index: 100;">
-    <div class="rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] border"
-         style="background:#0F1713;border-color:#1A2820;">
-        <div class="px-6 py-4 flex items-center justify-between" style="border-bottom:1px solid #1A2820;">
+    <div class="rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] border bg-white dark:bg-[#0F1713] border-gray-200 dark:border-[#1A2820]">
+        <div class="px-6 py-4 flex items-center justify-between border-b bg-gray-50/80 dark:bg-[#0F1713] border-gray-200 dark:border-[#1A2820]">
             <div>
-                <h3 class="text-white font-semibold text-base" id="modalStudentName">Jawaban Mahasiswa</h3>
-                <p class="text-xs text-gray-400 font-mono mt-0.5" id="modalStudentNim"></p>
+                <h3 class="text-gray-900 dark:text-white font-semibold text-base" id="modalStudentName">Jawaban Mahasiswa</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5" id="modalStudentNim"></p>
             </div>
-            <button onclick="closeTextModal()" class="text-gray-400 hover:text-white p-1 rounded-lg transition-colors">
+            <button onclick="closeTextModal()" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-1 rounded-lg transition-colors cursor-pointer">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <div class="p-6 overflow-y-auto flex-1">
-            <pre class="p-4 rounded-xl border text-gray-200 font-mono text-xs whitespace-pre-wrap leading-relaxed select-text"
-                 style="background:#090D0B;border-color:#1A2820;" id="modalTextContent"></pre>
+        <div class="p-6 overflow-y-auto flex-1 bg-white dark:bg-[#0F1713]">
+            <pre class="p-4 rounded-xl border text-gray-800 dark:text-gray-200 font-mono text-xs whitespace-pre-wrap leading-relaxed select-text bg-gray-50 dark:bg-[#090D0B] border-gray-200 dark:border-[#1A2820]"
+                 id="modalTextContent"></pre>
         </div>
-        <div class="px-6 py-3 flex justify-end gap-3" style="border-top:1px solid #1A2820;background:#090D0B;">
+        <div class="px-6 py-3 flex justify-end gap-3 border-t bg-gray-50 dark:bg-[#090D0B] border-gray-200 dark:border-[#1A2820]">
             <button type="button" onclick="copyModalText()"
-                    class="px-4 py-2 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md shadow-emerald-500/20"
-                    style="background:linear-gradient(135deg,#10B981,#0D9488);">
+                    class="px-4 py-2 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md shadow-emerald-500/20 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                 Salin Teks
             </button>
             <button type="button" onclick="closeTextModal()"
-                    class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-300 transition-colors border"
-                    style="background:#1A2820;border-color:#25382D;"
-                    onmouseover="this.style.background='#25382D'"
-                    onmouseout="this.style.background='#1A2820'">Tutup</button>
+                    class="px-4 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#25382D] transition-colors border border-gray-300 dark:border-[#25382D] bg-white dark:bg-[#1A2820] cursor-pointer">Tutup</button>
         </div>
     </div>
 </div>
@@ -565,33 +553,30 @@
 <div id="filePreviewModal" class="fixed inset-0 z-[100] hidden bg-black/85 backdrop-blur-md p-3 sm:p-6 items-center justify-center"
      style="z-index: 100;"
      onclick="if(event.target === this) closeFilePreviewModal()">
-    <div class="rounded-2xl w-full max-w-5xl overflow-hidden shadow-2xl flex flex-col h-[90vh] border"
-         style="background:#0F1713;border-color:#1A2820;">
-        <div class="px-6 py-4 flex items-center justify-between" style="border-bottom:1px solid #1A2820;background:#0F1713;">
+    <div class="rounded-2xl w-full max-w-5xl overflow-hidden shadow-2xl flex flex-col h-[90vh] border bg-white dark:bg-[#0F1713] border-gray-200 dark:border-[#1A2820]">
+        <div class="px-6 py-4 flex items-center justify-between border-b bg-gray-50/90 dark:bg-[#0F1713] border-gray-200 dark:border-[#1A2820]">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs"
-                     style="background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3);">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-600 dark:text-[#34D399] border border-emerald-500/30">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 </div>
                 <div>
-                    <h3 class="text-white font-semibold text-sm sm:text-base truncate max-w-md" id="previewFileName">Pratinjau Berkas</h3>
-                    <p class="text-xs text-emerald-400 font-mono mt-0.5" id="previewStudentInfo"></p>
+                    <h3 class="text-gray-900 dark:text-white font-semibold text-sm sm:text-base truncate max-w-md" id="previewFileName">Pratinjau Berkas</h3>
+                    <p class="text-xs text-emerald-600 dark:text-emerald-400 font-mono mt-0.5" id="previewStudentInfo"></p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
                 <a id="previewOpenNewTab" href="#" target="_blank" rel="noopener noreferrer"
-                   class="px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-300 hover:text-white border transition-colors flex items-center gap-1.5 cursor-pointer"
-                   style="background:#142019;border-color:#1A2820;" title="Buka di Tab Baru">
-                    <svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                   class="px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-white border border-gray-200 dark:border-[#1A2820] bg-white hover:bg-gray-50 dark:bg-[#142019] transition-colors flex items-center gap-1.5 cursor-pointer" title="Buka di Tab Baru">
+                    <svg class="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     <span class="hidden sm:inline">Tab Baru</span>
                 </a>
-                <button type="button" onclick="closeFilePreviewModal()" class="text-gray-400 hover:text-white p-1.5 rounded-lg transition-colors cursor-pointer" title="Tutup">
+                <button type="button" onclick="closeFilePreviewModal()" class="text-gray-400 hover:text-gray-700 dark:hover:text-white p-1.5 rounded-lg transition-colors cursor-pointer" title="Tutup">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
         </div>
-        <div class="flex-1 bg-[#090D0B] p-2 sm:p-4 overflow-hidden relative flex items-center justify-center" id="previewContainer">
-            <iframe id="previewIframe" src="" class="w-full h-full rounded-xl border border-[#1A2820] hidden" frameborder="0"></iframe>
+        <div class="flex-1 bg-gray-100 dark:bg-[#090D0B] p-2 sm:p-4 overflow-hidden relative flex items-center justify-center" id="previewContainer">
+            <iframe id="previewIframe" src="" class="w-full h-full rounded-xl border border-gray-200 dark:border-[#1A2820] hidden" frameborder="0"></iframe>
             <img id="previewImage" src="" class="max-w-full max-h-full object-contain rounded-xl shadow-lg hidden" alt="Pratinjau Gambar">
         </div>
     </div>
