@@ -281,20 +281,37 @@
                                  x-data="{
                                      open: false,
                                      openUp: false,
+                                     menuStyle: '',
                                      toggleMenu() {
                                          if (!this.open) {
-                                             const rect = this.$el.getBoundingClientRect();
-                                             // Menu height approx 260px; jika ruang di bawah kurang dari 280px atau berada di paruh bawah layar, buka ke atas
+                                             const btn = this.$refs.trigger;
+                                             const rect = btn.getBoundingClientRect();
                                              const spaceBelow = window.innerHeight - rect.bottom;
-                                             this.openUp = spaceBelow < 280 || rect.top > (window.innerHeight * 0.45);
+                                             const spaceAbove = rect.top;
+
+                                             // Menu tingginya sekitar 340px. Hanya buka ke atas jika ruang di bawah benar-benar sempit (< 340px)
+                                             // DAN ruang di atas lebih luas daripada ruang di bawah.
+                                             this.openUp = spaceBelow < 340 && spaceAbove > spaceBelow;
+
+                                             const right = Math.max(12, Math.min(window.innerWidth - 236, window.innerWidth - rect.right));
+                                             if (this.openUp) {
+                                                 const maxHeight = Math.min(380, Math.max(160, rect.top - 16));
+                                                 this.menuStyle = `position: fixed; bottom: ${window.innerHeight - rect.top + 6}px; right: ${right}px; max-height: ${maxHeight}px; z-index: 9999;`;
+                                             } else {
+                                                 const maxHeight = Math.min(380, Math.max(160, spaceBelow - 16));
+                                                 this.menuStyle = `position: fixed; top: ${rect.bottom + 6}px; right: ${right}px; max-height: ${maxHeight}px; z-index: 9999;`;
+                                             }
                                          }
                                          this.open = !this.open;
                                      }
                                  }"
                                  @click.outside="open = false"
-                                 @close.stop="open = false">
+                                 @close.stop="open = false"
+                                 @scroll.capture.window="if(open) open = false"
+                                 @resize.window="if(open) open = false"
+                                 @keydown.escape.window="if(open) open = false">
                                 {{-- Trigger Button --}}
-                                <button @click="toggleMenu()" type="button"
+                                <button x-ref="trigger" @click="toggleMenu()" type="button"
                                         id="action-menu-button-{{ $soal->id }}"
                                         class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-white hover:bg-gray-50 dark:bg-[#142019] dark:hover:bg-[#1C2E24] border border-gray-300 dark:border-[#1E3327] hover:border-emerald-500/40 dark:hover:border-emerald-500/40 transition-all shadow-sm group cursor-pointer focus:outline-none"
                                         title="Menu Aksi">
@@ -315,8 +332,9 @@
                                      x-transition:leave="transition ease-in duration-100"
                                      x-transition:leave-start="transform opacity-100 scale-100"
                                      x-transition:leave-end="transform opacity-0 scale-95"
-                                     class="absolute right-0 w-56 rounded-2xl shadow-xl shadow-gray-200/60 dark:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.85),0_0_18px_rgba(16,185,129,0.08)] py-1.5 z-50 border border-gray-200 dark:border-emerald-500/20 bg-white/95 dark:bg-[#0F1713] text-left backdrop-blur-xl"
-                                     :class="openUp ? 'bottom-full mb-2' : 'top-full mt-2'">
+                                     class="w-56 rounded-2xl shadow-2xl shadow-gray-400/30 dark:shadow-[0_20px_35px_-10px_rgba(0,0,0,0.85),0_0_18px_rgba(16,185,129,0.08)] py-1.5 border border-gray-200 dark:border-emerald-500/20 bg-white/95 dark:bg-[#0F1713] text-left backdrop-blur-xl overflow-y-auto"
+                                     :class="openUp ? 'origin-bottom-right' : 'origin-top-right'"
+                                     :style="menuStyle">
 
                                     {{-- Section 1: Navigasi & Detail --}}
                                     <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-[#1A2820]">
