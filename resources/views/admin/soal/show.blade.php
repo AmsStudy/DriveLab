@@ -357,18 +357,35 @@
             {{-- Header Pengumpulan Tugas --}}
             <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-30" style="border-bottom:1px solid #1A2820;">
                 <div>
-                    <h2 class="text-base font-bold text-white flex items-center gap-2.5">
-                        <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(13,148,136,.15);color:#2DD4BF;">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        </div>
-                        Riwayat Pengumpulan Tugas
-                    </h2>
+                    <div class="flex items-center gap-2.5 flex-wrap">
+                        <h2 class="text-base font-bold text-white flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background:rgba(13,148,136,.15);color:#2DD4BF;">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            </div>
+                            Riwayat Pengumpulan Tugas
+                        </h2>
+                        {{-- Live Auto-Refresh Badge Indicator --}}
+                        <span id="liveSubmissionsBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-xs transition-all duration-300" title="Pembaruan otomatis tiap 3 detik jika ada data baru">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>Live 3s</span>
+                        </span>
+                    </div>
                     <p class="text-xs text-gray-400 mt-1">Satu baris per mahasiswa (pengumpulan ulang otomatis menimpa versi sebelumnya)</p>
                 </div>
 
                 {{-- Action Buttons --}}
                 <div class="flex items-center gap-2 flex-wrap">
-                    @if(!$submissions->isEmpty())
+                    {{-- Button Segarkan Langsung --}}
+                    <button type="button" id="btnRefreshSubmissions" onclick="refreshSubmissionsManually()"
+                            class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-emerald-600 dark:hover:text-emerald-400 bg-white hover:bg-gray-50 dark:bg-[#090D0B] dark:hover:bg-[#142019] border border-gray-300 dark:border-[#1A2820] hover:border-emerald-500/40 dark:hover:border-emerald-500/40 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                            title="Segarkan riwayat pengumpulan tugas secara langsung">
+                        <svg id="refreshSpinnerIcon" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        <span>Segarkan</span>
+                    </button>
+
+                    <div id="submissionsDownloadActions" class="flex items-center gap-2 flex-wrap {{ $submissions->isEmpty() ? 'hidden' : '' }}">
                         @if($soal->hasClasses())
                             {{-- Dropdown Unduh ZIP per Kelas --}}
                             <div class="relative inline-block text-left" x-data="{ open: false }">
@@ -390,7 +407,7 @@
                                        class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-semibold transition-colors"
                                        style="gap:1rem;">
                                         <span>Semua Kelas</span>
-                                        <span class="text-[11px] font-mono font-bold {{ $submissions->count() > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $submissions->count() }}</span>
+                                        <span class="zip-count-all text-[11px] font-mono font-bold {{ $submissions->count() > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $submissions->count() }}</span>
                                     </a>
                                     <div class="border-t border-gray-100 dark:border-[#1A2820] my-1.5"></div>
                                     @foreach($soal->getClassesList() as $cls)
@@ -399,7 +416,7 @@
                                            class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-500/10 transition-colors"
                                            style="gap:1rem;">
                                             <span>Kelas {{ $cls }}</span>
-                                            <span class="text-[11px] font-mono font-bold {{ $cCount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $cCount }}</span>
+                                            <span class="zip-count-class text-[11px] font-mono font-bold {{ $cCount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2" data-class="{{ $cls }}">{{ $cCount }}</span>
                                         </a>
                                     @endforeach
                                 </div>
@@ -411,56 +428,55 @@
                                 Unduh Semua (ZIP)
                             </a>
                         @endif
-                    @endif
 
-                    @if($soal->hasClasses() && !$submissions->isEmpty())
-                        {{-- Dropdown Export CSV per Kelas --}}
-                        <div class="relative inline-block text-left" x-data="{ open: false }">
-                            <button @click="open = !open" @click.away="open = false" type="button"
-                                    class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-emerald-600 dark:hover:text-emerald-400 bg-white hover:bg-gray-50 dark:bg-[#090D0B] dark:hover:bg-[#142019] border border-gray-300 dark:border-[#1A2820] hover:border-emerald-500/40 dark:hover:border-emerald-500/40 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
-                                <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                <span>Export CSV</span>
-                                <svg class="w-3.5 h-3.5 ml-0.5 text-gray-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                            </button>
-                            <div x-show="open" x-cloak
-                                 x-transition:enter="transition ease-out duration-150"
-                                 x-transition:enter-start="transform opacity-0 scale-95 -translate-y-1"
-                                 x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
-                                 x-transition:leave="transition ease-in duration-100"
-                                 x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
-                                 x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
-                                 class="absolute right-0 mt-2 w-60 min-w-[220px] rounded-2xl shadow-xl shadow-gray-200/60 dark:shadow-[0_20px_30px_-10px_rgba(0,0,0,0.8),0_0_15px_rgba(16,185,129,0.08)] py-2 z-50 border border-gray-200/90 dark:border-emerald-500/25 bg-white/95 dark:bg-[#0F1713] backdrop-blur-md">
-                                <a href="{{ route('admin.soal.export-submissions', $soal) }}"
-                                   class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-semibold transition-colors"
-                                   style="gap:1rem;">
-                                    <span>Semua Kelas</span>
-                                    <span class="text-[11px] font-mono font-bold {{ $submissions->count() > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $submissions->count() }}</span>
-                                </a>
-                                <div class="border-t border-gray-100 dark:border-[#1A2820] my-1.5"></div>
-                                @foreach($soal->getClassesList() as $cls)
-                                    @php $cCount = $submissions->where('kelas', $cls)->count(); @endphp
-                                    <a href="{{ route('admin.soal.export-submissions', [$soal, 'kelas' => $cls]) }}"
-                                       class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-500/10 transition-colors"
+                        @if($soal->hasClasses())
+                            {{-- Dropdown Export CSV per Kelas --}}
+                            <div class="relative inline-block text-left" x-data="{ open: false }">
+                                <button @click="open = !open" @click.away="open = false" type="button"
+                                        class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-emerald-600 dark:hover:text-emerald-400 bg-white hover:bg-gray-50 dark:bg-[#090D0B] dark:hover:bg-[#142019] border border-gray-300 dark:border-[#1A2820] hover:border-emerald-500/40 dark:hover:border-emerald-500/40 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
+                                    <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    <span>Export CSV</span>
+                                    <svg class="w-3.5 h-3.5 ml-0.5 text-gray-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                                <div x-show="open" x-cloak
+                                     x-transition:enter="transition ease-out duration-150"
+                                     x-transition:enter-start="transform opacity-0 scale-95 -translate-y-1"
+                                     x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+                                     x-transition:leave="transition ease-in duration-100"
+                                     x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+                                     x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
+                                     class="absolute right-0 mt-2 w-60 min-w-[220px] rounded-2xl shadow-xl shadow-gray-200/60 dark:shadow-[0_20px_30px_-10px_rgba(0,0,0,0.8),0_0_15px_rgba(16,185,129,0.08)] py-2 z-50 border border-gray-200/90 dark:border-emerald-500/25 bg-white/95 dark:bg-[#0F1713] backdrop-blur-md">
+                                    <a href="{{ route('admin.soal.export-submissions', $soal) }}"
+                                       class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-semibold transition-colors"
                                        style="gap:1rem;">
-                                        <span>Kelas {{ $cls }}</span>
-                                        <span class="text-[11px] font-mono font-bold {{ $cCount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $cCount }}</span>
+                                        <span>Semua Kelas</span>
+                                        <span class="csv-count-all text-[11px] font-mono font-bold {{ $submissions->count() > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $submissions->count() }}</span>
                                     </a>
-                                @endforeach
+                                    <div class="border-t border-gray-100 dark:border-[#1A2820] my-1.5"></div>
+                                    @foreach($soal->getClassesList() as $cls)
+                                        @php $cCount = $submissions->where('kelas', $cls)->count(); @endphp
+                                        <a href="{{ route('admin.soal.export-submissions', [$soal, 'kelas' => $cls]) }}"
+                                           class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-500/10 transition-colors"
+                                           style="gap:1rem;">
+                                            <span>Kelas {{ $cls }}</span>
+                                            <span class="csv-count-class text-[11px] font-mono font-bold {{ $cCount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2" data-class="{{ $cls }}">{{ $cCount }}</span>
+                                        </a>
+                                    @endforeach
+                                </div>
                             </div>
-                        </div>
-                    @else
-                        <a href="{{ route('admin.soal.export-submissions', $soal) }}"
-                           class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-emerald-600 dark:hover:text-emerald-400 bg-white hover:bg-gray-50 dark:bg-[#090D0B] dark:hover:bg-[#142019] border border-gray-300 dark:border-[#1A2820] hover:border-emerald-500/40 dark:hover:border-emerald-500/40 shadow-sm transition-all flex items-center gap-1.5">
-                            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Export Rekap (CSV)
-                        </a>
-                    @endif
+                        @else
+                            <a href="{{ route('admin.soal.export-submissions', $soal) }}"
+                               class="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-emerald-600 dark:hover:text-emerald-400 bg-white hover:bg-gray-50 dark:bg-[#090D0B] dark:hover:bg-[#142019] border border-gray-300 dark:border-[#1A2820] hover:border-emerald-500/40 dark:hover:border-emerald-500/40 shadow-sm transition-all flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                Export Rekap (CSV)
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </div>
 
             {{-- Filter & Search Bar --}}
-            @if(!$submissions->isEmpty())
-            <div class="px-5 md:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 relative z-10 bg-gray-50/70 dark:bg-[#090D0B]/60 border-b border-gray-200 dark:border-[#1A2820]">
+            <div id="submissionsFilterBar" class="{{ $submissions->isEmpty() ? 'hidden' : '' }} px-5 md:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 relative z-10 bg-gray-50/70 dark:bg-[#090D0B]/60 border-b border-gray-200 dark:border-[#1A2820]">
                 <div class="flex items-center gap-2.5 w-full sm:w-auto flex-1">
                     <div class="relative w-full sm:w-64">
                         <input type="text" id="submissionSearchInput" onkeyup="filterSubmissions()"
@@ -486,136 +502,26 @@
                 <div class="flex items-center gap-1.5 self-start sm:self-auto text-xs flex-wrap" id="typeFilterPills">
                     <button type="button" onclick="setSubFilter('all')"
                             class="sub-filter-pill active px-3 py-1.5 rounded-lg font-medium transition-colors bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30"
-                            data-type="all">Semua ({{ $submissions->count() }})</button>
+                            data-type="all">Semua (<span id="countPillAll">{{ $submissions->count() }}</span>)</button>
                     <button type="button" onclick="setSubFilter('file')"
                             class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#090D0B] border border-gray-300 dark:border-[#1A2820]"
-                            data-type="file">File ({{ $submissions->where('submission_type', 'file')->count() }})</button>
+                            data-type="file">File (<span id="countPillFile">{{ $submissions->filter(fn($s) => ($s->submission_type ?? 'file') === 'file')->count() }}</span>)</button>
                     <button type="button" onclick="setSubFilter('link')"
                             class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#090D0B] border border-gray-300 dark:border-[#1A2820]"
-                            data-type="link">Link ({{ $submissions->where('submission_type', 'link')->count() }})</button>
+                            data-type="link">Link (<span id="countPillLink">{{ $submissions->where('submission_type', 'link')->count() }}</span>)</button>
                     <button type="button" onclick="setSubFilter('text')"
                             class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#090D0B] border border-gray-300 dark:border-[#1A2820]"
-                            data-type="text">Teks ({{ $submissions->where('submission_type', 'text')->count() }})</button>
+                            data-type="text">Teks (<span id="countPillText">{{ $submissions->where('submission_type', 'text')->count() }}</span>)</button>
                 </div>
             </div>
-            @endif
 
-            {{-- Table Content --}}
-            @if($submissions->isEmpty())
-                <div class="py-20 text-center text-gray-500">
-                    <div class="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    </div>
-                    <p class="text-base font-semibold text-gray-800 dark:text-gray-200">Belum ada tugas yang dikumpulkan</p>
-                    <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Ketika mahasiswa mengirimkan file, link, atau teks jawaban, data mereka akan otomatis ditampilkan di sini.</p>
-                </div>
-            @else
-                <div class="overflow-x-auto overflow-y-auto rounded-b-2xl relative z-0" style="max-height: 700px; overflow-y: auto; scrollbar-width: thin;">
-                    <table class="w-full text-sm min-w-[580px]" id="submissionsTable">
-                        <thead class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider sticky top-0 z-10 shadow-sm bg-gray-50/90 dark:bg-[#090D0B] border-b border-gray-200 dark:border-[#1A2820] backdrop-blur-sm">
-                            <tr>
-                                <th class="px-6 py-3.5 text-left font-semibold">Mahasiswa</th>
-                                <th class="px-4 py-3.5 text-left font-semibold">Kelas</th>
-                                <th class="px-4 py-3.5 text-left font-semibold">Tipe</th>
-                                <th class="px-4 py-3.5 text-left font-semibold">Waktu Pengumpulan</th>
-                                <th class="px-4 py-3.5 text-center font-semibold">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 dark:divide-[#1A2820]" id="submissionsTableBody">
-                            @foreach($submissions as $sub)
-                            <tr class="hover:bg-emerald-500/5 dark:hover:bg-emerald-950/10 transition-colors submission-row border-b border-gray-100 dark:border-[#1A2820]" data-type="{{ $sub->submission_type ?: 'file' }}" data-kelas="{{ $sub->kelas ?? '' }}">
-                                {{-- Mahasiswa Identity --}}
-                                <td class="px-6 py-3.5">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs uppercase flex-shrink-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
-                                            {{ substr($sub->nama, 0, 1) }}
-                                        </div>
-                                        <div class="min-w-0">
-                                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate sub-nama">{{ $sub->nama }}</p>
-                                            <p class="text-xs font-mono text-gray-500 sub-nim">{{ $sub->nim }}</p>
-                                        </div>
-                                    </div>
-                                </td>
+            {{-- Table Content Container --}}
+            <div id="submissionsContainer">
+                @include('admin.soal.partials.submissions-table', ['soal' => $soal, 'submissions' => $submissions])
+            </div>
 
-                                {{-- Kelas Badge --}}
-                                <td class="px-4 py-3.5 text-xs">
-                                    @if($sub->kelas)
-                                        <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold inline-block bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
-                                            {{ preg_replace('/^kelas\s+/i', '', trim($sub->kelas)) }}
-                                        </span>
-                                    @else
-                                        <span class="text-gray-400 dark:text-gray-500 font-mono text-xs">-</span>
-                                    @endif
-                                </td>
-
-                                {{-- Submission Type Badge --}}
-                                <td class="px-4 py-3.5 text-xs">
-                                    @if($sub->isLink())
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/30">Link</span>
-                                    @elseif($sub->isText())
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">Teks</span>
-                                    @else
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">File</span>
-                                    @endif
-                                </td>
-
-                                {{-- Waktu --}}
-                                <td class="px-4 py-3.5 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                                    <p class="font-medium text-gray-800 dark:text-gray-200">{{ $sub->created_at->format('d M Y, H:i') }}</p>
-                                    <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 font-mono">{{ $sub->created_at->diffForHumans() }}</p>
-                                </td>
-
-                                {{-- Aksi --}}
-                                <td class="px-4 py-3.5 text-center">
-                                    <div class="flex items-center justify-center gap-1">
-                                        @if($sub->isLink())
-                                            <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer"
-                                               class="p-2 text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block" title="Buka Link Tautan">
-                                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                            </a>
-                                        @elseif($sub->isText())
-                                            <button type="button"
-                                                    data-nama="{{ $sub->nama }}"
-                                                    data-nim="{{ $sub->nim }}"
-                                                    data-content="{{ $sub->text_content }}"
-                                                    onclick="showTextModal(this.dataset.nama, this.dataset.nim, this.dataset.content)"
-                                                    class="p-2 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Baca Teks Lengkap">
-                                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            </button>
-                                        @else
-                                            @php
-                                                $isImgOrPdf = in_array(strtolower($sub->file_extension ?? ''), ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'svg']);
-                                            @endphp
-                                            @if($isImgOrPdf)
-                                                <button type="button"
-                                                        onclick="showFilePreviewModal('{{ route('admin.soal.submission.preview', $sub->id) }}', '{{ addslashes($sub->file_original_name ?: 'tugas') }}', '{{ addslashes($sub->nama) }} ({{ $sub->nim }})', '{{ strtolower($sub->file_extension ?? '') }}')"
-                                                        class="p-2 text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Lihat Berkas Langsung">
-                                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                                </button>
-                                            @endif
-
-                                            <a href="{{ route('admin.soal.download-submissions', $sub->id) }}"
-                                               class="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors inline-block" title="Unduh File Mahasiswa ({{ $sub->file_original_name }})">
-                                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                            </a>
-                                        @endif
-
-                                        {{-- Hapus / Reset Pengumpulan --}}
-                                        <form method="POST" action="{{ route('admin.soal.submission.destroy', $sub->id) }}" class="inline"
-                                              onsubmit="confirmAction(event, 'Hapus pengumpulan tugas mahasiswa {{ addslashes($sub->nama) }} ({{ $sub->nim }})? Berkas akan dihapus permanen dan mahasiswa dapat mengumpulkan ulang.', 'Ya, Hapus Pengumpulan', true)">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Hapus / Reset Pengumpulan">
-                                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
+        </div>
+    </div>
 
         </div>
     </div>
@@ -1073,6 +979,16 @@ const rawPassword = {!! json_encode($soal->plain_password ?? '') !!};
 let modalExistingFileCount = {{ $soal->attachments()->where('type', 'file')->count() }};
 let modalEditLinkCount = 0;
 
+@php
+    $subCount = $submissions->count();
+    $subMaxUpdated = $submissions->max('updated_at')?->timestamp ?? 0;
+    $subMaxId = $submissions->max('id') ?? 0;
+    $initialChecksum = md5("{$soal->id}_{$subCount}_{$subMaxUpdated}_{$subMaxId}");
+@endphp
+let lastSubmissionsChecksum = '{{ $initialChecksum }}';
+let isRefreshingSubmissions = false;
+const submissionsDataUrl = '{{ route('admin.soal.submissions-data', $soal) }}';
+
 function togglePasswordVisibility() {
     const textEl = document.getElementById('passwordTextVal');
     const eyeIcon = document.getElementById('passwordEyeIcon');
@@ -1411,6 +1327,148 @@ function filterSubmissions() {
         }
     });
 }
+
+async function checkSubmissionsUpdate(force = false) {
+    if (isRefreshingSubmissions) return;
+    isRefreshingSubmissions = true;
+
+    const spinner = document.getElementById('refreshSpinnerIcon');
+    if (force && spinner) {
+        spinner.classList.add('animate-spin');
+    }
+
+    try {
+        const url = new URL(submissionsDataUrl, window.location.origin);
+        if (!force && lastSubmissionsChecksum) {
+            url.searchParams.set('checksum', lastSubmissionsChecksum);
+        }
+        if (force) {
+            url.searchParams.set('force', '1');
+        }
+
+        const response = await fetch(url.toString(), {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) throw new Error('HTTP error ' + response.status);
+
+        const data = await response.json();
+
+        if (data.success && (data.changed || force)) {
+            if (data.checksum) {
+                lastSubmissionsChecksum = data.checksum;
+            }
+
+            // Update Table Container
+            const container = document.getElementById('submissionsContainer');
+            if (container && data.html) {
+                container.innerHTML = data.html;
+            }
+
+            // Update Counts UI
+            if (data.counts) {
+                updateSubmissionCountsUI(data.counts);
+            }
+
+            // Re-apply active search & filters without resetting admin state
+            filterSubmissions();
+
+            // Flash live badge indicator
+            flashLiveBadge();
+        }
+    } catch (err) {
+        console.warn('Submissions auto-refresh check failed:', err);
+    } finally {
+        if (spinner) {
+            setTimeout(() => spinner.classList.remove('animate-spin'), 400);
+        }
+        isRefreshingSubmissions = false;
+    }
+}
+
+function updateSubmissionCountsUI(counts) {
+    const filterBar = document.getElementById('submissionsFilterBar');
+    const downloadActions = document.getElementById('submissionsDownloadActions');
+    if (counts.total > 0) {
+        if (filterBar) filterBar.classList.remove('hidden');
+        if (downloadActions) downloadActions.classList.remove('hidden');
+    } else {
+        if (filterBar) filterBar.classList.add('hidden');
+        if (downloadActions) downloadActions.classList.add('hidden');
+    }
+
+    const pillAll = document.getElementById('countPillAll');
+    if (pillAll) pillAll.textContent = counts.total;
+    const pillFile = document.getElementById('countPillFile');
+    if (pillFile) pillFile.textContent = counts.file;
+    const pillLink = document.getElementById('countPillLink');
+    if (pillLink) pillLink.textContent = counts.link;
+    const pillText = document.getElementById('countPillText');
+    if (pillText) pillText.textContent = counts.text;
+
+    const classSelect = document.getElementById('classFilterSelect');
+    if (classSelect && classSelect.options) {
+        for (let i = 0; i < classSelect.options.length; i++) {
+            const opt = classSelect.options[i];
+            if (opt.value === 'all') {
+                opt.textContent = `Semua Kelas (${counts.total})`;
+            } else if (counts.classes && counts.classes[opt.value] !== undefined) {
+                opt.textContent = `Kelas ${opt.value} (${counts.classes[opt.value]})`;
+            }
+        }
+    }
+
+    document.querySelectorAll('.zip-count-all, .csv-count-all').forEach(el => {
+        el.textContent = counts.total;
+        if (counts.total > 0) {
+            el.classList.add('text-emerald-600', 'dark:text-emerald-400');
+            el.classList.remove('text-gray-400', 'dark:text-gray-600');
+        } else {
+            el.classList.remove('text-emerald-600', 'dark:text-emerald-400');
+            el.classList.add('text-gray-400', 'dark:text-gray-600');
+        }
+    });
+
+    document.querySelectorAll('.zip-count-class, .csv-count-class').forEach(el => {
+        const cls = el.getAttribute('data-class');
+        const cCount = (counts.classes && counts.classes[cls] !== undefined) ? counts.classes[cls] : 0;
+        el.textContent = cCount;
+        if (cCount > 0) {
+            el.classList.add('text-emerald-600', 'dark:text-emerald-400');
+            el.classList.remove('text-gray-400', 'dark:text-gray-600');
+        } else {
+            el.classList.remove('text-emerald-600', 'dark:text-emerald-400');
+            el.classList.add('text-gray-400', 'dark:text-gray-600');
+        }
+    });
+}
+
+function flashLiveBadge() {
+    const badge = document.getElementById('liveSubmissionsBadge');
+    if (!badge) return;
+    badge.classList.add('ring-2', 'ring-emerald-400/50', 'scale-105');
+    setTimeout(() => {
+        badge.classList.remove('ring-2', 'ring-emerald-400/50', 'scale-105');
+    }, 800);
+}
+
+function refreshSubmissionsManually() {
+    const btn = document.getElementById('btnRefreshSubmissions');
+    if (btn) btn.disabled = true;
+    checkSubmissionsUpdate(true).finally(() => {
+        if (btn) btn.disabled = false;
+    });
+}
+
+// Auto-refresh interval 3s (hanya saat tab / window aktif)
+setInterval(() => {
+    if (!document.hidden) {
+        checkSubmissionsUpdate(false);
+    }
+}, 3000);
 </script>
 
 @endsection

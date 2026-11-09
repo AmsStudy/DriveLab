@@ -107,6 +107,7 @@ Route::prefix('admin')
         Route::patch('soal/{soal}/toggle', [SoalController::class, 'toggleActive'])->name('soal.toggle');
         Route::get('soal/{soal}/preview', [SoalController::class, 'preview'])->name('soal.preview');
         Route::get('soal/attachment/{attachment}/download', [SoalController::class, 'downloadAttachment'])->name('soal.download');
+        Route::get('soal/{soal}/submissions-data', [SoalController::class, 'submissionsData'])->name('soal.submissions-data');
         Route::get('soal/{soal}/export-submissions', [SoalController::class, 'exportSubmissions'])->name('soal.export-submissions');
         Route::get('soal/{soal}/download-submissions-zip', [SoalController::class, 'downloadSubmissionsZip'])->name('soal.download-submissions-zip');
         Route::get('soal/submission/{id}/download', [SoalController::class, 'downloadSubmission'])->name('soal.download-submissions');

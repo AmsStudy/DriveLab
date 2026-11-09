@@ -222,6 +222,56 @@ class SoalController extends Controller
         return view('admin.soal.show', compact('soal', 'submissions', 'categories'));
     }
 
+    public function submissionsData(Request $request, Soal $soal)
+    {
+        $this->authorizeAccess($soal);
+
+        $submissions = Submission::where('soal_id', $soal->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $count = $submissions->count();
+        $maxUpdated = $submissions->max('updated_at')?->timestamp ?? 0;
+        $maxId = $submissions->max('id') ?? 0;
+        $checksum = md5("{$soal->id}_{$count}_{$maxUpdated}_{$maxId}");
+
+        $clientChecksum = $request->query('checksum');
+        $force = $request->boolean('force');
+
+        if (!$force && $clientChecksum === $checksum) {
+            return response()->json([
+                'success'  => true,
+                'changed'  => false,
+                'checksum' => $checksum,
+            ]);
+        }
+
+        $classCounts = [];
+        if ($soal->hasClasses()) {
+            foreach ($soal->getClassesList() as $cls) {
+                $classCounts[$cls] = $submissions->where('kelas', $cls)->count();
+            }
+        }
+
+        $counts = [
+            'total'   => $count,
+            'file'    => $submissions->filter(fn($s) => ($s->submission_type ?? 'file') === 'file')->count(),
+            'link'    => $submissions->where('submission_type', 'link')->count(),
+            'text'    => $submissions->where('submission_type', 'text')->count(),
+            'classes' => $classCounts,
+        ];
+
+        $html = view('admin.soal.partials.submissions-table', compact('soal', 'submissions'))->render();
+
+        return response()->json([
+            'success'  => true,
+            'changed'  => true,
+            'checksum' => $checksum,
+            'counts'   => $counts,
+            'html'     => $html,
+        ]);
+    }
+
     public function edit(Soal $soal)
     {
         $this->authorizeAccess($soal);
