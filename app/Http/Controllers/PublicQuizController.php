@@ -298,11 +298,18 @@ class PublicQuizController extends Controller
         // Calculate remaining time
         $totalAllowedMinutes = $quiz->time_limit_minutes + ($attempt->extra_time_minutes ?? 0);
         $timeRemaining = null;
+        $isPaused = $quiz->isSessionPaused() || $sessionStatus === 'paused';
+
         if ($totalAllowedMinutes > 0) {
-            $elapsedSeconds = abs((int) now()->diffInSeconds($attempt->started_at));
+            if ($isPaused && $quiz->paused_at) {
+                // While paused, time elapsed is frozen strictly at the exact second the pause started!
+                $elapsedSeconds = max(0, (int) ($quiz->paused_at->timestamp - $attempt->started_at->timestamp));
+            } else {
+                $elapsedSeconds = max(0, (int) (now()->timestamp - $attempt->started_at->timestamp));
+            }
             $totalSeconds = (int) ($totalAllowedMinutes * 60);
             $timeRemaining = (int) max(0, $totalSeconds - $elapsedSeconds);
-            if ($timeRemaining <= 0) {
+            if ($timeRemaining <= 0 && !$isPaused) {
                 if (!$attempt->isCompleted()) {
                     QuizScoringService::finalize($attempt, $attempt->draft_answers ?? []);
                 }
@@ -335,13 +342,15 @@ class PublicQuizController extends Controller
         $latestAnnouncement = !empty($announcements) ? $announcements[0] : null;
 
         return response()->json([
-            'status'              => 'active',
+            'status'              => $isPaused ? 'paused' : 'active',
             'is_ended'            => false,
+            'is_paused'           => $isPaused,
             'is_locked'           => (bool) $attempt->is_locked,
             'time_remaining'      => $timeRemaining,
             'extra_time_minutes'  => (int) ($attempt->extra_time_minutes ?? 0),
             'announcements'       => $announcements,
             'latest_announcement' => $latestAnnouncement,
+            'message'             => $isPaused ? 'Ujian sedang dijeda oleh pengawas lab.' : null,
         ]);
     }
 
@@ -459,6 +468,17 @@ class PublicQuizController extends Controller
 
         if ($attempt->isCompleted()) {
             return response()->json(['success' => false]);
+        }
+
+        // If exam is paused by instructor, do not penalize students
+        if ($quiz->isSessionPaused()) {
+            return response()->json([
+                'success'         => true,
+                'is_paused'       => true,
+                'penalty_seconds' => 0,
+                'is_locked'       => false,
+                'message'         => 'Ujian sedang dijeda oleh pengawas lab.',
+            ]);
         }
 
         // If open book mode is allowed by instructor, no punishment is applied!
@@ -594,6 +614,14 @@ class PublicQuizController extends Controller
         $quiz = $this->findQuizByIdentifier($token);
         $this->validateAttemptAccess($quiz, $attempt);
 
+        if ($quiz->isSessionPaused()) {
+            return response()->json([
+                'success'   => false,
+                'is_paused' => true,
+                'message'   => 'Ujian sedang dijeda oleh pengawas lab.',
+            ]);
+        }
+
         if ($attempt->isCompleted() || $attempt->is_force_submitted || $quiz->isSessionEnded()) {
             if (!$attempt->isCompleted()) {
                 $attempt->update(['is_force_submitted' => true]);
@@ -637,6 +665,14 @@ class PublicQuizController extends Controller
     {
         $quiz = $this->findQuizByIdentifier($token);
         $this->validateAttemptAccess($quiz, $attempt);
+
+        if ($quiz->isSessionPaused()) {
+            $msg = 'Ujian sedang dijeda oleh pengawas lab. Anda tidak dapat mengumpulkan ujian selama masa jeda.';
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'is_paused' => true, 'message' => $msg], 422);
+            }
+            return back()->with('error', $msg);
+        }
 
         return DB::transaction(function () use ($request, $quiz, $attempt, $token) {
             // Pessimistic locking: lock the attempt record so concurrent requests wait and resolve idempotently

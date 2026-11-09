@@ -77,11 +77,18 @@
             </div>
             <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 -ml-3.5"></span>
-                        LIVE ARENA
-                    </span>
+                    <template x-if="sessionStatus === 'paused'">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">
+                            <span>⏸️</span> UJIAN DIJEDA
+                        </span>
+                    </template>
+                    <template x-if="sessionStatus !== 'paused'">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 -ml-3.5"></span>
+                            LIVE ARENA
+                        </span>
+                    </template>
                     <span class="text-xs text-gray-400 font-mono" x-text="syncCounterText"></span>
                 </div>
                 <h1 class="text-base sm:text-lg font-extrabold text-white truncate heading-font tracking-tight mt-0.5" title="{{ $quiz->title }}">

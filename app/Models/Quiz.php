@@ -29,6 +29,7 @@ class Quiz extends Model
         'shuffle_options',
         'is_active',
         'session_status',
+        'paused_at',
         'show_leaderboard',
         'show_review',
         'show_correct_answer',
@@ -42,6 +43,7 @@ class Quiz extends Model
         'time_limit_minutes' => 'integer',
         'starts_at'          => 'datetime',
         'ends_at'            => 'datetime',
+        'paused_at'          => 'datetime',
         'time_per_question'  => 'integer',
         'shuffle_questions'  => 'boolean',
         'shuffle_options'    => 'boolean',
@@ -178,6 +180,11 @@ class Quiz extends Model
     public function isSessionStarted(): bool
     {
         return ($this->session_status ?? 'waiting') === 'started';
+    }
+
+    public function isSessionPaused(): bool
+    {
+        return ($this->session_status ?? 'waiting') === 'paused';
     }
 
     public function isSessionEnded(): bool

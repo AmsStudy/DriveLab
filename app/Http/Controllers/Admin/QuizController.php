@@ -871,11 +871,18 @@ class QuizController extends Controller
                 'created_at_human' => $a->created_at->diffForHumans(),
             ]);
 
+        $isPaused = $quiz->isSessionPaused();
+        $pauseDuration = ($isPaused && $quiz->paused_at) ? abs((int) now()->diffInSeconds($quiz->paused_at)) : 0;
+
         return response()->json([
-            'success'        => true,
-            'session_status' => $quiz->session_status ?? 'waiting',
+            'success'                => true,
+            'session_status'         => $quiz->session_status ?? 'waiting',
+            'is_paused'              => $isPaused,
+            'paused_at'              => $quiz->paused_at ? $quiz->paused_at->toIso8601String() : null,
+            'pause_duration_seconds' => $pauseDuration,
             'summary'   => [
                 'session_status'  => $quiz->session_status ?? 'waiting',
+                'is_paused'       => $isPaused,
                 'total_active'    => count($activeAttempts),
                 'total_completed' => count($completedAttempts),
                 'total_locked'    => count(array_filter($activeAttempts, fn($a) => $a['is_locked'])),
@@ -1060,6 +1067,76 @@ class QuizController extends Controller
                 'success'        => true,
                 'session_status' => 'started',
                 'message'        => $msg,
+            ]);
+        }
+
+        return back()->with('success', $msg);
+    }
+
+    public function pauseSession(Request $request, Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+
+        $quiz->update([
+            'session_status' => 'paused',
+            'paused_at'      => now(),
+        ]);
+
+        cache()->put("quiz_{$quiz->id}_status", 'paused', 120);
+
+        $msg = 'Ujian berhasil dijeda! Hitungan mundur dan layar ujian seluruh mahasiswa telah dibekukan sementara.';
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success'        => true,
+                'session_status' => 'paused',
+                'paused_at'      => $quiz->paused_at->toIso8601String(),
+                'message'        => $msg,
+            ]);
+        }
+
+        return back()->with('success', $msg);
+    }
+
+    public function resumeSession(Request $request, Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+
+        $pausedAt = $quiz->paused_at ?? now();
+        $pauseDurationSeconds = max(0, (int) (now()->timestamp - $pausedAt->timestamp));
+
+        // Shift started_at forward for all active attempts so paused duration does NOT eat into students' exam time!
+        if ($pauseDurationSeconds > 0) {
+            $activeAttempts = $quiz->attempts()->whereNull('completed_at')->get();
+            foreach ($activeAttempts as $att) {
+                if ($att->started_at) {
+                    $att->update([
+                        'started_at'        => $att->started_at->addSeconds($pauseDurationSeconds),
+                        'last_heartbeat_at' => now(),
+                    ]);
+                }
+            }
+        }
+
+        $quiz->update([
+            'session_status' => 'started',
+            'paused_at'      => null,
+        ]);
+
+        cache()->put("quiz_{$quiz->id}_status", 'started', 120);
+
+        $minutes = floor($pauseDurationSeconds / 60);
+        $seconds = $pauseDurationSeconds % 60;
+        $durStr = $minutes > 0 ? "{$minutes} menit {$seconds} detik" : "{$seconds} detik";
+        $msg = "Ujian berhasil dilanjutkan! Kompensasi jeda ({$durStr}) telah otomatis ditambahkan ke seluruh mahasiswa aktif.";
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success'                => true,
+                'session_status'         => 'started',
+                'pause_duration_seconds' => $pauseDurationSeconds,
+                'pause_duration_human'   => $durStr,
+                'message'                => $msg,
             ]);
         }
 

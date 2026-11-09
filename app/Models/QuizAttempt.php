@@ -129,7 +129,11 @@ class QuizAttempt extends Model
             return null; // Unlimited
         }
         $totalMinutes = $quiz->time_limit_minutes + ($this->extra_time_minutes ?? 0);
-        $elapsed = abs((int) now()->diffInSeconds($this->started_at));
+        if ($quiz->isSessionPaused() && $quiz->paused_at) {
+            $elapsed = max(0, (int) ($quiz->paused_at->timestamp - $this->started_at->timestamp));
+        } else {
+            $elapsed = max(0, (int) (now()->timestamp - $this->started_at->timestamp));
+        }
         $allowed = $totalMinutes * 60;
         return max(0, $allowed - $elapsed);
     }

@@ -59,11 +59,12 @@
         </div>
     </div>
 
-    {{-- ─── LIVE EXAM SESSION CONTROL BANNER (START / END / WAITING ROOM) ─── --}}
+    {{-- ─── LIVE EXAM SESSION CONTROL BANNER (START / PAUSE / RESUME / END / WAITING ROOM) ─── --}}
     <div class="rounded-2xl p-4 sm:p-5 border transition-all duration-300 shadow-sm session-status-banner"
          :class="{
              'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-amber-300 dark:border-amber-500/30': sessionStatus === 'waiting',
              'bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-300 dark:border-emerald-500/30': sessionStatus === 'started',
+             'bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-transparent border-amber-400 dark:border-amber-500/50 ring-2 ring-amber-500/20': sessionStatus === 'paused',
              'bg-gradient-to-r from-rose-500/10 via-rose-500/5 to-transparent border-rose-300 dark:border-rose-500/30': sessionStatus === 'ended'
          }">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -73,6 +74,7 @@
                      :class="{
                          'session-icon-waiting bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-500/40': sessionStatus === 'waiting',
                          'session-icon-started bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/40': sessionStatus === 'started',
+                         'bg-amber-500/20 text-amber-500 border border-amber-500/50 animate-pulse': sessionStatus === 'paused',
                          'session-icon-ended bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-300 dark:border-rose-500/40': sessionStatus === 'ended'
                      }">
                     <template x-if="sessionStatus === 'waiting'">
@@ -80,6 +82,9 @@
                     </template>
                     <template x-if="sessionStatus === 'started'">
                         <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </template>
+                    <template x-if="sessionStatus === 'paused'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </template>
                     <template x-if="sessionStatus === 'ended'">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
@@ -92,24 +97,30 @@
                               :class="{
                                   'session-badge-waiting bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30': sessionStatus === 'waiting',
                                   'session-badge-started bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30': sessionStatus === 'started',
+                                  'bg-amber-500 text-gray-950 border border-amber-400 font-extrabold animate-pulse': sessionStatus === 'paused',
                                   'session-badge-ended bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30': sessionStatus === 'ended'
                               }"
-                              x-text="sessionStatus === 'waiting' ? '⏳ Ruang Tunggu Aktif (Lobby)' : (sessionStatus === 'started' ? '🟢 Ujian Sedang Berlangsung' : '⛔ Ujian Telah Selesai')">
+                              x-text="sessionStatus === 'waiting' ? '⏳ Ruang Tunggu Aktif (Lobby)' : (sessionStatus === 'started' ? '🟢 Ujian Sedang Berlangsung' : (sessionStatus === 'paused' ? '⏸️ UJIAN DIJEDA DARURAT (PAUSED)' : '⛔ Ujian Telah Selesai'))">
                         </span>
                         <span class="text-xs font-mono text-gray-600 dark:text-gray-400 font-semibold"
                               x-show="sessionStatus === 'waiting'"
                               x-text="'(' + summary.total_active + ' Mahasiswa Siap di Ruang Tunggu)'"></span>
+                        <span class="text-xs font-mono text-amber-600 dark:text-amber-400 font-bold"
+                              x-show="sessionStatus === 'paused'"
+                              x-text="'(Hitung Mundur Seluruh Layar Dibekukan)'"></span>
                     </div>
 
                     <h4 class="text-base font-extrabold session-banner-title mt-1.5">
                         <span x-show="sessionStatus === 'waiting'">Menunggu Pengawas Membuka Pengerjaan Soal</span>
                         <span x-show="sessionStatus === 'started'">Akses Soal Terbuka & Hitungan Mundur Waktu Berjalan</span>
+                        <span x-show="sessionStatus === 'paused'">Ujian Sedang Dibekukan Sementara (Emergency Pause)</span>
                         <span x-show="sessionStatus === 'ended'">Akses Pengerjaan Ditutup & Nilai Telah Direkap</span>
                     </h4>
 
                     <p class="text-xs session-banner-desc mt-0.5 font-medium leading-relaxed">
                         <span x-show="sessionStatus === 'waiting'">Mahasiswa yang mengisi NIM berkumpul di Ruang Tunggu. Tekan tombol hijau di samping untuk memulai ujian serentak.</span>
-                        <span x-show="sessionStatus === 'started'">Mahasiswa sedang aktif menjawab. Tekan tombol merah di samping jika Anda ingin menghentikan ujian sewaktu-waktu.</span>
+                        <span x-show="sessionStatus === 'started'">Mahasiswa sedang aktif menjawab. Anda dapat menjeda ujian sewaktu-waktu jika terjadi kendala listrik/jaringan lab.</span>
+                        <span x-show="sessionStatus === 'paused'">Layar ujian mahasiswa tertutup instruksi jeda. Waktu jeda TIDAK AKAN memotong sisa waktu ujian mahasiswa saat dilanjutkan.</span>
                         <span x-show="sessionStatus === 'ended'">Seluruh pengerjaan aktif telah dikumpulkan dan dinilai. Anda dapat membuka kembali ruang tunggu jika ada sesi susulan.</span>
                     </p>
                 </div>
@@ -127,13 +138,34 @@
                     <span>Mulai Kuis Sekarang</span>
                 </button>
 
-                {{-- Button END (When Started) --}}
+                {{-- Button PAUSE (When Started) --}}
                 <button type="button"
                         x-show="sessionStatus === 'started'"
+                        @click="confirmPauseSession()"
+                        :disabled="isSessionProcessing"
+                        class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-amber-500/20 flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                        title="Jeda hitung mundur dan bekukan sementara layar seluruh mahasiswa">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Jeda Ujian (Pause)</span>
+                </button>
+
+                {{-- Button RESUME (When Paused) --}}
+                <button type="button"
+                        x-show="sessionStatus === 'paused'"
+                        @click="confirmResumeSession()"
+                        :disabled="isSessionProcessing"
+                        class="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm shadow-lg shadow-emerald-500/30 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50 animate-bounce">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>▶️ Lanjutkan Ujian (Resume)</span>
+                </button>
+
+                {{-- Button END (When Started OR Paused) --}}
+                <button type="button"
+                        x-show="sessionStatus === 'started' || sessionStatus === 'paused'"
                         @click="confirmEndSession()"
                         :disabled="isSessionProcessing"
-                        class="px-5 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-sm shadow-lg shadow-rose-500/25 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+                        class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-500/20 flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
                     <span>Hentikan Kuis</span>
                 </button>
 
@@ -876,6 +908,110 @@ function liveExamMonitor(quizId) {
                         }
                     } catch (err) {
                         Swal.fire('Gagal', 'Terjadi kesalahan sistem saat memulai kuis.', 'error');
+                    } finally {
+                        this.isSessionProcessing = false;
+                    }
+                }
+            });
+        },
+
+        confirmPauseSession() {
+            const isDark = document.documentElement.classList.contains('dark');
+            Swal.fire({
+                title: 'Jeda Ujian Massal Darurat?',
+                html: `<p class="text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}">Apakah Anda yakin ingin menjeda ujian untuk kuis <strong>{{ $quiz->title }}</strong>?</p><div class="mt-3 p-3 rounded-xl ${isDark ? 'bg-amber-500/10 border border-amber-500/30 text-amber-300' : 'bg-amber-50 border border-amber-200 text-amber-800'} text-xs text-left space-y-1"><p class="font-bold">⚡ Dampak Jeda Darurat:</p><ul class="list-disc pl-4 space-y-0.5"><li>Hitungan mundur seluruh mahasiswa langsung dibekukan.</li><li>Layar ujian tertutup instruksi jeda dari pengawas.</li><li>Durasi jeda <b>TIDAK AKAN</b> mengurangi waktu ujian mahasiswa saat dilanjutkan.</li></ul></div>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#F59E0B',
+                cancelButtonColor: isDark ? '#374151' : '#6B7280',
+                confirmButtonText: '⏸️ Ya, Jeda Ujian Sekarang!',
+                cancelButtonText: 'Batal',
+                background: isDark ? '#0F1713' : '#FFFFFF',
+                color: isDark ? '#F3F4F6' : '#111827',
+                customClass: { popup: isDark ? 'border border-amber-500/40 rounded-2xl shadow-2xl' : 'border border-amber-200 rounded-2xl shadow-2xl' }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    this.isSessionProcessing = true;
+                    try {
+                        const res = await fetch(`{{ route('admin.quizzes.session.pause', $quiz) }}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': this.getCsrfToken()
+                            }
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            this.sessionStatus = 'paused';
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Ujian Berhasil Dijeda!',
+                                text: data.message,
+                                timer: 2500,
+                                showConfirmButton: false,
+                                background: isDark ? '#0F1713' : '#FFFFFF',
+                                color: isDark ? '#F59E0B' : '#B45309',
+                                customClass: { popup: isDark ? 'border border-amber-500/40 rounded-xl' : 'border border-amber-200 rounded-xl' }
+                            });
+                            this.fetchData(true);
+                        } else {
+                            Swal.fire('Gagal', data.message || 'Gagal menjeda kuis.', 'error');
+                        }
+                    } catch (err) {
+                        Swal.fire('Gagal', 'Terjadi kesalahan sistem saat menjeda kuis.', 'error');
+                    } finally {
+                        this.isSessionProcessing = false;
+                    }
+                }
+            });
+        },
+
+        confirmResumeSession() {
+            const isDark = document.documentElement.classList.contains('dark');
+            Swal.fire({
+                title: 'Lanjutkan Kembali Ujian?',
+                html: `<p class="text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}">Akses pengerjaan soal akan dibuka kembali untuk seluruh mahasiswa.</p><p class="text-xs ${isDark ? 'text-emerald-400' : 'text-emerald-700'} mt-2.5 font-semibold">Waktu pengerjaan seluruh mahasiswa otomatis diperpanjang sesuai lama jeda sehingga tidak ada waktu yang terpotong.</p>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10B981',
+                cancelButtonColor: isDark ? '#374151' : '#6B7280',
+                confirmButtonText: '▶️ Ya, Lanjutkan Ujian!',
+                cancelButtonText: 'Batal',
+                background: isDark ? '#0F1713' : '#FFFFFF',
+                color: isDark ? '#F3F4F6' : '#111827',
+                customClass: { popup: isDark ? 'border border-emerald-500/40 rounded-2xl shadow-2xl' : 'border border-emerald-200 rounded-2xl shadow-2xl' }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    this.isSessionProcessing = true;
+                    try {
+                        const res = await fetch(`{{ route('admin.quizzes.session.resume', $quiz) }}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': this.getCsrfToken()
+                            }
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            this.sessionStatus = 'started';
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Ujian Dilanjutkan!',
+                                text: data.message,
+                                timer: 2500,
+                                showConfirmButton: false,
+                                background: isDark ? '#0F1713' : '#FFFFFF',
+                                color: isDark ? '#34D399' : '#059669',
+                                customClass: { popup: isDark ? 'border border-emerald-500/40 rounded-xl' : 'border border-emerald-200 rounded-xl' }
+                            });
+                            this.fetchData(true);
+                        } else {
+                            Swal.fire('Gagal', data.message || 'Gagal melanjutkan kuis.', 'error');
+                        }
+                    } catch (err) {
+                        Swal.fire('Gagal', 'Terjadi kesalahan sistem saat melanjutkan kuis.', 'error');
                     } finally {
                         this.isSessionProcessing = false;
                     }

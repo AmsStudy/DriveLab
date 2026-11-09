@@ -120,3 +120,4 @@ class QuizAddTimeTest extends TestCase
         $this->assertLessThanOrEqual(900, $timeRemaining);
     }
 }
+

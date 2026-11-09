@@ -824,6 +824,52 @@
     </div>
 
     {{-- ========================================================================= --}}
+    {{-- EMERGENCY GLOBAL PAUSE OVERLAY (UJIAN DIJEDA OLEH PENGAWAS LAB)           --}}
+    {{-- ========================================================================= --}}
+    <div x-show="isExamPaused"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md select-none"
+         style="display: none;">
+        
+        <div class="max-w-md w-full bg-[#0F1713] border-2 border-amber-500/50 rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden ring-4 ring-amber-500/10">
+            {{-- Ambient Glow --}}
+            <div class="absolute -top-20 -left-20 w-44 h-44 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -right-20 w-44 h-44 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+            {{-- Pause Icon --}}
+            <div class="w-20 h-20 mx-auto mb-4 rounded-3xl bg-amber-500/20 border-2 border-amber-500/40 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/20">
+                <svg class="w-10 h-10 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+
+            <span class="px-3 py-1 rounded-full text-xs font-black tracking-widest uppercase bg-amber-500 text-gray-950 font-mono inline-block mb-3 animate-pulse">
+                ⏸️ Ujian Dijeda Pengawas
+            </span>
+
+            <h3 class="text-xl sm:text-2xl font-black text-white mb-2">Hitungan Waktu Dibekukan</h3>
+            
+            <p class="text-xs sm:text-sm text-gray-300 leading-relaxed font-medium mb-5">
+                Pengawas lab sedang menjeda jalannya ujian. <strong class="text-amber-400 font-bold">Waktu pengerjaan Anda otomatis dibekukan</strong> dan tidak akan berkurang sama sekali selama masa jeda ini.
+            </p>
+
+            {{-- Frozen Timer Status --}}
+            <div class="p-3.5 rounded-2xl bg-black/40 border border-[#1A2820] flex items-center justify-center gap-3">
+                <span class="text-xs text-gray-400 font-medium">Sisa Waktu Anda:</span>
+                <span class="font-mono text-base font-bold text-amber-400" x-text="formatTime(remainingSeconds) + ' (Frozen)'"></span>
+            </div>
+
+            <div class="mt-5 flex items-center justify-center gap-2 text-[11px] text-gray-400">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                <span>Layar akan otomatis terbuka saat pengawas melanjutkan ujian</span>
+            </div>
+        </div>
+    </div>
+
+    {{-- ========================================================================= --}}
     {{-- HOVER PREVIEW POPUP (INSTANT PREVIEW SAAT KURSOR MENDEKAT)                --}}
     {{-- ========================================================================= --}}
     <div class="cyber-hover-preview-bubble"
@@ -941,6 +987,9 @@
                 activeAnnouncementModal: null,
                 isAnnouncementDrawerOpen: false,
                 lastSeenAnnouncementId: parseInt(localStorage.getItem('quiz_seen_announcement_{{ $attempt->id }}') || '0'),
+
+                // Emergency Global Pause
+                isExamPaused: {{ $quiz->isSessionPaused() ? 'true' : 'false' }},
                 timerInterval: null,
                 penaltyTimerInterval: null,
                 isFullscreen: false,
@@ -1006,6 +1055,7 @@
                     if (this.remainingSeconds !== null && this.remainingSeconds > 0) {
                         this.remainingSeconds = Math.max(0, Math.floor(Number(this.remainingSeconds)));
                         this.timerInterval = setInterval(() => {
+                            if (this.isExamPaused) return; // Do not decrement timer while exam is paused!
                             if (this.remainingSeconds > 0) {
                                 this.remainingSeconds--;
                             } else {
@@ -1381,6 +1431,32 @@
                                         this.enterFullscreen();
                                     }
                                     window.focus();
+                                }
+                            }
+
+                            // Sync emergency global pause state
+                            if (data.is_paused !== undefined) {
+                                if (data.is_paused && !this.isExamPaused) {
+                                    this.isExamPaused = true;
+                                    if (this.penaltyTimerInterval) clearInterval(this.penaltyTimerInterval);
+                                    if (this.focusLossTimer) clearTimeout(this.focusLossTimer);
+                                    if (this.visibilityLossTimer) clearTimeout(this.visibilityLossTimer);
+                                } else if (!data.is_paused && this.isExamPaused) {
+                                    this.isExamPaused = false;
+                                    this.unlockImmunityUntil = Date.now() + 10000; // 10s immunity upon resume
+                                    if (window.Swal) {
+                                        Swal.fire({
+                                            toast: true,
+                                            position: 'top-end',
+                                            icon: 'success',
+                                            title: 'Ujian dilanjutkan oleh pengawas!',
+                                            showConfirmButton: false,
+                                            timer: 3000,
+                                            background: '#0F1713',
+                                            color: '#34D399',
+                                            customClass: { popup: 'border border-emerald-500/40 rounded-xl' }
+                                        });
+                                    }
                                 }
                             }
 

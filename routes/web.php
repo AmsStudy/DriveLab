@@ -134,6 +134,8 @@ Route::prefix('admin')
         Route::get('quizzes/{quiz}/projector', [QuizController::class, 'projectorLeaderboard'])->name('quizzes.projector');
         Route::get('quizzes/{quiz}/projector/data', [QuizController::class, 'projectorLeaderboardData'])->name('quizzes.projector.data');
         Route::post('quizzes/{quiz}/session/start', [QuizController::class, 'startSession'])->name('quizzes.session.start');
+        Route::post('quizzes/{quiz}/session/pause', [QuizController::class, 'pauseSession'])->name('quizzes.session.pause');
+        Route::post('quizzes/{quiz}/session/resume', [QuizController::class, 'resumeSession'])->name('quizzes.session.resume');
         Route::post('quizzes/{quiz}/session/end', [QuizController::class, 'endSession'])->name('quizzes.session.end');
         Route::post('quizzes/{quiz}/session/reset', [QuizController::class, 'resetSession'])->name('quizzes.session.reset');
         Route::post('quizzes/{quiz}/announcements', [QuizController::class, 'broadcastAnnouncement'])->name('quizzes.announcements.store');
