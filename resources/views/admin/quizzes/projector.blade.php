@@ -174,19 +174,7 @@
             box-shadow: 0 0 30px -5px rgba(249, 115, 22, 0.25), inset 0 0 20px rgba(249, 115, 22, 0.1);
         }
 
-        /* ─── TICKER & EQUALIZER ─── */
-        @keyframes marquee {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-        .animate-marquee {
-            display: inline-block;
-            white-space: nowrap;
-            animation: marquee 26s linear infinite;
-        }
-        .animate-marquee:hover {
-            animation-play-state: paused;
-        }
+        /* ─── EQUALIZER ─── */
 
         @keyframes eqBar {
             0%, 100% { height: 4px; }
@@ -207,7 +195,7 @@
         }
     </style>
 </head>
-<body x-data="projectorArena()" x-init="initArena()" class="min-h-screen flex flex-col justify-between select-none relative bg-[#050806] text-gray-100 antialiased overflow-x-hidden">
+<body x-data="projectorArena()" x-init="initArena()" class="min-h-screen flex flex-col justify-start select-none relative bg-[#050806] text-gray-100 antialiased overflow-x-hidden">
 
     {{-- Canvas Partikel Ambient & Confetti (Offline Native 60fps Canvas) --}}
     <canvas id="arena-canvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full"></canvas>
@@ -357,7 +345,7 @@
     {{-- ========================================================================= --}}
     {{-- MAIN STAGE CONTENT (HERO PODIUM TOP 3 + PAPAN KLASEMEN TOP 15)           --}}
     {{-- ========================================================================= --}}
-    <main class="relative z-10 flex-1 px-4 sm:px-6 lg:px-8 py-5 max-w-7xl mx-auto w-full flex flex-col justify-start gap-6">
+    <main class="relative z-10 flex-1 px-4 sm:px-6 lg:px-8 py-5 pb-10 max-w-7xl mx-auto w-full flex flex-col justify-start gap-6">
 
         {{-- Loading Initial State --}}
         <template x-if="isLoading && leaderboard.length === 0">
@@ -741,21 +729,7 @@
         </div>
     </main>
 
-    {{-- ========================================================================= --}}
-    {{-- BOTTOM COMMENTATOR BROADCAST TICKER                                       --}}
-    {{-- ========================================================================= --}}
-    <footer class="relative z-20 border-t border-[#1A2820] bg-[#080D0A]/95 backdrop-blur-md py-2.5 px-4 overflow-hidden shadow-2xl">
-        <div class="max-w-7xl mx-auto flex items-center gap-3">
-            <div class="shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-amber-500/20 to-emerald-500/20 text-amber-300 text-xs font-black uppercase tracking-wider border border-amber-500/40 shadow-sm">
-                <span class="text-sm">⚡</span> LIVE KOMENTATOR:
-            </div>
-            <div class="overflow-hidden whitespace-nowrap flex-1">
-                <div class="animate-marquee text-xs font-semibold text-gray-300 space-x-8">
-                    <span x-text="marqueeText"></span>
-                </div>
-            </div>
-        </div>
-    </footer>
+
 
     {{-- ========================================================================= --}}
     {{-- JAVASCRIPT ARENA LOGIC, 60FPS AMBIENT PARTICLES & SFX SYNTHESIZER         --}}
@@ -777,7 +751,6 @@
                 syncSecondsLeft: 4,
                 audioCtx: null,
                 lastAnnouncementId: null,
-                marqueeText: 'Menyambungkan ke Live Arena... Persaingan peringkat berjalan secara dinamis!',
                 pollingInterval: null,
                 countdownInterval: null,
                 activeParticles: [],
@@ -933,7 +906,7 @@
                 },
 
                 updateMarquee(text) {
-                    this.marqueeText = text + ' • ' + this.marqueeText;
+                    // Komentator footer dinonaktifkan
                 },
 
                 getInitials(name) {
