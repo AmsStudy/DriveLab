@@ -1638,7 +1638,7 @@ footer{
                                         <div class="dz-sub">{{ $extText }} · Maks. {{ $maxAllowedFiles }} Berkas (10 MB/file)</div>
                                     </div>
                                     <div class="dz-success" id="dz-success" style="display:none;flex-direction:column;gap:10px;width:100%;text-align:left;">
-                                        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                                        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:8px;">
                                             <div style="display:flex;align-items:center;gap:8px;">
                                                 <div class="dz-success-icon" style="flex-shrink:0;">
                                                     <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -1647,12 +1647,27 @@ footer{
                                                 </div>
                                                 <span id="dz-files-summary" style="font-size:12px;font-weight:600;color:var(--emerald);"></span>
                                             </div>
-                                            <span class="dz-change"
-                                                  onclick="event.stopPropagation();document.getElementById('sub_file').click()">
-                                                Pilih Ulang
-                                            </span>
+                                            <div style="display:flex;align-items:center;gap:12px;">
+                                                @if($maxAllowedFiles > 1)
+                                                    <button type="button" class="dz-change"
+                                                            style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--emerald);font-weight:700;display:inline-flex;align-items:center;gap:3px;padding:0;"
+                                                            onclick="event.stopPropagation();document.getElementById('sub_file').click()">
+                                                        <span>+ Tambah Berkas</span>
+                                                    </button>
+                                                @endif
+                                                <button type="button" class="dz-change"
+                                                        style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--text3);font-weight:500;padding:0;"
+                                                        onclick="event.stopPropagation();resetAllSelectedFiles()">
+                                                    Reset Semua
+                                                </button>
+                                            </div>
                                         </div>
                                         <div id="dz-files-list" style="display:flex;flex-direction:column;gap:6px;width:100%;max-height:180px;overflow-y:auto;padding-right:4px;"></div>
+                                        @if($maxAllowedFiles > 1)
+                                            <div style="font-size:11px;color:var(--text3);text-align:center;padding-top:4px;border-top:1px dashed var(--border);">
+                                                💡 Klik di sini atau seret berkas lagi untuk menambahkan file dari folder lain
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -1805,37 +1820,99 @@ function formatFileSize(bytes) {
     return (bytes / 1024).toFixed(0) + ' KB';
 }
 
+function resetAllSelectedFiles() {
+    selectedFiles = [];
+    if (fileInput) fileInput.value = '';
+    renderSelectedFilesUI();
+}
+
 function handleFilesSelected(incomingFiles) {
     const list = Array.from(incomingFiles);
     if (!list.length) return;
 
-    if (list.length > maxFilesAllowed) {
-        showAlert('error', `Maksimal ${maxFilesAllowed} berkas yang dapat dikumpulkan. Anda memilih ${list.length} berkas.`);
+    // Filter duplikat: jika file dengan nama, ukuran, dan waktu modifikasi sama sudah dipilih sebelumnya
+    const newFiles = [];
+    const duplicateNames = [];
+
+    for (let f of list) {
+        const isDuplicate = selectedFiles.some(existing => 
+            existing.name === f.name && existing.size === f.size && existing.lastModified === f.lastModified
+        );
+        if (isDuplicate) {
+            duplicateNames.push(f.name);
+        } else {
+            newFiles.push(f);
+        }
+    }
+
+    if (duplicateNames.length > 0 && newFiles.length === 0) {
+        showAlert('error', `Berkas "${duplicateNames.join(', ')}" sudah ada di dalam daftar pilihan.`);
         return;
     }
 
-    let totalBytes = 0;
-    for (let f of list) {
-        totalBytes += f.size;
+    // Mode berkas tunggal (jika hanya 1 berkas yang diizinkan)
+    if (maxFilesAllowed === 1) {
+        if (newFiles.length > 1) {
+            showAlert('error', `Tugas ini hanya mengizinkan pengumpulan maksimal 1 berkas.`);
+            return;
+        }
+        const singleFile = newFiles[0] || list[0];
+        if (singleFile.size > 10 * 1024 * 1024) {
+            showAlert('error', `Berkas "${singleFile.name}" (${formatFileSize(singleFile.size)}) melebihi batas maksimal 10 MB per berkas!`);
+            return;
+        }
+        selectedFiles = [singleFile];
+        renderSelectedFilesUI();
+        return;
+    }
+
+    // Mode multi-berkas: akumulasikan berkas yang sudah ada dengan berkas baru
+    const combined = [...selectedFiles, ...newFiles];
+
+    if (combined.length > maxFilesAllowed) {
+        showAlert('error', `Maksimal ${maxFilesAllowed} berkas yang dapat dikumpulkan. Saat ini sudah ada ${selectedFiles.length} berkas dipilih, Anda mencoba menambahkan ${newFiles.length} berkas baru (Total: ${combined.length} berkas).`);
+        return;
+    }
+
+    // Validasi ukuran masing-masing file baru
+    for (let f of newFiles) {
         if (f.size > 10 * 1024 * 1024) {
             showAlert('error', `Berkas "${f.name}" (${formatFileSize(f.size)}) melebihi batas maksimal 10 MB per berkas!`);
             return;
         }
     }
 
+    // Validasi total ukuran seluruh berkas yang telah diakumulasi
+    const totalBytes = combined.reduce((acc, f) => acc + f.size, 0);
     const maxTotalBytes = 35 * 1024 * 1024;
     if (totalBytes > maxTotalBytes) {
         showAlert('error', `Total ukuran seluruh berkas (${formatFileSize(totalBytes)}) melebihi batas aman maksimal 35 MB. Silakan kompres atau pilih berkas yang lebih ringkas.`);
         return;
     }
 
-    selectedFiles = list;
+    selectedFiles = combined;
     renderSelectedFilesUI();
+
+    // Notifikasi jika ada berkas duplikat yang dilewati
+    if (duplicateNames.length > 0 && window.Swal) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'info',
+            title: `Berkas duplikat "${duplicateNames.join(', ')}" dilewati. ${newFiles.length} berkas baru berhasil ditambahkan.`,
+            showConfirmButton: false,
+            timer: 3500,
+            background: document.documentElement.classList.contains('dark') ? '#0F1713' : '#FFFFFF',
+            color: document.documentElement.classList.contains('dark') ? '#F3F4F6' : '#111827',
+            customClass: { popup: 'border border-emerald-500/30 rounded-xl' }
+        });
+    }
 }
 
 function removeSelectedFile(index, evt) {
     if (evt) evt.stopPropagation();
     selectedFiles.splice(index, 1);
+    if (fileInput) fileInput.value = '';
     renderSelectedFilesUI();
 }
 
@@ -2018,6 +2095,7 @@ function setLoading(loading, progressText) {
 if (fileInput) {
     fileInput.addEventListener('change', function() {
         if (this.files && this.files.length) handleFilesSelected(this.files);
+        this.value = '';
     });
 }
 
