@@ -242,3 +242,4 @@ class QuizAnnouncementTest extends TestCase
         ]);
     }
 }
+

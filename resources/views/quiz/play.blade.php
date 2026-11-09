@@ -1343,7 +1343,22 @@
                             // Sync adjusted extra time
                             if (data.time_remaining !== undefined && data.time_remaining !== null) {
                                 const newTime = Math.max(0, Math.floor(Number(data.time_remaining)));
-                                if (this.remainingSeconds !== null && Math.abs(this.remainingSeconds - newTime) > 60) {
+                                if (this.remainingSeconds !== null && (newTime - this.remainingSeconds) > 30) {
+                                    this.remainingSeconds = newTime;
+                                    if (window.Swal) {
+                                        Swal.fire({
+                                            toast: true,
+                                            position: 'top-end',
+                                            icon: 'info',
+                                            title: 'Waktu ujian telah disesuaikan oleh pengawas.',
+                                            showConfirmButton: false,
+                                            timer: 3500,
+                                            background: '#0F1713',
+                                            color: '#34D399',
+                                            customClass: { popup: 'border border-emerald-500/40 rounded-xl' }
+                                        });
+                                    }
+                                } else if (this.remainingSeconds !== null && Math.abs(this.remainingSeconds - newTime) > 60) {
                                     this.remainingSeconds = newTime;
                                 }
                             }
