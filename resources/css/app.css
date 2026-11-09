@@ -272,13 +272,25 @@ html:not(.dark) header.admin-header {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Primary Button & Emerald Gradient Text Protection */
+/* Primary Button & Gradient Text Protection (Keep Pure White in ALL Themes) */
 html:not(.dark) .btn-primary,
 html:not(.dark) .btn-primary *,
 html:not(.dark) button[class*="bg-gradient-to-r from-emerald"],
 html:not(.dark) button[class*="bg-gradient-to-r from-emerald"] *,
 html:not(.dark) a[class*="bg-gradient-to-r from-emerald"],
 html:not(.dark) a[class*="bg-gradient-to-r from-emerald"] *,
+html:not(.dark) button[class*="bg-gradient-to-r from-amber"],
+html:not(.dark) button[class*="bg-gradient-to-r from-amber"] *,
+html:not(.dark) a[class*="bg-gradient-to-r from-amber"],
+html:not(.dark) a[class*="bg-gradient-to-r from-amber"] *,
+html:not(.dark) button[class*="bg-gradient-to-r from-rose"],
+html:not(.dark) button[class*="bg-gradient-to-r from-rose"] *,
+html:not(.dark) a[class*="bg-gradient-to-r from-rose"],
+html:not(.dark) a[class*="bg-gradient-to-r from-rose"] *,
+html:not(.dark) button[class*="bg-gradient-to-r from-red"],
+html:not(.dark) button[class*="bg-gradient-to-r from-red"] *,
+html:not(.dark) .btn-session-action,
+html:not(.dark) .btn-session-action *,
 html:not(.dark) [style*="linear-gradient(135deg,#10B981"],
 html:not(.dark) [style*="linear-gradient(135deg,#10B981"] *,
 html:not(.dark) [style*="linear-gradient(135deg, #10B981"],

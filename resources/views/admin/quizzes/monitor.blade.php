@@ -137,9 +137,10 @@
                         x-show="sessionStatus === 'waiting'"
                         @click="confirmStartSession()"
                         :disabled="isSessionProcessing"
-                        class="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span>Mulai Kuis Sekarang</span>
+                        class="btn-session-action px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                        style="color: #FFFFFF !important;">
+                    <svg class="w-5 h-5 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="text-white" style="color: #FFFFFF !important;">Mulai Kuis Sekarang</span>
                 </button>
 
                 {{-- Button PAUSE (When Started) --}}
@@ -147,10 +148,11 @@
                         x-show="sessionStatus === 'started'"
                         @click="confirmPauseSession()"
                         :disabled="isSessionProcessing"
-                        class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-amber-500/20 flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                        class="btn-session-action px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-amber-500/20 flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                        style="color: #FFFFFF !important;"
                         title="Jeda hitung mundur dan bekukan sementara layar seluruh mahasiswa">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span>Jeda Ujian (Pause)</span>
+                    <svg class="w-4 h-4 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="text-white" style="color: #FFFFFF !important;">Jeda Ujian (Pause)</span>
                 </button>
 
                 {{-- Button RESUME (When Paused) --}}
@@ -158,9 +160,10 @@
                         x-show="sessionStatus === 'paused'"
                         @click="confirmResumeSession()"
                         :disabled="isSessionProcessing"
-                        class="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm shadow-lg shadow-emerald-500/30 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50 animate-bounce">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span>▶️ Lanjutkan Ujian (Resume)</span>
+                        class="btn-session-action px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm shadow-lg shadow-emerald-500/30 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50 animate-bounce"
+                        style="color: #FFFFFF !important;">
+                    <svg class="w-5 h-5 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="text-white" style="color: #FFFFFF !important;">▶️ Lanjutkan Ujian (Resume)</span>
                 </button>
 
                 {{-- Button END (When Started OR Paused) --}}
@@ -168,9 +171,10 @@
                         x-show="sessionStatus === 'started' || sessionStatus === 'paused'"
                         @click="confirmEndSession()"
                         :disabled="isSessionProcessing"
-                        class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-500/20 flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
-                    <span>Hentikan Kuis</span>
+                        class="btn-session-action px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-500/20 flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                        style="color: #FFFFFF !important;">
+                    <svg class="w-4 h-4 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+                    <span class="text-white" style="color: #FFFFFF !important;">Hentikan Kuis</span>
                 </button>
 
                 {{-- Button RESET (When Ended) --}}
@@ -1392,6 +1396,21 @@ function liveExamMonitor(quizId) {
         background-color: #FFE4E6 !important;
         color: #BE123C !important;
         border-color: #FDA4AF !important;
+    }
+
+    /* Action Buttons Pure White Text & Icons Protection across ALL themes */
+    .btn-session-action,
+    .btn-session-action *,
+    .session-status-banner button.btn-session-action,
+    .session-status-banner button.btn-session-action *,
+    html:not(.dark) .session-status-banner button.btn-session-action,
+    html:not(.dark) .session-status-banner button.btn-session-action *,
+    html:not(.dark) .session-status-banner button.btn-session-action span,
+    html:not(.dark) .session-status-banner button.btn-session-action svg,
+    html.dark .session-status-banner button.btn-session-action,
+    html.dark .session-status-banner button.btn-session-action * {
+        color: #FFFFFF !important;
+        stroke: #FFFFFF !important;
     }
 </style>
 @endpush
