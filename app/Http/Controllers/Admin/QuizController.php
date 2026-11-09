@@ -939,7 +939,7 @@ class QuizController extends Controller
                 $points = (int) ($att->total_points_earned ?? 0);
                 $correctCount = (int) ($att->correct_answers_count ?? 0);
                 $answeredCount = $totalQuestions;
-                $lastActivityTimestamp = $att->completed_at ? $att->completed_at->timestamp : 0;
+                $duration = (int) ($att->duration_seconds ?? ($att->started_at && $att->completed_at ? abs((int)$att->completed_at->diffInSeconds($att->started_at)) : 999999));
             } else {
                 $draft = $att->draft_answers ?? [];
                 unset($draft['__flagged']);
@@ -965,9 +965,7 @@ class QuizController extends Controller
                     }
                 }
 
-                $lastActivityTimestamp = $att->last_heartbeat_at
-                    ? $att->last_heartbeat_at->timestamp
-                    : ($att->started_at ? $att->started_at->timestamp : 0);
+                $duration = $att->started_at ? abs((int) now()->diffInSeconds($att->started_at)) : 0;
             }
 
             $progressPercent = $totalQuestions > 0 ? round(($answeredCount / $totalQuestions) * 100) : 0;
@@ -978,7 +976,7 @@ class QuizController extends Controller
                 'student_name'            => $att->student_name,
                 'kelas'                   => $att->kelas ?? '-',
                 'points'                  => $points, // Digunakan HANYA di server untuk perankingan!
-                'last_activity_timestamp' => $lastActivityTimestamp,
+                'duration_seconds'        => $duration,
                 'answered_count'          => $answeredCount,
                 'correct_count'           => $correctCount,
                 'total_questions'         => $totalQuestions,
@@ -988,16 +986,16 @@ class QuizController extends Controller
             ];
         }
 
-        // Sort participants:
-        // 1. Poin benar tertinggi
-        // 2. Waktu tercepat mencapai poin (timestamp lebih awal)
+        // Sort participants (Selaras dengan Hasil Resmi & Export CSV):
+        // 1. Poin benar tertinggi (points DESC)
+        // 2. Durasi pengerjaan tersingkat / paling cepat (duration_seconds ASC)
         // 3. ID ASC (tie-breaker stabil)
         usort($rankedList, function ($a, $b) {
             if ($b['points'] !== $a['points']) {
                 return $b['points'] <=> $a['points'];
             }
-            if ($a['last_activity_timestamp'] !== $b['last_activity_timestamp']) {
-                return $a['last_activity_timestamp'] <=> $b['last_activity_timestamp'];
+            if ($a['duration_seconds'] !== $b['duration_seconds']) {
+                return $a['duration_seconds'] <=> $b['duration_seconds'];
             }
             return $a['id'] <=> $b['id'];
         });
