@@ -116,6 +116,38 @@ html:not(.dark) .dz-change {
   background: #E2EAE5 !important;
   color: #374151 !important;
 }
+html:not(.dark) .btn-dz-add {
+  background: #ECFDF5 !important;
+  color: #047857 !important;
+  border: 1px solid #A7F3D0 !important;
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.12) !important;
+}
+html:not(.dark) .btn-dz-add:hover {
+  background: #059669 !important;
+  color: #FFFFFF !important;
+  border-color: #047857 !important;
+  box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25) !important;
+}
+html:not(.dark) .btn-dz-add:hover svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+html:not(.dark) .btn-dz-reset {
+  background: #F9FAFB !important;
+  color: #4B5563 !important;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+html:not(.dark) .btn-dz-reset:hover {
+  background: #FEF2F2 !important;
+  color: #DC2626 !important;
+  border-color: #FCA5A5 !important;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.1) !important;
+}
+html:not(.dark) .btn-dz-reset:hover svg {
+  color: #DC2626 !important;
+  stroke: #DC2626 !important;
+}
 html:not(.dark) .custom-cyber-menu {
   background: rgba(255, 255, 255, 0.98) !important;
   border-color: #E2EAE5 !important;
@@ -1003,6 +1035,71 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
 }
 .dz-change:hover{color:var(--text1);background:var(--surface2)}
 
+/* Dropzone Action Buttons */
+.btn-dz-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: rgba(16, 185, 129, 0.12);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-dz-add svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.5;
+  transition: transform 0.2s ease;
+}
+.btn-dz-add:hover {
+  background: rgba(16, 185, 129, 0.22);
+  color: #6EE7B7;
+  border-color: rgba(52, 211, 153, 0.6);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+  transform: translateY(-1px);
+}
+.btn-dz-add:hover svg {
+  transform: scale(1.15);
+}
+.btn-dz-add:active {
+  transform: translateY(0px) scale(0.97);
+}
+
+.btn-dz-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.04);
+  color: #9CA3AF;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-dz-reset svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.2;
+}
+.btn-dz-reset:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #F87171;
+  border-color: rgba(239, 68, 68, 0.35);
+  transform: translateY(-1px);
+}
+.btn-dz-reset:active {
+  transform: translateY(0px) scale(0.97);
+}
+
 /* Alert */
 .alert{
   display:none;padding:13px 16px;border-radius:10px;
@@ -1647,18 +1744,24 @@ footer{
                                                 </div>
                                                 <span id="dz-files-summary" style="font-size:12px;font-weight:600;color:var(--emerald);"></span>
                                             </div>
-                                            <div style="display:flex;align-items:center;gap:12px;">
+                                            <div style="display:flex;align-items:center;gap:8px;">
                                                 @if($maxAllowedFiles > 1)
-                                                    <button type="button" class="dz-change"
-                                                            style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--emerald);font-weight:700;display:inline-flex;align-items:center;gap:3px;padding:0;"
-                                                            onclick="event.stopPropagation();document.getElementById('sub_file').click()">
-                                                        <span>+ Tambah Berkas</span>
+                                                    <button type="button" class="btn-dz-add"
+                                                            onclick="event.stopPropagation();document.getElementById('sub_file').click()"
+                                                            title="Pilih dan tambahkan berkas dari folder lain">
+                                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                                        </svg>
+                                                        <span>Tambah Berkas</span>
                                                     </button>
                                                 @endif
-                                                <button type="button" class="dz-change"
-                                                        style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--text3);font-weight:500;padding:0;"
-                                                        onclick="event.stopPropagation();resetAllSelectedFiles()">
-                                                    Reset Semua
+                                                <button type="button" class="btn-dz-reset"
+                                                        onclick="event.stopPropagation();resetAllSelectedFiles()"
+                                                        title="Kosongkan seluruh berkas yang dipilih">
+                                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                    <span>Reset Semua</span>
                                                 </button>
                                             </div>
                                         </div>
