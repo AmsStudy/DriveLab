@@ -109,6 +109,7 @@ class SoalController extends Controller
             'submission_types.*' => 'string|in:file,link,text',
             'deadline_at' => 'nullable|required_if:is_submission_enabled,1|date',
             'submission_instructions' => 'nullable|string',
+            'max_files'    => 'nullable|integer|min:1|max:20',
             'allowed_extensions' => 'nullable|required_if:is_submission_enabled,1|array',
             'allowed_extensions.*' => 'string|in:all,pdf,word,excel,ppt,image,archive,pkt',
             'classes'      => 'nullable|string|max:500',
@@ -164,6 +165,7 @@ class SoalController extends Controller
             'is_downloadable'     => $request->boolean('is_downloadable'),
             'is_submission_enabled' => $request->boolean('is_submission_enabled'),
             'submission_types'    => $submissionTypes,
+            'max_files'           => $request->boolean('is_submission_enabled') ? max(1, (int)$request->input('max_files', 1)) : 1,
             'deadline_at'         => $validated['deadline_at'] ?? null,
             'submission_instructions' => $validated['submission_instructions'] ?? null,
             'allowed_extensions'  => $validated['allowed_extensions'] ?? [],
@@ -217,7 +219,7 @@ class SoalController extends Controller
     public function show(Soal $soal)
     {
         $this->authorizeAccess($soal);
-        $submissions = Submission::where('soal_id', $soal->id)->orderBy('created_at', 'desc')->get();
+        $submissions = Submission::with('files')->where('soal_id', $soal->id)->orderBy('created_at', 'desc')->get();
         $categories  = Category::all();
         return view('admin.soal.show', compact('soal', 'submissions', 'categories'));
     }
@@ -226,7 +228,7 @@ class SoalController extends Controller
     {
         $this->authorizeAccess($soal);
 
-        $submissions = Submission::where('soal_id', $soal->id)
+        $submissions = Submission::with('files')->where('soal_id', $soal->id)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -299,6 +301,7 @@ class SoalController extends Controller
             'submission_types.*' => 'string|in:file,link,text',
             'deadline_at' => 'nullable|required_if:is_submission_enabled,1|date',
             'submission_instructions' => 'nullable|string',
+            'max_files'    => 'nullable|integer|min:1|max:20',
             'allowed_extensions' => 'nullable|required_if:is_submission_enabled,1|array',
             'allowed_extensions.*' => 'string|in:all,pdf,word,excel,ppt,image,archive,pkt',
             'classes'      => 'nullable|string|max:500',
@@ -350,6 +353,7 @@ class SoalController extends Controller
             'is_downloadable' => $request->boolean('is_downloadable'),
             'is_submission_enabled' => $request->boolean('is_submission_enabled'),
             'submission_types'    => $submissionTypes,
+            'max_files'           => $request->boolean('is_submission_enabled') ? max(1, (int)$request->input('max_files', 1)) : 1,
             'deadline_at'         => $validated['deadline_at'] ?? null,
             'submission_instructions' => $validated['submission_instructions'] ?? null,
             'allowed_extensions'  => $validated['allowed_extensions'] ?? [],
@@ -584,7 +588,9 @@ class SoalController extends Controller
                 $konten = match ($sub->submission_type) {
                     'link'  => $sub->link_url,
                     'text'  => $sub->text_content,
-                    default => $sub->file_original_name ?: ($sub->file_path ? basename($sub->file_path) : '-'),
+                    default => $sub->getFilesCount() > 1
+                        ? $sub->getFilesList()->pluck('file_original_name')->filter()->implode(', ')
+                        : ($sub->file_original_name ?: ($sub->file_path ? basename($sub->file_path) : '-')),
                 };
 
                 // Sanitasi setiap kolom terhadap Formula Injection (CWE-1236)
@@ -688,15 +694,21 @@ class SoalController extends Controller
             $filterKelas = $request->input('kelas');
 
             foreach ($submissions as $submission) {
-                // Tentukan prefix folder jika unduh semua dan kuis memiliki kelas
+                // Tentukan folder mahasiswa: {NIM}_{Nama}
+                $safeNim           = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $submission->nim);
+                $safeNama          = preg_replace('/[^a-zA-Z0-9\-_\s]/', '_', str_replace(' ', '_', $submission->nama));
+                $studentFolderName = "{$safeNim}_{$safeNama}";
+
                 $folderPrefix = '';
                 if (empty($filterKelas) && ($soal->hasClasses() || !empty($submission->kelas))) {
-                    $safeKelas = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $submission->kelas ?: 'Lainnya');
-                    $folderPrefix = "Kelas_{$safeKelas}/";
+                    $safeKelas    = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $submission->kelas ?: 'Lainnya');
+                    $folderPrefix = "Kelas_{$safeKelas}/{$studentFolderName}/";
+                } else {
+                    $folderPrefix = "{$studentFolderName}/";
                 }
 
                 if ($submission->isLink()) {
-                    $entryName = $folderPrefix . $this->submissionZipEntryName($submission, $usedNames, 'txt');
+                    $entryName = $folderPrefix . 'tautan_tugas.txt';
                     $content   = "PENGUMPULAN TUGAS BERUPA TAUTAN / LINK\n"
                                . "NIM        : " . $submission->nim . "\n"
                                . "Nama       : " . $submission->nama . "\n"
@@ -709,7 +721,7 @@ class SoalController extends Controller
                 }
 
                 if ($submission->isText()) {
-                    $entryName = $folderPrefix . $this->submissionZipEntryName($submission, $usedNames, 'txt');
+                    $entryName = $folderPrefix . 'jawaban_teks.txt';
                     $content   = "PENGUMPULAN TUGAS BERUPA TEKS\n"
                                . "NIM        : " . $submission->nim . "\n"
                                . "Nama       : " . $submission->nama . "\n"
@@ -722,10 +734,24 @@ class SoalController extends Controller
                     continue;
                 }
 
-                if ($submission->file_path) {
-                    $realFile = $this->resolvePrivateFile($submission->file_path, $realBase);
+                // Berkas fisik tugas mahasiswa (mendukung 1 atau banyak berkas)
+                $files = $submission->getFilesList();
+                foreach ($files as $file) {
+                    if (empty($file->file_path)) continue;
+                    $realFile = $this->resolvePrivateFile($file->file_path, $realBase);
                     if ($realFile !== null) {
-                        $entryName = $folderPrefix . $this->submissionZipEntryName($submission, $usedNames);
+                        $cleanOriginal = preg_replace('/[^a-zA-Z0-9.\-_]/', '_', $file->file_original_name ?: basename($file->file_path));
+                        $entryName = $folderPrefix . $cleanOriginal;
+                        $entryBase = $cleanOriginal;
+                        $c = 1;
+                        while (isset($usedNames[$entryName])) {
+                            $ext = pathinfo($entryBase, PATHINFO_EXTENSION);
+                            $stem = pathinfo($entryBase, PATHINFO_FILENAME);
+                            $cleanOriginal = $ext ? "{$stem}_{$c}.{$ext}" : "{$stem}_{$c}";
+                            $entryName = $folderPrefix . $cleanOriginal;
+                            $c++;
+                        }
+                        $usedNames[$entryName] = true;
                         $zip->addFile($realFile, $entryName);
                         $added++;
                     }
@@ -751,26 +777,87 @@ class SoalController extends Controller
 
     public function downloadSubmission($id)
     {
-        $submission = Submission::findOrFail($id);
+        $submission = Submission::with(['soal', 'files'])->findOrFail($id);
         $this->authorizeAccess($submission->soal);
 
-        if (!$submission->isFile() || empty($submission->file_path)) {
-            abort(404, 'Pengumpulan ini bukan file yang dapat diunduh.');
+        if (!class_exists(ZipArchive::class)) {
+            abort(500, 'Ekstensi ZIP tidak tersedia di server.');
         }
 
         $realBase = realpath(Storage::disk('private')->path(''));
-        $realFile = $this->resolvePrivateFile($submission->file_path, $realBase);
-
-        if ($realFile === null) {
-            abort(404, 'File tidak ditemukan.');
+        $tempDir  = storage_path('app/temp');
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0755, true);
         }
 
-        return response()->download($realFile, basename($submission->file_original_name));
+        $tempPath = $tempDir . '/' . Str::uuid() . '.zip';
+        $zip      = new ZipArchive();
+
+        if ($zip->open($tempPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            abort(500, 'Gagal membuat file ZIP pada server.');
+        }
+
+        $added = 0;
+        $usedFileNames = [];
+
+        if ($submission->isLink()) {
+            $content = "PENGUMPULAN TUGAS BERUPA TAUTAN / LINK\n"
+                     . "NIM        : " . $submission->nim . "\n"
+                     . "Nama       : " . $submission->nama . "\n"
+                     . ($submission->kelas ? ("Kelas      : " . $submission->kelas . "\n") : "")
+                     . "Tautan     : " . $submission->link_url . "\n"
+                     . "Waktu      : " . $submission->created_at->format('Y-m-d H:i:s') . "\n";
+            $zip->addFromString('tautan_tugas.txt', $content);
+            $added++;
+        } elseif ($submission->isText()) {
+            $content = "PENGUMPULAN TUGAS BERUPA TEKS\n"
+                     . "NIM        : " . $submission->nim . "\n"
+                     . "Nama       : " . $submission->nama . "\n"
+                     . ($submission->kelas ? ("Kelas      : " . $submission->kelas . "\n") : "")
+                     . "Waktu      : " . $submission->created_at->format('Y-m-d H:i:s') . "\n"
+                     . "--------------------------------------------------------\n\n"
+                     . $submission->text_content . "\n";
+            $zip->addFromString('jawaban_teks.txt', $content);
+            $added++;
+        } else {
+            $files = $submission->getFilesList();
+            foreach ($files as $file) {
+                if (empty($file->file_path)) continue;
+                $realFile = $this->resolvePrivateFile($file->file_path, $realBase);
+                if ($realFile !== null) {
+                    $cleanName = preg_replace('/[^a-zA-Z0-9.\-_]/', '_', $file->file_original_name ?: basename($file->file_path));
+                    $name = $cleanName;
+                    $k = 1;
+                    while (isset($usedFileNames[$name])) {
+                        $ext = pathinfo($cleanName, PATHINFO_EXTENSION);
+                        $stem = pathinfo($cleanName, PATHINFO_FILENAME);
+                        $name = $ext ? "{$stem}_{$k}.{$ext}" : "{$stem}_{$k}";
+                        $k++;
+                    }
+                    $usedFileNames[$name] = true;
+                    $zip->addFile($realFile, $name);
+                    $added++;
+                }
+            }
+        }
+
+        $zip->close();
+
+        if ($added === 0) {
+            @unlink($tempPath);
+            return back()->with('error', 'Tidak ada berkas yang dapat diunduh untuk mahasiswa ini.');
+        }
+
+        $safeNim  = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $submission->nim);
+        $safeNama = preg_replace('/[^a-zA-Z0-9\-_]/', '_', str_replace(' ', '_', $submission->nama));
+        $zipFileName = 'tugas_' . $safeNim . '_' . $safeNama . '.zip';
+
+        return response()->download($tempPath, $zipFileName)->deleteFileAfterSend(true);
     }
 
-    public function previewSubmission($id)
+    public function previewSubmission(Request $request, $id)
     {
-        $submission = Submission::with('soal')->findOrFail($id);
+        $submission = Submission::with(['soal', 'files'])->findOrFail($id);
         $this->authorizeAccess($submission->soal);
 
         if ($submission->isLink()) {
@@ -787,25 +874,33 @@ class SoalController extends Controller
             ]);
         }
 
-        if (!$submission->isFile() || empty($submission->file_path)) {
+        $fileObj = null;
+        if ($request->filled('file_id')) {
+            $fileObj = $submission->files()->find($request->file_id);
+        }
+        if (!$fileObj) {
+            $fileObj = $submission->getFilesList()->first();
+        }
+
+        if (!$fileObj || empty($fileObj->file_path)) {
             abort(404, 'Pengumpulan ini bukan file yang dapat dilihat.');
         }
 
         $realBase = realpath(Storage::disk('private')->path(''));
-        $realFile = $this->resolvePrivateFile($submission->file_path, $realBase);
+        $realFile = $this->resolvePrivateFile($fileObj->file_path, $realBase);
 
         if ($realFile === null) {
             abort(404, 'File fisik tidak ditemukan pada server.');
         }
 
         $mimeType = mime_content_type($realFile) ?: 'application/octet-stream';
-        $ext = strtolower(pathinfo($submission->file_original_name ?: $submission->file_path, PATHINFO_EXTENSION));
+        $ext = strtolower(pathinfo($fileObj->file_original_name ?: $fileObj->file_path, PATHINFO_EXTENSION));
         $inlineExts = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'svg', 'gif', 'txt'];
         $disposition = in_array($ext, $inlineExts, true) ? 'inline' : 'attachment';
 
         return response()->file($realFile, [
             'Content-Type'           => $mimeType,
-            'Content-Disposition'    => $disposition . '; filename="' . basename($submission->file_original_name ?: 'tugas') . '"',
+            'Content-Disposition'    => $disposition . '; filename="' . basename($fileObj->file_original_name ?: 'tugas') . '"',
             'X-Frame-Options'        => 'SAMEORIGIN',
             'X-Content-Type-Options' => 'nosniff',
             'Cache-Control'          => 'no-store, no-cache, must-revalidate',

@@ -37,6 +37,7 @@ class Soal extends Model
         'is_downloadable',
         'is_submission_enabled',
         'submission_types',
+        'max_files',
         'deadline_at',
         'submission_instructions',
         'allowed_extensions',
@@ -50,6 +51,7 @@ class Soal extends Model
         'is_downloadable' => 'boolean',
         'is_submission_enabled' => 'boolean',
         'submission_types' => 'array',
+        'max_files'    => 'integer',
         'deadline_at'  => 'datetime',
         'allowed_extensions' => 'array',
         'classes'      => 'array',
@@ -202,5 +204,11 @@ class Soal extends Model
         return 'active';
     }
 
-
+    /**
+     * Batas maksimal berkas file yang dapat dikumpulkan mahasiswa.
+     */
+    public function getMaxFiles(): int
+    {
+        return max(1, (int) ($this->max_files ?? 1));
+    }
 }

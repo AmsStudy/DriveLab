@@ -52,7 +52,10 @@
                         @elseif($sub->isText())
                             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">Teks</span>
                         @else
-                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">File</span>
+                            @php $fCount = $sub->getFilesCount(); @endphp
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30" title="{{ $fCount }} berkas diunggah">
+                                File {{ $fCount > 1 ? "({$fCount})" : '' }}
+                            </span>
                         @endif
                     </td>
 
@@ -92,7 +95,7 @@
                                 @endif
 
                                 <a href="{{ route('admin.soal.download-submissions', $sub->id) }}"
-                                   class="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors inline-block" title="Unduh File Mahasiswa ({{ $sub->file_original_name }})">
+                                   class="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-colors inline-block" title="Unduh Arsip Berkas Mahasiswa (.ZIP)">
                                     <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                 </a>
                             @endif
@@ -113,3 +116,4 @@
         </table>
     </div>
 @endif
+

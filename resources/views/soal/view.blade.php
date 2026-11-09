@@ -1590,10 +1590,11 @@ footer{
 
                         {{-- Pane: File --}}
                         @if(in_array('file', $allowedSubTypes))
+                            @php $maxAllowedFiles = $soal->getMaxFiles(); @endphp
                             <div class="sub-pane {{ $defaultSubType === 'file' ? 'active' : '' }}" id="pane-file">
                                 <label class="field-label" style="margin-bottom:7px">
                                     File Tugas <span class="req">*</span>
-                                    <span class="note">Maks. 10 MB (Check Keamanan Otomatis)</span>
+                                    <span class="note">Maks. {{ $maxAllowedFiles }} Berkas · Maks. 10 MB/file (Check Keamanan Otomatis)</span>
                                 </label>
 
                                 <div class="dropzone" id="dropzone"
@@ -1604,26 +1605,38 @@ footer{
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                                             </svg>
                                         </div>
-                                        <div class="dz-text">Klik atau seret file ke sini</div>
-                                        <div class="dz-sub">{{ $extText }} · Maks. 10 MB</div>
-                                    </div>
-                                    <div class="dz-success" id="dz-success">
-                                        <div class="dz-success-icon">
-                                            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
+                                        <div class="dz-text">
+                                            @if($maxAllowedFiles > 1)
+                                                Klik atau seret hingga {{ $maxAllowedFiles }} file ke sini
+                                            @else
+                                                Klik atau seret file ke sini
+                                            @endif
                                         </div>
-                                        <div class="dz-filename" id="dz-filename"></div>
-                                        <span class="dz-change"
-                                              onclick="event.stopPropagation();document.getElementById('sub_file').click()">
-                                            Ganti File
-                                        </span>
+                                        <div class="dz-sub">{{ $extText }} · Maks. {{ $maxAllowedFiles }} Berkas (10 MB/file)</div>
+                                    </div>
+                                    <div class="dz-success" id="dz-success" style="display:none;flex-direction:column;gap:10px;width:100%;text-align:left;">
+                                        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                                            <div style="display:flex;align-items:center;gap:8px;">
+                                                <div class="dz-success-icon" style="flex-shrink:0;">
+                                                    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                </div>
+                                                <span id="dz-files-summary" style="font-size:12px;font-weight:600;color:#34D399;"></span>
+                                            </div>
+                                            <span class="dz-change"
+                                                  onclick="event.stopPropagation();document.getElementById('sub_file').click()">
+                                                Pilih Ulang
+                                            </span>
+                                        </div>
+                                        <div id="dz-files-list" style="display:flex;flex-direction:column;gap:6px;width:100%;max-height:180px;overflow-y:auto;padding-right:4px;"></div>
                                     </div>
                                 </div>
 
                                 <input type="file"
                                        id="sub_file"
-                                       name="file"
+                                       name="files[]"
+                                       {{ $maxAllowedFiles > 1 ? 'multiple' : '' }}
                                        style="display:none"
                                        {{ $acceptAttr ? 'accept=' . $acceptAttr : '' }}>
                             </div>
@@ -1767,22 +1780,77 @@ function showAlert(type, msg) {
     }
 }
 
-function setFileSelected(file) {
-    const sizeStr = file.size > (1024 * 1024)
-        ? (file.size / (1024 * 1024)).toFixed(2) + ' MB'
-        : (file.size / 1024).toFixed(0) + ' KB';
+const maxFilesAllowed = {{ (int) $soal->getMaxFiles() }};
+let selectedFiles = [];
 
-    if (file.size > 10 * 1024 * 1024) {
-        showAlert('error', `Ukuran file melebihi batas maksimal 10 MB! (Ukuran file terpilih: ${sizeStr})`);
+function formatFileSize(bytes) {
+    if (bytes > 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    return (bytes / 1024).toFixed(0) + ' KB';
+}
+
+function handleFilesSelected(incomingFiles) {
+    const list = Array.from(incomingFiles);
+    if (!list.length) return;
+
+    if (list.length > maxFilesAllowed) {
+        showAlert('error', `Maksimal ${maxFilesAllowed} berkas yang dapat dikumpulkan. Anda memilih ${list.length} berkas.`);
+        return;
+    }
+
+    for (let f of list) {
+        if (f.size > 10 * 1024 * 1024) {
+            showAlert('error', `Berkas "${f.name}" (${formatFileSize(f.size)}) melebihi batas maksimal 10 MB!`);
+            return;
+        }
+    }
+
+    selectedFiles = list;
+    renderSelectedFilesUI();
+}
+
+function removeSelectedFile(index, evt) {
+    if (evt) evt.stopPropagation();
+    selectedFiles.splice(index, 1);
+    renderSelectedFilesUI();
+}
+
+function renderSelectedFilesUI() {
+    const listEl = document.getElementById('dz-files-list');
+    const summaryEl = document.getElementById('dz-files-summary');
+    const dzEmptyEl = document.getElementById('dz-empty');
+    const dzSuccessEl = document.getElementById('dz-success');
+
+    if (!selectedFiles.length) {
+        if (dzEmptyEl) dzEmptyEl.style.display = 'block';
+        if (dzSuccessEl) dzSuccessEl.style.display = 'none';
+        if (dropzone) dropzone.classList.remove('has-file');
         if (fileInput) fileInput.value = '';
         return;
     }
-    if (dzEmpty) dzEmpty.style.display   = 'none';
-    if (dzSuccess) dzSuccess.style.display = 'flex';
-    if (dzFilename) dzFilename.textContent  = `${file.name} (${sizeStr})`;
-    if (dropzone) {
-        dropzone.classList.add('has-file');
-        dropzone.classList.remove('dragover');
+
+    if (dzEmptyEl) dzEmptyEl.style.display = 'none';
+    if (dzSuccessEl) dzSuccessEl.style.display = 'flex';
+    if (dropzone) dropzone.classList.add('has-file');
+
+    if (summaryEl) {
+        summaryEl.textContent = `${selectedFiles.length} Berkas Dipilih (Maks. ${maxFilesAllowed})`;
+    }
+
+    if (listEl) {
+        listEl.innerHTML = '';
+        selectedFiles.forEach((file, idx) => {
+            const row = document.createElement('div');
+            row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(16,185,129,0.2);padding:6px 10px;border-radius:10px;font-size:12px;';
+            row.innerHTML = `
+                <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
+                    <span style="font-size:14px;flex-shrink:0;">📄</span>
+                    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#F3F4F6;font-weight:500;">${file.name}</span>
+                    <span style="color:#9CA3AF;font-family:monospace;font-size:11px;flex-shrink:0;">(${formatFileSize(file.size)})</span>
+                </div>
+                <button type="button" onclick="removeSelectedFile(${idx}, event)" style="background:none;border:none;color:#EF4444;cursor:pointer;padding:2px 6px;border-radius:6px;font-size:15px;line-height:1;font-weight:bold;" title="Hapus berkas ini">&times;</button>
+            `;
+            listEl.appendChild(row);
+        });
     }
 }
 
@@ -1932,7 +2000,7 @@ function setLoading(loading, progressText) {
 
 if (fileInput) {
     fileInput.addEventListener('change', function() {
-        if (this.files[0]) setFileSelected(this.files[0]);
+        if (this.files && this.files.length) handleFilesSelected(this.files);
     });
 }
 
@@ -1950,8 +2018,9 @@ if (dropzone) {
         });
     });
     dropzone.addEventListener('drop', e => {
-        const f = e.dataTransfer.files[0];
-        if (f && fileInput) { fileInput.files = e.dataTransfer.files; setFileSelected(f); }
+        if (e.dataTransfer.files && e.dataTransfer.files.length) {
+            handleFilesSelected(e.dataTransfer.files);
+        }
     });
 }
 
@@ -1975,8 +2044,12 @@ document.getElementById('submission-form').addEventListener('submit', async func
     const currentType = subTypeInput ? subTypeInput.value : 'file';
 
     if (currentType === 'file') {
-        if (!fileInput || !fileInput.files.length) {
+        if (!selectedFiles.length) {
             showAlert('error', 'Silakan pilih file tugas terlebih dahulu.');
+            return;
+        }
+        if (selectedFiles.length > maxFilesAllowed) {
+            showAlert('error', `Jumlah berkas melebihi batas maksimal (${maxFilesAllowed} file). Anda memilih ${selectedFiles.length} berkas.`);
             return;
         }
     } else if (currentType === 'link') {
@@ -2000,6 +2073,16 @@ document.getElementById('submission-form').addEventListener('submit', async func
     }
 
     const formData = new FormData(this);
+    if (currentType === 'file') {
+        formData.delete('files[]');
+        formData.delete('file');
+        selectedFiles.forEach(f => {
+            formData.append('files[]', f);
+        });
+        if (selectedFiles[0]) {
+            formData.append('file', selectedFiles[0]);
+        }
+    }
     setLoading(true);
     subAlert.style.display = 'none';
 
@@ -2050,6 +2133,8 @@ document.getElementById('submission-form').addEventListener('submit', async func
 
             // Bersihkan hanya input materi tugas (file/link/text), pertahankan identitas
             if (fileInput) fileInput.value = '';
+            selectedFiles = [];
+            renderSelectedFilesUI();
             const linkEl = document.getElementById('sub_link');
             if (linkEl) linkEl.value = '';
             const textEl = document.getElementById('sub_text');
