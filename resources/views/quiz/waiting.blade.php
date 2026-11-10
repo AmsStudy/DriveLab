@@ -39,12 +39,16 @@
             font-family: 'Outfit', sans-serif;
         }
         .glow-card {
-            background: radial-gradient(circle at top left, rgba(16,185,129,0.08), transparent 70%), #0F1713;
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+            background: radial-gradient(circle at top left, rgba(16,185,129,0.08), transparent 70%), rgba(15, 23, 19, 0.90) !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.75), 0 0 30px rgba(16, 185, 129, 0.08) !important;
         }
         html:not(.dark) .glow-card {
-            background: radial-gradient(circle at top left, rgba(16,185,129,0.06), transparent 70%), #FFFFFF !important;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05) !important;
+            background: radial-gradient(circle at top left, rgba(16,185,129,0.06), transparent 70%), rgba(255, 255, 255, 0.94) !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 12px 35px -8px rgba(0, 0, 0, 0.06), 0 0 25px rgba(16, 185, 129, 0.05) !important;
         }
 
         /* ─── Cyber Quantum Reactor Spinner (Ultra "Wah" & Futuristik) ─── */
@@ -58,12 +62,12 @@
         }
         @keyframes pulseGlowWave {
             0%, 100% {
-                transform: scale(0.92);
-                box-shadow: 0 0 15px rgba(16, 185, 129, 0.3), inset 0 0 10px rgba(16, 185, 129, 0.2);
+                transform: scale(1);
+                box-shadow: 0 0 15px rgba(16, 185, 129, 0.35), inset 0 0 10px rgba(16, 185, 129, 0.2);
             }
             50% {
-                transform: scale(1.08);
-                box-shadow: 0 0 35px rgba(52, 211, 153, 0.7), 0 0 60px rgba(16, 185, 129, 0.4), inset 0 0 18px rgba(52, 211, 153, 0.4);
+                transform: scale(1);
+                box-shadow: 0 0 32px rgba(52, 211, 153, 0.7), 0 0 55px rgba(16, 185, 129, 0.4), inset 0 0 18px rgba(52, 211, 153, 0.4);
             }
         }
         @keyframes floatingOrb {
@@ -248,25 +252,325 @@
         }
 
         /* Background Moving Gradient Orbs */
-        @keyframes floatBackdrop1 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(25px, -20px) scale(1.1); }
+        /* ─── ULTRA "WAH" AMBIENT CYBER BACKGROUND (SERENTAK DENGAN HALAMAN SOAL) ─── */
+        .soal-ambient-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+            will-change: transform;
         }
-        @keyframes floatBackdrop2 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(-30px, 25px) scale(1.15); }
+
+        /* Fluid Morphing Aurora Waves */
+        .soal-aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(85px);
+            -webkit-filter: blur(85px);
+            will-change: transform, border-radius;
+            opacity: 0.85;
         }
-        .backdrop-orb-1 {
-            animation: floatBackdrop1 10s ease-in-out infinite;
+
+        .soal-aurora-blob.blob-1 {
+            width: 680px;
+            height: 680px;
+            top: -120px;
+            left: -140px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, rgba(6, 182, 212, 0.12) 50%, transparent 75%);
+            animation: auroraMorph1 24s ease-in-out infinite alternate;
         }
-        .backdrop-orb-2 {
-            animation: floatBackdrop2 12s ease-in-out infinite;
+        html:not(.dark) .soal-aurora-blob.blob-1 {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.20) 0%, rgba(6, 182, 212, 0.10) 50%, transparent 75%);
+        }
+
+        .soal-aurora-blob.blob-2 {
+            width: 640px;
+            height: 640px;
+            top: -80px;
+            right: -120px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.20) 0%, rgba(13, 148, 136, 0.12) 50%, transparent 75%);
+            animation: auroraMorph2 28s ease-in-out infinite alternate;
+        }
+        html:not(.dark) .soal-aurora-blob.blob-2 {
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, rgba(2, 132, 199, 0.08) 50%, transparent 75%);
+        }
+
+        .soal-aurora-blob.blob-3 {
+            width: 580px;
+            height: 580px;
+            top: 40%;
+            left: -120px;
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.16) 0%, rgba(99, 102, 241, 0.08) 55%, transparent 75%);
+            animation: auroraMorph3 22s ease-in-out infinite alternate;
+        }
+        html:not(.dark) .soal-aurora-blob.blob-3 {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(99, 102, 241, 0.06) 55%, transparent 75%);
+        }
+
+        .soal-aurora-blob.blob-4 {
+            width: 720px;
+            height: 720px;
+            bottom: -160px;
+            right: -140px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(6, 182, 212, 0.12) 50%, transparent 75%);
+            animation: auroraMorph4 32s ease-in-out infinite alternate;
+        }
+        html:not(.dark) .soal-aurora-blob.blob-4 {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.09) 50%, transparent 75%);
+        }
+
+        @keyframes auroraMorph1 {
+            0% {
+                border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+                transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+            }
+            50% {
+                border-radius: 58% 42% 40% 60% / 60% 50% 50% 40%;
+                transform: translate3d(80px, 60px, 0) rotate(160deg) scale(1.12);
+            }
+            100% {
+                border-radius: 48% 52% 58% 42% / 40% 60% 40% 60%;
+                transform: translate3d(-30px, 90px, 0) rotate(320deg) scale(0.96);
+            }
+        }
+
+        @keyframes auroraMorph2 {
+            0% {
+                border-radius: 50% 50% 40% 60% / 55% 45% 55% 45%;
+                transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+            }
+            50% {
+                border-radius: 40% 60% 55% 45% / 45% 55% 45% 55%;
+                transform: translate3d(-90px, 70px, 0) rotate(-140deg) scale(1.08);
+            }
+            100% {
+                border-radius: 60% 40% 45% 55% / 55% 40% 60% 45%;
+                transform: translate3d(50px, 100px, 0) rotate(-280deg) scale(0.94);
+            }
+        }
+
+        @keyframes auroraMorph3 {
+            0% {
+                border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+                transform: translate3d(0, 0, 0) scale(0.95);
+            }
+            50% {
+                border-radius: 45% 55% 65% 35% / 40% 65% 35% 60%;
+                transform: translate3d(70px, -50px, 0) scale(1.14);
+            }
+            100% {
+                border-radius: 55% 45% 40% 60% / 50% 45% 55% 50%;
+                transform: translate3d(-30px, 40px, 0) scale(1);
+            }
+        }
+
+        @keyframes auroraMorph4 {
+            0% {
+                border-radius: 45% 55% 60% 40% / 50% 50% 50% 50%;
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+            50% {
+                border-radius: 65% 35% 45% 55% / 40% 60% 40% 60%;
+                transform: translate3d(-80px, -60px, 0) scale(1.1);
+            }
+            100% {
+                border-radius: 35% 65% 55% 45% / 60% 40% 60% 40%;
+                transform: translate3d(40px, -40px, 0) scale(0.95);
+            }
+        }
+
+        /* Cinematic Cyber Light Shafts / Rays */
+        .soal-light-shaft {
+            position: absolute;
+            top: -20vh;
+            width: 440px;
+            height: 130vh;
+            pointer-events: none;
+            filter: blur(55px);
+            -webkit-filter: blur(55px);
+            opacity: 0.55;
+            will-change: opacity, transform;
+        }
+        .soal-light-shaft.shaft-left {
+            left: -100px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(6, 182, 212, 0.08) 50%, transparent 80%);
+            transform: rotate(-24deg);
+            animation: shaftPulse1 12s ease-in-out infinite alternate;
+        }
+        .soal-light-shaft.shaft-right {
+            right: -100px;
+            background: linear-gradient(225deg, rgba(6, 182, 212, 0.18) 0%, rgba(16, 185, 129, 0.08) 50%, transparent 80%);
+            transform: rotate(24deg);
+            animation: shaftPulse2 14s ease-in-out infinite alternate;
+        }
+        html:not(.dark) .soal-light-shaft.shaft-left {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(6, 182, 212, 0.06) 50%, transparent 80%);
+        }
+        html:not(.dark) .soal-light-shaft.shaft-right {
+            background: linear-gradient(225deg, rgba(6, 182, 212, 0.14) 0%, rgba(16, 185, 129, 0.06) 50%, transparent 80%);
+        }
+
+        @keyframes shaftPulse1 {
+            0% { opacity: 0.35; transform: rotate(-24deg) translateY(0); }
+            100% { opacity: 0.65; transform: rotate(-22deg) translateY(20px); }
+        }
+        @keyframes shaftPulse2 {
+            0% { opacity: 0.35; transform: rotate(24deg) translateY(0); }
+            100% { opacity: 0.65; transform: rotate(22deg) translateY(20px); }
+        }
+
+        /* Cyber Matrix Grid */
+        .soal-ambient-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle, rgba(16, 185, 129, 0.14) 1.2px, transparent 1.2px),
+                linear-gradient(to right, rgba(16, 185, 129, 0.035) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(16, 185, 129, 0.035) 1px, transparent 1px);
+            background-size: 36px 36px, 36px 36px, 36px 36px;
+            mask-image: radial-gradient(ellipse 90% 85% at 50% 35%, black 40%, transparent 95%);
+            -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 35%, black 40%, transparent 95%);
+        }
+        html:not(.dark) .soal-ambient-grid {
+            background-image:
+                radial-gradient(circle, rgba(16, 185, 129, 0.16) 1.2px, transparent 1.2px),
+                linear-gradient(to right, rgba(16, 185, 129, 0.045) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(16, 185, 129, 0.045) 1px, transparent 1px);
+            mask-image: radial-gradient(ellipse 90% 85% at 50% 35%, black 45%, transparent 95%);
+            -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 35%, black 45%, transparent 95%);
+        }
+
+        .soal-grid-scanner {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 140px;
+            background: linear-gradient(180deg, transparent, rgba(16, 185, 129, 0.07), transparent);
+            animation: gridScanner 14s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            pointer-events: none;
+        }
+        html:not(.dark) .soal-grid-scanner {
+            background: linear-gradient(180deg, transparent, rgba(16, 185, 129, 0.09), transparent);
+        }
+        @keyframes gridScanner {
+            0% { top: -150px; opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { top: 100vh; opacity: 0; }
+        }
+
+        /* Interactive Quantum Constellation Canvas */
+        .soal-constellation-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Subtle Interactive Cursor Glow */
+        .soal-cursor-glow {
+            position: absolute;
+            top: var(--cursor-y, 50vh);
+            left: var(--cursor-x, 50vw);
+            width: 560px;
+            height: 560px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.09) 0%, rgba(6, 182, 212, 0.04) 40%, transparent 70%);
+            filter: blur(65px);
+            will-change: top, left;
+            opacity: 0.9;
+        }
+        html:not(.dark) .soal-cursor-glow {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.07) 0%, rgba(6, 182, 212, 0.03) 40%, transparent 70%);
+        }
+
+        /* Floating Micro-Particles */
+        .soal-particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            background: #10B981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+            opacity: 0;
+            animation: particleFloat linear infinite;
+        }
+        html:not(.dark) .soal-particle {
+            background: #059669;
+            box-shadow: 0 0 8px rgba(5, 150, 105, 0.45);
+        }
+        .soal-particle.p-cyan {
+            background: #06B6D4;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.7);
+        }
+        html:not(.dark) .soal-particle.p-cyan {
+            background: #0284C7;
+            box-shadow: 0 0 8px rgba(2, 132, 199, 0.45);
+        }
+        .soal-particle.p1 { width: 4px; height: 4px; left: 8%; animation-duration: 22s; animation-delay: 0s; }
+        .soal-particle.p2 { width: 5px; height: 5px; left: 22%; animation-duration: 26s; animation-delay: 5s; }
+        .soal-particle.p3 { width: 3px; height: 3px; left: 35%; animation-duration: 19s; animation-delay: 2s; }
+        .soal-particle.p4 { width: 5px; height: 5px; left: 68%; animation-duration: 24s; animation-delay: 7s; }
+        .soal-particle.p5 { width: 4px; height: 4px; left: 82%; animation-duration: 21s; animation-delay: 3s; }
+        .soal-particle.p6 { width: 3px; height: 3px; left: 93%; animation-duration: 28s; animation-delay: 9s; }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(105vh) translateX(0) scale(0.6); opacity: 0; }
+            15% { opacity: 0.65; }
+            85% { opacity: 0.65; }
+            100% { transform: translateY(-5vh) translateX(25px) scale(1.1); opacity: 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .soal-aurora-blob,
+            .soal-light-shaft,
+            .soal-grid-scanner,
+            .soal-particle,
+            .soal-constellation-canvas {
+                animation: none !important;
+            }
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen selection:bg-emerald-500 selection:text-white"
+<body class="flex flex-col min-h-screen selection:bg-emerald-500 selection:text-white relative"
       x-data="studentWaitingRoom({{ $quiz->id }}, {{ $attempt->id }}, '{{ $quiz->unique_token }}')"
       x-init="initWaiting()">
+
+    {{-- ─── AMBIENT CYBER BACKGROUND (Identik Serentak dengan Halaman Soal) ─── --}}
+    <div class="soal-ambient-canvas" aria-hidden="true">
+        {{-- Fluid Cosmic Morphing Aurora Blobs --}}
+        <div class="soal-aurora-blob blob-1"></div>
+        <div class="soal-aurora-blob blob-2"></div>
+        <div class="soal-aurora-blob blob-3"></div>
+        <div class="soal-aurora-blob blob-4"></div>
+
+        {{-- Diagonal Volumetric Light Beams --}}
+        <div class="soal-light-shaft shaft-left"></div>
+        <div class="soal-light-shaft shaft-right"></div>
+
+        {{-- Cyber Grid Mesh & Sweeping Radar Scanner --}}
+        <div class="soal-ambient-grid"></div>
+        <div class="soal-grid-scanner"></div>
+
+        {{-- Interactive Quantum Constellation Canvas (Plexus / Synaptic Nodes) --}}
+        <canvas id="ambientConstellationCanvas" class="soal-constellation-canvas"></canvas>
+
+        {{-- Subtle Floating Horizon Glow & Particles --}}
+        <div class="soal-particle p1"></div>
+        <div class="soal-particle p2 p-cyan"></div>
+        <div class="soal-particle p3"></div>
+        <div class="soal-particle p4 p-cyan"></div>
+        <div class="soal-particle p5"></div>
+        <div class="soal-particle p6"></div>
+
+        {{-- Interactive Cursor Aura Halo --}}
+        <div class="soal-cursor-glow"></div>
+    </div>
 
     {{-- Top Navbar --}}
     <header class="border-b border-gray-200 dark:border-[#1A2820] bg-white/80 dark:bg-[#090D0B]/80 backdrop-blur-md sticky top-0 z-40">
@@ -311,11 +615,7 @@
     </div>
 
     {{-- Main Content --}}
-    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-8 md:py-12 flex flex-col justify-center relative">
-
-        {{-- Background Ambient Gradient Orbs --}}
-        <div class="absolute -top-12 -left-16 w-80 h-80 rounded-full bg-emerald-500/10 dark:bg-emerald-500/5 blur-3xl pointer-events-none backdrop-orb-1"></div>
-        <div class="absolute -bottom-12 -right-16 w-80 h-80 rounded-full bg-teal-500/10 dark:bg-teal-500/5 blur-3xl pointer-events-none backdrop-orb-2"></div>
+    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-8 md:py-12 flex flex-col justify-center relative z-10">
 
         <div class="space-y-6 relative z-10">
 
@@ -468,7 +768,7 @@
 
     </main>
 
-    <footer class="py-6 border-t border-gray-200 dark:border-[#1A2820] text-center text-xs text-gray-500 dark:text-gray-600 mt-auto">
+    <footer class="py-6 border-t border-gray-200 dark:border-[#1A2820] text-center text-xs text-gray-500 dark:text-gray-600 mt-auto relative z-10">
         &copy; 2026-AAN MS
     </footer>
 
@@ -521,6 +821,179 @@
             }
         };
     }
+    </script>
+
+    <script>
+    // ─── High-End Cyber Constellation & Ambient Cursor Engine (Identik Serentak dengan Halaman Soal) ───
+    (function() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const ambientCanvas = document.querySelector('.soal-ambient-canvas');
+        const constCanvas = document.getElementById('ambientConstellationCanvas');
+        if (!constCanvas) return;
+
+        const ctx = constCanvas.getContext('2d');
+        if (!ctx) return;
+
+        let width = 0;
+        let height = 0;
+        let dpr = 1;
+        let particles = [];
+        const particleCount = 42;
+        const maxDistance = 120;
+        let mouse = { x: null, y: null, targetX: null, targetY: null, maxDist: 140 };
+        let animationId = null;
+
+        function isDark() {
+            return document.documentElement.classList.contains('dark') ||
+                   document.documentElement.getAttribute('data-theme') === 'dark';
+        }
+
+        function resize() {
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            width = window.innerWidth;
+            height = window.innerHeight;
+            constCanvas.width = width * dpr;
+            constCanvas.height = height * dpr;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    radius: Math.random() * 2 + 1.2,
+                    colorType: Math.random() > 0.4 ? 'emerald' : 'cyan',
+                    pulse: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, width, height);
+            const dark = isDark();
+
+            const colorEmerald = dark ? 'rgba(52, 211, 153,' : 'rgba(5, 150, 105,';
+            const colorCyan = dark ? 'rgba(56, 189, 248,' : 'rgba(2, 132, 199,';
+            const lineBase = dark ? '52, 211, 153' : '16, 185, 129';
+
+            // Update mouse position smoothly
+            if (mouse.targetX !== null && mouse.targetY !== null) {
+                if (mouse.x === null) {
+                    mouse.x = mouse.targetX;
+                    mouse.y = mouse.targetY;
+                } else {
+                    mouse.x += (mouse.targetX - mouse.x) * 0.12;
+                    mouse.y += (mouse.targetY - mouse.y) * 0.12;
+                }
+
+                if (ambientCanvas) {
+                    ambientCanvas.style.setProperty('--cursor-x', mouse.x.toFixed(1) + 'px');
+                    ambientCanvas.style.setProperty('--cursor-y', mouse.y.toFixed(1) + 'px');
+                }
+            }
+
+            // Render particles and connections
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.pulse += 0.025;
+
+                // Screen wrap
+                if (p.x < -10) p.x = width + 10;
+                else if (p.x > width + 10) p.x = -10;
+                if (p.y < -10) p.y = height + 10;
+                else if (p.y > height + 10) p.y = -10;
+
+                const baseAlpha = dark ? 0.65 : 0.45;
+                const dynamicAlpha = Math.max(0.2, baseAlpha + Math.sin(p.pulse) * 0.25);
+                const pColor = (p.colorType === 'emerald' ? colorEmerald : colorCyan) + dynamicAlpha + ')';
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = pColor;
+                if (dark) {
+                    ctx.shadowColor = p.colorType === 'emerald' ? '#10B981' : '#06B6D4';
+                    ctx.shadowBlur = 8;
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+                ctx.fill();
+
+                // Connect lines between nearby particles
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < maxDistance) {
+                        const lineAlpha = (1 - dist / maxDistance) * (dark ? 0.22 : 0.12);
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(${lineBase}, ${lineAlpha})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.stroke();
+                    }
+                }
+
+                // Connect to mouse cursor
+                if (mouse.x !== null && mouse.y !== null) {
+                    const mdx = p.x - mouse.x;
+                    const mdy = p.y - mouse.y;
+                    const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+
+                    if (mdist < mouse.maxDist) {
+                        const mLineAlpha = (1 - mdist / mouse.maxDist) * (dark ? 0.35 : 0.2);
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.strokeStyle = `rgba(${lineBase}, ${mLineAlpha})`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            animationId = requestAnimationFrame(render);
+        }
+
+        window.addEventListener('resize', () => {
+            resize();
+            initParticles();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.targetX = e.clientX;
+            mouse.targetY = e.clientY;
+        }, { passive: true });
+
+        window.addEventListener('mouseleave', () => {
+            mouse.targetX = null;
+            mouse.targetY = null;
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (animationId) cancelAnimationFrame(animationId);
+            } else {
+                animationId = requestAnimationFrame(render);
+            }
+        });
+
+        resize();
+        initParticles();
+        animationId = requestAnimationFrame(render);
+    })();
     </script>
 </body>
 </html>
