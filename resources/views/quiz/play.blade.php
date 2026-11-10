@@ -121,6 +121,8 @@
         }
         .option-card {
             transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .option-card:hover {
             transform: translateY(-2px);
@@ -128,13 +130,344 @@
         .option-card:active {
             transform: translateY(0);
         }
+        html:not(.dark) .option-card {
+            background-color: rgba(255, 255, 255, 0.92) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+        }
+        html:not(.dark) .option-card:hover {
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.12) !important;
+        }
+
+        /* Arena Question Card Glassmorphic Styling */
+        .arena-question-card {
+            background: radial-gradient(circle at top left, rgba(16,185,129,0.06), transparent 70%), rgba(15, 23, 19, 0.88) !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(26, 40, 32, 0.9) !important;
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.75), 0 0 30px rgba(16, 185, 129, 0.08) !important;
+        }
+        html:not(.dark) .arena-question-card {
+            background: radial-gradient(circle at top left, rgba(16,185,129,0.05), transparent 70%), rgba(255, 255, 255, 0.94) !important;
+            border: 1px solid rgba(226, 234, 229, 0.95) !important;
+            box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.06), 0 0 25px rgba(16, 185, 129, 0.05) !important;
+        }
+
+        /* ─── ULTRA "WAH" AMBIENT CYBER BACKGROUND (SERENTAK DENGAN HALAMAN SOAL & RUANG TUNGGU) ─── */
+        .soal-ambient-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+            will-change: transform;
+        }
+
+        /* Fluid Morphing Aurora Waves */
+        .soal-aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(85px);
+            -webkit-filter: blur(85px);
+            will-change: transform, border-radius;
+            opacity: 0.85;
+        }
+
+        .soal-aurora-blob.blob-1 {
+            width: 680px;
+            height: 680px;
+            top: -120px;
+            left: -140px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, rgba(6, 182, 212, 0.12) 50%, transparent 75%);
+            animation: auroraMorph1 24s ease-in-out infinite alternate;
+        }
+        html:not(.dark) .soal-aurora-blob.blob-1 {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.20) 0%, rgba(6, 182, 212, 0.10) 50%, transparent 75%);
+        }
+
+        .soal-aurora-blob.blob-2 {
+            width: 640px;
+            height: 640px;
+            top: -80px;
+            right: -120px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.20) 0%, rgba(13, 148, 136, 0.12) 50%, transparent 75%);
+            animation: auroraMorph2 28s ease-in-out infinite alternate;
+        }
+        html:not(.dark) .soal-aurora-blob.blob-2 {
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, rgba(2, 132, 199, 0.08) 50%, transparent 75%);
+        }
+
+        .soal-aurora-blob.blob-3 {
+            width: 580px;
+            height: 580px;
+            bottom: -100px;
+            left: 20%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(5, 150, 105, 0.10) 50%, transparent 75%);
+            animation: auroraMorph3 26s ease-in-out infinite alternate;
+        }
+        html:not(.dark) .soal-aurora-blob.blob-3 {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.08) 50%, transparent 75%);
+        }
+
+        .soal-aurora-blob.blob-4 {
+            width: 520px;
+            height: 520px;
+            bottom: -80px;
+            right: 5%;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.16) 0%, rgba(16, 185, 129, 0.10) 50%, transparent 75%);
+            animation: auroraMorph4 32s ease-in-out infinite alternate;
+        }
+        html:not(.dark) .soal-aurora-blob.blob-4 {
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.14) 0%, rgba(16, 185, 129, 0.08) 50%, transparent 75%);
+        }
+
+        @keyframes auroraMorph1 {
+            0% {
+                border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+                transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+            }
+            50% {
+                border-radius: 58% 42% 40% 60% / 60% 50% 50% 40%;
+                transform: translate3d(80px, 60px, 0) rotate(160deg) scale(1.12);
+            }
+            100% {
+                border-radius: 48% 52% 58% 42% / 40% 60% 40% 60%;
+                transform: translate3d(-30px, 90px, 0) rotate(320deg) scale(0.96);
+            }
+        }
+
+        @keyframes auroraMorph2 {
+            0% {
+                border-radius: 50% 50% 40% 60% / 55% 45% 55% 45%;
+                transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+            }
+            50% {
+                border-radius: 40% 60% 55% 45% / 45% 55% 45% 55%;
+                transform: translate3d(-90px, 70px, 0) rotate(-140deg) scale(1.08);
+            }
+            100% {
+                border-radius: 60% 40% 45% 55% / 55% 40% 60% 45%;
+                transform: translate3d(50px, 100px, 0) rotate(-280deg) scale(0.94);
+            }
+        }
+
+        @keyframes auroraMorph3 {
+            0% {
+                border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+                transform: translate3d(0, 0, 0) scale(0.95);
+            }
+            50% {
+                border-radius: 45% 55% 65% 35% / 40% 65% 35% 60%;
+                transform: translate3d(70px, -50px, 0) scale(1.14);
+            }
+            100% {
+                border-radius: 55% 45% 40% 60% / 50% 45% 55% 50%;
+                transform: translate3d(-30px, 40px, 0) scale(1);
+            }
+        }
+
+        @keyframes auroraMorph4 {
+            0% {
+                border-radius: 45% 55% 60% 40% / 50% 50% 50% 50%;
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+            50% {
+                border-radius: 65% 35% 45% 55% / 40% 60% 40% 60%;
+                transform: translate3d(-80px, -60px, 0) scale(1.1);
+            }
+            100% {
+                border-radius: 35% 65% 55% 45% / 60% 40% 60% 40%;
+                transform: translate3d(40px, -40px, 0) scale(0.95);
+            }
+        }
+
+        /* Diagonal Volumetric Light Shafts */
+        .soal-light-shaft {
+            position: absolute;
+            top: -30%;
+            width: 480px;
+            height: 180%;
+            pointer-events: none;
+            opacity: 0.18;
+            filter: blur(60px);
+            -webkit-filter: blur(60px);
+            will-change: opacity, transform;
+        }
+        .soal-light-shaft.shaft-left {
+            left: -10%;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, transparent 60%);
+            transform: rotate(-18deg);
+            animation: lightShaftPulse 16s ease-in-out infinite alternate;
+        }
+        .soal-light-shaft.shaft-right {
+            right: -10%;
+            background: linear-gradient(225deg, rgba(6, 182, 212, 0.30) 0%, transparent 60%);
+            transform: rotate(20deg);
+            animation: lightShaftPulse 20s ease-in-out infinite alternate 4s;
+        }
+        html:not(.dark) .soal-light-shaft {
+            opacity: 0.12;
+        }
+
+        @keyframes lightShaftPulse {
+            0% { opacity: 0.12; transform: rotate(-18deg) scaleY(1); }
+            50% { opacity: 0.24; transform: rotate(-15deg) scaleY(1.08); }
+            100% { opacity: 0.14; transform: rotate(-20deg) scaleY(0.95); }
+        }
+
+        /* Subtle Matrix Grid with sweeping light */
+        .soal-ambient-grid {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                radial-gradient(circle, rgba(16, 185, 129, 0.14) 1.2px, transparent 1.2px),
+                linear-gradient(to right, rgba(16, 185, 129, 0.035) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(16, 185, 129, 0.035) 1px, transparent 1px);
+            background-size: 36px 36px, 36px 36px, 36px 36px;
+            mask-image: radial-gradient(ellipse 90% 85% at 50% 35%, black 40%, transparent 95%);
+            -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 35%, black 40%, transparent 95%);
+        }
+        html:not(.dark) .soal-ambient-grid {
+            background-image:
+                radial-gradient(circle, rgba(16, 185, 129, 0.16) 1.2px, transparent 1.2px),
+                linear-gradient(to right, rgba(16, 185, 129, 0.045) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(16, 185, 129, 0.045) 1px, transparent 1px);
+            mask-image: radial-gradient(ellipse 90% 85% at 50% 35%, black 45%, transparent 95%);
+            -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 35%, black 45%, transparent 95%);
+        }
+
+        .soal-grid-scanner {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 140px;
+            background: linear-gradient(180deg, transparent, rgba(16, 185, 129, 0.07), transparent);
+            animation: gridScanner 14s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            pointer-events: none;
+        }
+        html:not(.dark) .soal-grid-scanner {
+            background: linear-gradient(180deg, transparent, rgba(16, 185, 129, 0.09), transparent);
+        }
+        @keyframes gridScanner {
+            0% { top: -150px; opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { top: 100vh; opacity: 0; }
+        }
+
+        /* Interactive Quantum Constellation Canvas */
+        .soal-constellation-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Subtle Interactive Cursor Glow */
+        .soal-cursor-glow {
+            position: absolute;
+            top: var(--cursor-y, 50vh);
+            left: var(--cursor-x, 50vw);
+            width: 560px;
+            height: 560px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.09) 0%, rgba(6, 182, 212, 0.04) 40%, transparent 70%);
+            filter: blur(65px);
+            will-change: top, left;
+            opacity: 0.9;
+        }
+        html:not(.dark) .soal-cursor-glow {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.07) 0%, rgba(6, 182, 212, 0.03) 40%, transparent 70%);
+        }
+
+        /* Floating Micro-Particles */
+        .soal-particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            background: #10B981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+            opacity: 0;
+            animation: particleFloat linear infinite;
+        }
+        html:not(.dark) .soal-particle {
+            background: #059669;
+            box-shadow: 0 0 8px rgba(5, 150, 105, 0.45);
+        }
+        .soal-particle.p-cyan {
+            background: #06B6D4;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.7);
+        }
+        html:not(.dark) .soal-particle.p-cyan {
+            background: #0284C7;
+            box-shadow: 0 0 8px rgba(2, 132, 199, 0.45);
+        }
+        .soal-particle.p1 { width: 4px; height: 4px; left: 8%; animation-duration: 22s; animation-delay: 0s; }
+        .soal-particle.p2 { width: 5px; height: 5px; left: 22%; animation-duration: 26s; animation-delay: 5s; }
+        .soal-particle.p3 { width: 3px; height: 3px; left: 35%; animation-duration: 19s; animation-delay: 2s; }
+        .soal-particle.p4 { width: 5px; height: 5px; left: 68%; animation-duration: 24s; animation-delay: 7s; }
+        .soal-particle.p5 { width: 4px; height: 4px; left: 82%; animation-duration: 21s; animation-delay: 3s; }
+        .soal-particle.p6 { width: 3px; height: 3px; left: 93%; animation-duration: 28s; animation-delay: 9s; }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(105vh) translateX(0) scale(0.6); opacity: 0; }
+            15% { opacity: 0.65; }
+            85% { opacity: 0.65; }
+            100% { transform: translateY(-5vh) translateX(25px) scale(1.1); opacity: 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .soal-aurora-blob,
+            .soal-light-shaft,
+            .soal-grid-scanner,
+            .soal-particle,
+            .soal-constellation-canvas {
+                animation: none !important;
+            }
+        }
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body x-data="quizArena()" x-init="initArena()" x-cloak class="flex flex-col min-h-screen bg-[#090D0B]">
+<body x-data="quizArena()" x-init="initArena()" x-cloak class="flex flex-col min-h-screen bg-[#F4F7F5] dark:bg-[#090D0B] relative text-gray-900 dark:text-gray-100 selection:bg-emerald-500 selection:text-white">
+
+    {{-- ─── AMBIENT CYBER BACKGROUND (Identik Serentak dengan Halaman Soal & Ruang Tunggu) ─── --}}
+    <div class="soal-ambient-canvas" aria-hidden="true">
+        {{-- Fluid Cosmic Morphing Aurora Blobs --}}
+        <div class="soal-aurora-blob blob-1"></div>
+        <div class="soal-aurora-blob blob-2"></div>
+        <div class="soal-aurora-blob blob-3"></div>
+        <div class="soal-aurora-blob blob-4"></div>
+
+        {{-- Diagonal Volumetric Light Beams --}}
+        <div class="soal-light-shaft shaft-left"></div>
+        <div class="soal-light-shaft shaft-right"></div>
+
+        {{-- Cyber Grid Mesh & Sweeping Radar Scanner --}}
+        <div class="soal-ambient-grid"></div>
+        <div class="soal-grid-scanner"></div>
+
+        {{-- Interactive Quantum Constellation Canvas (Plexus / Synaptic Nodes) --}}
+        <canvas id="ambientConstellationCanvas" class="soal-constellation-canvas"></canvas>
+
+        {{-- Subtle Floating Horizon Glow & Particles --}}
+        <div class="soal-particle p1"></div>
+        <div class="soal-particle p2 p-cyan"></div>
+        <div class="soal-particle p3"></div>
+        <div class="soal-particle p4 p-cyan"></div>
+        <div class="soal-particle p5"></div>
+        <div class="soal-particle p6"></div>
+
+        {{-- Interactive Cursor Aura Halo --}}
+        <div class="soal-cursor-glow"></div>
+    </div>
 
     {{-- Top App Bar --}}
-    <header class="border-b border-[#1A2820] bg-[#090D0B]/95 backdrop-blur-md sticky top-0 z-40 px-4 py-3">
+    <header class="border-b border-gray-200 dark:border-[#1A2820] bg-white/80 dark:bg-[#090D0B]/80 backdrop-blur-md sticky top-0 z-40 px-4 py-3">
         <div class="max-w-5xl mx-auto flex items-center justify-between gap-4">
             {{-- Quiz Title & Progress --}}
             <div class="flex items-center gap-3">
@@ -142,9 +475,9 @@
                     <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs" class="w-full h-full object-contain" draggable="false">
                 </div>
                 <div>
-                    <h2 class="text-sm font-bold text-white heading-font truncate max-w-[180px] sm:max-w-xs">{{ $quiz->title }}</h2>
-                    <div class="flex items-center gap-2 text-xs text-gray-400">
-                        <span class="font-mono text-emerald-400 font-bold" x-text="'Soal ' + (currentIndex + 1) + ' / ' + questions.length"></span>
+                    <h2 class="text-sm font-bold text-gray-900 dark:text-white heading-font truncate max-w-[180px] sm:max-w-xs">{{ $quiz->title }}</h2>
+                    <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <span class="font-mono text-emerald-600 dark:text-emerald-400 font-bold" x-text="'Soal ' + (currentIndex + 1) + ' / ' + questions.length"></span>
                         <span>&bull;</span>
                         <span class="truncate">{{ $attempt->student_name }}</span>
                     </div>
@@ -248,32 +581,32 @@
     </header>
 
     {{-- Main Question Arena (Zero-Visibility Curtain if not in Fullscreen during strict exam) --}}
-    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6 sm:py-10 flex flex-col justify-between transition-all duration-300"
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6 sm:py-10 flex flex-col justify-between transition-all duration-300 relative z-10"
           :class="(!allowOpenBook && !isFullscreen && !isLocked && penaltySeconds === 0) ? 'filter blur-2xl pointer-events-none select-none opacity-5 scale-95' : ''">
 
         <template x-if="currentQuestion">
             <div class="space-y-6">
 
                 {{-- Question Card --}}
-                <div class="bg-[#0F1713] border border-[#1A2820] rounded-3xl p-6 sm:p-8 shadow-xl relative">
+                <div class="bg-white/90 dark:bg-[#0F1713]/90 border border-gray-200 dark:border-[#1A2820] rounded-3xl p-6 sm:p-8 shadow-xl relative arena-question-card">
                     <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
                         <div class="flex items-center gap-2 flex-wrap">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono"
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-mono"
                                   x-text="'Soal #' + currentQuestion.number"></span>
                             
                             <template x-if="currentQuestion.question_type === 'multi_select'">
-                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30 flex items-center gap-1">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30 flex items-center gap-1">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     Pilihan Jamak (Centang Semua Jawaban Benar)
                                 </span>
                             </template>
                             <template x-if="currentQuestion.question_type === 'true_false'">
-                                <span class="px-2.5 py-1 rounded-full text-xs bg-[#142019] text-gray-400 border border-[#1E3327]">
+                                <span class="px-2.5 py-1 rounded-full text-xs bg-gray-100 dark:bg-[#142019] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-[#1E3327]">
                                     Benar / Salah
                                 </span>
                             </template>
                             <template x-if="currentQuestion.question_type === 'multiple_choice'">
-                                <span class="px-2.5 py-1 rounded-full text-xs bg-[#142019] text-gray-400 border border-[#1E3327]">
+                                <span class="px-2.5 py-1 rounded-full text-xs bg-gray-100 dark:bg-[#142019] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-[#1E3327]">
                                     Pilihan Tunggal
                                 </span>
                             </template>
@@ -285,14 +618,14 @@
                                     @click="toggleFlagQuestion(currentQuestion.id)"
                                     class="px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 border shadow-sm cursor-pointer"
                                     :class="isFlagged(currentQuestion.id) 
-                                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 ring-2 ring-amber-500/25 shadow-amber-500/20 animate-pulse' 
-                                        : 'bg-[#142019] text-gray-400 border-[#1E3327] hover:text-amber-300 hover:border-amber-500/40 hover:bg-amber-500/10'"
+                                        ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/60 ring-2 ring-amber-500/25 shadow-amber-500/20 animate-pulse' 
+                                        : 'bg-gray-100 dark:bg-[#142019] text-gray-600 dark:text-gray-400 border-gray-200 dark:border-[#1E3327] hover:text-amber-600 dark:hover:text-amber-300 hover:border-amber-500/40 hover:bg-amber-500/10'"
                                     :title="isFlagged(currentQuestion.id) ? 'Klik untuk membatalkan tanda ragu-ragu' : 'Tandai soal ini sebagai ragu-ragu untuk ditinjau ulang'">
                                 <span x-text="isFlagged(currentQuestion.id) ? '🚩' : '🏳️'"></span>
                                 <span x-text="isFlagged(currentQuestion.id) ? 'Ragu-ragu' : 'Tandai Ragu'"></span>
                             </button>
 
-                            <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20"
+                            <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20"
                                   x-text="'+' + currentQuestion.points + ' Poin'"></span>
                         </div>
                     </div>
@@ -305,7 +638,7 @@
                                     @mousemove="updateHoverPreviewPos($event)"
                                     @mouseleave="hideHoverPreview()"
                                     @click="openImagePreview(currentQuestion.image_url, 'Gambar Soal #' + (currentIndex + 1))"
-                                    class="inline-block group cursor-zoom-in focus:outline-none rounded-2xl overflow-hidden border border-[#1A2820] bg-black/40 hover:border-emerald-500/40 p-2 transition-all shadow-sm">
+                                    class="inline-block group cursor-zoom-in focus:outline-none rounded-2xl overflow-hidden border border-gray-200 dark:border-[#1A2820] bg-gray-50/50 dark:bg-black/40 hover:border-emerald-500/40 p-2 transition-all shadow-sm">
                                 <img :src="currentQuestion.image_url" alt="Gambar Soal"
                                      class="max-h-72 w-auto object-contain rounded-xl group-hover:scale-[1.01] transition-transform">
                             </button>
@@ -313,7 +646,7 @@
                     </template>
 
                     {{-- Question Text with Syntax Highlighting Support --}}
-                    <div class="text-lg sm:text-2xl font-bold text-white heading-font leading-relaxed"
+                    <div class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white heading-font leading-relaxed"
                          x-html="renderRichText(currentQuestion.question_text)"></div>
                 </div>
 
@@ -340,13 +673,13 @@
                                                 @mousemove="updateHoverPreviewPos($event)"
                                                 @mouseleave="hideHoverPreview()"
                                                 @click.stop="openImagePreview(opt.image_url, 'Gambar Opsi ' + getOptionLabel(optIdx))"
-                                                class="block group cursor-zoom-in focus:outline-none rounded-xl overflow-hidden border border-white/10 bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
+                                                class="block group cursor-zoom-in focus:outline-none rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
                                             <img :src="opt.image_url" alt="Gambar Opsi" class="max-h-32 w-auto object-contain rounded-lg group-hover:scale-105 transition-transform">
                                         </button>
                                     </div>
                                 </template>
                                 <div class="text-sm sm:text-base font-semibold leading-snug"
-                                     :class="isSelected(currentQuestion.id, opt.id) ? 'text-white' : 'text-gray-200'"
+                                     :class="isSelected(currentQuestion.id, opt.id) ? 'text-gray-900 dark:text-white' : 'text-gray-800 dark:text-gray-200'"
                                      x-html="renderRichText(opt.text)">
                                 </div>
                             </div>
@@ -363,7 +696,7 @@
                 {{-- Keyboard hint --}}
                 <div class="text-center">
                     <span class="text-[11px] text-gray-500">
-                        💡 Tips: Tekan angka <strong class="text-gray-400">1 - 4</strong> atau huruf <strong class="text-gray-400">A - D</strong> di keyboard untuk memilih jawaban cepat.
+                        💡 Tips: Tekan angka <strong class="text-gray-600 dark:text-gray-400">1 - 4</strong> atau huruf <strong class="text-gray-600 dark:text-gray-400">A - D</strong> di keyboard untuk memilih jawaban cepat.
                     </span>
                 </div>
 
@@ -371,20 +704,20 @@
         </template>
 
         {{-- Bottom Navigation Controls --}}
-        <div class="pt-6 sm:pt-8 flex items-center justify-between gap-3 border-t border-[#1A2820] mt-6">
+        <div class="pt-6 sm:pt-8 flex items-center justify-between gap-3 border-t border-gray-200 dark:border-[#1A2820] mt-6 relative z-10">
             {{-- Prev Question --}}
             <button type="button" @click="prevQuestion()" :disabled="currentIndex === 0"
-                    class="px-4 py-2.5 rounded-xl border border-[#1A2820] text-gray-300 hover:text-white hover:bg-[#142019] text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 disabled:opacity-30 disabled:pointer-events-none">
+                    class="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[#1A2820] bg-white/80 dark:bg-[#0F1713] text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#142019] text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 disabled:opacity-30 disabled:pointer-events-none shadow-xs">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 <span>Sebelumnya</span>
             </button>
 
             {{-- Question Drawer / Grid Button --}}
             <button type="button" @click="showDrawer = true"
-                    class="px-3.5 py-2.5 rounded-xl bg-[#0F1713] border border-[#1A2820] hover:border-emerald-500/40 text-xs sm:text-sm text-gray-300 hover:text-emerald-400 font-semibold transition-colors flex items-center gap-2">
+                    class="px-3.5 py-2.5 rounded-xl bg-white/80 dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] hover:border-emerald-500/40 text-xs sm:text-sm text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold transition-colors flex items-center gap-2 shadow-xs">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
                 <span class="hidden sm:inline">Daftar Soal</span>
-                <span class="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 text-xs font-mono font-bold"
+                <span class="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-bold"
                       x-text="answeredCount() + '/' + questions.length"></span>
                 <template x-if="flaggedCount() > 0">
                     <span class="px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-xs font-mono font-bold flex items-center gap-1"
@@ -2334,5 +2667,178 @@
 
     {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}
     @include('components.cyber-loading')
+
+    <script>
+    // ─── High-End Cyber Constellation & Ambient Cursor Engine (Identik Serentak dengan Halaman Soal & Ruang Tunggu) ───
+    (function() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const ambientCanvas = document.querySelector('.soal-ambient-canvas');
+        const constCanvas = document.getElementById('ambientConstellationCanvas');
+        if (!constCanvas) return;
+
+        const ctx = constCanvas.getContext('2d');
+        if (!ctx) return;
+
+        let width = 0;
+        let height = 0;
+        let dpr = 1;
+        let particles = [];
+        const particleCount = 42;
+        const maxDistance = 120;
+        let mouse = { x: null, y: null, targetX: null, targetY: null, maxDist: 140 };
+        let animationId = null;
+
+        function isDark() {
+            return document.documentElement.classList.contains('dark') ||
+                   document.documentElement.getAttribute('data-theme') === 'dark';
+        }
+
+        function resize() {
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            width = window.innerWidth;
+            height = window.innerHeight;
+            constCanvas.width = width * dpr;
+            constCanvas.height = height * dpr;
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    radius: Math.random() * 2 + 1.2,
+                    colorType: Math.random() > 0.4 ? 'emerald' : 'cyan',
+                    pulse: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, width, height);
+            const dark = isDark();
+
+            const colorEmerald = dark ? 'rgba(52, 211, 153,' : 'rgba(5, 150, 105,';
+            const colorCyan = dark ? 'rgba(56, 189, 248,' : 'rgba(2, 132, 199,';
+            const lineBase = dark ? '52, 211, 153' : '16, 185, 129';
+
+            // Update mouse position smoothly
+            if (mouse.targetX !== null && mouse.targetY !== null) {
+                if (mouse.x === null) {
+                    mouse.x = mouse.targetX;
+                    mouse.y = mouse.targetY;
+                } else {
+                    mouse.x += (mouse.targetX - mouse.x) * 0.12;
+                    mouse.y += (mouse.targetY - mouse.y) * 0.12;
+                }
+
+                if (ambientCanvas) {
+                    ambientCanvas.style.setProperty('--cursor-x', mouse.x.toFixed(1) + 'px');
+                    ambientCanvas.style.setProperty('--cursor-y', mouse.y.toFixed(1) + 'px');
+                }
+            }
+
+            // Render particles and connections
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.pulse += 0.025;
+
+                // Screen wrap
+                if (p.x < -10) p.x = width + 10;
+                else if (p.x > width + 10) p.x = -10;
+                if (p.y < -10) p.y = height + 10;
+                else if (p.y > height + 10) p.y = -10;
+
+                const baseAlpha = dark ? 0.65 : 0.45;
+                const dynamicAlpha = Math.max(0.2, baseAlpha + Math.sin(p.pulse) * 0.25);
+                const pColor = (p.colorType === 'emerald' ? colorEmerald : colorCyan) + dynamicAlpha + ')';
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = pColor;
+                if (dark) {
+                    ctx.shadowColor = p.colorType === 'emerald' ? '#10B981' : '#06B6D4';
+                    ctx.shadowBlur = 8;
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+                ctx.fill();
+
+                // Connect lines between nearby particles
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < maxDistance) {
+                        const lineAlpha = (1 - dist / maxDistance) * (dark ? 0.22 : 0.12);
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(${lineBase}, ${lineAlpha})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.stroke();
+                    }
+                }
+
+                // Connect to mouse cursor
+                if (mouse.x !== null && mouse.y !== null) {
+                    const mdx = p.x - mouse.x;
+                    const mdy = p.y - mouse.y;
+                    const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+
+                    if (mdist < mouse.maxDist) {
+                        const mLineAlpha = (1 - mdist / mouse.maxDist) * (dark ? 0.35 : 0.2);
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.strokeStyle = `rgba(${lineBase}, ${mLineAlpha})`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            animationId = requestAnimationFrame(render);
+        }
+
+        window.addEventListener('resize', () => {
+            resize();
+            initParticles();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.targetX = e.clientX;
+            mouse.targetY = e.clientY;
+        }, { passive: true });
+
+        window.addEventListener('mouseleave', () => {
+            mouse.targetX = null;
+            mouse.targetY = null;
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (animationId) cancelAnimationFrame(animationId);
+            } else {
+                animationId = requestAnimationFrame(render);
+            }
+        });
+
+        resize();
+        initParticles();
+        animationId = requestAnimationFrame(render);
+    })();
+    </script>
 </body>
 </html>
