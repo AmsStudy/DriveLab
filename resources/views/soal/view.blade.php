@@ -748,6 +748,221 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
 .instr-box svg{width:18px;height:18px;flex-shrink:0;margin-top:1px;opacity:0.8}
 .instr-box strong{font-size:12px;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px}
 
+/* ─── Assistant Note (Catatan Asisten) ─── */
+.assistant-note-card {
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-left: 3.5px solid #06B6D4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+html:not(.dark) .assistant-note-card {
+  background: #F0F9FF !important;
+  border-color: #BAE6FD !important;
+  border-left-color: #0284C7 !important;
+}
+
+.note-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Syne', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #38BDF8;
+  text-transform: uppercase;
+}
+html:not(.dark) .note-badge {
+  color: #0284C7 !important;
+}
+
+.note-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text1);
+}
+html:not(.dark) .note-text {
+  color: #0F172A !important;
+}
+
+/* ─── Compact Helper Tip (Kebijakan Ringkas) ─── */
+.sub-policy-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  color: var(--text3);
+  font-size: 12px;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+html:not(.dark) .sub-policy-tip {
+  background: #F8FAF9 !important;
+  border-color: #E2EAE5 !important;
+  color: #64748B !important;
+}
+.sub-policy-tip svg {
+  color: var(--emerald);
+  flex-shrink: 0;
+}
+
+/* ─── Prior Submission Receipt Card ─── */
+.prior-submission-card {
+  margin-bottom: 18px;
+  border-radius: 14px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  animation: fadeInDown 0.25s ease both;
+}
+html:not(.dark) .prior-submission-card {
+  background: #F0FDF4 !important;
+  border-color: #86EFAC !important;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.08) !important;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.prior-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(16, 185, 129, 0.12);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+}
+html:not(.dark) .prior-card-header {
+  background: #DCFCE7 !important;
+  border-bottom-color: #BBF7D0 !important;
+}
+
+.prior-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #34D399;
+}
+html:not(.dark) .prior-status-pill {
+  color: #15803D !important;
+}
+
+.prior-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px #10B981;
+  animation: pulse 1.8s infinite;
+}
+html:not(.dark) .prior-pulse-dot {
+  background: #16A34A;
+  box-shadow: 0 0 6px #16A34A;
+}
+
+.prior-mode-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #F59E0B;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+html:not(.dark) .prior-mode-tag {
+  background: #FEF3C7 !important;
+  color: #B45309 !important;
+  border-color: #FDE68A !important;
+}
+
+.prior-card-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.prior-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.prior-meta-item,
+.prior-file-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+}
+
+.p-label {
+  color: var(--text3);
+  font-size: 11.5px;
+}
+html:not(.dark) .p-label {
+  color: #64748B !important;
+}
+
+.p-val {
+  color: var(--text1);
+}
+html:not(.dark) .p-val {
+  color: #0F172A !important;
+}
+
+.p-val.file-tag {
+  font-family: monospace;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+  color: #34D399;
+}
+html:not(.dark) .p-val.file-tag {
+  background: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  color: #047857 !important;
+}
+
+.prior-warning-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.10);
+  border-top: 1px solid rgba(239, 68, 68, 0.2);
+  color: #F87171;
+  font-size: 11.5px;
+}
+html:not(.dark) .prior-warning-bar {
+  background: #FEF2F2 !important;
+  border-top-color: #FECACA !important;
+  color: #DC2626 !important;
+}
+.prior-warning-bar svg {
+  flex-shrink: 0;
+}
+
 .deadline-passed-notice{
   padding:16px;border-radius:12px;text-align:center;font-size:13.5px;font-weight:600;
   background:rgba(239,68,68,0.08);
@@ -1860,12 +2075,14 @@ html.dark .task-card,
             <div class="sub-body">
 
                 @if($soal->submission_instructions)
-                    <div class="instr-box">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <div>
-                            <strong>Catatan Asisten</strong>
+                    <div class="assistant-note-card">
+                        <div class="note-badge">
+                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Catatan Asisten</span>
+                        </div>
+                        <div class="note-text">
                             {!! nl2br(e($soal->submission_instructions)) !!}
                         </div>
                     </div>
@@ -1880,26 +2097,47 @@ html.dark .task-card,
                         Maaf, batas waktu pengumpulan tugas telah berakhir.
                     </div>
                 @else
-                    <div class="instr-box" style="margin-bottom:16px;">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    {{-- Kebijakan Ringkas (Aktif saat belum ada tugas lama) --}}
+                    <div id="submission-policy-tip" class="sub-policy-tip">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <div>
-                            <strong>Pengumpulan ulang</strong>
-                            Satu NIM hanya menyimpan satu data tugas. Upload lagi dengan NIM yang sama akan menggantikan pengumpulan sebelumnya.
-                        </div>
+                        <span>Satu NIM hanya menyimpan satu data tugas. Pengunggahan baru dengan NIM sama otomatis memperbarui berkas sebelumnya.</span>
                     </div>
 
-                    {{-- Banner Notifikasi Status Pengumpulan Tugas Sebelumnya --}}
-                    <div id="existing-submission-banner" class="instr-box" style="display:none;margin-bottom:16px;border-color:rgba(16,185,129,0.35);background:rgba(16,185,129,0.08);">
-                        <svg style="color:#34D399;flex-shrink:0;width:20px;height:20px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <div>
-                            <strong style="color:var(--emerald);">Data Tugas Sebelumnya Ditemukan</strong>
-                            <div id="existing-submission-info" style="color:var(--text2);font-size:12px;margin-top:2px;"></div>
-                            <div style="font-size:11px;color:#EF4444;margin-top:3px;font-weight:600;">⚠️ Perhatian: Pengiriman ulang akan menimpa dan menggantikan seluruh berkas sebelumnya.</div>
+                    {{-- Card Status Terdaftar (Tampil Dinamis menggantikan tip umum saat NIM memiliki tugas lama) --}}
+                    <div id="existing-submission-banner" class="prior-submission-card" style="display:none;">
+                        <div class="prior-card-header">
+                            <div class="prior-status-pill">
+                                <span class="prior-pulse-dot"></span>
+                                <span>DATA TUGAS TERDAFTAR</span>
+                            </div>
+                            <span class="prior-mode-tag">Mode Pembaruan</span>
                         </div>
+                        <div class="prior-card-body">
+                            <div class="prior-meta-row">
+                                <div class="prior-meta-item">
+                                    <span class="p-label">Mahasiswa:</span>
+                                    <strong id="existing-sub-name" class="p-val">—</strong>
+                                </div>
+                                <div class="prior-meta-item">
+                                    <span class="p-label">Waktu Pengumpulan:</span>
+                                    <span id="existing-sub-time" class="p-val">—</span>
+                                </div>
+                            </div>
+                            <div class="prior-file-row">
+                                <span class="p-label">Berkas Tersimpan:</span>
+                                <span id="existing-sub-file" class="p-val file-tag">—</span>
+                            </div>
+                        </div>
+                        <div class="prior-warning-bar">
+                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <span>Pengiriman ulang akan <strong>menimpa dan menggantikan</strong> seluruh berkas sebelumnya.</span>
+                        </div>
+                        {{-- Hidden legacy element to ensure backward compatibility --}}
+                        <div id="existing-submission-info" style="display:none;"></div>
                     </div>
 
                     <form id="submission-form" autocomplete="off">
@@ -2409,10 +2647,17 @@ let checkNimTimeout = null;
 let currentExistingSubmission = null;
 
 function checkExistingSubmission(nim) {
+    const banner = document.getElementById('existing-submission-banner');
+    const policyTip = document.getElementById('submission-policy-tip');
+    const info = document.getElementById('existing-submission-info');
+    const nameEl = document.getElementById('existing-sub-name');
+    const timeEl = document.getElementById('existing-sub-time');
+    const fileEl = document.getElementById('existing-sub-file');
+
     if (!nim || nim.length < 3) {
         currentExistingSubmission = null;
-        const banner = document.getElementById('existing-submission-banner');
         if (banner) banner.style.display = 'none';
+        if (policyTip) policyTip.style.display = 'flex';
         btnLabel.textContent = 'Kirim Tugas Sekarang';
         return;
     }
@@ -2423,16 +2668,26 @@ function checkExistingSubmission(nim) {
     })
     .then(r => r.json())
     .then(data => {
-        const banner = document.getElementById('existing-submission-banner');
-        const info = document.getElementById('existing-submission-info');
         if (data && data.has_submitted) {
             data.nim = nim;
             currentExistingSubmission = data;
-            if (banner) banner.style.display = 'flex';
+            if (policyTip) policyTip.style.display = 'none';
+            if (banner) banner.style.display = 'block';
+
+            const subTipe = data.submission_type === 'link' ? 'Tautan' : (data.submission_type === 'text' ? 'Jawaban Teks' : 'Berkas File');
             if (info) {
-                const subTipe = data.submission_type === 'link' ? 'Tautan' : (data.submission_type === 'text' ? 'Jawaban Teks' : 'Berkas File');
                 info.textContent = `Tercatat atas nama ${data.nama}${data.kelas ? ' (Kelas ' + data.kelas + ')' : ''}, dikumpulkan pada ${data.submitted_at}. (${subTipe}: ${data.identifier})`;
             }
+            if (nameEl) {
+                nameEl.textContent = `${data.nama}${data.kelas ? ' (' + (data.kelas.startsWith('Kelas') ? data.kelas : 'Kelas ' + data.kelas) + ')' : ''}`;
+            }
+            if (timeEl) {
+                timeEl.textContent = data.submitted_at;
+            }
+            if (fileEl) {
+                fileEl.textContent = `${subTipe}: ${data.identifier}`;
+            }
+
             const namaEl = document.getElementById('sub_nama');
             if (namaEl && !namaEl.value) {
                 namaEl.value = data.nama;
@@ -2442,6 +2697,7 @@ function checkExistingSubmission(nim) {
         } else {
             currentExistingSubmission = null;
             if (banner) banner.style.display = 'none';
+            if (policyTip) policyTip.style.display = 'flex';
             btnLabel.textContent = 'Kirim Tugas Sekarang';
         }
     })
