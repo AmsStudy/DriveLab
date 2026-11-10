@@ -1745,6 +1745,273 @@ html.dark .task-card,
     animation: none !important;
   }
 }
+
+/* ─── Ultra "Wah" SweetAlert & Cyber Lock Modal Backdrop Blur ─── */
+.swal2-container {
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+/* ─── Ultra "Wah" Cyber Access Ended Lock Modal (Backdrop Blur & High-End Glassmorphism) ─── */
+.soal-lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(9, 13, 11, 0.85);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.soal-lock-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+html:not(.dark) .soal-lock-overlay {
+  background: rgba(244, 247, 245, 0.88);
+}
+
+.soal-lock-card {
+  max-width: 480px;
+  width: 100%;
+  background: radial-gradient(circle at top, rgba(239, 68, 68, 0.12), transparent 70%), rgba(15, 23, 19, 0.95);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  border-radius: 28px;
+  padding: 34px 28px;
+  text-align: center;
+  box-shadow: 0 30px 70px -10px rgba(0, 0, 0, 0.9), 0 0 45px rgba(239, 68, 68, 0.22);
+  transform: scale(0.92) translateY(12px);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+.soal-lock-overlay.is-active .soal-lock-card {
+  transform: scale(1) translateY(0);
+}
+html:not(.dark) .soal-lock-card {
+  background: radial-gradient(circle at top, rgba(239, 68, 68, 0.08), transparent 70%), rgba(255, 255, 255, 0.98);
+  border-color: rgba(239, 68, 68, 0.35);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12), 0 0 35px rgba(239, 68, 68, 0.12);
+}
+
+/* Animated Lock Icon */
+.soal-lock-icon-wrap {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.soal-lock-icon-ping {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: rgba(239, 68, 68, 0.3);
+  animation: lockIconPulse 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes lockIconPulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  70%, 100% { transform: scale(1.35); opacity: 0; }
+}
+.soal-lock-icon-box {
+  position: relative;
+  z-index: 2;
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.4));
+  border: 1.5px solid rgba(239, 68, 68, 0.6);
+  color: #F87171;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.35);
+}
+html:not(.dark) .soal-lock-icon-box {
+  background: linear-gradient(135deg, rgba(254, 226, 226, 0.9), rgba(254, 202, 202, 0.7));
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #DC2626;
+}
+
+/* Status Chip */
+.soal-lock-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 14px;
+  border-radius: 50px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #F87171;
+  font-size: 11px;
+  font-weight: 800;
+  font-family: 'Syne', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.soal-lock-chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #EF4444;
+  box-shadow: 0 0 8px #EF4444;
+}
+
+.soal-lock-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 10px;
+  line-height: 1.35;
+}
+html:not(.dark) .soal-lock-title {
+  color: #0F1F17;
+}
+
+.soal-lock-desc {
+  font-size: 13.5px;
+  color: #9CA3AF;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+html:not(.dark) .soal-lock-desc {
+  color: #4B5563;
+}
+
+/* Lock Meta Table */
+.soal-lock-meta {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+}
+html:not(.dark) .soal-lock-meta {
+  background: #F9FAFB;
+  border-color: #E5E7EB;
+}
+.soal-lock-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.soal-lock-meta-label {
+  color: #6B7280;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.soal-lock-meta-val {
+  font-weight: 700;
+  color: #F3F4F6;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 250px;
+}
+html:not(.dark) .soal-lock-meta-val {
+  color: #111827;
+}
+.soal-lock-meta-val.text-amber {
+  color: #FBBF24 !important;
+}
+html:not(.dark) .soal-lock-meta-val.text-amber {
+  color: #D97706 !important;
+}
+
+/* Notice box */
+.soal-lock-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 11.5px;
+  color: #FCD34D;
+  text-align: left;
+  line-height: 1.5;
+  margin-bottom: 22px;
+}
+html:not(.dark) .soal-lock-notice {
+  background: #FEF3C7;
+  border-color: #FDE68A;
+  color: #92400E;
+}
+
+/* Actions */
+.soal-lock-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.soal-lock-btn-primary {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #10B981, #0D9488);
+  color: #FFFFFF !important;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.soal-lock-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.45);
+}
+.soal-lock-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #E5E7EB;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.soal-lock-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+}
+html:not(.dark) .soal-lock-btn-secondary {
+  background: #F3F4F6;
+  border-color: #E5E7EB;
+  color: #374151;
+}
+html:not(.dark) .soal-lock-btn-secondary:hover {
+  background: #E5E7EB;
+  color: #111827;
+}
 </style>
 </head>
 <body>
@@ -2428,29 +2695,139 @@ document.addEventListener('keydown', e => {
     }
 });
 
-// ─── Auto-reload when scheduled access expires ───
+// ─── Cyber Lock Modal for Stopped / Expired Access ───
+let isLockModalShown = false;
+
+function showAccessEndedModal(statusData) {
+    if (isLockModalShown) return;
+    isLockModalShown = true;
+
+    const modal = document.getElementById('soal-access-lock-modal');
+    if (!modal) return;
+
+    const titleEl = document.getElementById('soal-lock-title');
+    const descEl = document.getElementById('soal-lock-desc');
+    const badgeEl = document.getElementById('soal-lock-status-badge');
+    const timeValEl = document.getElementById('soal-lock-time-val');
+    const noticeTextEl = document.getElementById('soal-lock-notice-text');
+
+    const status = statusData ? statusData.access_status : 'expired';
+
+    if (status === 'inactive') {
+        if (titleEl) titleEl.textContent = 'Akses Dokumen Dihentikan Pengawas';
+        if (descEl) descEl.textContent = (statusData && statusData.message) ? statusData.message : 'Pengawas atau instruktur laboratorium telah menghentikan akses ke dokumen soal ini. Sesi pengerjaan dinyatakan selesai.';
+        if (badgeEl) badgeEl.textContent = 'AKSES DIHENTIKAN';
+        if (noticeTextEl) noticeTextEl.textContent = 'Akses telah ditutup dari ruang kontrol pengawas laboratorium. Hubungi asisten atau instruktur lab jika Anda memerlukan info lanjutan.';
+    } else if (status === 'expired') {
+        if (titleEl) titleEl.textContent = 'Waktu Akses Soal Telah Berakhir';
+        if (descEl) descEl.textContent = (statusData && statusData.message) ? statusData.message : 'Batas waktu pengerjaan atau akses dokumen soal ini telah berakhir sesuai jadwal pelaksanaan laboratorium. Lembar tugas telah ditutup secara otomatis.';
+        if (badgeEl) badgeEl.textContent = 'WAKTU AKSES HABIS';
+    } else if (status === 'deleted') {
+        if (titleEl) titleEl.textContent = 'Dokumen Soal Tidak Tersedia';
+        if (descEl) descEl.textContent = 'Dokumen soal ini telah dihapus atau dipindahkan oleh administrator sistem.';
+        if (badgeEl) badgeEl.textContent = 'TIDAK TERSEDIA';
+    } else if (statusData && statusData.is_deadline_passed) {
+        if (titleEl) titleEl.textContent = 'Batas Waktu Pengumpulan Berakhir';
+        if (descEl) descEl.textContent = 'Batas waktu pengumpulan tugas untuk soal ini telah berakhir. Pengiriman berkas baru tidak dapat lagi diproses.';
+        if (badgeEl) badgeEl.textContent = 'DEADLINE BERAKHIR';
+    }
+
+    if (statusData && statusData.active_until && timeValEl) {
+        timeValEl.textContent = statusData.active_until;
+    } else if (statusData && statusData.deadline_at && timeValEl) {
+        timeValEl.textContent = statusData.deadline_at;
+    }
+
+    // Blur main content and disable all interactions
+    const mainWrap = document.querySelector('main');
+    if (mainWrap) {
+        mainWrap.style.filter = 'blur(12px)';
+        mainWrap.style.pointerEvents = 'none';
+        mainWrap.style.transition = 'filter 0.4s ease';
+    }
+
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => {
+        modal.classList.add('is-active');
+    });
+}
+
+function hideAccessEndedModal() {
+    isLockModalShown = false;
+    const modal = document.getElementById('soal-access-lock-modal');
+    if (modal) {
+        modal.classList.remove('is-active');
+        setTimeout(() => { modal.style.display = 'none'; }, 300);
+    }
+    const mainWrap = document.querySelector('main');
+    if (mainWrap) {
+        mainWrap.style.filter = '';
+        mainWrap.style.pointerEvents = '';
+    }
+}
+
+// ─── Auto-trigger popup when scheduled access expires ───
 @if($soal->access_type === 'scheduled' && $soal->active_until)
     @php $remainingSeconds = max(0, now()->diffInSeconds($soal->active_until, false)); @endphp
     @if($remainingSeconds > 0)
-        setTimeout(() => window.location.reload(), {{ $remainingSeconds }} * 1000);
+        setTimeout(() => {
+            showAccessEndedModal({
+                access_status: 'expired',
+                title: 'Waktu Akses Soal Telah Berakhir',
+                message: 'Batas waktu pengerjaan atau akses dokumen soal ini telah berakhir sesuai jadwal laboratorium. Lembar tugas telah ditutup secara otomatis.',
+                active_until: '{{ $soal->active_until->format('d M Y, H:i') }}'
+            });
+        }, {{ $remainingSeconds }} * 1000);
+    @else
+        setTimeout(() => {
+            showAccessEndedModal({
+                access_status: 'expired',
+                title: 'Waktu Akses Soal Telah Berakhir',
+                message: 'Batas waktu pengerjaan atau akses dokumen soal ini telah berakhir sesuai jadwal laboratorium. Lembar tugas telah ditutup secara otomatis.',
+                active_until: '{{ $soal->active_until->format('d M Y, H:i') }}'
+            });
+        }, 300);
     @endif
 @endif
 
-// ─── Polling: reload if admin changes access/download status ───
+// ─── Polling: check if admin changes access or access expires ───
 @if(!isset($isAdminPreview) || !$isAdminPreview)
-setInterval(() => {
-    fetch('{{ route('soal.status', $soal->slug ?: $soal->unique_token, false) }}')
+function checkSoalStatusNow(isManual = false) {
+    const statusUrl = '{{ route('soal.status', $soal->slug ?: $soal->unique_token, false) }}';
+    const recheckBtn = document.getElementById('btn-recheck-soal-status');
+    if (isManual && recheckBtn) {
+        recheckBtn.disabled = true;
+        recheckBtn.style.opacity = '0.6';
+    }
+
+    fetch(statusUrl, { headers: { 'Accept': 'application/json' } })
         .then(r => r.json())
         .then(data => {
-            if (data.access_status !== 'active') {
-                window.location.reload();
+            if (isManual && recheckBtn) {
+                recheckBtn.disabled = false;
+                recheckBtn.style.opacity = '1';
             }
+
+            if (data.access_status !== 'active') {
+                showAccessEndedModal(data);
+            } else if (isLockModalShown) {
+                hideAccessEndedModal();
+            }
+
             if (data.is_downloadable !== {{ $soal->is_downloadable ? 'true' : 'false' }}) {
                 window.location.reload();
             }
         })
-        .catch(() => {});
-}, 15000);
+        .catch(() => {
+            if (isManual && recheckBtn) {
+                recheckBtn.disabled = false;
+                recheckBtn.style.opacity = '1';
+            }
+        });
+}
+
+// Polling interval: every 7 seconds for responsive supervisor control
+setInterval(checkSoalStatusNow, 7000);
 @endif
 
 // ─── Submission form logic ───
@@ -3029,6 +3406,14 @@ document.getElementById('submission-form').addEventListener('submit', async func
                 const firstKey = Object.keys(result.errors)[0];
                 errorMsg = result.errors[firstKey][0];
             }
+            if (xhr.status === 403 && (errorMsg.includes('waktu akses') || errorMsg.includes('Batas waktu') || errorMsg.includes('tidak aktif'))) {
+                showAccessEndedModal({
+                    access_status: errorMsg.includes('tidak aktif') ? 'inactive' : 'expired',
+                    title: errorMsg.includes('tidak aktif') ? 'Akses Dihentikan Pengawas' : 'Waktu Akses Telah Berakhir',
+                    message: errorMsg
+                });
+                return;
+            }
             showAlert('error', errorMsg);
         }
     };
@@ -3238,6 +3623,77 @@ setInterval(() => {
     animationId = requestAnimationFrame(render);
 })();
 </script>
+
+    {{-- ─── CYBER MODAL: AKSES DITUTUP / WAKTU HABIS (POPUP DENGAN BACKDROP BLUR) ─── --}}
+    <div id="soal-access-lock-modal" class="soal-lock-overlay" style="display: none;" aria-hidden="true">
+        <div class="soal-lock-card">
+            {{-- Animated Pulse Halo & Shield / Lock Icon --}}
+            <div class="soal-lock-icon-wrap">
+                <div class="soal-lock-icon-ping"></div>
+                <div class="soal-lock-icon-box">
+                    <svg id="soal-lock-svg-icon" width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+            </div>
+
+            {{-- Status Chip --}}
+            <div class="soal-lock-chip">
+                <span class="soal-lock-chip-dot"></span>
+                <span id="soal-lock-status-badge">AKSES SOAL DITUTUP</span>
+            </div>
+
+            {{-- Title & Message --}}
+            <h3 id="soal-lock-title" class="soal-lock-title">Waktu Akses Soal Telah Berakhir</h3>
+            <p id="soal-lock-desc" class="soal-lock-desc">
+                Batas waktu pengerjaan atau akses dokumen soal ini telah berakhir sesuai jadwal pelaksanaan laboratorium. Lembar tugas telah ditutup secara otomatis.
+            </p>
+
+            {{-- Meta Information Table --}}
+            <div class="soal-lock-meta">
+                <div class="soal-lock-meta-row">
+                    <span class="soal-lock-meta-label">Mata Kuliah / Soal:</span>
+                    <span class="soal-lock-meta-val" title="{{ $soal->title }}">{{ $soal->title }}</span>
+                </div>
+                <div class="soal-lock-meta-row">
+                    <span class="soal-lock-meta-label">Kode Unik:</span>
+                    <span class="soal-lock-meta-val" style="font-family:ui-monospace,monospace;">{{ $soal->kode_unik }}</span>
+                </div>
+                <div class="soal-lock-meta-row" id="soal-lock-time-row">
+                    <span class="soal-lock-meta-label">Batas Waktu:</span>
+                    <span id="soal-lock-time-val" class="soal-lock-meta-val text-amber">
+                        {{ $soal->active_until ? $soal->active_until->format('d M Y, H:i') : ($soal->deadline_at ? $soal->deadline_at->format('d M Y, H:i') : 'Selesai') }}
+                    </span>
+                </div>
+            </div>
+
+            {{-- Notice box --}}
+            <div class="soal-lock-notice">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span id="soal-lock-notice-text">
+                    Jika Anda merasa ini adalah kekeliruan atau membutuhkan perpanjangan waktu, silakan segera konfirmasi kepada pengawas atau asisten laboratorium yang bertugas.
+                </span>
+            </div>
+
+            {{-- Action Buttons --}}
+            <div class="soal-lock-actions">
+                <a href="{{ url('/') }}" class="soal-lock-btn-primary">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    <span>Kembali ke Beranda</span>
+                </a>
+                <button type="button" onclick="checkSoalStatusNow(true)" class="soal-lock-btn-secondary" id="btn-recheck-soal-status">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    <span>Cek Ulang Status</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}
     @include('components.cyber-loading')

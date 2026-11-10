@@ -119,6 +119,10 @@
         .heading-font {
             font-family: 'Outfit', sans-serif;
         }
+        .swal2-container {
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+        }
         .option-card {
             transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(12px);

@@ -286,11 +286,39 @@ class SoalAccessController extends Controller
     {
         $soal = $this->findSoalByIdentifier($token);
         if (!$soal) {
-            return response()->json(['access_status' => 'deleted']);
+            return response()->json([
+                'access_status'   => 'deleted',
+                'is_downloadable' => false,
+                'title'           => 'Dokumen Tidak Ditemukan',
+                'message'         => 'Dokumen soal ini telah dihapus atau tidak tersedia lagi.',
+            ]);
         }
+
+        $accessStatus = $soal->access_status;
+        $isDeadlinePassed = (bool) ($soal->deadline_at && now()->greaterThan($soal->deadline_at));
+
+        $title = match ($accessStatus) {
+            'inactive'  => 'Akses Dihentikan Pengawas',
+            'expired'   => 'Waktu Akses Telah Berakhir',
+            'scheduled' => 'Akses Belum Dimulai',
+            default     => ($isDeadlinePassed ? 'Batas Waktu Berakhir' : 'Akses Aktif'),
+        };
+
+        $message = match ($accessStatus) {
+            'inactive'  => 'Pengawas atau instruktur laboratorium telah menghentikan akses ke dokumen soal ini.',
+            'expired'   => 'Waktu akses dokumen soal ini telah berakhir sesuai jadwal laboratorium.',
+            'scheduled' => 'Jadwal akses dokumen soal ini belum dimulai.',
+            default     => ($isDeadlinePassed ? 'Batas waktu pengumpulan tugas telah berakhir.' : 'Akses dokumen soal sedang aktif.'),
+        };
+
         return response()->json([
-            'access_status'   => $soal->access_status,
-            'is_downloadable' => $soal->is_downloadable,
+            'access_status'      => $accessStatus,
+            'is_downloadable'    => (bool) $soal->is_downloadable,
+            'is_deadline_passed' => $isDeadlinePassed,
+            'title'              => $title,
+            'message'            => $message,
+            'active_until'       => $soal->active_until ? $soal->active_until->format('d M Y, H:i') : null,
+            'deadline_at'        => $soal->deadline_at ? $soal->deadline_at->format('d M Y, H:i') : null,
         ]);
     }
 

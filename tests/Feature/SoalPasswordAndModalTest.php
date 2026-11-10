@@ -376,5 +376,54 @@ class SoalPasswordAndModalTest extends TestCase
         ]));
         $checkRes->assertOk()->assertJson(['available' => true]);
     }
+
+    public function test_soal_status_endpoint_returns_correct_access_status_and_metadata(): void
+    {
+        $soal = Soal::create([
+            'title'                 => 'Soal Uji Status',
+            'user_id'               => $this->admin->id,
+            'kode_unik'             => 'STATUS-01',
+            'unique_token'          => 'token-status-01',
+            'password'              => bcrypt('secret123'),
+            'access_type'           => 'scheduled',
+            'is_active'             => true,
+            'is_downloadable'       => true,
+            'active_from'           => now()->subHour(),
+            'active_until'          => now()->addHour(),
+            'deadline_at'           => now()->addMinutes(30),
+            'is_submission_enabled' => true,
+        ]);
+
+        // 1. Status saat aktif
+        $res = $this->getJson(route('soal.status', $soal->slug));
+        $res->assertOk()
+            ->assertJson([
+                'access_status'      => 'active',
+                'is_downloadable'    => true,
+                'is_deadline_passed' => false,
+                'title'              => 'Akses Aktif',
+            ]);
+
+        // 2. Status saat dinonaktifkan oleh admin
+        $soal->update(['is_active' => false]);
+        $resInactive = $this->getJson(route('soal.status', $soal->slug));
+        $resInactive->assertOk()
+            ->assertJson([
+                'access_status' => 'inactive',
+                'title'         => 'Akses Dihentikan Pengawas',
+            ]);
+
+        // 3. Status saat waktu berakhir (expired)
+        $soal->update([
+            'is_active'    => true,
+            'active_until' => now()->subMinutes(5),
+        ]);
+        $resExpired = $this->getJson(route('soal.status', $soal->slug));
+        $resExpired->assertOk()
+            ->assertJson([
+                'access_status' => 'expired',
+                'title'         => 'Waktu Akses Telah Berakhir',
+            ]);
+    }
 }
 
