@@ -80,6 +80,29 @@ class PublicQuizController extends Controller
         ));
     }
 
+    /**
+     * Endpoint status kuis publik untuk sinkronisasi otomatis ruang lobby.
+     */
+    public function status(string $token)
+    {
+        $quiz = $this->findQuizByIdentifier($token);
+
+        $isUpcoming = $quiz->isScheduleUpcoming();
+        $isExpired = $quiz->isScheduleExpired();
+        $secondsUntilStart = $isUpcoming ? abs((int) now()->diffInSeconds($quiz->starts_at)) : 0;
+
+        return response()->json([
+            'is_active'           => (bool) $quiz->is_active,
+            'session_status'      => $quiz->session_status ?? 'waiting',
+            'is_upcoming'         => $isUpcoming,
+            'is_expired'          => $isExpired,
+            'seconds_until_start' => $secondsUntilStart,
+            'title'               => $quiz->title,
+            'starts_at'           => $quiz->starts_at ? $quiz->starts_at->translatedFormat('d M Y, H:i') : null,
+            'ends_at'             => $quiz->ends_at ? $quiz->ends_at->translatedFormat('d M Y, H:i') : null,
+        ]);
+    }
+
     public function start(Request $request, string $token)
     {
         $quiz = $this->findQuizByIdentifier($token);

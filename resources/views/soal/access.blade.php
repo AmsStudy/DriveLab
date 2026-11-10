@@ -56,7 +56,185 @@
         .error-msg { font-size: 12px; color: #FB7185; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
         .submit-btn { width: 100%; margin-top: 20px; background: linear-gradient(135deg, #10B981, #0D9488); color: #fff; font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif; border: none; padding: 14px 24px; border-radius: 12px; cursor: pointer; transition: opacity .2s, box-shadow .2s; box-shadow: 0 0 20px rgba(16,185,129,.25); }
         .submit-btn:hover { opacity: .9; box-shadow: 0 0 30px rgba(16,185,129,.4); }
-        .inactive-card { background: rgba(239,68,68,.06); border: 1px solid rgba(239,68,68,.2); border-radius: 20px; padding: 28px; text-align: center; }
+        .inactive-card {
+            background: rgba(15, 23, 19, 0.9);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            border-radius: 20px;
+            padding: 28px 22px;
+            text-align: center;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .inactive-card.is-expired {
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+        .inactive-radar-wrap {
+            position: relative;
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .inactive-radar-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px dashed rgba(245, 158, 11, 0.4);
+            animation: radarRotate 10s linear infinite;
+        }
+        .inactive-radar-pulse {
+            position: absolute;
+            inset: 6px;
+            border-radius: 50%;
+            background: rgba(245, 158, 11, 0.12);
+            animation: radarPulse 2.2s ease-out infinite;
+        }
+        .inactive-icon-core {
+            position: relative;
+            z-index: 2;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(245, 158, 11, 0.16);
+            border: 1px solid rgba(245, 158, 11, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FBBF24;
+        }
+        .inactive-card.is-expired .inactive-radar-ring {
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+        .inactive-card.is-expired .inactive-radar-pulse {
+            background: rgba(239, 68, 68, 0.12);
+        }
+        .inactive-card.is-expired .inactive-icon-core {
+            background: rgba(239, 68, 68, 0.16);
+            border-color: rgba(239, 68, 68, 0.45);
+            color: #F87171;
+        }
+        @keyframes radarRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes radarPulse {
+            0% { transform: scale(0.9); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 0.35; }
+            100% { transform: scale(0.9); opacity: 0.8; }
+        }
+        .inactive-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            background: rgba(245, 158, 11, 0.12);
+            color: #FBBF24;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            margin-bottom: 12px;
+        }
+        .inactive-card.is-expired .inactive-badge {
+            background: rgba(239, 68, 68, 0.12);
+            color: #F87171;
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+        .inactive-ping-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #FBBF24;
+            box-shadow: 0 0 8px #FBBF24;
+            display: inline-block;
+        }
+        .inactive-card.is-expired .inactive-ping-dot {
+            background: #F87171;
+            box-shadow: 0 0 8px #F87171;
+        }
+        .sync-box {
+            margin-top: 16px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #9CA3AF;
+        }
+        html:not(.dark) .sync-box {
+            background: #F8FAFC !important;
+            border-color: #E2E8F0 !important;
+            color: #64748B !important;
+        }
+        .btn-check-status {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 14px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            background: rgba(16, 185, 129, 0.12);
+            color: #34D399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-check-status:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.5);
+            transform: translateY(-1px);
+        }
+        .btn-home-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            margin-top: 10px;
+            padding: 11px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #9CA3AF;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-home-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        html:not(.dark) .inactive-card {
+            background: #FFFFFF !important;
+            border-color: #E2EAE5 !important;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important;
+        }
+        html:not(.dark) .btn-home-link {
+            background: #F1F5F9 !important;
+            border-color: #CBD5E1 !important;
+            color: #475569 !important;
+        }
+        html:not(.dark) .btn-home-link:hover {
+            background: #E2E8F0 !important;
+            color: #0F172A !important;
+        }
         .footer-note { margin-top: 20px; text-align: center; font-size: 12px; color: #374151; }
         .footer-note span { color: #10B981; }
         @media (max-width: 480px) {
@@ -124,17 +302,79 @@
 
         {{-- Status Check --}}
         @if($soal->access_status !== 'active')
-            <div class="inactive-card">
-                <svg style="width:44px;height:44px;color:#F87171;margin:0 auto 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-                </svg>
-                <p style="font-size:15px;font-weight:700;color:#F87171;">Dokumen Tidak Tersedia</p>
-                <p style="font-size:13px;color:#6B7280;margin-top:6px;">
-                    @if($soal->access_status === 'inactive') Dokumen ini sedang tidak aktif.
-                    @elseif($soal->access_status === 'scheduled') Waktu Akses Dokumen belum dimulai. (Aktif: {{ $soal->active_from->format('d M Y H:i') }})
-                    @elseif($soal->access_status === 'expired') Waktu Akses Dokumen ini telah berakhir.
+            <div class="inactive-card {{ $soal->access_status === 'expired' ? 'is-expired' : '' }}">
+                <div class="inactive-radar-wrap">
+                    <div class="inactive-radar-ring"></div>
+                    <div class="inactive-radar-pulse"></div>
+                    <div class="inactive-icon-core">
+                        @if($soal->access_status === 'scheduled')
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        @elseif($soal->access_status === 'expired')
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                            </svg>
+                        @else
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="inactive-badge">
+                    <span class="inactive-ping-dot"></span>
+                    <span>
+                        @if($soal->access_status === 'inactive')
+                            STANDBY &bull; MENUNGGU PENGURUS
+                        @elseif($soal->access_status === 'scheduled')
+                            TERJADWAL &bull; BELUM DIMULAI
+                        @elseif($soal->access_status === 'expired')
+                            DITUTUP &bull; WAKTU AKSES BERAKHIR
+                        @endif
+                    </span>
+                </div>
+
+                <h3 style="font-size:16px;font-weight:700;color:var(--text1, #fff);margin-bottom:8px;font-family:'Chakra Petch',sans-serif;letter-spacing:0.3px;">
+                    @if($soal->access_status === 'inactive')
+                        Akses Dokumen Sedang Dijeda
+                    @elseif($soal->access_status === 'scheduled')
+                        Jadwal Akses Belum Dimulai
+                    @elseif($soal->access_status === 'expired')
+                        Waktu Akses Dokumen Telah Berakhir
+                    @endif
+                </h3>
+
+                <p style="font-size:13px;color:#9CA3AF;line-height:1.6;margin:0 auto;max-width:320px;">
+                    @if($soal->access_status === 'inactive')
+                        Asisten atau pengawas laboratorium sedang menyiapkan sesi ini. Sistem otomatis mendeteksi perubahan status secara berkala tanpa perlu me-refresh halaman.
+                    @elseif($soal->access_status === 'scheduled')
+                        Dokumen soal ini dijadwalkan aktif pada: <strong style="color:#FBBF24;">{{ $soal->active_from ? $soal->active_from->format('d M Y H:i') : '-' }}</strong>. Halaman ini otomatis terbuka saat jadwal tiba.
+                    @elseif($soal->access_status === 'expired')
+                        Waktu pengerjaan dan akses berkas dokumen ini telah berakhir sesuai jadwal laboratorium.
                     @endif
                 </p>
+
+                @if($soal->access_status !== 'expired')
+                    <div class="sync-box">
+                        <svg id="sync-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="color:#10B981;flex-shrink:0;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        <span id="poll-status-text">Sinkronisasi otomatis aktif (cek berkala)...</span>
+                    </div>
+
+                    <button type="button" onclick="checkStatusNow(true)" id="btn-check-status" class="btn-check-status">
+                        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        <span>Cek Status Sekarang</span>
+                    </button>
+                @endif
+
+                <a href="{{ route('home') }}" class="btn-home-link">
+                    &larr; Kembali ke Beranda
+                </a>
             </div>
         @else
             {{-- Password Form --}}
@@ -202,6 +442,73 @@
                 })
                 .catch(() => {});
         }, 5 * 60 * 1000);
+
+        @if($soal->access_status !== 'active' && $soal->access_status !== 'expired')
+        let isCheckingStatus = false;
+        const statusUrl = '{{ route('soal.status', $soal->slug ?: $soal->unique_token) }}';
+
+        async function checkStatusNow(isManual = false) {
+            if (isCheckingStatus) return;
+            isCheckingStatus = true;
+            const btn = document.getElementById('btn-check-status');
+            const statusText = document.getElementById('poll-status-text');
+            const syncIcon = document.getElementById('sync-icon');
+
+            if (syncIcon) syncIcon.style.animation = 'radarRotate 0.8s linear infinite';
+            if (isManual && btn) {
+                btn.disabled = true;
+                btn.style.opacity = '0.7';
+                const label = btn.querySelector('span');
+                if (label) label.textContent = 'Memeriksa status...';
+            }
+
+            try {
+                const res = await fetch(statusUrl, {
+                    headers: { 'Accept': 'application/json' },
+                    cache: 'no-store'
+                });
+                const data = await res.json();
+                if (data && data.access_status === 'active') {
+                    if (statusText) statusText.textContent = 'Akses dibuka! Memuat formulir...';
+                    if (window.showLoading) {
+                        window.showLoading('AKSES TERBUKA', 'Pengawas telah membuka sesi. Memuat dokumen...');
+                    }
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                    return;
+                } else if (data && data.access_status === 'expired') {
+                    // Jika sesi kadaluarsa
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                    return;
+                } else {
+                    if (statusText) {
+                        const now = new Date();
+                        const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        statusText.innerHTML = `Terakhir dicek pukul <strong>${timeStr}</strong> &bull; Masih menunggu`;
+                    }
+                }
+            } catch (err) {
+                // Abaikan jika network sementara
+            } finally {
+                isCheckingStatus = false;
+                if (syncIcon) syncIcon.style.animation = '';
+                if (isManual && btn) {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    const label = btn.querySelector('span');
+                    if (label) label.textContent = 'Cek Status Sekarang';
+                }
+            }
+        }
+
+        // Auto polling status setiap 6 detik
+        setInterval(() => {
+            checkStatusNow(false);
+        }, 6000);
+        @endif
     </script>
 
     {{-- ─── UNIFIED CYBER LOADING POPUP COMPONENT ─── --}}

@@ -615,6 +615,23 @@ class SoalAccessController extends Controller
                 : $existing->file_original_name,
         };
 
+        $filesData = [];
+        if ($existing->submission_type === 'file') {
+            foreach ($existing->getFilesList() as $f) {
+                $fId = $f->id ?? 0;
+                $filesData[] = [
+                    'id'           => $fId,
+                    'name'         => $f->file_original_name ?: basename($f->file_path),
+                    'size'         => $f->file_size ? number_format($f->file_size / 1024, 1) . ' KB' : '0 KB',
+                    'download_url' => route('soal.downloadOwnSubmission', [
+                        'token'  => $soal->slug ?: $soal->unique_token,
+                        'fileId' => $fId,
+                        'nim'    => $existing->nim,
+                    ]),
+                ];
+            }
+        }
+
         return response()->json([
             'has_submitted'   => true,
             'nim'             => $existing->nim,
@@ -624,7 +641,47 @@ class SoalAccessController extends Controller
             'files_count'     => $existing->getFilesCount(),
             'identifier'      => $identifier,
             'submitted_at'    => $existing->updated_at ? $existing->updated_at->format('d M Y, H:i') : $existing->created_at->format('d M Y, H:i'),
+            'files'           => $filesData,
+            'link_url'        => $existing->link_url,
+            'text_content'    => $existing->text_content,
         ]);
+    }
+
+    /**
+     * Mahasiswa mengunduh berkas tugas miliknya sendiri untuk verifikasi hasil pengumpulan.
+     */
+    public function downloadOwnSubmission(Request $request, string $token, $fileId)
+    {
+        $soal = $this->findSoalByIdentifier($token);
+
+        if (!$this->hasAuthorizedAccess($soal)) {
+            abort(403, 'Akses tidak diizinkan. Silakan verifikasi password dokumen terlebih dahulu.');
+        }
+
+        $nim = trim((string) $request->query('nim', ''));
+        if (!$nim) {
+            abort(403, 'Identitas NIM diperlukan untuk memverifikasi berkas.');
+        }
+
+        $submission = Submission::where('soal_id', $soal->id)
+            ->where('nim', $nim)
+            ->firstOrFail();
+
+        $fileIdInt = (int) $fileId;
+        if ($fileIdInt > 0) {
+            $subFile = $submission->files()->findOrFail($fileIdInt);
+            $realFile = $this->resolveStorageFile($subFile->file_path);
+            $filename = basename($subFile->file_original_name ?: basename($subFile->file_path));
+            return response()->download($realFile, $filename);
+        }
+
+        if (!$submission->file_path) {
+            abort(404, 'Berkas pengumpulan tidak ditemukan.');
+        }
+
+        $realFile = $this->resolveStorageFile($submission->file_path);
+        $filename = basename($submission->file_original_name ?: basename($submission->file_path));
+        return response()->download($realFile, $filename);
     }
 
     public function trackTask(Request $request)

@@ -45,6 +45,7 @@ Route::prefix('soal')->name('soal.')->group(function () {
     Route::get('/{token}/preview-wrapper/{attachment}', [SoalAccessController::class, 'previewWrapper'])->name('preview_wrapper');
     Route::get('/{token}/file/{attachment}', [SoalAccessController::class, 'previewFile'])->name('file');
     Route::get('/{token}/download/{attachment}', [SoalAccessController::class, 'downloadFile'])->name('download');
+    Route::get('/{token}/download-submission/{fileId}', [SoalAccessController::class, 'downloadOwnSubmission'])->name('downloadOwnSubmission');
     Route::get('/{token}/status', [SoalAccessController::class, 'status'])->name('status');
 });
 
@@ -55,6 +56,7 @@ Route::post('/quiz/join', [PublicQuizController::class, 'joinByCode'])
 
 Route::prefix('quiz')->name('quiz.')->group(function () {
     Route::get('/{token}', [PublicQuizController::class, 'lobby'])->name('lobby');
+    Route::get('/{token}/status', [PublicQuizController::class, 'status'])->name('status');
     Route::post('/{token}/start', [PublicQuizController::class, 'start'])
         ->middleware('throttle:quiz-start')
         ->name('start');

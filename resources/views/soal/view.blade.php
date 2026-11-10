@@ -963,6 +963,160 @@ html:not(.dark) .prior-warning-bar {
   flex-shrink: 0;
 }
 
+/* ─── Digital Receipt Files Container ─── */
+.prior-files-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+.prior-file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease;
+}
+html:not(.dark) .prior-file-item {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+.prior-file-item:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+.prior-file-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+.prior-file-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.prior-file-size {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: monospace;
+}
+.btn-sub-file-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34D399;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.btn-sub-file-download:hover {
+  background: rgba(16, 185, 129, 0.25);
+  color: #10B981;
+  transform: translateY(-1px);
+}
+html:not(.dark) .btn-sub-file-download {
+  background: #ECFDF5 !important;
+  border-color: #A7F3D0 !important;
+  color: #059669 !important;
+}
+html:not(.dark) .btn-sub-file-download:hover {
+  background: #D1FAE5 !important;
+  color: #047857 !important;
+}
+
+/* ─── Offline Network Monitor Banner ─── */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999;
+  background: rgba(185, 28, 28, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(248, 113, 113, 0.5);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  padding: 10px 16px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideDownBanner 0.3s ease both;
+}
+.offline-banner.is-restored {
+  background: rgba(5, 150, 105, 0.95) !important;
+  border-bottom-color: rgba(52, 211, 153, 0.5) !important;
+}
+@keyframes slideDownBanner {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.offline-banner-content {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.offline-pulse-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+.offline-banner-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #FFFFFF;
+}
+.offline-banner-text strong {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.offline-banner-text span {
+  font-size: 11.5px;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+.offline-banner-badge {
+  font-family: 'Syne', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+@media (max-width: 640px) {
+  .offline-banner-text span { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+}
+
 .deadline-passed-notice{
   padding:16px;border-radius:12px;text-align:center;font-size:13.5px;font-weight:600;
   background:rgba(239,68,68,0.08);
@@ -2016,6 +2170,22 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
 </head>
 <body>
 
+{{-- ─── OFFLINE NETWORK STATUS BANNER ─── --}}
+<div id="offline-connection-banner" class="offline-banner" style="display:none;" aria-live="assertive">
+    <div class="offline-banner-content">
+        <div class="offline-pulse-icon" id="offline-banner-icon">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-5.657-2.343m0 0l2.828-2.829m-2.828 2.829L3 21m3.172-8.464a5 5 0 012.485-3.899M1 1l22 22"/>
+            </svg>
+        </div>
+        <div class="offline-banner-text">
+            <strong id="offline-banner-title">KONEKSI LAB TERPUTUS</strong>
+            <span id="offline-banner-desc">Perangkat Anda terputus dari jaringan/Wi-Fi laboratorium. Mohon periksa koneksi sebelum mengumpulkan tugas.</span>
+        </div>
+        <div class="offline-banner-badge" id="offline-banner-badge">OFFLINE</div>
+    </div>
+</div>
+
 {{-- ─── AMBIENT CYBER BACKGROUND (High-End Aurora, Light Rays & Interactive Quantum Mesh) ─── --}}
 <div class="soal-ambient-canvas" aria-hidden="true">
     {{-- Fluid Cosmic Morphing Aurora Blobs --}}
@@ -2393,9 +2563,11 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                 </div>
                             </div>
                             <div class="prior-file-row">
-                                <span class="p-label">Berkas Tersimpan:</span>
+                                <span class="p-label">Ringkasan Berkas:</span>
                                 <span id="existing-sub-file" class="p-val file-tag">—</span>
                             </div>
+                            {{-- Daftar Berkas Tugas (Digital Receipt & Download Mandiri) --}}
+                            <div id="existing-sub-files-list" class="prior-files-container" style="display:none;"></div>
                         </div>
                         <div class="prior-warning-bar">
                             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -2694,6 +2866,44 @@ document.addEventListener('keydown', e => {
         e.preventDefault();
     }
 });
+
+// ─── Live Offline Network Connection Monitor ───
+const offlineBanner = document.getElementById('offline-connection-banner');
+const offlineTitle = document.getElementById('offline-banner-title');
+const offlineDesc = document.getElementById('offline-banner-desc');
+const offlineBadge = document.getElementById('offline-banner-badge');
+let onlineRestoreTimeout = null;
+
+function handleNetworkOffline() {
+    if (!offlineBanner) return;
+    clearTimeout(onlineRestoreTimeout);
+    offlineBanner.classList.remove('is-restored');
+    if (offlineTitle) offlineTitle.textContent = 'KONEKSI LAB TERPUTUS';
+    if (offlineDesc) offlineDesc.textContent = 'Perangkat Anda terputus dari jaringan/Wi-Fi laboratorium. Mohon periksa koneksi sebelum mengumpulkan tugas.';
+    if (offlineBadge) offlineBadge.textContent = 'OFFLINE';
+    offlineBanner.style.display = 'block';
+}
+
+function handleNetworkOnline() {
+    if (!offlineBanner) return;
+    offlineBanner.classList.add('is-restored');
+    if (offlineTitle) offlineTitle.textContent = 'KONEKSI PULIH KEMBALI';
+    if (offlineDesc) offlineDesc.textContent = 'Terhubung kembali ke jaringan server laboratorium.';
+    if (offlineBadge) offlineBadge.textContent = 'ONLINE';
+    offlineBanner.style.display = 'block';
+
+    onlineRestoreTimeout = setTimeout(() => {
+        offlineBanner.style.display = 'none';
+        offlineBanner.classList.remove('is-restored');
+    }, 2800);
+}
+
+window.addEventListener('offline', handleNetworkOffline);
+window.addEventListener('online', handleNetworkOnline);
+
+if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    handleNetworkOffline();
+}
 
 // ─── Cyber Lock Modal for Stopped / Expired Access ───
 let isLockModalShown = false;
@@ -3030,11 +3240,16 @@ function checkExistingSubmission(nim) {
     const nameEl = document.getElementById('existing-sub-name');
     const timeEl = document.getElementById('existing-sub-time');
     const fileEl = document.getElementById('existing-sub-file');
+    const filesContainer = document.getElementById('existing-sub-files-list');
 
     if (!nim || nim.length < 3) {
         currentExistingSubmission = null;
         if (banner) banner.style.display = 'none';
         if (policyTip) policyTip.style.display = 'flex';
+        if (filesContainer) {
+            filesContainer.innerHTML = '';
+            filesContainer.style.display = 'none';
+        }
         btnLabel.textContent = 'Kirim Tugas Sekarang';
         return;
     }
@@ -3065,6 +3280,61 @@ function checkExistingSubmission(nim) {
                 fileEl.textContent = `${subTipe}: ${data.identifier}`;
             }
 
+            // Render digital receipt berkas & tombol unduh mandiri mahasiswa
+            if (filesContainer) {
+                filesContainer.innerHTML = '';
+                if (data.submission_type === 'file' && data.files && data.files.length > 0) {
+                    filesContainer.style.display = 'flex';
+                    data.files.forEach(file => {
+                        const item = document.createElement('div');
+                        item.className = 'prior-file-item';
+                        item.innerHTML = `
+                            <div class="prior-file-left">
+                                <svg width="15" height="15" fill="none" stroke="#10B981" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span class="prior-file-name" title="${file.name}">${file.name}</span>
+                                <span class="prior-file-size">(${file.size})</span>
+                            </div>
+                            <a href="${file.download_url}" target="_blank" class="btn-sub-file-download" title="Unduh berkas tersimpan untuk verifikasi">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                Unduh
+                            </a>
+                        `;
+                        filesContainer.appendChild(item);
+                    });
+                } else if (data.submission_type === 'link' && (data.link_url || data.identifier)) {
+                    filesContainer.style.display = 'flex';
+                    const targetLink = data.link_url || data.identifier;
+                    filesContainer.innerHTML = `
+                        <div class="prior-file-item">
+                            <div class="prior-file-left">
+                                <svg width="15" height="15" fill="none" stroke="#A855F7" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                </svg>
+                                <span class="prior-file-name" title="${targetLink}">${targetLink}</span>
+                            </div>
+                            <a href="${targetLink}" target="_blank" rel="noopener noreferrer" class="btn-sub-file-download">
+                                Buka Tautan
+                            </a>
+                        </div>
+                    `;
+                } else if (data.submission_type === 'text') {
+                    filesContainer.style.display = 'flex';
+                    const textVal = data.text_content || data.identifier;
+                    filesContainer.innerHTML = `
+                        <div class="prior-file-item" style="flex-direction:column;align-items:flex-start;gap:6px;">
+                            <span class="p-label" style="font-size:11px;">Teks Jawaban Tersimpan:</span>
+                            <div style="font-size:12px;color:var(--text1);font-family:monospace;white-space:pre-wrap;background:rgba(0,0,0,0.25);padding:8px 10px;border-radius:6px;width:100%;max-height:85px;overflow-y:auto;border:1px solid rgba(255,255,255,0.06);">${textVal}</div>
+                        </div>
+                    `;
+                } else {
+                    filesContainer.style.display = 'none';
+                }
+            }
+
             const namaEl = document.getElementById('sub_nama');
             if (namaEl && !namaEl.value) {
                 namaEl.value = data.nama;
@@ -3075,6 +3345,10 @@ function checkExistingSubmission(nim) {
             currentExistingSubmission = null;
             if (banner) banner.style.display = 'none';
             if (policyTip) policyTip.style.display = 'flex';
+            if (filesContainer) {
+                filesContainer.innerHTML = '';
+                filesContainer.style.display = 'none';
+            }
             btnLabel.textContent = 'Kirim Tugas Sekarang';
         }
     })
@@ -3246,6 +3520,27 @@ document.getElementById('submission-form').addEventListener('submit', async func
             showAlert('error', 'Silakan ketikkan jawaban teks terlebih dahulu.');
             return;
         }
+    }
+
+    // ─── Network Offline Guard ───
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        handleNetworkOffline();
+        if (window.Swal) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Perangkat Offline',
+                text: 'Koneksi jaringan terputus. Mohon pastikan komputer/laptop terhubung kembali ke jaringan sebelum mengirimkan tugas.',
+                confirmButtonText: 'Tutup & Periksa Jaringan',
+                customClass: {
+                    popup: 'cyber-swal-popup border border-rose-500/40 rounded-2xl shadow-2xl',
+                    title: 'text-lg font-extrabold text-rose-500',
+                    confirmButton: 'px-5 py-2.5 rounded-xl font-bold text-sm bg-rose-600 hover:bg-rose-500 text-white shadow-md'
+                }
+            });
+        } else {
+            alert('Perangkat Anda sedang offline. Mohon sambungkan kembali ke jaringan sebelum mengumpulkan tugas.');
+        }
+        return;
     }
 
     // ─── Konfirmasi Pengumpulan Ulang (Peringatan Timpa Berkas) ───

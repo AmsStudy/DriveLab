@@ -137,18 +137,40 @@
     <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 md:py-12 flex flex-col justify-center">
 
         @if(!$quiz->is_active)
-            {{-- Inactive Quiz State --}}
-            <div class="bg-[#0F1713] border border-amber-500/30 rounded-3xl p-8 md:p-12 text-center max-w-lg mx-auto glow-card">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            {{-- Inactive Quiz State with Auto-Detect --}}
+            <div class="bg-[#0F1713] border border-amber-500/30 rounded-3xl p-8 md:p-12 text-center max-w-lg mx-auto glow-card relative overflow-hidden">
+                <div class="relative w-20 h-20 mx-auto mb-5 flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full border-2 border-dashed border-amber-500/40 animate-spin" style="animation-duration: 9s;"></div>
+                    <div class="absolute inset-1.5 rounded-full bg-amber-500/10 animate-ping" style="animation-duration: 2.2s;"></div>
+                    <div class="relative z-10 w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/10">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    </div>
                 </div>
-                <h2 class="text-xl font-bold text-white mb-2 heading-font">Kuis Belum Dibuka</h2>
-                <p class="text-sm text-gray-400 mb-6 leading-relaxed">
-                    Kuis "<strong>{{ $quiz->title }}</strong>" saat ini sedang dinonaktifkan oleh instruktur atau asisten laboratorium. Silakan tanyakan kepada asisten untuk membuka sesi kuis.
+
+                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-bold tracking-wider uppercase mb-3" style="font-family:'Chakra Petch',sans-serif;">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                    <span>STANDBY &bull; MENUNGGU PENGURUS</span>
+                </div>
+
+                <h2 class="text-xl md:text-2xl font-bold text-white mb-2 heading-font">Sesi Kuis Belum Dibuka</h2>
+                <p class="text-xs md:text-sm text-gray-400 mb-5 leading-relaxed max-w-md mx-auto">
+                    Kuis "<strong>{{ $quiz->title }}</strong>" saat ini sedang dinonaktifkan oleh instruktur atau asisten laboratorium. Halaman ini akan otomatis beralih saat instruktur membuka sesi.
                 </p>
-                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1A2820] hover:bg-gray-800 text-gray-200 text-sm font-semibold transition-all">
-                    Kembali ke Beranda
-                </a>
+
+                <div class="p-3 rounded-2xl bg-[#090D0B] border border-[#1A2820] flex items-center justify-center gap-2.5 text-xs text-gray-400 mb-5">
+                    <svg id="quiz-poll-spin" class="w-4 h-4 text-emerald-400 animate-spin" style="animation-duration: 3s;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    <span id="quiz-poll-status-text">Sinkronisasi otomatis aktif (cek berkala)...</span>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button type="button" onclick="checkQuizStatusNow(true)" id="btn-quiz-check" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold tracking-wide transition-all shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        <span>Cek Status Sekarang</span>
+                    </button>
+                    <a href="{{ route('home') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#1A2820] hover:bg-gray-800 text-gray-300 text-xs font-semibold transition-all border border-gray-800">
+                        Kembali ke Beranda
+                    </a>
+                </div>
             </div>
         @else
             {{-- Active Quiz Lobby with Schedule & Access Check --}}
@@ -721,6 +743,63 @@
                 }
             }
         });
+
+        @if(!$quiz->is_active)
+        let isCheckingQuiz = false;
+        const quizStatusUrl = '{{ route('quiz.status', $quiz->slug_or_token) }}';
+
+        async function checkQuizStatusNow(isManual = false) {
+            if (isCheckingQuiz) return;
+            isCheckingQuiz = true;
+            const btn = document.getElementById('btn-quiz-check');
+            const statusText = document.getElementById('quiz-poll-status-text');
+            const spinIcon = document.getElementById('quiz-poll-spin');
+
+            if (spinIcon) spinIcon.style.animationDuration = '0.7s';
+            if (isManual && btn) {
+                btn.disabled = true;
+                btn.style.opacity = '0.7';
+                const label = btn.querySelector('span');
+                if (label) label.textContent = 'Memeriksa status...';
+            }
+
+            try {
+                const res = await fetch(quizStatusUrl, {
+                    headers: { 'Accept': 'application/json' },
+                    cache: 'no-store'
+                });
+                const data = await res.json();
+                if (data && data.is_active) {
+                    if (statusText) statusText.textContent = 'Kuis telah dibuka! Memuat formulir...';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                    return;
+                } else {
+                    if (statusText) {
+                        const now = new Date();
+                        const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        statusText.innerHTML = `Terakhir dicek pukul <strong>${timeStr}</strong> &bull; Belum dibuka`;
+                    }
+                }
+            } catch (e) {
+                // Ignore transient network errors
+            } finally {
+                isCheckingQuiz = false;
+                if (spinIcon) spinIcon.style.animationDuration = '3s';
+                if (isManual && btn) {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    const label = btn.querySelector('span');
+                    if (label) label.textContent = 'Cek Status Sekarang';
+                }
+            }
+        }
+
+        setInterval(() => {
+            checkQuizStatusNow(false);
+        }, 6000);
+        @endif
     </script>
 </body>
 </html>
