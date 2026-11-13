@@ -38,8 +38,61 @@ class QuizScoringService
                 $points = 0;
                 $selectedOptionId = null;
                 $selectedOptionIds = null;
+                $textAnswer = null;
 
-                if ($q->isMultiSelect()) {
+                if ($q->question_type === 'fill_blank') {
+                    $blanksOptions = $q->options->sortBy('order_num')->values();
+                    $totalBlanks = $blanksOptions->count();
+                    $userBlanks = [];
+
+                    if (is_array($rawAns)) {
+                        $userBlanks = array_values($rawAns);
+                    } elseif (is_string($rawAns) && !empty($rawAns)) {
+                        $decoded = json_decode($rawAns, true);
+                        $userBlanks = is_array($decoded) ? array_values($decoded) : [$rawAns];
+                    }
+
+                    $correctBlanksCount = 0;
+                    if ($totalBlanks > 0) {
+                        foreach ($blanksOptions as $bIdx => $bOpt) {
+                            $userVal = trim((string)($userBlanks[$bIdx] ?? ''));
+                            $rawKey = $bOpt->option_text ?? '';
+                            $possibleKeys = array_filter(array_map('trim', preg_split('/[\|,]/', $rawKey)));
+                            if (empty($possibleKeys)) {
+                                $possibleKeys = [trim($rawKey)];
+                            }
+
+                            $userLower = mb_strtolower($userVal);
+                            $matched = false;
+                            foreach ($possibleKeys as $pk) {
+                                if ($userLower !== '' && $userLower === mb_strtolower($pk)) {
+                                    $matched = true;
+                                    break;
+                                }
+                            }
+
+                            if ($matched) {
+                                $correctBlanksCount++;
+                            }
+                        }
+
+                        if ($correctBlanksCount === $totalBlanks) {
+                            $isCorrect = true;
+                            $points = $q->points;
+                            $correctCount++;
+                        } elseif ($correctBlanksCount > 0) {
+                            $ratio = $correctBlanksCount / $totalBlanks;
+                            $points = (int) round($q->points * $ratio);
+                            $wrongCount++;
+                        } else {
+                            $wrongCount++;
+                        }
+                    } else {
+                        $wrongCount++;
+                    }
+
+                    $textAnswer = json_encode($userBlanks);
+                } elseif ($q->isMultiSelect()) {
                     $correctOptionIds = $q->options->where('is_correct', true)->pluck('id')->values()->all();
                     $userAnsIds = [];
                     if (is_array($rawAns)) {
@@ -102,6 +155,7 @@ class QuizScoringService
                     'quiz_question_id'    => $q->id,
                     'selected_option_id'  => $validSelectedOptionId,
                     'selected_option_ids' => $selectedOptionIds,
+                    'text_answer'         => $textAnswer,
                     'is_correct'          => $isCorrect,
                     'points_earned'       => $points,
                 ]);

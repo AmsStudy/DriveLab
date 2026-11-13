@@ -67,8 +67,17 @@ class QuizQuestion extends Model
 
     public function isMultiSelect(): bool
     {
+        if ($this->question_type === 'fill_blank') {
+            return false;
+        }
+
         return $this->question_type === 'multi_select'
             || ($this->relationLoaded('options') && $this->options->where('is_correct', true)->count() > 1);
+    }
+
+    public function isFillBlank(): bool
+    {
+        return $this->question_type === 'fill_blank';
     }
 
     public function quiz(): BelongsTo

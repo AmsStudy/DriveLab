@@ -151,6 +151,7 @@
                             <option value="multiple_choice">Pilihan Ganda (Tunggal)</option>
                             <option value="multi_select">Pilihan Jamak (Checkbox)</option>
                             <option value="true_false">Benar / Salah (True / False)</option>
+                            <option value="fill_blank">Isian Rumpang (Fill in the Blank)</option>
                         </select>
                     </div>
 
@@ -166,12 +167,33 @@
 
                 {{-- Teks Pertanyaan --}}
                 <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
-                        Teks Pertanyaan <span class="text-red-400">*</span>
-                    </label>
-                    <textarea name="question_text" x-model="formData.question_text" rows="3" required
-                              placeholder="Tuliskan teks atau butir pertanyaan di sini..."
+                    <div class="flex items-center justify-between mb-1.5 flex-wrap gap-2">
+                        <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                            Teks Pertanyaan <span class="text-red-400">*</span>
+                        </label>
+                        {{-- Toolbar Cepat Khusus Isian Rumpang --}}
+                        <div x-show="formData.question_type === 'fill_blank'" class="flex items-center gap-1.5 flex-wrap">
+                            <button type="button" @click="wrapSelectedTextAsBlank()"
+                                    title="Sorot kata di dalam teks lalu klik tombol ini untuk menjadikannya titik-titik"
+                                    class="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25 font-semibold flex items-center gap-1 transition-all shadow-xs cursor-pointer">
+                                <span>🎯</span>
+                                <span>Jadikan Teks Terpilih Sebagai Titik-Titik</span>
+                            </button>
+                            <button type="button" @click="insertBlankAtCursor()"
+                                    title="Sisipkan titik-titik baru pada posisi kursor"
+                                    class="text-[11px] px-2.5 py-1 rounded-lg bg-teal-500/15 border border-teal-500/30 text-teal-300 hover:bg-teal-500/25 font-semibold flex items-center gap-1 transition-all shadow-xs cursor-pointer">
+                                <span>➕</span>
+                                <span>Sisipkan Titik-Titik</span>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea name="question_text" x-ref="questionTextArea" x-model="formData.question_text" @input="handleQuestionTextInput()" rows="3" required
+                              :placeholder="formData.question_type === 'fill_blank' ? 'Tuliskan kalimat soal di sini, contoh: Nilai x pada Outer adalah 10 dan Inner adalah 20...' : 'Tuliskan teks atau butir pertanyaan di sini...'"
                               class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-500 leading-relaxed"></textarea>
+                    <p x-show="formData.question_type === 'fill_blank'" class="text-[11px] text-gray-400 mt-1 flex items-center gap-1">
+                        <span>💡</span>
+                        <span>Admin cukup mengetik kalimat biasa. Gunakan tombol di atas atau form di bawah untuk menentukan kata kunci tanpa perlu menghafal tanda kurung siku <code>[ ]</code>.</span>
+                    </p>
                 </div>
 
                 {{-- Upload Gambar Pertanyaan (Kompresi Tajam / Anti-Blur) --}}
@@ -203,8 +225,8 @@
                     <p class="text-[11px] text-gray-500 mt-1.5">Format: JPG, PNG, WebP. Gambar dikompresi otomatis tanpa pecah/blur agar cepat diakses mahasiswa.</p>
                 </div>
 
-                {{-- Opsi Jawaban --}}
-                <div>
+                {{-- Opsi Jawaban untuk Pilihan Ganda & Benar-Salah --}}
+                <div x-show="formData.question_type !== 'fill_blank'">
                     <div class="flex items-center justify-between mb-2">
                         <div>
                             <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider">
@@ -288,7 +310,103 @@
                     </div>
                 </div>
 
-                {{-- Penjelasan / Pembahasan --}}
+                {{-- Opsi Jawaban Khusus ISIAN RUMPANG (Fill in the Blank) --}}
+                <div x-show="formData.question_type === 'fill_blank'" class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="block text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                Daftar Kunci Jawaban Titik-Titik
+                            </label>
+                            <p class="text-[11px] text-gray-400">Admin langsung menginput kunci jawaban di bawah ini tanpa perlu mengetik tanda kurung <code>[ ]</code>.</p>
+                        </div>
+
+                        <button type="button" @click="insertBlankAtEnd()"
+                                class="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Tambah Titik-Titik
+                        </button>
+                    </div>
+
+                    {{-- Hidden Form Inputs for Options Payload (used by standard form submit) --}}
+                    <template x-if="formData.question_type === 'fill_blank'">
+                        <div>
+                            <template x-for="(blank, bIdx) in formData.blanks" :key="'opt-hidden-' + bIdx">
+                                <input type="hidden" :name="'options[' + bIdx + ']'" :value="getBlankOptionValue(blank)">
+                            </template>
+                            <template x-if="formData.blanks.length === 0">
+                                <input type="hidden" name="options[0]" value="">
+                            </template>
+                        </div>
+                    </template>
+
+                    {{-- Cards Daftar Titik-Titik --}}
+                    <div class="space-y-3">
+                        <template x-for="(blank, bIdx) in formData.blanks" :key="'blank-' + bIdx">
+                            <div class="p-3.5 rounded-xl bg-[#090D0B] border border-emerald-500/30 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold font-mono text-xs flex items-center justify-center"
+                                              x-text="'#' + (bIdx + 1)"></span>
+                                        <span class="text-xs font-semibold text-gray-200" x-text="'Titik-Titik Nomor ' + (bIdx + 1)"></span>
+                                    </div>
+
+                                    <button type="button" @click="removeBlank(bIdx)"
+                                            class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 font-medium transition-colors cursor-pointer">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        Hapus
+                                    </button>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                    {{-- Kunci Jawaban Utama --}}
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-gray-400 mb-1">
+                                            Kunci Jawaban Utama <span class="text-red-400">*</span>
+                                        </label>
+                                        <input type="text" x-model="blank.key" @input="syncBlanksToText()"
+                                               placeholder="Contoh: 20 atau public"
+                                               class="w-full px-3 py-1.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 rounded-lg text-sm text-emerald-300 font-mono font-bold placeholder-gray-600">
+                                    </div>
+
+                                    {{-- Jawaban Alternatif / Sinonim --}}
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-gray-400 mb-1">
+                                            Alternatif / Sinonim (Opsional)
+                                        </label>
+                                        <input type="text" x-model="blank.synonyms" @input="syncBlanksToText()"
+                                               placeholder="Pisahkan dengan | contoh: dua puluh | 20.0"
+                                               class="w-full px-3 py-1.5 bg-[#0F1713] border border-[#1A2820] focus:border-emerald-500 rounded-lg text-sm text-gray-200 font-mono placeholder-gray-600">
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template x-if="formData.blanks.length === 0">
+                            <div class="p-6 text-center rounded-xl border border-dashed border-gray-700 bg-[#090D0B] text-gray-400 text-xs">
+                                <p class="mb-2">Belum ada titik-titik yang ditentukan.</p>
+                                <button type="button" @click="insertBlankAtEnd()"
+                                        class="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30 hover:bg-emerald-500/30 transition-all cursor-pointer">
+                                    + Tambah Titik-Titik Pertama
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+
+                    {{-- Live Preview Kartu Soal di Sisi Mahasiswa --}}
+                    <div class="p-4 rounded-xl bg-[#090D0B] border border-emerald-500/20 space-y-2">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-emerald-400 flex items-center gap-1.5">
+                                <span>👁️</span>
+                                <span>Pratinjau Tampilan Mahasiswa (Real-time)</span>
+                            </span>
+                            <span class="text-[11px] text-gray-400" x-text="formData.blanks.length + ' Bagian Titik-Titik'"></span>
+                        </div>
+                        <div class="p-3.5 rounded-lg bg-[#0F1713] border border-[#1A2820] text-sm text-gray-200 leading-loose">
+                            <div x-html="renderAdminLivePreview()"></div>
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-300 mb-1.5 uppercase tracking-wider">
                         Pembahasan & Kunci Jawaban (Opsional)
@@ -490,7 +608,7 @@
                                             <span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 font-sans font-bold text-[10px]">Wajib</span>
                                             <span class="px-1.5 py-0.5 rounded bg-sky-100 dark:bg-sky-500/15 text-sky-800 dark:text-sky-300 font-sans font-bold text-[10px]">Dropdown</span>
                                         </td>
-                                        <td class="py-2 px-3 text-sky-700 dark:text-sky-300">multiple_choice | multi_select | true_false</td>
+                                        <td class="py-2 px-3 text-sky-700 dark:text-sky-300">multiple_choice | multi_select | true_false | fill_blank</td>
                                         <td class="py-2 pl-3 text-gray-500 dark:text-gray-400">multiple_choice</td>
                                     </tr>
                                     <tr>
@@ -577,6 +695,7 @@
                 options: ['', '', '', ''],
                 correct_index: 0,
                 correct_indices: [0],
+                blanks: [],
                 explanation: '',
                 question_image_preview: null,
                 remove_question_image: false,
@@ -594,6 +713,7 @@
                     options: ['', '', '', ''],
                     correct_index: 0,
                     correct_indices: [0],
+                    blanks: [],
                     explanation: '',
                     question_image_preview: null,
                     remove_question_image: false,
@@ -610,10 +730,39 @@
                 let optTexts = [];
                 let correctIdx = 0;
                 let correctIndices = [];
+                let blanks = [];
                 let existingOptImages = {};
                 let optImagePreviews = {};
 
-                if (question.options && question.options.length > 0) {
+                if (question.question_type === 'fill_blank') {
+                    if (question.options && question.options.length > 0) {
+                        question.options.forEach((opt, idx) => {
+                            const raw = opt.option_text || '';
+                            const parts = raw.split('|');
+                            const key = parts[0] ? parts[0].trim() : '';
+                            const syn = parts.slice(1).join(' | ').trim();
+                            blanks.push({ key: key, synonyms: syn });
+                            optTexts.push(raw);
+                        });
+                    } else {
+                        // Parse from brackets if options table empty
+                        const regex = /\[([^\]]+)\]/g;
+                        let match;
+                        while ((match = regex.exec(question.question_text)) !== null) {
+                            const raw = match[1] || '';
+                            const parts = raw.split('|');
+                            blanks.push({
+                                key: parts[0] ? parts[0].trim() : '',
+                                synonyms: parts.slice(1).join(' | ').trim()
+                            });
+                            optTexts.push(raw);
+                        }
+                    }
+                    if (blanks.length === 0) {
+                        blanks.push({ key: '', synonyms: '' });
+                        optTexts.push('');
+                    }
+                } else if (question.options && question.options.length > 0) {
                     question.options.forEach((opt, idx) => {
                         optTexts.push(opt.option_text || '');
                         if (opt.is_correct) {
@@ -634,15 +783,16 @@
                     correctIndices = [0];
                 }
 
-                const isMulti = question.question_type === 'multi_select' || correctIndices.length > 1;
+                const isMulti = question.question_type === 'multi_select' || (question.question_type !== 'fill_blank' && correctIndices.length > 1);
 
                 this.formData = {
                     question_text: question.question_text,
-                    question_type: isMulti ? 'multi_select' : (question.question_type || 'multiple_choice'),
+                    question_type: question.question_type === 'fill_blank' ? 'fill_blank' : (isMulti ? 'multi_select' : (question.question_type || 'multiple_choice')),
                     points: question.points,
                     options: optTexts,
                     correct_index: correctIdx,
                     correct_indices: correctIndices,
+                    blanks: blanks,
                     explanation: question.explanation || '',
                     question_image_preview: question.image_url || null,
                     remove_question_image: false,
@@ -660,9 +810,153 @@
                     this.formData.options = ['Benar', 'Salah'];
                     this.formData.correct_index = 0;
                     this.formData.correct_indices = [0];
+                } else if (this.formData.question_type === 'fill_blank') {
+                    this.parseBlanksFromText();
+                    if (!this.formData.blanks || this.formData.blanks.length === 0) {
+                        this.formData.blanks = [{ key: '', synonyms: '' }];
+                    }
                 } else if (this.formData.options.length < 2) {
                     this.formData.options = ['', '', '', ''];
                 }
+            },
+            getBlankOptionValue(blank) {
+                if (!blank) return '';
+                const k = (blank.key || '').trim();
+                const s = (blank.synonyms || '').trim();
+                return s ? `${k}|${s}` : k;
+            },
+            parseBlanksFromText() {
+                const text = this.formData.question_text || '';
+                const regex = /\[([^\]]+)\]/g;
+                let match;
+                const found = [];
+                while ((match = regex.exec(text)) !== null) {
+                    const raw = match[1] || '';
+                    const parts = raw.split('|');
+                    found.push({
+                        key: parts[0] ? parts[0].trim() : '',
+                        synonyms: parts.slice(1).join(' | ').trim()
+                    });
+                }
+                if (found.length > 0) {
+                    this.formData.blanks = found;
+                }
+            },
+            handleQuestionTextInput() {
+                if (this.formData.question_type !== 'fill_blank') return;
+                const regex = /\[([^\]]+)\]/g;
+                let match;
+                const found = [];
+                while ((match = regex.exec(this.formData.question_text)) !== null) {
+                    const raw = match[1] || '';
+                    const parts = raw.split('|');
+                    found.push({
+                        key: parts[0] ? parts[0].trim() : '',
+                        synonyms: parts.slice(1).join(' | ').trim()
+                    });
+                }
+                if (found.length > 0) {
+                    this.formData.blanks = found;
+                }
+            },
+            wrapSelectedTextAsBlank() {
+                const ta = this.$refs.questionTextArea;
+                if (!ta) return;
+                const start = ta.selectionStart;
+                const end = ta.selectionEnd;
+                const text = this.formData.question_text || '';
+                const selected = text.substring(start, end).trim();
+
+                if (selected.length > 0) {
+                    const before = text.substring(0, start);
+                    const after = text.substring(end);
+                    this.formData.question_text = `${before}[${selected}]${after}`;
+                    this.formData.blanks.push({ key: selected, synonyms: '' });
+                    this.$nextTick(() => {
+                        ta.focus();
+                        ta.setSelectionRange(start + 1, start + 1 + selected.length);
+                    });
+                } else {
+                    this.insertBlankAtCursor();
+                }
+            },
+            insertBlankAtCursor() {
+                const ta = this.$refs.questionTextArea;
+                const text = this.formData.question_text || '';
+                const start = ta ? ta.selectionStart : text.length;
+                const end = ta ? ta.selectionEnd : text.length;
+                const before = text.substring(0, start);
+                const after = text.substring(end);
+                const defaultKey = 'Kunci';
+
+                this.formData.question_text = `${before}[${defaultKey}]${after}`;
+                this.formData.blanks.push({ key: defaultKey, synonyms: '' });
+                this.$nextTick(() => {
+                    if (ta) {
+                        ta.focus();
+                        ta.setSelectionRange(start + 1, start + 1 + defaultKey.length);
+                    }
+                });
+            },
+            insertBlankAtEnd() {
+                const text = this.formData.question_text || '';
+                const defaultKey = 'Kunci';
+                this.formData.question_text = text.trim() ? `${text.trim()} [${defaultKey}]` : `[${defaultKey}]`;
+                this.formData.blanks.push({ key: defaultKey, synonyms: '' });
+                const ta = this.$refs.questionTextArea;
+                this.$nextTick(() => {
+                    if (ta) ta.focus();
+                });
+            },
+            removeBlank(index) {
+                if (index < 0 || index >= this.formData.blanks.length) return;
+                const targetBlank = this.formData.blanks[index];
+                this.formData.blanks.splice(index, 1);
+
+                let count = 0;
+                this.formData.question_text = (this.formData.question_text || '').replace(/\[([^\]]*)\]/g, (match, content) => {
+                    if (count === index) {
+                        count++;
+                        return targetBlank ? targetBlank.key : '';
+                    }
+                    count++;
+                    return match;
+                });
+            },
+            syncBlanksToText() {
+                if (this.formData.question_type !== 'fill_blank') return;
+                let bIdx = 0;
+                const blanks = this.formData.blanks;
+                this.formData.question_text = (this.formData.question_text || '').replace(/\[([^\]]*)\]/g, (match) => {
+                    if (bIdx < blanks.length) {
+                        const b = blanks[bIdx++];
+                        const val = this.getBlankOptionValue(b);
+                        return `[${val}]`;
+                    }
+                    return match;
+                });
+            },
+            renderAdminLivePreview() {
+                const raw = this.formData.question_text || '';
+                if (!raw) {
+                    return '<span class="italic text-gray-500">Tulis teks pertanyaan untuk melihat pratinjau...</span>';
+                }
+                let bCount = 0;
+                const escRaw = raw
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+
+                const rendered = escRaw.replace(/\[([^\]]*)\]/g, (match, content) => {
+                    bCount++;
+                    const parts = content.split('|');
+                    const key = parts[0] ? parts[0].trim() : ('Titik-titik #' + bCount);
+                    return `<span class="inline-flex items-center gap-1 mx-1 px-2.5 py-0.5 rounded-lg border border-emerald-500/50 bg-emerald-500/10 text-emerald-300 font-mono font-bold text-xs shadow-inner">
+                        <span class="text-[10px] text-emerald-500/80">#${bCount}:</span> ${key}
+                    </span>`;
+                });
+
+                return rendered.replace(/\n/g, '<br>');
             },
             isCorrect(idx) {
                 if (this.formData.question_type === 'multi_select') {

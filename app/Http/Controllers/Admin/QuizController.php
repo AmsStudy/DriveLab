@@ -333,13 +333,15 @@ class QuizController extends Controller
     {
         $this->authorizeQuiz($quiz);
 
+        $isFillBlank = $request->input('question_type') === 'fill_blank';
+
         $validated = $request->validate([
             'question_text'    => 'required|string',
-            'question_type'    => 'nullable|in:multiple_choice,multi_select,true_false',
+            'question_type'    => 'nullable|in:multiple_choice,multi_select,true_false,fill_blank',
             'points'           => 'required|integer|min:1|max:1000',
             'explanation'      => 'nullable|string',
             'question_image'   => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
-            'options'          => 'required|array|min:2',
+            'options'          => $isFillBlank ? 'required|array|min:1' : 'required|array|min:2',
             'options.*'        => 'nullable|string',
             'option_images.*'  => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'correct_indices'  => 'nullable|array|min:1',
@@ -347,17 +349,22 @@ class QuizController extends Controller
             'correct_index'    => 'nullable|integer|min:0',
         ]);
 
-        $correctIndices = [];
-        if ($request->has('correct_indices') && is_array($request->correct_indices)) {
-            $correctIndices = array_map('intval', $request->correct_indices);
-        } elseif ($request->filled('correct_index')) {
-            $correctIndices = [(int)$request->correct_index];
+        if ($isFillBlank) {
+            $questionType = 'fill_blank';
+            $correctIndices = array_keys($request->input('options', []));
         } else {
-            $correctIndices = [0];
-        }
+            $correctIndices = [];
+            if ($request->has('correct_indices') && is_array($request->correct_indices)) {
+                $correctIndices = array_map('intval', $request->correct_indices);
+            } elseif ($request->filled('correct_index')) {
+                $correctIndices = [(int)$request->correct_index];
+            } else {
+                $correctIndices = [0];
+            }
 
-        $isMulti = count($correctIndices) > 1;
-        $questionType = $isMulti ? 'multi_select' : ($request->input('question_type') ?: 'multiple_choice');
+            $isMulti = count($correctIndices) > 1;
+            $questionType = $isMulti ? 'multi_select' : ($request->input('question_type') ?: 'multiple_choice');
+        }
 
         $questionImagePath = null;
         if ($request->hasFile('question_image')) {
@@ -400,14 +407,16 @@ class QuizController extends Controller
             abort(404);
         }
 
+        $isFillBlank = $request->input('question_type') === 'fill_blank';
+
         $validated = $request->validate([
             'question_text'            => 'required|string',
-            'question_type'            => 'nullable|in:multiple_choice,multi_select,true_false',
+            'question_type'            => 'nullable|in:multiple_choice,multi_select,true_false,fill_blank',
             'points'                   => 'required|integer|min:1|max:1000',
             'explanation'              => 'nullable|string',
             'question_image'           => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'remove_question_image'    => 'nullable|boolean',
-            'options'                  => 'required|array|min:2',
+            'options'                  => $isFillBlank ? 'required|array|min:1' : 'required|array|min:2',
             'options.*'                => 'nullable|string',
             'option_images.*'          => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
             'existing_option_images.*' => 'nullable|string',
@@ -417,17 +426,22 @@ class QuizController extends Controller
             'correct_index'            => 'nullable|integer|min:0',
         ]);
 
-        $correctIndices = [];
-        if ($request->has('correct_indices') && is_array($request->correct_indices)) {
-            $correctIndices = array_map('intval', $request->correct_indices);
-        } elseif ($request->filled('correct_index')) {
-            $correctIndices = [(int)$request->correct_index];
+        if ($isFillBlank) {
+            $questionType = 'fill_blank';
+            $correctIndices = array_keys($request->input('options', []));
         } else {
-            $correctIndices = [0];
-        }
+            $correctIndices = [];
+            if ($request->has('correct_indices') && is_array($request->correct_indices)) {
+                $correctIndices = array_map('intval', $request->correct_indices);
+            } elseif ($request->filled('correct_index')) {
+                $correctIndices = [(int)$request->correct_index];
+            } else {
+                $correctIndices = [0];
+            }
 
-        $isMulti = count($correctIndices) > 1;
-        $questionType = $isMulti ? 'multi_select' : ($request->input('question_type') ?: 'multiple_choice');
+            $isMulti = count($correctIndices) > 1;
+            $questionType = $isMulti ? 'multi_select' : ($request->input('question_type') ?: 'multiple_choice');
+        }
 
         $questionImagePath = $question->image_path;
         if ($request->boolean('remove_question_image')) {

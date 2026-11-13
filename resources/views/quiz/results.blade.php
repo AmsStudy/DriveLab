@@ -506,6 +506,62 @@
                             {{-- Question Text --}}
                             <div class="review-question-text text-sm sm:text-base font-bold text-gray-900 dark:text-white mb-4 leading-relaxed">{!! App\Helpers\RichTextHelper::format($ans->question->question_text ?? 'Pertanyaan') !!}</div>
 
+                            @if($ans->question->question_type === 'fill_blank')
+                                {{-- Hasil Isian Rumpang (Fill in the Blank) --}}
+                                @php
+                                    $userBlanks = [];
+                                    if (!empty($ans->text_answer)) {
+                                        $decoded = json_decode($ans->text_answer, true);
+                                        $userBlanks = is_array($decoded) ? $decoded : [$ans->text_answer];
+                                    }
+                                    $blankOptions = $ans->question->options->sortBy('order_num')->values();
+                                @endphp
+                                <div class="space-y-2 text-xs">
+                                    <div class="p-3.5 rounded-xl bg-gray-50/80 dark:bg-[#070B09] border border-gray-200 dark:border-[#1A2820]">
+                                        <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2.5 flex items-center justify-between">
+                                            <span>Evaluasi Jawaban Isian Rumpang:</span>
+                                            <span class="text-[10px] text-gray-400 font-mono">{{ count($blankOptions) }} Kolom</span>
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                            @foreach($blankOptions as $bIdx => $bOpt)
+                                                @php
+                                                    $userVal = trim((string)($userBlanks[$bIdx] ?? ''));
+                                                    $rawKey = $bOpt->option_text ?? '';
+                                                    $possibleKeys = array_filter(array_map('trim', preg_split('/[\|,]/', $rawKey)));
+                                                    if (empty($possibleKeys)) {
+                                                        $possibleKeys = [trim($rawKey)];
+                                                    }
+                                                    $isBlankCorrect = false;
+                                                    foreach ($possibleKeys as $pk) {
+                                                        if ($userVal !== '' && mb_strtolower($userVal) === mb_strtolower($pk)) {
+                                                            $isBlankCorrect = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                @endphp
+                                                <div class="p-2.5 rounded-xl border flex items-center justify-between gap-2 {{ $isBlankCorrect ? 'border-emerald-500/50 bg-emerald-500/10' : ($userVal === '' ? 'border-gray-200 dark:border-gray-800 bg-gray-500/5' : 'border-rose-500/50 bg-rose-500/10') }}">
+                                                    <div class="min-w-0">
+                                                        <div class="flex items-center gap-1.5 font-mono text-[11px] text-gray-400 mb-0.5">
+                                                            <span class="font-bold">Titik-titik #{{ $bIdx + 1 }}</span>
+                                                        </div>
+                                                        <div class="font-mono font-bold text-xs {{ $isBlankCorrect ? 'text-emerald-400' : ($userVal === '' ? 'text-gray-400 italic' : 'text-rose-400') }}">
+                                                            {{ $userVal !== '' ? $userVal : '(Tidak Dijawab)' }}
+                                                        </div>
+                                                        @if($canRevealCorrect)
+                                                            <div class="text-[10px] text-gray-400 mt-1">
+                                                                Kunci: <span class="font-mono text-emerald-400 font-semibold">{{ $rawKey }}</span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md flex-shrink-0 {{ $isBlankCorrect ? 'bg-emerald-500 text-white' : ($userVal === '' ? 'bg-gray-700 text-gray-300' : 'bg-rose-500 text-white') }}">
+                                                        {{ $isBlankCorrect ? '✓ Tepat' : ($userVal === '' ? 'Kosong' : '✕ Belum Tepat') }}
+                                                    </span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
                             {{-- Options Grid: Hanya opsi yang dipilih yang diwarnai (Hijau jika benar, Merah jika salah) --}}
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
                                 @php
@@ -632,17 +688,22 @@
                                     @endif
                                 @endforeach
                             </div>
+                            @endif
 
                             {{-- Catatan Pembahasan & Kunci Jawaban --}}
                             @php
-                                $correctOpts = $ans->question->options->where('is_correct', true)->values();
-                                $correctTextArray = [];
-                                foreach ($correctOpts as $co) {
-                                    $idx = $ans->question->options->search(fn($item) => $item->id === $co->id);
-                                    $ltr = $labels[$idx] ?? ($idx + 1);
-                                    $correctTextArray[] = "[{$ltr}] " . $co->option_text;
+                                if ($ans->question->question_type === 'fill_blank') {
+                                    $correctAnswerDisplay = $ans->question->options->map(fn($o, $i) => '#' . ($i + 1) . ': ' . $o->option_text)->implode(', ');
+                                } else {
+                                    $correctOpts = $ans->question->options->where('is_correct', true)->values();
+                                    $correctTextArray = [];
+                                    foreach ($correctOpts as $co) {
+                                        $idx = $ans->question->options->search(fn($item) => $item->id === $co->id);
+                                        $ltr = $labels[$idx] ?? ($idx + 1);
+                                        $correctTextArray[] = "[{$ltr}] " . $co->option_text;
+                                    }
+                                    $correctAnswerDisplay = implode(', ', $correctTextArray);
                                 }
-                                $correctAnswerDisplay = implode(', ', $correctTextArray);
                             @endphp
 
                             @if($ans->is_correct)

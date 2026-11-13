@@ -764,6 +764,23 @@
                 }
                 const letters = ['A','B','C','D','E','F'];
 
+                // Isian Rumpang (Fill in the Blank)
+                if (ans.question.question_type === 'fill_blank') {
+                    let blanks = [];
+                    if (ans.text_answer) {
+                        try {
+                            const parsed = JSON.parse(ans.text_answer);
+                            blanks = Array.isArray(parsed) ? parsed : [ans.text_answer];
+                        } catch (e) {
+                            blanks = [ans.text_answer];
+                        }
+                    }
+                    if (blanks.length === 0 || blanks.every(b => !b || !String(b).trim())) {
+                        return '<span class="italic text-gray-500">Tidak menjawab butir soal ini</span>';
+                    }
+                    return blanks.map((b, i) => `<span class="inline-block mr-1"><strong>#${i + 1}:</strong> ${b ? b : '<em class="text-gray-500">(kosong)</em>'}</span>`).join('<br>');
+                }
+
                 // Pilihan jamak (multi select)
                 if (Array.isArray(ans.selected_option_ids) && ans.selected_option_ids.length > 0) {
                     const selected = ans.question.options.filter(opt => ans.selected_option_ids.map(Number).includes(Number(opt.id)));
@@ -792,6 +809,12 @@
             getCorrectAnswerText(ans) {
                 if (!ans || !ans.question || !Array.isArray(ans.question.options)) return '-';
                 const letters = ['A','B','C','D','E','F'];
+
+                // Isian Rumpang (Fill in the Blank)
+                if (ans.question.question_type === 'fill_blank') {
+                    return ans.question.options.map((opt, i) => `<strong>#${i + 1}:</strong> ${opt.option_text}`).join(', ');
+                }
+
                 const correctOpts = ans.question.options.filter(o => o.is_correct);
                 if (correctOpts.length === 0) {
                     return '<span class="italic text-gray-500">Kunci jawaban belum disetel</span>';

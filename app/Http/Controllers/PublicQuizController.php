@@ -449,14 +449,20 @@ class PublicQuizController extends Controller
 
         // Prepare sanitized payload for client-side (NEVER expose is_correct in HTML/JSON!)
         $clientQuestions = $questions->map(function ($q, $index) {
+            $isFillBlank = $q->question_type === 'fill_blank';
+            $sanitizedQuestionText = $isFillBlank
+                ? preg_replace('/\[[^\]]+\]/', '[___]', $q->question_text)
+                : $q->question_text;
+
             return [
                 'id'            => $q->id,
                 'number'        => $index + 1,
-                'question_text' => $q->question_text,
+                'question_text' => $sanitizedQuestionText,
                 'image_url'     => $q->image_url,
-                'question_type' => $q->isMultiSelect() ? 'multi_select' : $q->question_type,
+                'question_type' => $isFillBlank ? 'fill_blank' : ($q->isMultiSelect() ? 'multi_select' : $q->question_type),
                 'points'        => $q->points,
-                'options'       => $q->options->map(function ($opt) {
+                'blanks_count'  => $isFillBlank ? $q->options->count() : 0,
+                'options'       => $isFillBlank ? [] : $q->options->map(function ($opt) {
                     return [
                         'id'        => $opt->id,
                         'text'      => $opt->option_text,

@@ -651,58 +651,124 @@
 
                     {{-- Question Text with Syntax Highlighting Support --}}
                     <div class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white heading-font leading-relaxed"
-                         x-html="renderRichText(currentQuestion.question_text)"></div>
+                         x-show="currentQuestion.question_type !== 'fill_blank' || getTopQuestionDisplay(currentQuestion)"
+                         x-html="renderRichText(getTopQuestionDisplay(currentQuestion))"></div>
                 </div>
 
-                {{-- Options Grid (Quizizz Colorful Theme with Image & Rich Text Support) --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
-                    <template x-for="(opt, optIdx) in currentQuestion.options" :key="opt.id">
-                        <button type="button"
-                                @click="selectOption(currentQuestion.id, opt.id)"
-                                class="option-card p-4 sm:p-5 rounded-2xl border text-left flex items-start gap-3.5 relative overflow-hidden group cursor-pointer transition-all"
-                                :class="getOptionClasses(optIdx, isSelected(currentQuestion.id, opt.id))">
-                            
-                            {{-- Option Badge (A, B, C, D) / Checkbox indicator --}}
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0 transition-transform group-hover:scale-105 mt-0.5"
-                                 :class="getOptionBadgeClasses(optIdx, isSelected(currentQuestion.id, opt.id))">
-                                <span x-text="getOptionLabel(optIdx)"></span>
+                {{-- Opsi Jawaban Khusus Pilihan Ganda & Benar/Salah --}}
+                <template x-if="currentQuestion.question_type !== 'fill_blank'">
+                    <div>
+                        {{-- Options Grid (Quizizz Colorful Theme with Image & Rich Text Support) --}}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                            <template x-for="(opt, optIdx) in currentQuestion.options" :key="opt.id">
+                                <button type="button"
+                                        @click="selectOption(currentQuestion.id, opt.id)"
+                                        class="option-card p-4 sm:p-5 rounded-2xl border text-left flex items-start gap-3.5 relative overflow-hidden group cursor-pointer transition-all"
+                                        :class="getOptionClasses(optIdx, isSelected(currentQuestion.id, opt.id))">
+                                    
+                                    {{-- Option Badge (A, B, C, D) / Checkbox indicator --}}
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0 transition-transform group-hover:scale-105 mt-0.5"
+                                         :class="getOptionBadgeClasses(optIdx, isSelected(currentQuestion.id, opt.id))">
+                                        <span x-text="getOptionLabel(optIdx)"></span>
+                                    </div>
+
+                                    {{-- Option Content (Text + Image) --}}
+                                    <div class="flex-1 min-w-0">
+                                        <template x-if="opt.image_url">
+                                            <div class="mb-2 inline-block">
+                                                <button type="button"
+                                                        @mouseenter="showHoverPreview($event, opt.image_url)"
+                                                        @mousemove="updateHoverPreviewPos($event)"
+                                                        @mouseleave="hideHoverPreview()"
+                                                        @click.stop="openImagePreview(opt.image_url, 'Gambar Opsi ' + getOptionLabel(optIdx))"
+                                                        class="block group cursor-zoom-in focus:outline-none rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
+                                                    <img :src="opt.image_url" alt="Gambar Opsi" class="max-h-32 w-auto object-contain rounded-lg group-hover:scale-105 transition-transform">
+                                                </button>
+                                            </div>
+                                        </template>
+                                        <div class="text-sm sm:text-base font-semibold leading-snug"
+                                             :class="isSelected(currentQuestion.id, opt.id) ? 'text-gray-900 dark:text-white' : 'text-gray-800 dark:text-gray-200'"
+                                             x-html="renderRichText(opt.text)">
+                                        </div>
+                                    </div>
+
+                                    {{-- Active Selected Indicator --}}
+                                    <div x-show="isSelected(currentQuestion.id, opt.id)"
+                                         class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 shadow-md mt-0.5">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                    </div>
+                                </button>
+                            </template>
+                        </div>
+
+                        {{-- Keyboard hint --}}
+                        <div class="text-center mt-4">
+                            <span class="text-[11px] text-gray-500">
+                                💡 Tips: Tekan angka <strong class="text-gray-600 dark:text-gray-400">1 - 4</strong> atau huruf <strong class="text-gray-600 dark:text-gray-400">A - D</strong> di keyboard untuk memilih jawaban cepat.
+                            </span>
+                        </div>
+                    </div>
+                </template>
+
+                {{-- Area Isian Rumpang (Fill in the Blank) --}}
+                <template x-if="currentQuestion.question_type === 'fill_blank'">
+                    <div class="space-y-4">
+                        <div class="p-5 sm:p-7 rounded-2xl border border-gray-200 dark:border-[#1A2820] bg-white/95 dark:bg-[#0F1713] shadow-md">
+                            <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100 dark:border-[#1A2820]">
+                                <span class="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 uppercase tracking-wider">
+                                    <span>✏️</span>
+                                    <span>Lengkapi Bagian Titik-Titik di Bawah Ini:</span>
+                                </span>
+                                <span class="text-xs font-mono text-gray-500" x-text="(currentQuestion.blanks_count || 1) + ' Kolom Isian'"></span>
                             </div>
 
-                            {{-- Option Content (Text + Image) --}}
-                            <div class="flex-1 min-w-0">
-                                <template x-if="opt.image_url">
-                                    <div class="mb-2 inline-block">
-                                        <button type="button"
-                                                @mouseenter="showHoverPreview($event, opt.image_url)"
-                                                @mousemove="updateHoverPreviewPos($event)"
-                                                @mouseleave="hideHoverPreview()"
-                                                @click.stop="openImagePreview(opt.image_url, 'Gambar Opsi ' + getOptionLabel(optIdx))"
-                                                class="block group cursor-zoom-in focus:outline-none rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-black/40 hover:border-emerald-500/40 p-1 transition-all">
-                                            <img :src="opt.image_url" alt="Gambar Opsi" class="max-h-32 w-auto object-contain rounded-lg group-hover:scale-105 transition-transform">
-                                        </button>
+                            {{-- Kalimat dengan Kotak Input Tersemat Langsung (Inline Blank Inputs) --}}
+                            <div class="text-base sm:text-xl font-medium leading-loose text-gray-900 dark:text-gray-100">
+                                <template x-for="(seg, segIdx) in getBlankSegments(getFillBlankParts(currentQuestion).sentence)" :key="segIdx">
+                                    <span class="inline">
+                                        <span x-html="renderRichTextInline(seg)"></span>
+                                        <template x-if="segIdx < getBlankSegments(getFillBlankParts(currentQuestion).sentence).length - 1">
+                                            <span class="inline-block mx-1.5 my-1 align-baseline">
+                                                <input type="text"
+                                                       :value="getBlankAnswer(currentQuestion.id, segIdx)"
+                                                       @input="setBlankAnswer(currentQuestion.id, segIdx, $event.target.value)"
+                                                       @keydown.enter.prevent="focusNextBlank($event, segIdx)"
+                                                       :placeholder="'Titik-titik #' + (segIdx + 1)"
+                                                       autocomplete="off"
+                                                       spellcheck="false"
+                                                       class="inline-blank-input text-center font-mono font-bold text-sm sm:text-base px-3.5 py-1.5 rounded-xl border-2 border-emerald-500/50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 bg-gray-50 dark:bg-[#070B09] text-gray-900 dark:text-emerald-300 placeholder-gray-400 dark:placeholder-gray-600 outline-none transition-all shadow-inner"
+                                                       style="min-width: 140px; max-width: 250px;" />
+                                            </span>
+                                        </template>
+                                    </span>
+                                </template>
+                            </div>
+
+                            {{-- Navigasi Cepat per Kolom Isian (Mobile / Multi-blank summary) --}}
+                            <div class="mt-6 pt-4 border-t border-gray-100 dark:border-[#1A2820] grid grid-cols-1 sm:grid-cols-2 gap-3"
+                                 x-show="(currentQuestion.blanks_count || 1) > 1">
+                                <template x-for="bNum in (currentQuestion.blanks_count || 1)" :key="'blank-num-' + bNum">
+                                    <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-gray-50 dark:bg-[#070B09] border border-gray-200 dark:border-[#1A2820]">
+                                        <span class="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono font-bold text-xs flex items-center justify-center flex-shrink-0"
+                                              x-text="'#' + bNum"></span>
+                                        <input type="text"
+                                               :value="getBlankAnswer(currentQuestion.id, bNum - 1)"
+                                               @input="setBlankAnswer(currentQuestion.id, bNum - 1, $event.target.value)"
+                                               :placeholder="'Ketik jawaban titik-titik #' + bNum + '...'"
+                                               class="flex-1 bg-transparent border-0 border-b border-gray-300 dark:border-gray-700 focus:border-emerald-500 focus:ring-0 text-sm font-mono text-gray-900 dark:text-emerald-300 placeholder-gray-400 dark:placeholder-gray-600 py-1 px-2 outline-none transition-colors">
                                     </div>
                                 </template>
-                                <div class="text-sm sm:text-base font-semibold leading-snug"
-                                     :class="isSelected(currentQuestion.id, opt.id) ? 'text-gray-900 dark:text-white' : 'text-gray-800 dark:text-gray-200'"
-                                     x-html="renderRichText(opt.text)">
-                                </div>
                             </div>
+                        </div>
 
-                            {{-- Active Selected Indicator --}}
-                            <div x-show="isSelected(currentQuestion.id, opt.id)"
-                                 class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 shadow-md mt-0.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                            </div>
-                        </button>
-                    </template>
-                </div>
-
-                {{-- Keyboard hint --}}
-                <div class="text-center">
-                    <span class="text-[11px] text-gray-500">
-                        💡 Tips: Tekan angka <strong class="text-gray-600 dark:text-gray-400">1 - 4</strong> atau huruf <strong class="text-gray-600 dark:text-gray-400">A - D</strong> di keyboard untuk memilih jawaban cepat.
-                    </span>
-                </div>
+                        {{-- Keyboard hint khusus Isian Rumpang --}}
+                        <div class="text-center">
+                            <span class="text-[11px] text-gray-500">
+                                💡 Tips: Tekan <strong class="text-gray-600 dark:text-gray-400">Tab</strong> atau <strong class="text-gray-600 dark:text-gray-400">Enter</strong> untuk berpindah ke kotak isian titik-titik berikutnya secara otomatis.
+                            </span>
+                        </div>
+                    </div>
+                </template>
 
             </div>
         </template>
@@ -2391,9 +2457,82 @@
                     if (questionId === '__flagged') return false;
                     const val = this.answers[questionId];
                     if (Array.isArray(val)) {
-                        return val.length > 0;
+                        return val.length > 0 && val.some(item => item !== undefined && item !== null && String(item).trim() !== '');
                     }
                     return val !== undefined && val !== null && val !== '';
+                },
+
+                getFillBlankParts(question) {
+                    if (!question || question.question_type !== 'fill_blank') {
+                        return { preamble: '', sentence: question ? question.question_text : '' };
+                    }
+                    const text = question.question_text || '';
+                    const codeBlockMatch = text.match(/^([\s\S]*?```[\s\S]*?```)\s*([\s\S]*)$/);
+                    if (codeBlockMatch) {
+                        return {
+                            preamble: codeBlockMatch[1].trim(),
+                            sentence: codeBlockMatch[2].trim()
+                        };
+                    }
+                    const lines = text.split('\n');
+                    const blankLineIndex = lines.findIndex(l => l.includes('[___]'));
+                    if (blankLineIndex > 0) {
+                        return {
+                            preamble: lines.slice(0, blankLineIndex).join('\n').trim(),
+                            sentence: lines.slice(blankLineIndex).join('\n').trim()
+                        };
+                    }
+                    return { preamble: '', sentence: text };
+                },
+
+                getTopQuestionDisplay(question) {
+                    if (!question) return '';
+                    if (question.question_type !== 'fill_blank') {
+                        return question.question_text;
+                    }
+                    const parts = this.getFillBlankParts(question);
+                    return parts.preamble || '';
+                },
+
+                getBlankSegments(sentence) {
+                    if (!sentence) return [''];
+                    return sentence.split('[___]');
+                },
+
+                getBlankAnswer(questionId, blankIdx) {
+                    const list = this.answers[questionId];
+                    if (Array.isArray(list) && list[blankIdx] !== undefined) {
+                        return list[blankIdx];
+                    }
+                    return '';
+                },
+
+                setBlankAnswer(questionId, blankIdx, val) {
+                    if (!Array.isArray(this.answers[questionId])) {
+                        const q = this.questions.find(item => item.id === questionId);
+                        const count = q ? (q.blanks_count || 1) : (blankIdx + 1);
+                        this.answers[questionId] = new Array(count).fill('');
+                    }
+                    this.answers[questionId][blankIdx] = val;
+                    this.saveLocalCache();
+                    this.triggerBackgroundSync();
+                },
+
+                focusNextBlank(event, currentIdx) {
+                    const parentContainer = event.target.closest('.space-y-4');
+                    if (!parentContainer) return;
+                    const inputs = Array.from(parentContainer.querySelectorAll('.inline-blank-input'));
+                    const nextInput = inputs[currentIdx + 1];
+                    if (nextInput) {
+                        nextInput.focus();
+                    } else {
+                        this.nextQuestion();
+                    }
+                },
+
+                renderRichTextInline(raw) {
+                    if (!raw) return '';
+                    return this.renderRichText(raw);
                 },
 
                 nextQuestion() {
