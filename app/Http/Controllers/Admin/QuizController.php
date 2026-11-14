@@ -674,6 +674,62 @@ class QuizController extends Controller
         $avgScore          = $totalParticipants > 0 ? round((float) ($analytics->avg_score ?? 0), 1) : 0;
         $avgDuration       = $totalParticipants > 0 ? round((float) ($analytics->avg_duration ?? 0)) : 0;
 
+        // Analisis Butir Soal Kuis (Statistik Akurasi & Tingkat Kesulitan)
+        $questionStats = DB::table('quiz_questions as q')
+            ->where('q.quiz_id', $quiz->id)
+            ->leftJoin('quiz_attempt_answers as a', 'a.quiz_question_id', '=', 'q.id')
+            ->selectRaw('
+                q.id,
+                q.order_num,
+                q.question_text,
+                q.question_type,
+                q.points,
+                COUNT(a.id) as total_answers,
+                SUM(CASE WHEN a.is_correct = 1 THEN 1 ELSE 0 END) as correct_count,
+                SUM(CASE WHEN a.is_correct = 0 THEN 1 ELSE 0 END) as wrong_count
+            ')
+            ->groupBy('q.id', 'q.order_num', 'q.question_text', 'q.question_type', 'q.points')
+            ->orderBy('q.order_num')
+            ->get()
+            ->map(function ($item) {
+                $total = (int) $item->total_answers;
+                $correct = (int) $item->correct_count;
+                $wrong = (int) $item->wrong_count;
+                $accuracyPercent = $total > 0 ? round(($correct / $total) * 100) : 0;
+
+                if ($total === 0) {
+                    $difficulty = 'Belum Diuji';
+                    $difficultyColor = 'gray';
+                } elseif ($accuracyPercent >= 70) {
+                    $difficulty = 'Mudah';
+                    $difficultyColor = 'emerald';
+                } elseif ($accuracyPercent >= 40) {
+                    $difficulty = 'Sedang';
+                    $difficultyColor = 'amber';
+                } else {
+                    $difficulty = 'Sulit';
+                    $difficultyColor = 'rose';
+                }
+
+                return [
+                    'id'               => $item->id,
+                    'order_num'        => $item->order_num,
+                    'question_text'    => strip_tags($item->question_text),
+                    'question_type'    => $item->question_type,
+                    'points'           => $item->points,
+                    'total_answers'    => $total,
+                    'correct_count'    => $correct,
+                    'wrong_count'      => $wrong,
+                    'accuracy_percent' => $accuracyPercent,
+                    'difficulty'       => $difficulty,
+                    'difficulty_color' => $difficultyColor,
+                ];
+            });
+
+        $answeredStats = $questionStats->where('total_answers', '>', 0);
+        $hardestQuestion = $answeredStats->sortBy('accuracy_percent')->first();
+        $easiestQuestion = $answeredStats->sortByDesc('accuracy_percent')->first();
+
         return view('admin.quizzes.results', compact(
             'quiz',
             'attempts',
@@ -681,7 +737,10 @@ class QuizController extends Controller
             'highestScore',
             'lowestScore',
             'avgScore',
-            'avgDuration'
+            'avgDuration',
+            'questionStats',
+            'hardestQuestion',
+            'easiestQuestion'
         ));
     }
 

@@ -121,6 +121,156 @@
         </div>
     </div>
 
+    {{-- ─── Analisis Kesulitan Butir Soal (Statistik Soal Tersulit vs Termudah) ─── --}}
+    @if($totalParticipants > 0 && $questionStats->isNotEmpty())
+    <div x-data="{ openTable: false }" class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-4 sm:p-5 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1A2820]">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white">Analisis Tingkat Kesulitan Butir Soal</h3>
+                    <p class="text-xs text-gray-400 mt-0.5">Statistik pedagogis daya serap materi mahasiswa per butir soal</p>
+                </div>
+            </div>
+
+            <button type="button" @click="openTable = !openTable"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#142019] hover:bg-[#1A2820] text-emerald-400 border border-emerald-500/30 transition-colors cursor-pointer self-start sm:self-auto">
+                <span x-text="openTable ? 'Tutup Detail Butir' : 'Lihat Semua Butir Soal'"></span>
+                <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="{'rotate-180': openTable}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Highlight Card Soal Tersulit vs Termudah --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mt-4">
+            {{-- Soal Tersulit --}}
+            <div class="p-3.5 rounded-xl bg-rose-950/15 border border-rose-500/25 flex items-start gap-3">
+                <div class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                    ⚠️
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-rose-300">Soal Paling Menantang (Tersulit)</span>
+                        @if($hardestQuestion)
+                            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                                Akurasi: {{ $hardestQuestion['accuracy_percent'] }}%
+                            </span>
+                        @endif
+                    </div>
+                    @if($hardestQuestion)
+                        <p class="text-xs font-semibold text-gray-200 mt-1 truncate">
+                            No. {{ $hardestQuestion['order_num'] }}: {{ $hardestQuestion['question_text'] }}
+                        </p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">
+                            {{ $hardestQuestion['wrong_count'] }} dari {{ $hardestQuestion['total_answers'] }} mahasiswa menjawab salah.
+                        </p>
+                    @else
+                        <p class="text-xs text-gray-500 mt-1">Belum cukup data pengerjaan.</p>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Soal Termudah --}}
+            <div class="p-3.5 rounded-xl bg-emerald-950/15 border border-emerald-500/25 flex items-start gap-3">
+                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                    🎯
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-emerald-300">Soal Paling Dipahami (Termudah)</span>
+                        @if($easiestQuestion)
+                            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                Akurasi: {{ $easiestQuestion['accuracy_percent'] }}%
+                            </span>
+                        @endif
+                    </div>
+                    @if($easiestQuestion)
+                        <p class="text-xs font-semibold text-gray-200 mt-1 truncate">
+                            No. {{ $easiestQuestion['order_num'] }}: {{ $easiestQuestion['question_text'] }}
+                        </p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">
+                            {{ $easiestQuestion['correct_count'] }} dari {{ $easiestQuestion['total_answers'] }} mahasiswa menjawab benar.
+                        </p>
+                    @else
+                        <p class="text-xs text-gray-500 mt-1">Belum cukup data pengerjaan.</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        {{-- Tabel Rincian Seluruh Butir Soal --}}
+        <div x-show="openTable" x-cloak class="mt-4 pt-3 border-t border-[#1A2820] overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead>
+                    <tr class="text-gray-400 uppercase tracking-wider text-[10px] border-b border-[#1A2820]">
+                        <th class="py-2.5 px-3">No</th>
+                        <th class="py-2.5 px-3">Teks Soal</th>
+                        <th class="py-2.5 px-3">Tipe</th>
+                        <th class="py-2.5 px-3 text-center">Percobaan</th>
+                        <th class="py-2.5 px-3 text-center">Benar / Salah</th>
+                        <th class="py-2.5 px-3">Tingkat Akurasi</th>
+                        <th class="py-2.5 px-3 text-center">Tingkat Kesulitan</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#1A2820]/60">
+                    @foreach($questionStats as $q)
+                        <tr class="hover:bg-[#142019]/40 transition-colors">
+                            <td class="py-2.5 px-3 font-mono font-bold text-gray-300">#{{ $q['order_num'] }}</td>
+                            <td class="py-2.5 px-3 max-w-xs sm:max-w-md truncate text-gray-200" title="{{ $q['question_text'] }}">
+                                {{ $q['question_text'] }}
+                            </td>
+                            <td class="py-2.5 px-3 text-gray-400 capitalize">
+                                {{ str_replace('_', ' ', $q['question_type']) }}
+                            </td>
+                            <td class="py-2.5 px-3 text-center font-mono text-gray-300">
+                                {{ $q['total_answers'] }}
+                            </td>
+                            <td class="py-2.5 px-3 text-center font-mono">
+                                <span class="text-emerald-400 font-bold">{{ $q['correct_count'] }}</span>
+                                <span class="text-gray-600">/</span>
+                                <span class="text-rose-400 font-bold">{{ $q['wrong_count'] }}</span>
+                            </td>
+                            <td class="py-2.5 px-3 w-40">
+                                <div class="flex items-center gap-2">
+                                    <div class="flex-1 bg-gray-800/80 rounded-full h-1.5 overflow-hidden">
+                                        <div class="h-1.5 rounded-full {{ $q['accuracy_percent'] >= 70 ? 'bg-emerald-500' : ($q['accuracy_percent'] >= 40 ? 'bg-amber-500' : 'bg-rose-500') }}"
+                                             style="width: {{ $q['accuracy_percent'] }}%"></div>
+                                    </div>
+                                    <span class="font-mono text-[11px] font-bold text-gray-200 w-8 text-right">{{ $q['accuracy_percent'] }}%</span>
+                                </div>
+                            </td>
+                            <td class="py-2.5 px-3 text-center">
+                                @if($q['difficulty_color'] === 'emerald')
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                        {{ $q['difficulty'] }}
+                                    </span>
+                                @elseif($q['difficulty_color'] === 'amber')
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                                        {{ $q['difficulty'] }}
+                                    </span>
+                                @elseif($q['difficulty_color'] === 'rose')
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                                        {{ $q['difficulty'] }}
+                                    </span>
+                                @else
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-gray-700/20 text-gray-400 border border-gray-600/30">
+                                        {{ $q['difficulty'] }}
+                                    </span>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
     {{-- Filter Search --}}
     <div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl p-4">
         <form method="GET" action="{{ route('admin.quizzes.results', $quiz) }}" class="flex flex-col sm:flex-row items-center justify-between gap-3">

@@ -11,3 +11,6 @@ Artisan::command('inspire', function () {
 // ─── Penjadwalan Backup Database Otomatis Setiap Malam Pukul 02:00 ───
 Schedule::command('db:backup')->dailyAt('02:00')->runInBackground();
 
+// ─── Pembersihan Otomatis Sesi & Cache Kadaluarsa Setiap Jam (DB Slim & Cepat) ───
+Schedule::command('app:prune-expired')->hourly()->runInBackground();
+
