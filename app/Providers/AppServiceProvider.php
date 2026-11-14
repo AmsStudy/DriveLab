@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -23,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // ─── Perlindungan Keamanan Database: Larang Perintah Destruktif di Production ───
+        DB::prohibitDestructiveCommands($this->app->isProduction());
+
         if (env('APP_ENV') !== 'local') {
             URL::forceScheme('https');
         }

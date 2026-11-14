@@ -973,6 +973,9 @@
                 <x-admin.nav-item route="admin.users.index" icon="users">
                     Kelola Admin
                 </x-admin.nav-item>
+                <x-admin.nav-item route="admin.backups.index" icon="database">
+                    Backup Database
+                </x-admin.nav-item>
                 @endif
             </nav>
 

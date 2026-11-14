@@ -821,8 +821,56 @@ class QuizController extends Controller
     public function liveMonitorData(Quiz $quiz)
     {
         $this->authorizeQuiz($quiz);
+        return response()->json($this->buildLiveMonitorData($quiz));
+    }
 
-        // Preload counts to eliminate N+1 queries during 5s polling
+    /**
+     * Server-Sent Events (SSE) Stream untuk Live Monitor Admin
+     * Menyediakan pembaruan real-time instan tanpa beban polling berulang.
+     */
+    public function liveMonitorStream(Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+
+        return response()->stream(function () use ($quiz) {
+            $startTime = time();
+            $lastDataHash = null;
+
+            // Stream aktif selama maksimal 25 detik per sesi koneksi
+            // EventSource di browser akan otomatis reconnect secara seamless
+            while (time() - $startTime < 25) {
+                if (connection_aborted()) {
+                    break;
+                }
+
+                $data = $this->buildLiveMonitorData($quiz);
+                $currentHash = md5(json_encode($data));
+
+                if ($currentHash !== $lastDataHash) {
+                    echo "data: " . json_encode($data) . "\n\n";
+                    if (ob_get_level() > 0) {
+                        ob_flush();
+                    }
+                    flush();
+                    $lastDataHash = $currentHash;
+                }
+
+                sleep(2);
+            }
+        }, 200, [
+            'Content-Type'      => 'text/event-stream',
+            'Cache-Control'     => 'no-cache, no-transform',
+            'Connection'        => 'keep-alive',
+            'X-Accel-Buffering' => 'no',
+        ]);
+    }
+
+    /**
+     * Helper penyusun payload monitoring real-time
+     */
+    protected function buildLiveMonitorData(Quiz $quiz): array
+    {
+        // Preload counts to eliminate N+1 queries during stream / polling
         $quiz->loadCount('questions');
         $totalQuestions = (int) $quiz->questions_count;
 
@@ -891,7 +939,7 @@ class QuizController extends Controller
         $isPaused = $quiz->isSessionPaused();
         $pauseDuration = ($isPaused && $quiz->paused_at) ? abs((int) now()->diffInSeconds($quiz->paused_at)) : 0;
 
-        return response()->json([
+        return [
             'success'                => true,
             'session_status'         => $quiz->session_status ?? 'waiting',
             'is_paused'              => $isPaused,
@@ -909,7 +957,7 @@ class QuizController extends Controller
             'announcements' => $announcements,
             'active'        => $activeAttempts,
             'completed'     => $completedAttempts,
-        ]);
+        ];
     }
 
     public function projectorLeaderboard(Quiz $quiz)

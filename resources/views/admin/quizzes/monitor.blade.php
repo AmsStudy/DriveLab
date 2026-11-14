@@ -22,10 +22,13 @@
                     <span class="inline-flex items-center gap-1.5 font-medium text-emerald-700 dark:text-emerald-400">
                         <span class="w-2 h-2 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-ping"></span>
                         <span class="w-2 h-2 rounded-full bg-emerald-600 dark:bg-emerald-400 -ml-3.5"></span>
-                        Live Monitoring Aktif
+                        Live Monitoring
                     </span>
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold"
+                          :class="sseConnected ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700'"
+                          x-text="sseConnected ? '⚡ Real-Time SSE' : '🔄 Polling'"></span>
                     <span>&bull;</span>
-                    <span x-text="'Sinkronisasi terakhir: ' + lastSyncTime"></span>
+                    <span x-text="'Sinkron: ' + lastSyncTime"></span>
                 </div>
             </div>
         </div>
@@ -421,6 +424,19 @@
                         :class="statusFilter === 'online' ? 'bg-teal-50 dark:bg-teal-500/15 text-teal-800 dark:text-teal-400 border-teal-300 dark:border-teal-500/30' : 'text-gray-600 dark:text-gray-400 border-gray-200 dark:border-[#1A2820] hover:bg-gray-50 dark:hover:bg-[#1A2820]'">Online</button>
             </div>
 
+            {{-- Filter Kelas --}}
+            <template x-if="availableKelas.length > 0">
+                <div class="relative flex-shrink-0">
+                    <select x-model="selectedKelas"
+                            class="bg-white dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-xs text-gray-800 dark:text-gray-200 px-3 py-1.5 shadow-xs font-semibold cursor-pointer">
+                        <option value="">Semua Kelas</option>
+                        <template x-for="k in availableKelas" :key="k">
+                            <option :value="k" x-text="'Kelas ' + k"></option>
+                        </template>
+                    </select>
+                </div>
+            </template>
+
             {{-- Search Bar --}}
             <div class="relative w-full sm:w-60">
                 <input type="text" x-model="searchQuery"
@@ -798,16 +814,25 @@ function liveExamMonitor(quizId) {
         targetStudent: null,
         addedMinutes: 5,
 
+        // Filter Kelas & Real-Time Stream Status
+        selectedKelas: '',
+        sseConnected: false,
+        eventSource: null,
+
+        get availableKelas() {
+            const set = new Set();
+            this.activeAttempts.forEach(i => { if (i.kelas) set.add(i.kelas); });
+            this.completedAttempts.forEach(i => { if (i.kelas) set.add(i.kelas); });
+            return Array.from(set).sort();
+        },
+
         getCsrfToken() {
             return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
         },
 
         initMonitor() {
             this.fetchData();
-            // Auto refresh realtime setiap 4 detik tanpa reload halaman
-            this.timer = setInterval(() => {
-                this.fetchData();
-            }, 4000);
+            this.initEventSource();
 
             // Heartbeat penyegar token CSRF tiap 10 menit agar sesi admin tidak kadaluarsa
             setInterval(async () => {
@@ -822,8 +847,72 @@ function liveExamMonitor(quizId) {
             }, 10 * 60 * 1000);
         },
 
+        initEventSource() {
+            if (!window.EventSource) {
+                this.startFallbackPolling();
+                return;
+            }
+
+            try {
+                const sseUrl = '{{ route('admin.quizzes.monitor.stream', $quiz) }}';
+                this.eventSource = new EventSource(sseUrl);
+
+                this.eventSource.onmessage = (e) => {
+                    if (!e.data) return;
+                    try {
+                        const data = JSON.parse(e.data);
+                        if (data && data.success) {
+                            this.applyData(data);
+                            this.sseConnected = true;
+                            if (this.timer) {
+                                clearInterval(this.timer);
+                                this.timer = null;
+                            }
+                        }
+                    } catch (err) {}
+                };
+
+                this.eventSource.onerror = (e) => {
+                    this.sseConnected = false;
+                    this.startFallbackPolling();
+                };
+
+                this.eventSource.onopen = () => {
+                    this.sseConnected = true;
+                    if (this.timer) {
+                        clearInterval(this.timer);
+                        this.timer = null;
+                    }
+                };
+            } catch (err) {
+                this.startFallbackPolling();
+            }
+        },
+
+        startFallbackPolling() {
+            if (this.timer) return;
+            this.timer = setInterval(() => {
+                this.fetchData();
+            }, 4000);
+        },
+
+        applyData(data) {
+            if (data.session_status) {
+                this.sessionStatus = data.session_status;
+            }
+            if (data.announcements) {
+                this.announcements = data.announcements;
+            }
+            this.summary = data.summary;
+            this.activeAttempts = data.active;
+            this.completedAttempts = data.completed;
+            const now = new Date();
+            this.lastSyncTime = now.toLocaleTimeString('id-ID');
+        },
+
         get filteredActive() {
             return this.activeAttempts.filter(item => {
+                if (this.selectedKelas && item.kelas !== this.selectedKelas) return false;
                 const matchSearch = !this.searchQuery ||
                     item.student_name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
                     item.nim.toLowerCase().includes(this.searchQuery.toLowerCase());
@@ -838,6 +927,7 @@ function liveExamMonitor(quizId) {
 
         get filteredCompleted() {
             return this.completedAttempts.filter(item => {
+                if (this.selectedKelas && item.kelas !== this.selectedKelas) return false;
                 if (!this.searchQuery) return true;
                 return item.student_name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
                        item.nim.toLowerCase().includes(this.searchQuery.toLowerCase());
@@ -853,17 +943,7 @@ function liveExamMonitor(quizId) {
                 const res = await fetch(`{{ route('admin.quizzes.monitor.data', $quiz) }}`);
                 const data = await res.json();
                 if (data.success) {
-                    if (data.session_status) {
-                        this.sessionStatus = data.session_status;
-                    }
-                    if (data.announcements) {
-                        this.announcements = data.announcements;
-                    }
-                    this.summary = data.summary;
-                    this.activeAttempts = data.active;
-                    this.completedAttempts = data.completed;
-                    const now = new Date();
-                    this.lastSyncTime = now.toLocaleTimeString('id-ID');
+                    this.applyData(data);
                 }
             } catch (err) {
                 console.warn('Live monitor fetch error:', err);

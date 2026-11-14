@@ -134,6 +134,7 @@ Route::prefix('admin')
         // Live Exam Monitoring & Proctoring
         Route::get('quizzes/{quiz}/monitor', [QuizController::class, 'liveMonitor'])->name('quizzes.monitor');
         Route::get('quizzes/{quiz}/monitor/data', [QuizController::class, 'liveMonitorData'])->name('quizzes.monitor.data');
+        Route::get('quizzes/{quiz}/monitor/stream', [QuizController::class, 'liveMonitorStream'])->name('quizzes.monitor.stream');
         Route::get('quizzes/{quiz}/projector', [QuizController::class, 'projectorLeaderboard'])->name('quizzes.projector');
         Route::get('quizzes/{quiz}/projector/data', [QuizController::class, 'projectorLeaderboardData'])->name('quizzes.projector.data');
         Route::post('quizzes/{quiz}/session/start', [QuizController::class, 'startSession'])->name('quizzes.session.start');
@@ -158,6 +159,12 @@ Route::prefix('admin')
             Route::patch('users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');
             Route::patch('users/{user}/reject', [UserController::class, 'reject'])->name('users.reject');
             Route::patch('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+
+            // Backup Database (Super Admin)
+            Route::get('backups', [\App\Http\Controllers\Admin\BackupController::class, 'index'])->name('backups.index');
+            Route::post('backups', [\App\Http\Controllers\Admin\BackupController::class, 'create'])->name('backups.create');
+            Route::get('backups/{filename}/download', [\App\Http\Controllers\Admin\BackupController::class, 'download'])->name('backups.download');
+            Route::delete('backups/{filename}', [\App\Http\Controllers\Admin\BackupController::class, 'destroy'])->name('backups.destroy');
         });
     });
 
