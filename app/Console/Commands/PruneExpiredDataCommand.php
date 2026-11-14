@@ -66,3 +66,4 @@ class PruneExpiredDataCommand extends Command
         return Command::SUCCESS;
     }
 }
+
