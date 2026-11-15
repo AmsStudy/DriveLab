@@ -241,3 +241,4 @@ class AuditMediaStorageCommand extends Command
         return ['total' => $files->count(), 'found' => $found, 'missing' => $missing];
     }
 }
+

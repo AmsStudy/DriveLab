@@ -102,3 +102,4 @@ class AutoCloseExpiredQuizzesCommand extends Command
         return Command::SUCCESS;
     }
 }
+
