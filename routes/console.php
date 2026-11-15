@@ -14,3 +14,7 @@ Schedule::command('db:backup')->dailyAt('02:00')->runInBackground();
 // ─── Pembersihan Otomatis Sesi & Cache Kadaluarsa Setiap Jam (DB Slim & Cepat) ───
 Schedule::command('app:prune-expired')->hourly()->runInBackground();
 
+// ─── Penutupan Otomatis Sesi Kuis Kedaluwarsa & Attempt Ditinggalkan Setiap 15 Menit ───
+Schedule::command('quizzes:auto-close')->everyFifteenMinutes()->runInBackground();
+
+

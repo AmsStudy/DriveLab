@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
+use ZipArchive;
 
 class DatabaseBackupCommand extends Command
 {
@@ -13,14 +14,14 @@ class DatabaseBackupCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'db:backup {--keep=14 : Jumlah file backup terakhir yang dipertahankan}';
+    protected $signature = 'db:backup {--keep=14 : Jumlah file backup terakhir yang dipertahankan} {--with-files : Sertakan backup berkas fisik storage (gambar kuis & file tugas lab)}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Membuat backup database MySQL dalam bentuk file .sql / .sql.gz terkompresi';
+    protected $description = 'Membuat backup database MySQL (.sql.gz) dan arsip storage opsional (.zip)';
 
     /**
      * Execute the console command.
@@ -118,7 +119,12 @@ class DatabaseBackupCommand extends Command
             $this->warn("Kompresi gzip gagal, menyimpan file mentah .sql: {$finalFilename}");
         }
 
-        // 3. Rotasi Backup: Hapus file backup lama melebihi limit
+        // 3. Backup Berkas Fisik Storage (Jika diminta opsi --with-files)
+        if ($this->option('with-files')) {
+            $this->backupStorageFiles($backupDir, $timestamp);
+        }
+
+        // 4. Rotasi Backup: Hapus file backup lama melebihi limit
         $keepLimit = (int) $this->option('keep');
         $this->rotateBackups($backupDir, $keepLimit);
 
@@ -131,26 +137,82 @@ class DatabaseBackupCommand extends Command
     }
 
     /**
+     * Backup direktori penting storage/app ke file .zip
+     */
+    protected function backupStorageFiles(string $backupDir, string $timestamp): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->warn("Ekstensi ZipArchive tidak tersedia di PHP. Melewatkan backup berkas fisik.");
+            return;
+        }
+
+        $this->newLine();
+        $this->info("Membuat arsip backup berkas fisik storage (gambar kuis & file tugas lab)...");
+
+        $zipFilename = "backup_storage_{$timestamp}.zip";
+        $zipPath = $backupDir . DIRECTORY_SEPARATOR . $zipFilename;
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            $this->warn("Gagal membuka file ZIP: {$zipPath}");
+            return;
+        }
+
+        $dirsToBackup = [
+            'quiz_images' => storage_path('app/public/quiz_images'),
+            'submissions' => storage_path('app/private/submissions'),
+        ];
+
+        $addedCount = 0;
+        foreach ($dirsToBackup as $prefix => $fullPath) {
+            if (File::isDirectory($fullPath)) {
+                $files = File::allFiles($fullPath);
+                foreach ($files as $f) {
+                    $relativePath = $prefix . '/' . $f->getRelativePathname();
+                    $zip->addFile($f->getPathname(), $relativePath);
+                    $addedCount++;
+                }
+            }
+        }
+
+        $zip->close();
+
+        if (File::exists($zipPath)) {
+            $zipSize = File::size($zipPath);
+            $this->info("✅ Berhasil mengarsipkan {$addedCount} berkas fisik: {$zipFilename} (" . $this->formatBytes($zipSize) . ")");
+        }
+    }
+
+    /**
      * Hapus backup tertua jika jumlah file melebihi limit.
      */
     protected function rotateBackups(string $dir, int $limit): void
     {
         $files = File::files($dir);
-        $backupFiles = [];
+        $sqlBackups = [];
+        $zipBackups = [];
 
         foreach ($files as $file) {
             $filename = $file->getFilename();
             if (str_starts_with($filename, 'backup_') && (str_ends_with($filename, '.sql') || str_ends_with($filename, '.sql.gz'))) {
-                $backupFiles[$file->getPathname()] = $file->getMTime();
+                $sqlBackups[$file->getPathname()] = $file->getMTime();
+            } elseif (str_starts_with($filename, 'backup_storage_') && str_ends_with($filename, '.zip')) {
+                $zipBackups[$file->getPathname()] = $file->getMTime();
             }
         }
 
-        if (count($backupFiles) > $limit) {
-            asort($backupFiles); // Urutkan dari yang tertua
-            $toDeleteCount = count($backupFiles) - $limit;
+        $this->cleanExcessFiles($sqlBackups, $limit);
+        $this->cleanExcessFiles($zipBackups, $limit);
+    }
+
+    protected function cleanExcessFiles(array $files, int $limit): void
+    {
+        if (count($files) > $limit) {
+            asort($files); // Urutkan dari yang tertua
+            $toDeleteCount = count($files) - $limit;
             $deleted = 0;
 
-            foreach ($backupFiles as $path => $mtime) {
+            foreach ($files as $path => $mtime) {
                 if ($deleted >= $toDeleteCount) {
                     break;
                 }
@@ -172,4 +234,3 @@ class DatabaseBackupCommand extends Command
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
 }
-

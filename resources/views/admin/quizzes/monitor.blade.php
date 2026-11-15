@@ -381,7 +381,7 @@
             <button type="button" @click="activeTab = 'active'"
                     class="px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
                     :class="activeTab === 'active' ? 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30 shadow-xs' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'">
-                <span x-text="sessionStatus === 'waiting' ? 'Mahasiswa di Ruang Tunggu' : 'Peserta Aktif Mengerjakan'">Peserta Aktif</span>
+                <span x-text="sessionStatus === 'waiting' ? 'Mahasiswa di Ruang Tunggu' : (sessionStatus === 'ended' ? 'Peserta Belum Selesai' : 'Peserta Aktif Mengerjakan')">Peserta Aktif</span>
                 <span class="px-1.5 py-0.5 text-xs rounded-md bg-gray-100 dark:bg-[#090D0B] text-gray-700 dark:text-gray-300 font-bold" x-text="filteredActive.length">0</span>
             </button>
             <button type="button" @click="activeTab = 'completed'"

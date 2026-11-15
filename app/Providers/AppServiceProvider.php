@@ -24,8 +24,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // ─── Perlindungan Keamanan Database: Larang Perintah Destruktif di Production ───
-        DB::prohibitDestructiveCommands($this->app->isProduction());
+        // ─── Perlindungan Keamanan Database: Larang Perintah Destruktif ───
+        // Melindungi migrate:fresh, db:wipe, dll. baik di production maupun selama PROTECT_DATABASE=true (default aktif)
+        DB::prohibitDestructiveCommands(
+            $this->app->isProduction() || env('PROTECT_DATABASE', true)
+        );
 
         if (env('APP_ENV') !== 'local') {
             URL::forceScheme('https');

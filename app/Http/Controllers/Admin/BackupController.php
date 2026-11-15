@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class BackupController extends Controller
 {
     /**
-     * Tampilkan daftar file backup database.
+     * Tampilkan daftar file backup database & storage.
      */
     public function index()
     {
@@ -22,13 +22,18 @@ class BackupController extends Controller
             $files = File::files($backupDir);
             foreach ($files as $file) {
                 $filename = $file->getFilename();
-                if (str_starts_with($filename, 'backup_') && (str_ends_with($filename, '.sql') || str_ends_with($filename, '.sql.gz'))) {
+                $isSql = str_starts_with($filename, 'backup_') && (str_ends_with($filename, '.sql') || str_ends_with($filename, '.sql.gz'));
+                $isStorage = str_starts_with($filename, 'backup_storage_') && str_ends_with($filename, '.zip');
+
+                if ($isSql || $isStorage) {
                     $backups[] = [
-                        'filename'      => $filename,
-                        'size'          => $this->formatBytes($file->getSize()),
-                        'raw_size'      => $file->getSize(),
-                        'created_at'    => date('d M Y H:i:s', $file->getMTime()),
-                        'timestamp'     => $file->getMTime(),
+                        'filename'   => $filename,
+                        'type'       => $isSql ? 'database' : 'storage',
+                        'type_label' => $isSql ? 'Database MySQL' : 'Berkas Storage (.zip)',
+                        'size'       => $this->formatBytes($file->getSize()),
+                        'raw_size'   => $file->getSize(),
+                        'created_at' => date('d M Y H:i:s', $file->getMTime()),
+                        'timestamp'  => $file->getMTime(),
                     ];
                 }
             }
@@ -41,23 +46,29 @@ class BackupController extends Controller
     }
 
     /**
-     * Buat file backup database baru secara manual.
+     * Buat file backup baru secara manual (database atau full).
      */
-    public function create()
+    public function create(Request $request)
     {
         try {
-            $exitCode = Artisan::call('db:backup');
+            $withFiles = $request->boolean('with_files');
+            $params = $withFiles ? ['--with-files' => true] : [];
+
+            $exitCode = Artisan::call('db:backup', $params);
             if ($exitCode === 0) {
-                return redirect()->route('admin.backups.index')->with('success', 'Backup database baru berhasil dibuat!');
+                $msg = $withFiles
+                    ? 'Backup Database & Berkas Storage berhasil dibuat!'
+                    : 'Backup database baru berhasil dibuat!';
+                return redirect()->route('admin.backups.index')->with('success', $msg);
             }
-            return redirect()->route('admin.backups.index')->with('error', 'Gagal membuat backup database. Periksa log server.');
+            return redirect()->route('admin.backups.index')->with('error', 'Gagal membuat backup. Periksa log server.');
         } catch (\Throwable $e) {
             return redirect()->route('admin.backups.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
     /**
-     * Unduh file backup database.
+     * Unduh file backup.
      */
     public function download(string $filename): BinaryFileResponse
     {
@@ -74,7 +85,7 @@ class BackupController extends Controller
     }
 
     /**
-     * Hapus file backup database.
+     * Hapus file backup.
      */
     public function destroy(string $filename)
     {
@@ -102,4 +113,3 @@ class BackupController extends Controller
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
 }
-
