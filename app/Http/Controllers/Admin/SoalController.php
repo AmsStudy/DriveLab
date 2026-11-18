@@ -697,22 +697,54 @@ class SoalController extends Controller
             $added       = 0;
             $filterKelas = $request->input('kelas');
 
+            // Tambahkan file manifest rekapitulasi tugas di root ZIP
+            $rekapLines = [];
+            $rekapLines[] = "================================================================================";
+            $rekapLines[] = "REKAP PENGUMPULAN TUGAS: " . strtoupper($soal->title);
+            $rekapLines[] = "Total Pengumpulan : " . $submissions->count() . " Mahasiswa" . ($filterKelas ? " (Filter Kelas: {$filterKelas})" : "");
+            $rekapLines[] = "Diekspor Pada     : " . now()->format('d M Y, H:i:s');
+            $rekapLines[] = "================================================================================";
+            $rekapLines[] = sprintf("%-5s | %-15s | %-30s | %-12s | %-19s | %s", "No", "NIM", "Nama Mahasiswa", "Kelas", "Waktu Pengumpulan", "Tipe / Berkas");
+            $rekapLines[] = str_repeat("-", 110);
+
+            $no = 1;
+            foreach ($submissions as $sub) {
+                $subDesc = match ($sub->submission_type) {
+                    'link'  => 'Tautan: ' . $sub->link_url,
+                    'text'  => 'Teks (' . Str::limit(str_replace(["\r", "\n"], ' ', $sub->text_content), 40) . ')',
+                    default => $sub->getFilesCount() . ' Berkas File (' . ($sub->file_original_name ?: 'tugas') . ')',
+                };
+                $rekapLines[] = sprintf(
+                    "%-5d | %-15s | %-30s | %-12s | %-19s | %s",
+                    $no++,
+                    $sub->nim,
+                    Str::limit($sub->nama, 30),
+                    $sub->kelas ?: '-',
+                    $sub->created_at->format('Y-m-d H:i:s'),
+                    $subDesc
+                );
+            }
+            $rekapLines[] = "================================================================================";
+            $zip->addFromString('_REKAP_PENGUMPULAN_TUGAS.txt', implode("\n", $rekapLines));
+
             foreach ($submissions as $submission) {
-                // Tentukan folder mahasiswa: {NIM}_{Nama}
+                // Tentukan folder & prefix unik mahasiswa
                 $safeNim           = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $submission->nim);
-                $safeNama          = preg_replace('/[^a-zA-Z0-9\-_\s]/', '_', str_replace(' ', '_', $submission->nama));
+                $safeNama          = preg_replace('/_+/', '_', trim(preg_replace('/[^a-zA-Z0-9\-_\s]/', '_', str_replace(' ', '_', $submission->nama)), '_'));
                 $studentFolderName = "{$safeNim}_{$safeNama}";
 
                 $folderPrefix = '';
-                if (empty($filterKelas) && ($soal->hasClasses() || !empty($submission->kelas))) {
+                if ($soal->hasClasses() || !empty($submission->kelas)) {
                     $safeKelas    = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $submission->kelas ?: 'Lainnya');
-                    $folderPrefix = "Kelas_{$safeKelas}/{$studentFolderName}/";
+                    $folderPrefix = empty($filterKelas) ? "Kelas_{$safeKelas}/{$studentFolderName}/" : "{$studentFolderName}/";
+                    $filePrefix   = "{$safeKelas}_{$safeNim}_{$safeNama}";
                 } else {
                     $folderPrefix = "{$studentFolderName}/";
+                    $filePrefix   = "{$safeNim}_{$safeNama}";
                 }
 
                 if ($submission->isLink()) {
-                    $entryName = $folderPrefix . "{$safeNim}_{$safeNama}_tautan_tugas.txt";
+                    $entryName = $folderPrefix . "{$filePrefix}_tautan_tugas.txt";
                     $content   = "PENGUMPULAN TUGAS BERUPA TAUTAN / LINK\n"
                                . "NIM        : " . $submission->nim . "\n"
                                . "Nama       : " . $submission->nama . "\n"
@@ -725,7 +757,7 @@ class SoalController extends Controller
                 }
 
                 if ($submission->isText()) {
-                    $entryName = $folderPrefix . "{$safeNim}_{$safeNama}_jawaban_teks.txt";
+                    $entryName = $folderPrefix . "{$filePrefix}_jawaban_teks.txt";
                     $content   = "PENGUMPULAN TUGAS BERUPA TEKS\n"
                                . "NIM        : " . $submission->nim . "\n"
                                . "Nama       : " . $submission->nama . "\n"
@@ -744,15 +776,18 @@ class SoalController extends Controller
                     if (empty($file->file_path)) continue;
                     $realFile = $this->resolvePrivateFile($file->file_path, $realBase);
                     if ($realFile !== null) {
-                        $cleanOriginal = preg_replace('/[^a-zA-Z0-9.\-_]/', '_', $file->file_original_name ?: basename($file->file_path));
-                        $formattedName = "{$safeNim}_{$safeNama}_{$cleanOriginal}";
+                        $rawName = $file->file_original_name ?: basename($file->file_path);
+                        $ext = strtolower(pathinfo($rawName, PATHINFO_EXTENSION));
+                        $stem = pathinfo($rawName, PATHINFO_FILENAME);
+                        $cleanStem = preg_replace('/_+/', '_', trim(preg_replace('/[^a-zA-Z0-9\-_]/', '_', $stem), '_'));
+                        $cleanStem = $cleanStem ?: 'berkas';
+
+                        $baseFileName = $ext ? "{$cleanStem}.{$ext}" : $cleanStem;
+                        $formattedName = "{$filePrefix}_{$baseFileName}";
                         $entryName = $folderPrefix . $formattedName;
-                        $entryBase = $formattedName;
                         $c = 1;
                         while (isset($usedNames[$entryName])) {
-                            $ext = pathinfo($entryBase, PATHINFO_EXTENSION);
-                            $stem = pathinfo($entryBase, PATHINFO_FILENAME);
-                            $formattedName = $ext ? "{$stem}_{$c}.{$ext}" : "{$stem}_{$c}";
+                            $formattedName = $ext ? "{$filePrefix}_{$cleanStem}_{$c}.{$ext}" : "{$filePrefix}_{$cleanStem}_{$c}";
                             $entryName = $folderPrefix . $formattedName;
                             $c++;
                         }
@@ -805,7 +840,9 @@ class SoalController extends Controller
         $added = 0;
         $usedFileNames = [];
         $safeNim  = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $submission->nim);
-        $safeNama = preg_replace('/[^a-zA-Z0-9\-_]/', '_', str_replace(' ', '_', $submission->nama));
+        $safeNama = preg_replace('/_+/', '_', trim(preg_replace('/[^a-zA-Z0-9\-_\s]/', '_', str_replace(' ', '_', $submission->nama)), '_'));
+        $safeKelas = $submission->kelas ? preg_replace('/[^a-zA-Z0-9\-_]/', '_', $submission->kelas) : '';
+        $filePrefix = $safeKelas ? "{$safeKelas}_{$safeNim}_{$safeNama}" : "{$safeNim}_{$safeNama}";
 
         if ($submission->isLink()) {
             $content = "PENGUMPULAN TUGAS BERUPA TAUTAN / LINK\n"
@@ -814,7 +851,7 @@ class SoalController extends Controller
                      . ($submission->kelas ? ("Kelas      : " . $submission->kelas . "\n") : "")
                      . "Tautan     : " . $submission->link_url . "\n"
                      . "Waktu      : " . $submission->created_at->format('Y-m-d H:i:s') . "\n";
-            $zip->addFromString("{$safeNim}_{$safeNama}_tautan_tugas.txt", $content);
+            $zip->addFromString("{$filePrefix}_tautan_tugas.txt", $content);
             $added++;
         } elseif ($submission->isText()) {
             $content = "PENGUMPULAN TUGAS BERUPA TEKS\n"
@@ -824,7 +861,7 @@ class SoalController extends Controller
                      . "Waktu      : " . $submission->created_at->format('Y-m-d H:i:s') . "\n"
                      . "--------------------------------------------------------\n\n"
                      . $submission->text_content . "\n";
-            $zip->addFromString("{$safeNim}_{$safeNama}_jawaban_teks.txt", $content);
+            $zip->addFromString("{$filePrefix}_jawaban_teks.txt", $content);
             $added++;
         } else {
             $files = $submission->getFilesList();
@@ -832,14 +869,18 @@ class SoalController extends Controller
                 if (empty($file->file_path)) continue;
                 $realFile = $this->resolvePrivateFile($file->file_path, $realBase);
                 if ($realFile !== null) {
-                    $cleanName = preg_replace('/[^a-zA-Z0-9.\-_]/', '_', $file->file_original_name ?: basename($file->file_path));
-                    $formattedName = "{$safeNim}_{$safeNama}_{$cleanName}";
+                    $rawName = $file->file_original_name ?: basename($file->file_path);
+                    $ext = strtolower(pathinfo($rawName, PATHINFO_EXTENSION));
+                    $stem = pathinfo($rawName, PATHINFO_FILENAME);
+                    $cleanStem = preg_replace('/_+/', '_', trim(preg_replace('/[^a-zA-Z0-9\-_]/', '_', $stem), '_'));
+                    $cleanStem = $cleanStem ?: 'berkas';
+
+                    $baseFileName = $ext ? "{$cleanStem}.{$ext}" : $cleanStem;
+                    $formattedName = "{$filePrefix}_{$baseFileName}";
                     $name = $formattedName;
                     $k = 1;
                     while (isset($usedFileNames[$name])) {
-                        $ext = pathinfo($cleanName, PATHINFO_EXTENSION);
-                        $stem = pathinfo($cleanName, PATHINFO_FILENAME);
-                        $name = $ext ? "{$safeNim}_{$safeNama}_{$stem}_{$k}.{$ext}" : "{$safeNim}_{$safeNama}_{$stem}_{$k}";
+                        $name = $ext ? "{$filePrefix}_{$cleanStem}_{$k}.{$ext}" : "{$filePrefix}_{$cleanStem}_{$k}";
                         $k++;
                     }
                     $usedFileNames[$name] = true;
