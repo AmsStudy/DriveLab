@@ -1013,7 +1013,7 @@
     {{-- ========================================================================= --}}
     {{-- OVERLAY 3: Initial Fullscreen Enforced Prompt (CBT Kiosk Entrance)        --}}
     {{-- ========================================================================= --}}
-    <div x-show="!isFullscreen && !showFullscreenWarning && !allowOpenBook && !isLocked && penaltySeconds === 0"
+    <div x-show="!isFullscreen && !isBypassFullscreen && !showFullscreenWarning && !allowOpenBook && !isLocked && penaltySeconds === 0"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
@@ -1031,11 +1031,15 @@
             <p class="text-xs text-gray-300 mt-2 leading-relaxed">
                 Untuk menjaga ketertiban dan integritas praktikum, ujian ini mewajibkan Anda mengerjakan dalam mode layar penuh (Kiosk Experience).
             </p>
-            <div class="mt-6">
+            <div class="mt-6 flex flex-col gap-2">
                 <button type="button" @click="enterFullscreen()"
-                        class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                        class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
                     <span>Aktifkan Layar Penuh & Mulai Ujian</span>
+                </button>
+                <button type="button" @click="bypassFullscreenFallback()"
+                        class="text-xs text-gray-400 hover:text-emerald-400 py-1 transition-colors underline cursor-pointer">
+                    Kendala layar penuh di browser Anda? Lanjutkan langsung
                 </button>
             </div>
         </div>
@@ -1396,6 +1400,7 @@
                 timerInterval: null,
                 penaltyTimerInterval: null,
                 isFullscreen: false,
+                isBypassFullscreen: false,
                 isEnteringFullscreen: false,
                 hasEnteredFullscreenOnce: false,
                 showFullscreenWarning: false,
@@ -1454,18 +1459,9 @@
                         this.hasEnteredFullscreenOnce = true;
                     }
 
-                    // Start main quiz timer if applicable
-                    if (this.remainingSeconds !== null && this.remainingSeconds > 0) {
-                        this.remainingSeconds = Math.max(0, Math.floor(Number(this.remainingSeconds)));
-                        this.timerInterval = setInterval(() => {
-                            if (this.isExamPaused) return; // Do not decrement timer while exam is paused!
-                            if (this.remainingSeconds > 0) {
-                                this.remainingSeconds--;
-                            } else {
-                                clearInterval(this.timerInterval);
-                                this.autoSubmitExpired();
-                            }
-                        }, 1000);
+                    // Start main quiz timer if applicable (open book mode or already in fullscreen)
+                    if (this.allowOpenBook || this.isFullscreen) {
+                        this.startMainTimer();
                     }
 
                     // Start penalty countdown if student refreshed with an active penalty
@@ -1514,8 +1510,9 @@
                         if (this.isFullscreen) {
                             this.hasEnteredFullscreenOnce = true;
                             this.cancelFullscreenTolerance();
+                            this.startMainTimer();
                         } else {
-                            if (!this.allowOpenBook && this.hasEnteredFullscreenOnce && !this.isLocked && !this.isSubmitting && this.penaltySeconds === 0) {
+                            if (!this.allowOpenBook && !this.isBypassFullscreen && this.hasEnteredFullscreenOnce && !this.isLocked && !this.isSubmitting && this.penaltySeconds === 0) {
                                 this.startFullscreenTolerance();
                             }
                         }
@@ -1535,6 +1532,22 @@
                     this.setupNetworkAndUnloadGuards();
                 },
 
+                startMainTimer() {
+                    if (this.timerInterval) return;
+                    if (this.remainingSeconds !== null && this.remainingSeconds > 0) {
+                        this.remainingSeconds = Math.max(0, Math.floor(Number(this.remainingSeconds)));
+                        this.timerInterval = setInterval(() => {
+                            if (this.isExamPaused) return; // Do not decrement timer while exam is paused!
+                            if (this.remainingSeconds > 0) {
+                                this.remainingSeconds--;
+                            } else {
+                                clearInterval(this.timerInterval);
+                                this.autoSubmitExpired();
+                            }
+                        }, 1000);
+                    }
+                },
+
                 enterFullscreen() {
                     this.isEnteringFullscreen = true;
                     setTimeout(() => { this.isEnteringFullscreen = false; }, 1200);
@@ -1546,11 +1559,21 @@
                             this.isFullscreen = true;
                             this.hasEnteredFullscreenOnce = true;
                             this.cancelFullscreenTolerance();
+                            this.startMainTimer();
                         }).catch((err) => {
                             console.warn('Fullscreen request blocked or failed:', err);
                             this.isFullscreen = this.checkFullscreenState();
+                            if (this.isFullscreen) {
+                                this.startMainTimer();
+                            }
                         });
                     }
+                },
+
+                bypassFullscreenFallback() {
+                    this.isBypassFullscreen = true;
+                    this.hasEnteredFullscreenOnce = true;
+                    this.startMainTimer();
                 },
 
                 startFullscreenTolerance() {
