@@ -154,6 +154,37 @@ class Quiz extends Model
         return true;
     }
 
+    /**
+     * Cek apakah kuis benar-benar aktif dan dapat dikerjakan mahasiswa saat ini
+     */
+    public function isLive(): bool
+    {
+        if (!$this->is_active) {
+            return false;
+        }
+        if ($this->isSessionEnded()) {
+            return false;
+        }
+        if ($this->isScheduleExpired()) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Scope query untuk kuis aktif yang belum selesai/expired
+     */
+    public function scopeLive($query)
+    {
+        return $query->where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('session_status')->orWhere('session_status', '!=', 'ended');
+            })
+            ->where(function ($q) {
+                $q->whereNull('ends_at')->orWhere('ends_at', '>=', now());
+            });
+    }
+
     public function hasAccessPassword(): bool
     {
         return !empty($this->access_password);

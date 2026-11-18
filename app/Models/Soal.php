@@ -189,6 +189,25 @@ class Soal extends Model
     }
 
     /**
+     * Scope query untuk dokumen yang sedang aktif dan dapat diakses mahasiswa.
+     */
+    public function scopeAccessible($query)
+    {
+        $now = Carbon::now();
+        return $query->where('is_active', true)
+            ->where(function ($q) use ($now) {
+                $q->where('access_type', 'lifetime')
+                  ->orWhere(function ($sub) use ($now) {
+                      $sub->where(function ($f) use ($now) {
+                          $f->whereNull('active_from')->orWhere('active_from', '<=', $now);
+                      })->where(function ($u) use ($now) {
+                          $u->whereNull('active_until')->orWhere('active_until', '>=', $now);
+                      });
+                  });
+            });
+    }
+
+    /**
      * Status akses untuk ditampilkan di UI.
      */
     public function getAccessStatusAttribute(): string

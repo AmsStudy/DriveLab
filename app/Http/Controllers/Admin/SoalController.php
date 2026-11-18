@@ -29,11 +29,13 @@ class SoalController extends Controller
         }
         if ($request->filled('status')) {
             if ($request->status === 'active') {
-                $query->where('is_active', true);
+                $query->accessible();
             } elseif ($request->status === 'inactive') {
                 $query->where('is_active', false);
             } elseif ($request->status === 'expired') {
                 $query->where('access_type', 'scheduled')->where('active_until', '<', now());
+            } elseif ($request->status === 'scheduled') {
+                $query->where('access_type', 'scheduled')->where('active_from', '>', now());
             }
         }
 

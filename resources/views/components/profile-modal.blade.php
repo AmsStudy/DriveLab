@@ -1,9 +1,9 @@
 {{-- resources/views/components/profile-modal.blade.php --}}
 @php
     $modalUser = auth()->user();
-    $totalDokumen = $modalUser ? $modalUser->soals()->count() : 0;
-    $totalKuis    = $modalUser ? $modalUser->quizzes()->count() : 0;
-    $totalKategori = $modalUser ? $modalUser->categories()->count() : 0;
+    $totalDokumen = $modalUser ? ($modalUser->isSuperAdmin() ? \App\Models\Soal::count() : $modalUser->soals()->count()) : 0;
+    $totalKuis    = $modalUser ? ($modalUser->isSuperAdmin() ? \App\Models\Quiz::count() : $modalUser->quizzes()->count()) : 0;
+    $totalKategori = \App\Models\Category::count();
 @endphp
 
 @if($modalUser)

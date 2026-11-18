@@ -11,7 +11,19 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::with('creator')->withCount('soals')->latest()->paginate(20);
+        $user = auth()->user();
+        $query = Category::with('creator');
+
+        if ($user && $user->isSuperAdmin()) {
+            $query->withCount('soals');
+        } else {
+            $userId = $user ? $user->id : 0;
+            $query->withCount(['soals' => function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            }]);
+        }
+
+        $categories = $query->latest()->paginate(20);
 
         return view('admin.category.index', compact('categories'));
     }

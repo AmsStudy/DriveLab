@@ -23,7 +23,7 @@ class DashboardController extends Controller
         if ($user->isSuperAdmin()) {
             $stats = [
                 'total_soal'        => Soal::count(),
-                'soal_aktif'        => Soal::where('is_active', true)->count(),
+                'soal_aktif'        => Soal::accessible()->count(),
                 'tugas_masuk'       => Submission::count(),
                 'tugas_hari_ini'    => Submission::whereBetween('created_at', [$todayStart, $todayEnd])->count(),
                 'total_lampiran'    => SoalAttachment::count(),
@@ -35,7 +35,7 @@ class DashboardController extends Controller
                     ->count(),
                 // Metrik Kuis CBT
                 'total_quiz'        => Quiz::count(),
-                'quiz_aktif'        => Quiz::where('is_active', true)->count(),
+                'quiz_aktif'        => Quiz::live()->count(),
                 'total_attempts'    => QuizAttempt::whereNotNull('completed_at')->count(),
                 'avg_quiz_score'    => round((float) (QuizAttempt::whereNotNull('completed_at')->avg('score') ?? 0), 1),
             ];
@@ -68,14 +68,14 @@ class DashboardController extends Controller
 
         $stats = [
             'total_soal'     => $soalIds->count(),
-            'soal_aktif'     => Soal::where('user_id', $user->id)->where('is_active', true)->count(),
+            'soal_aktif'     => Soal::where('user_id', $user->id)->accessible()->count(),
             'tugas_masuk'    => Submission::whereIn('soal_id', $soalIds)->count(),
             'tugas_hari_ini' => Submission::whereIn('soal_id', $soalIds)
                 ->whereBetween('created_at', [$todayStart, $todayEnd])->count(),
             'total_lampiran' => SoalAttachment::whereIn('soal_id', $soalIds)->count(),
             // Metrik Kuis CBT untuk Asisten ini
             'total_quiz'     => $quizIds->count(),
-            'quiz_aktif'     => Quiz::where('user_id', $user->id)->where('is_active', true)->count(),
+            'quiz_aktif'     => Quiz::where('user_id', $user->id)->live()->count(),
             'total_attempts' => QuizAttempt::whereIn('quiz_id', $quizIds)->whereNotNull('completed_at')->count(),
             'avg_quiz_score' => round((float) (QuizAttempt::whereIn('quiz_id', $quizIds)->whereNotNull('completed_at')->avg('score') ?? 0), 1),
         ];
