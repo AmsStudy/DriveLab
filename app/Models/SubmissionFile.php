@@ -17,6 +17,7 @@ class SubmissionFile extends Model
         'file_original_name',
         'file_extension',
         'file_size',
+        'file_hash',
     ];
 
     protected static function booted(): void

@@ -555,11 +555,13 @@ class SoalAccessController extends Controller
             $fileName = $kelasPrefix . $nimClean . '_' . str_replace(' ', '_', $namaClean) . $suffix . '_' . time() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('submissions/' . $soal->id, $fileName, 'private');
 
+            $fileHash = @hash_file('sha256', $file->getRealPath()) ?: null;
             $savedFilesData[] = [
                 'file_path'          => $path,
                 'file_original_name' => $file->getClientOriginalName(),
                 'file_extension'     => $file->getClientOriginalExtension(),
                 'file_size'          => $file->getSize(),
+                'file_hash'          => $fileHash,
             ];
         }
 
@@ -576,6 +578,7 @@ class SoalAccessController extends Controller
             'file_original_name' => $firstFile['file_original_name'],
             'file_extension'     => $firstFile['file_extension'],
             'file_size'          => $firstFile['file_size'],
+            'file_hash'          => $firstFile['file_hash'] ?? null,
         ];
 
         if ($existing) {

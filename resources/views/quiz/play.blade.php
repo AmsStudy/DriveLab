@@ -518,8 +518,10 @@
                 @endif
 
                 {{-- Autosave Sync Status Indicator --}}
-                <div class="px-2.5 py-1.5 rounded-xl bg-[#142019] border border-[#1E3327] flex items-center gap-1.5 text-xs font-medium"
-                     :title="syncStatus === 'saving' ? 'Menyimpan jawaban ke server...' : (syncStatus === 'synced' ? 'Semua jawaban tersimpan aman di server & memori lokal' : 'Jaringan terputus: jawaban tersimpan aman di perangkat')">
+                <div class="px-2.5 py-1.5 rounded-xl bg-[#142019] border border-[#1E3327] flex items-center gap-1.5 text-xs font-medium cursor-pointer transition-colors"
+                     :class="syncStatus === 'offline' ? 'hover:bg-amber-500/15 border-amber-500/30' : ''"
+                     @click="syncStatus === 'offline' ? triggerBackgroundSync(true) : null"
+                     :title="syncStatus === 'saving' ? 'Menyimpan jawaban ke server...' : (syncStatus === 'synced' ? 'Semua jawaban tersimpan aman di server & memori lokal' : 'Jaringan lab terputus: jawaban tersimpan aman di perangkat. Klik untuk mencoba sinkronisasi sekarang')">
                     <template x-if="syncStatus === 'saving'">
                         <span class="text-sky-400 flex items-center gap-1">
                             <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
@@ -534,8 +536,8 @@
                     </template>
                     <template x-if="syncStatus === 'offline'">
                         <span class="text-amber-400 flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                            <span class="hidden lg:inline text-[11px]">Lokal (Offline)</span>
+                            <svg class="w-3.5 h-3.5 animate-pulse text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <span class="hidden lg:inline text-[11px]">Lokal (Klik Sinkron)</span>
                         </span>
                     </template>
                 </div>
@@ -1447,6 +1449,9 @@
                     const serverDraft = @json($savedAnswers);
                     const localDraft = this.loadLocalCache();
                     this.answers = Object.assign({}, serverDraft, localDraft);
+                    if (localDraft && Object.keys(localDraft).length > 0) {
+                        this.triggerBackgroundSync(true);
+                    }
 
                     // Initialize flagged questions
                     if (Array.isArray(this.answers['__flagged'])) {
@@ -1483,7 +1488,7 @@
                     // Setup background heartbeat sync every 15 seconds so supervisor Live Monitor stays online
                     this.heartbeatInterval = setInterval(() => {
                         if (!this.isSubmitting && !this.isLocked) {
-                            this.triggerBackgroundSync();
+                            this.triggerBackgroundSync(this.syncStatus === 'offline');
                         }
                     }, 15000);
 
@@ -1762,7 +1767,22 @@
                             }
 
                             if (data.success) {
+                                const wasOffline = this.syncStatus === 'offline';
                                 this.syncStatus = 'synced';
+
+                                if (wasOffline && window.Swal) {
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'success',
+                                        title: 'Koneksi jaringan pulih. Seluruh draf jawaban berhasil disinkronkan!',
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        background: '#0F1713',
+                                        color: '#34D399',
+                                        customClass: { popup: 'border border-emerald-500/40 rounded-xl' }
+                                    });
+                                }
 
                                 // Check if supervisor adjusted/added extra time
                                 if (data.time_remaining !== undefined && data.time_remaining !== null) {

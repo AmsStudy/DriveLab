@@ -357,6 +357,92 @@ class QuizImportService
     }
 
     /**
+     * Ekspor seluruh butir soal beserta opsi, kunci jawaban, dan pembahasan ke file CSV/Excel kompatibel.
+     */
+    public static function exportQuestions(Quiz $quiz, string $delimiter = ';'): StreamedResponse
+    {
+        $quizSlug = \Illuminate\Support\Str::slug($quiz->title) ?: 'kuis';
+        $filename = 'bank_soal_' . $quizSlug . '_' . date('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
+        ];
+
+        return response()->stream(function () use ($quiz, $delimiter) {
+            $handle = fopen('php://output', 'w');
+            // Add UTF-8 BOM so Microsoft Excel renders characters properly
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputs($handle, "sep={$delimiter}\r\n");
+
+            // Header columns matching QuizImportService expectations
+            fputcsv($handle, [
+                'Nomor',
+                'Pertanyaan',
+                'Tipe_Soal',
+                'Poin',
+                'Pilihan_A',
+                'Pilihan_B',
+                'Pilihan_C',
+                'Pilihan_D',
+                'Pilihan_E',
+                'Kunci_Jawaban',
+                'Pembahasan'
+            ], $delimiter);
+
+            $questions = $quiz->questions()->with('options')->orderBy('order_num')->get();
+
+            $idx = 1;
+            foreach ($questions as $q) {
+                $options = $q->options->values();
+                $optA = isset($options[0]) ? $options[0]->option_text : '';
+                $optB = isset($options[1]) ? $options[1]->option_text : '';
+                $optC = isset($options[2]) ? $options[2]->option_text : '';
+                $optD = isset($options[3]) ? $options[3]->option_text : '';
+                $optE = isset($options[4]) ? $options[4]->option_text : '';
+
+                $correctKeys = [];
+                $letterMap = ['A', 'B', 'C', 'D', 'E'];
+                foreach ($options as $k => $opt) {
+                    if ($opt->is_correct && isset($letterMap[$k])) {
+                        $correctKeys[] = $letterMap[$k];
+                    }
+                }
+
+                $keyString = implode(', ', $correctKeys);
+                if ($q->question_type === 'true_false') {
+                    if (in_array('A', $correctKeys)) {
+                        $keyString = 'Benar';
+                    } elseif (in_array('B', $correctKeys)) {
+                        $keyString = 'Salah';
+                    }
+                } elseif ($q->question_type === 'fill_blank') {
+                    $keyString = implode(', ', $q->options->pluck('option_text')->toArray());
+                }
+
+                fputcsv($handle, [
+                    $idx++,
+                    $q->question_text,
+                    $q->question_type,
+                    $q->points,
+                    $optA,
+                    $optB,
+                    $optC,
+                    $optD,
+                    $optE,
+                    $keyString,
+                    $q->explanation ?? '',
+                ], $delimiter);
+            }
+
+            fclose($handle);
+        }, 200, $headers);
+    }
+
+    /**
      * Import questions from CSV or XLSX file.
      */
     public static function import(Quiz $quiz, UploadedFile $file): array

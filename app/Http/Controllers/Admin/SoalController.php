@@ -224,8 +224,9 @@ class SoalController extends Controller
     {
         $this->authorizeAccess($soal);
         $submissions = Submission::with('files')->where('soal_id', $soal->id)->orderBy('created_at', 'desc')->get();
+        $duplicatesBySubId = $this->detectDuplicateSubmissions($submissions);
         $categories  = Category::all();
-        return view('admin.soal.show', compact('soal', 'submissions', 'categories'));
+        return view('admin.soal.show', compact('soal', 'submissions', 'categories', 'duplicatesBySubId'));
     }
 
     public function submissionsData(Request $request, Soal $soal)
@@ -252,6 +253,9 @@ class SoalController extends Controller
             ]);
         }
 
+        $duplicatesBySubId = $this->detectDuplicateSubmissions($submissions);
+        $duplicateCount = count($duplicatesBySubId);
+
         $classCounts = [];
         if ($soal->hasClasses()) {
             foreach ($soal->getClassesList() as $cls) {
@@ -260,14 +264,15 @@ class SoalController extends Controller
         }
 
         $counts = [
-            'total'   => $count,
-            'file'    => $submissions->filter(fn($s) => ($s->submission_type ?? 'file') === 'file')->count(),
-            'link'    => $submissions->where('submission_type', 'link')->count(),
-            'text'    => $submissions->where('submission_type', 'text')->count(),
-            'classes' => $classCounts,
+            'total'      => $count,
+            'file'       => $submissions->filter(fn($s) => ($s->submission_type ?? 'file') === 'file')->count(),
+            'link'       => $submissions->where('submission_type', 'link')->count(),
+            'text'       => $submissions->where('submission_type', 'text')->count(),
+            'duplicates' => $duplicateCount,
+            'classes'    => $classCounts,
         ];
 
-        $html = view('admin.soal.partials.submissions-table', compact('soal', 'submissions'))->render();
+        $html = view('admin.soal.partials.submissions-table', compact('soal', 'submissions', 'duplicatesBySubId'))->render();
 
         return response()->json([
             'success'  => true,
@@ -276,6 +281,67 @@ class SoalController extends Controller
             'counts'   => $counts,
             'html'     => $html,
         ]);
+    }
+
+    /**
+     * Deteksi duplikasi / indikasi plagiarisme berkas antar mahasiswa berbasis SHA-256 digital hash
+     */
+    protected function detectDuplicateSubmissions($submissions): array
+    {
+        $hashStudentMap = [];
+
+        foreach ($submissions as $sub) {
+            $hashes = [];
+            if (!empty($sub->file_hash)) {
+                $hashes[] = $sub->file_hash;
+            } elseif ($sub->file_path && Storage::disk('private')->exists($sub->file_path)) {
+                try {
+                    $calculated = hash_file('sha256', Storage::disk('private')->path($sub->file_path));
+                    $sub->updateQuietly(['file_hash' => $calculated]);
+                    $hashes[] = $calculated;
+                } catch (\Throwable $e) {}
+            }
+
+            if ($sub->relationLoaded('files')) {
+                foreach ($sub->files as $sf) {
+                    if (!empty($sf->file_hash)) {
+                        $hashes[] = $sf->file_hash;
+                    } elseif ($sf->file_path && Storage::disk('private')->exists($sf->file_path)) {
+                        try {
+                            $calc = hash_file('sha256', Storage::disk('private')->path($sf->file_path));
+                            $sf->updateQuietly(['file_hash' => $calc]);
+                            $hashes[] = $calc;
+                        } catch (\Throwable $e) {}
+                    }
+                }
+            }
+
+            $hashes = array_unique(array_filter($hashes));
+            foreach ($hashes as $h) {
+                $hashStudentMap[$h][] = [
+                    'sub_id' => $sub->id,
+                    'nim'    => $sub->nim,
+                    'nama'   => $sub->nama,
+                ];
+            }
+        }
+
+        $duplicatesBySubId = [];
+        foreach ($hashStudentMap as $hash => $students) {
+            $uniqueNims = array_unique(array_column($students, 'nim'));
+            if (count($uniqueNims) > 1) {
+                foreach ($students as $st) {
+                    $otherStudents = array_filter($students, fn($other) => $other['nim'] !== $st['nim']);
+                    $otherInfo = array_map(fn($o) => "{$o['nim']} ({$o['nama']})", $otherStudents);
+                    $duplicatesBySubId[$st['sub_id']][] = [
+                        'hash'    => $hash,
+                        'matches' => array_values(array_unique($otherInfo)),
+                    ];
+                }
+            }
+        }
+
+        return $duplicatesBySubId;
     }
 
     public function edit(Soal $soal)

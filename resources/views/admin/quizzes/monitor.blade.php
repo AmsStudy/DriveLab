@@ -829,6 +829,11 @@ function liveExamMonitor(quizId, initialData = null) {
 
         get availableKelas() {
             const set = new Set();
+            @if($quiz->hasClasses())
+                @foreach($quiz->getClassesList() as $c)
+                    set.add(@json($c));
+                @endforeach
+            @endif
             this.activeAttempts.forEach(i => { if (i.kelas) set.add(i.kelas); });
             this.completedAttempts.forEach(i => { if (i.kelas) set.add(i.kelas); });
             return Array.from(set).sort();

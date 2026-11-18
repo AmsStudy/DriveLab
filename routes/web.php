@@ -133,6 +133,7 @@ Route::prefix('admin')
         Route::post('quizzes/{quiz}/questions/{question}/reorder', [QuizController::class, 'reorderQuestion'])->name('quizzes.questions.reorder');
         Route::get('quizzes/{quiz}/questions/template', [QuizController::class, 'downloadQuestionsTemplate'])->name('quizzes.questions.template');
         Route::post('quizzes/{quiz}/questions/import', [QuizController::class, 'importQuestions'])->name('quizzes.questions.import');
+        Route::get('quizzes/{quiz}/questions/export', [QuizController::class, 'exportQuestions'])->name('quizzes.questions.export');
 
         // Live Exam Monitoring & Proctoring
         Route::get('quizzes/{quiz}/monitor', [QuizController::class, 'liveMonitor'])->name('quizzes.monitor');

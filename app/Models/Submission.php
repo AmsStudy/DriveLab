@@ -38,6 +38,7 @@ class Submission extends Model
         'file_original_name',
         'file_extension',
         'file_size',
+        'file_hash',
     ];
 
     public function soal(): BelongsTo

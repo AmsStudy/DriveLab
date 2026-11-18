@@ -516,7 +516,7 @@
 
             {{-- Table Content Container --}}
             <div id="submissionsContainer">
-                @include('admin.soal.partials.submissions-table', ['soal' => $soal, 'submissions' => $submissions])
+                @include('admin.soal.partials.submissions-table', ['soal' => $soal, 'submissions' => $submissions, 'duplicatesBySubId' => $duplicatesBySubId ?? []])
             </div>
 
         </div>

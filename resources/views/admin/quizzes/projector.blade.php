@@ -299,6 +299,18 @@
                 <span class="hidden sm:inline">Selebrasi</span>
             </button>
 
+            @if($quiz->hasClasses())
+                <div class="relative">
+                    <select x-model="selectedKelas" @change="fetchLeaderboard(true)"
+                            class="bg-[#090D0B] border border-white/20 focus:border-emerald-500 rounded-xl text-xs text-emerald-400 px-2.5 py-1.5 font-bold cursor-pointer">
+                        <option value="">Semua Kelas</option>
+                        @foreach($quiz->getClassesList() as $cls)
+                            <option value="{{ $cls }}">Kelas {{ $cls }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
+
             {{-- Link back to monitor --}}
             <a href="{{ route('admin.quizzes.monitor', $quiz) }}"
                class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-bold transition-all flex items-center gap-1.5 hover:scale-105 active:scale-95"
@@ -743,6 +755,7 @@
                 totalCompleted: 0,
                 totalQuestions: {{ (int) $quiz->questions_count }},
                 leaderboard: [],
+                selectedKelas: '',
                 previousRanks: {}, // id => rank
                 sfxEnabled: true,
                 isFullscreen: false,
@@ -812,7 +825,12 @@
                     if (manual) this.isLoading = true;
 
                     try {
-                        const res = await fetch('{{ route('admin.quizzes.projector.data', $quiz) }}', {
+                        const url = new URL('{{ route('admin.quizzes.projector.data', $quiz) }}', window.location.origin);
+                        if (this.selectedKelas) {
+                            url.searchParams.set('kelas', this.selectedKelas);
+                        }
+
+                        const res = await fetch(url.toString(), {
                             headers: {
                                 'Accept': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest'

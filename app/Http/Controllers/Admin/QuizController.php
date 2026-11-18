@@ -1117,7 +1117,7 @@ class QuizController extends Controller
         return view('admin.quizzes.projector', compact('quiz'));
     }
 
-    public function projectorLeaderboardData(Quiz $quiz)
+    public function projectorLeaderboardData(Request $request, Quiz $quiz)
     {
         $this->authorizeQuiz($quiz);
 
@@ -1141,7 +1141,11 @@ class QuizController extends Controller
             ];
         }
 
-        $attempts = $quiz->attempts()->latest('started_at')->get();
+        $attemptsQuery = $quiz->attempts()->latest('started_at');
+        if ($request->filled('kelas') && $request->kelas !== 'all') {
+            $attemptsQuery->where('kelas', $request->kelas);
+        }
+        $attempts = $attemptsQuery->get();
         $rankedList = [];
 
         foreach ($attempts as $att) {
@@ -1553,6 +1557,14 @@ class QuizController extends Controller
 
         $delimiter = ($format === 'csv' || $format === 'comma' || $format === 'standar') ? ',' : ';';
         return QuizImportService::downloadTemplate($delimiter);
+    }
+
+    public function exportQuestions(Request $request, Quiz $quiz): StreamedResponse
+    {
+        $this->authorizeQuiz($quiz);
+        $format = strtolower((string)$request->query('format', 'semicolon'));
+        $delimiter = ($format === 'comma' || $format === 'csv') ? ',' : ';';
+        return QuizImportService::exportQuestions($quiz, $delimiter);
     }
 
     public function importQuestions(Request $request, Quiz $quiz)
