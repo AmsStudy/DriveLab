@@ -779,34 +779,8 @@
                 <div id="modal-edit-links-container" class="space-y-2"></div>
             </div>
 
-            {{-- 6. STATUS & MASA AKTIF --}}
+            {{-- 6. MASA AKTIF DOKUMEN --}}
             <div class="pt-5 border-t border-gray-200 dark:border-[#1A2820] space-y-4">
-                <div class="flex items-center justify-between p-3.5 bg-gray-50/90 dark:bg-[#090E0B]/50 rounded-xl border border-gray-200 dark:border-[#1A2820]">
-                    <div>
-                        <p class="text-xs font-semibold text-gray-900 dark:text-gray-200">Status Dokumen</p>
-                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Aktifkan atau nonaktifkan akses dokumen bagi mahasiswa</p>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="hidden" name="is_active" value="0">
-                        <input type="checkbox" id="modal_is_active" name="is_active" value="1" class="sr-only peer"
-                               {{ old('is_active', $soal->is_active) ? 'checked' : '' }}>
-                        <div class="w-11 h-6 bg-gray-300 dark:bg-gray-700 peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                    </label>
-                </div>
-
-                <div class="flex items-center justify-between p-3.5 bg-gray-50/90 dark:bg-[#090E0B]/50 rounded-xl border border-gray-200 dark:border-[#1A2820]">
-                    <div>
-                        <p class="text-xs font-semibold text-gray-900 dark:text-gray-200">Master Hak Unduh Dokumen</p>
-                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Pengaturan global izin unduh (jika aktif, default file baru diizinkan unduh)</p>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="hidden" name="is_downloadable" value="0">
-                        <input type="checkbox" id="modal_is_downloadable" name="is_downloadable" value="1" class="sr-only peer"
-                               {{ old('is_downloadable', $soal->is_downloadable) ? 'checked' : '' }}>
-                        <div class="w-11 h-6 bg-gray-300 dark:bg-gray-700 peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                    </label>
-                </div>
-
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Masa Aktif Dokumen</label>
                     <div class="flex gap-4 mb-3">
@@ -1156,7 +1130,7 @@ function handleModalNewFiles(input) {
     }
 
     container.classList.remove('hidden');
-    const isMasterDl = document.getElementById('modal_is_downloadable').checked;
+    const isMasterDl = true;
 
     Array.from(input.files).forEach((file, index) => {
         const kb = file.size / 1024;
@@ -1211,20 +1185,6 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    const modalMasterDl = document.getElementById('modal_is_downloadable');
-    if (modalMasterDl) {
-        modalMasterDl.addEventListener('change', function() {
-            const isChecked = this.checked;
-            document.querySelectorAll('input[name^="attachment_downloadable["]').forEach(cb => {
-                cb.checked = isChecked;
-            });
-            document.querySelectorAll('input[name^="file_downloadable["]').forEach(cb => {
-                cb.checked = isChecked;
-            });
-        });
-    }
-});
 
 @if(session('open_edit_modal') || $errors->any())
 document.addEventListener('DOMContentLoaded', function() {

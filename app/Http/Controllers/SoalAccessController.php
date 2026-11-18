@@ -218,7 +218,7 @@ class SoalAccessController extends Controller
             $isPreviewable = in_array($ext, ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp']);
 
             // Jika file previewable dan unduhan dinonaktifkan:
-            if ($isPreviewable && !$soal->is_downloadable) {
+            if ($isPreviewable && !$attachment->canDownload()) {
                 $secFetchDest = strtolower($request->header('Sec-Fetch-Dest', ''));
                 $secFetchMode = strtolower($request->header('Sec-Fetch-Mode', ''));
 

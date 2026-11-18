@@ -46,9 +46,7 @@ class SoalAttachment extends Model
 
     public function canDownload(): bool
     {
-        return $this->isFile() 
-            && (bool) $this->is_downloadable 
-            && (bool) ($this->soal?->is_downloadable ?? true);
+        return $this->isFile() && (bool) $this->is_downloadable;
     }
 
     public function getFileSizeFormattedAttribute(): string

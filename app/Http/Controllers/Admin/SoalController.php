@@ -354,8 +354,8 @@ class SoalController extends Controller
             'access_type'  => $validated['access_type'],
             'active_from'  => $validated['active_from'] ?? null,
             'active_until' => $validated['active_until'] ?? null,
-            'is_active'    => $request->boolean('is_active'),
-            'is_downloadable' => $request->boolean('is_downloadable'),
+            'is_active'    => $request->has('is_active') ? $request->boolean('is_active') : $soal->is_active,
+            'is_downloadable' => $request->has('is_downloadable') ? $request->boolean('is_downloadable') : ($soal->is_downloadable ?? true),
             'is_submission_enabled' => $request->boolean('is_submission_enabled'),
             'submission_types'    => $submissionTypes,
             'max_files'           => $request->boolean('is_submission_enabled') ? max(1, (int)$request->input('max_files', 1)) : 1,
@@ -392,14 +392,11 @@ class SoalController extends Controller
         }
 
         // Update hak download lampiran file yang sudah ada
-        $masterDl = $request->boolean('is_downloadable');
         if ($request->has('attachment_downloadable') && is_array($request->attachment_downloadable)) {
             foreach ($soal->attachments()->where('type', 'file')->get() as $existingAtt) {
-                $canDl = $masterDl && !empty($request->attachment_downloadable[$existingAtt->id]);
+                $canDl = !empty($request->attachment_downloadable[$existingAtt->id]);
                 $existingAtt->update(['is_downloadable' => $canDl]);
             }
-        } else {
-            $soal->attachments()->where('type', 'file')->update(['is_downloadable' => $masterDl]);
         }
 
         // Tambahkan file baru (maks total 15 file)
@@ -414,7 +411,7 @@ class SoalController extends Controller
             $fileDl = $request->input('file_downloadable', []);
 
             foreach ($request->file('files') as $idx => $file) {
-                $canDownload = $masterDl && (isset($fileDl[$idx]) ? (bool)$fileDl[$idx] : true);
+                $canDownload = isset($fileDl[$idx]) ? (bool)$fileDl[$idx] : true;
 
                 $soal->attachments()->create([
                     'type'               => 'file',
