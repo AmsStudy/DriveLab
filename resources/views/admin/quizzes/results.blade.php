@@ -618,7 +618,7 @@
 
                                     <template x-for="(ans, idx) in (selectedAttempt.answers || [])" :key="ans.id || idx">
                                         <div class="bg-[#090D0B] border border-[#1A2820] rounded-2xl p-5 shadow-sm transition-all"
-                                             :class="ans.is_correct ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-rose-500'">
+                                             :class="ans.is_correct ? 'border-l-4 border-l-emerald-500' : (ans.points_earned > 0 ? 'border-l-4 border-l-amber-500' : 'border-l-4 border-l-rose-500')">
 
                                             {{-- Header Pertanyaan --}}
                                             <div class="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-[#16221B] flex-wrap">
@@ -626,7 +626,7 @@
                                                     <span class="font-mono text-xs font-bold text-gray-300 bg-[#142019] border border-[#1E3327] px-2.5 py-1 rounded-lg"
                                                           x-text="'Soal #' + (idx + 1)"></span>
                                                     <span class="text-xs text-gray-400 font-medium"
-                                                          x-text="(ans.is_correct ? '+' + ans.points_earned : '0') + ' / ' + (ans.question ? ans.question.points : 0) + ' Poin'"></span>
+                                                          x-text="(ans.points_earned > 0 ? '+' + ans.points_earned : '0') + ' / ' + (ans.question ? ans.question.points : 0) + ' Poin'"></span>
                                                     <template x-if="ans.question && ans.question.question_type === 'multi_select'">
                                                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
                                                             Pilihan Jamak
@@ -641,7 +641,13 @@
                                                             Jawaban Benar
                                                         </span>
                                                     </template>
-                                                    <template x-if="!ans.is_correct">
+                                                    <template x-if="!ans.is_correct && ans.points_earned > 0">
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                                            Benar Sebagian
+                                                        </span>
+                                                    </template>
+                                                    <template x-if="!ans.is_correct && (!ans.points_earned || ans.points_earned <= 0)">
                                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
                                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                                                             Jawaban Salah

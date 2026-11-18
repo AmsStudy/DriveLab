@@ -462,7 +462,7 @@
 
                 <div class="space-y-5">
                     @foreach($reviewAnswers as $idx => $ans)
-                        <div class="review-question-card bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] rounded-2xl p-5 shadow-sm transition-all {{ $ans->is_correct ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-rose-500' }}">
+                        <div class="review-question-card bg-[#090D0B] border border-gray-200 dark:border-[#1A2820] rounded-2xl p-5 shadow-sm transition-all {{ $ans->is_correct ? 'border-l-4 border-l-emerald-500' : ($ans->points_earned > 0 ? 'border-l-4 border-l-amber-500' : 'border-l-4 border-l-rose-500') }}">
                             {{-- Header Pertanyaan --}}
                             <div class="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-gray-100 dark:border-[#16221B]">
                                 <div class="flex items-center gap-2">
@@ -470,7 +470,7 @@
                                         Soal #{{ $idx + 1 }}
                                     </span>
                                     <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                                        {{ $ans->is_correct ? '+' . $ans->points_earned : '0' }} / {{ $ans->question->points ?? 0 }} Poin
+                                        {{ $ans->points_earned > 0 ? '+' . ($ans->points_earned + 0) : '0' }} / {{ $ans->question->points ?? 0 }} Poin
                                     </span>
                                 </div>
 
@@ -479,6 +479,11 @@
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 border border-emerald-500/30">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                             Jawaban Benar
+                                        </span>
+                                    @elseif($ans->points_earned > 0)
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-800 dark:text-amber-400 border border-amber-500/30">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                            Benar Sebagian
                                         </span>
                                     @else
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/30">
