@@ -2526,10 +2526,12 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                 @endif
 
                 @if(isset($isAdminPreview) && $isAdminPreview)
-                    <div class="deadline-passed-notice preview-notice" style="border-color:rgba(59,130,246,0.25);color:var(--blue);">
-                        Mode preview admin — pengumpulan tugas tidak tersedia.
+                    <div class="deadline-passed-notice preview-notice" style="border-color:rgba(59,130,246,0.3);color:#60A5FA;background:rgba(59,130,246,0.08);margin-bottom:16px;">
+                        ℹ️ <strong>Mode Pratinjau Pengawas</strong> — Formulir di bawah ini tampil aktif dan dapat diisi oleh mahasiswa. Pada mode pratinjau ini tombol kirim dinonaktifkan.
                     </div>
-                @elseif($isDeadlinePassed)
+                @endif
+
+                @if($isDeadlinePassed && (!isset($isAdminPreview) || !$isAdminPreview))
                     <div class="deadline-passed-notice">
                         Maaf, batas waktu pengumpulan tugas telah berakhir.
                     </div>
@@ -2840,12 +2842,18 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                             </div>
                         @endif
 
-                        <button type="submit" class="btn-submit" id="sub-btn">
-                            <span id="btn-label">Kirim Tugas Sekarang</span>
-                            <svg id="btn-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                            </svg>
-                        </button>
+                        @if(isset($isAdminPreview) && $isAdminPreview)
+                            <button type="button" class="btn-submit" disabled style="opacity:0.65;cursor:not-allowed;" title="Pengumpulan dinonaktifkan dalam mode pratinjau">
+                                <span id="btn-label">Mode Pratinjau Pengawas (Pengumpulan Dinonaktifkan)</span>
+                            </button>
+                        @else
+                            <button type="submit" class="btn-submit" id="sub-btn">
+                                <span id="btn-label">Kirim Tugas Sekarang</span>
+                                <svg id="btn-arrow" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
+                            </button>
+                        @endif
                     </form>
                 @endif
             </div>
@@ -3041,7 +3049,7 @@ setInterval(checkSoalStatusNow, 7000);
 @endif
 
 // ─── Submission form logic ───
-@if($soal->is_submission_enabled && (!isset($isDeadlinePassed) || !$isDeadlinePassed) && (!isset($isAdminPreview) || !$isAdminPreview))
+@if($soal->is_submission_enabled && (!isset($isDeadlinePassed) || !$isDeadlinePassed))
 
 const dropzone     = document.getElementById('dropzone');
 const fileInput    = document.getElementById('sub_file');
