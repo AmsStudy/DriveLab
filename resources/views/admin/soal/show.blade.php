@@ -378,8 +378,14 @@
                         <span>Segarkan</span>
                     </button>
 
+                    @php
+                        $configuredClasses = $soal->getClassesList();
+                        $submissionClasses = $submissions->pluck('kelas')->filter(fn($k) => filled($k))->unique()->values()->toArray();
+                        $exportClassesList = collect(array_merge($configuredClasses, $submissionClasses))->unique()->sort()->values();
+                    @endphp
+
                     <div id="submissionsDownloadActions" class="flex items-center gap-2 flex-wrap {{ $submissions->isEmpty() ? 'hidden' : '' }}">
-                        @if($soal->hasClasses())
+                        @if($exportClassesList->isNotEmpty())
                             {{-- Dropdown Unduh ZIP per Kelas --}}
                             <div class="relative inline-block text-left" x-data="{ open: false }">
                                 <button @click="open = !open" @click.away="open = false" type="button"
@@ -403,7 +409,7 @@
                                         <span class="zip-count-all text-[11px] font-mono font-bold {{ $submissions->count() > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $submissions->count() }}</span>
                                     </a>
                                     <div class="border-t border-gray-100 dark:border-[#1A2820] my-1.5"></div>
-                                    @foreach($soal->getClassesList() as $cls)
+                                    @foreach($exportClassesList as $cls)
                                         @php $cCount = $submissions->where('kelas', $cls)->count(); @endphp
                                         <a href="{{ route('admin.soal.download-submissions-zip', [$soal, 'kelas' => $cls]) }}"
                                            class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-500/10 transition-colors"
@@ -422,7 +428,7 @@
                             </a>
                         @endif
 
-                        @if($soal->hasClasses())
+                        @if($exportClassesList->isNotEmpty())
                             {{-- Dropdown Export CSV per Kelas --}}
                             <div class="relative inline-block text-left" x-data="{ open: false }">
                                 <button @click="open = !open" @click.away="open = false" type="button"
@@ -446,7 +452,7 @@
                                         <span class="csv-count-all text-[11px] font-mono font-bold {{ $submissions->count() > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $submissions->count() }}</span>
                                     </a>
                                     <div class="border-t border-gray-100 dark:border-[#1A2820] my-1.5"></div>
-                                    @foreach($soal->getClassesList() as $cls)
+                                    @foreach($exportClassesList as $cls)
                                         @php $cCount = $submissions->where('kelas', $cls)->count(); @endphp
                                         <a href="{{ route('admin.soal.export-submissions', [$soal, 'kelas' => $cls]) }}"
                                            class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-500/10 transition-colors"
