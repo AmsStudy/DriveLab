@@ -656,6 +656,19 @@ document.addEventListener('DOMContentLoaded', () => {
         debounceTimer = setTimeout(checkAvailability, 350);
     });
 
+    const masterDlToggle = document.getElementById('is_downloadable');
+    if (masterDlToggle) {
+        masterDlToggle.addEventListener('change', function() {
+            const isChecked = this.checked;
+            document.querySelectorAll('input[name^="attachment_downloadable["]').forEach(cb => {
+                cb.checked = isChecked;
+            });
+            document.querySelectorAll('input[name^="file_downloadable["]').forEach(cb => {
+                cb.checked = isChecked;
+            });
+        });
+    }
+
     if (form) {
         form.addEventListener('submit', (e) => {
             const val = input.value.trim();

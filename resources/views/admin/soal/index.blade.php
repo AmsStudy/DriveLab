@@ -1926,6 +1926,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const modalMasterDl = document.getElementById('modal_master_downloadable');
+    if (modalMasterDl) {
+        modalMasterDl.addEventListener('change', function() {
+            const isChecked = this.checked;
+            document.querySelectorAll('#modal-selected-files-list input[name^="file_downloadable["]').forEach(cb => {
+                cb.checked = isChecked;
+            });
+        });
+    }
+
+    const editModalMasterDl = document.getElementById('edit_modal_is_downloadable');
+    if (editModalMasterDl) {
+        editModalMasterDl.addEventListener('change', function() {
+            const isChecked = this.checked;
+            document.querySelectorAll('#edit-modal-existing-attachments input[name^="attachment_downloadable["]').forEach(cb => {
+                cb.checked = isChecked;
+            });
+            document.querySelectorAll('#edit-modal-new-files input[name^="file_downloadable["]').forEach(cb => {
+                cb.checked = isChecked;
+            });
+        });
+    }
+
     @if($errors->any() && (old('_method') === 'PUT' || old('soal_id')))
         openEditModalForSoal({{ old('soal_id') }});
         // Populate inputs with old() data if available after failed validation

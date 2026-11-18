@@ -538,6 +538,16 @@ document.addEventListener('DOMContentLoaded', () => {
         debounceTimer = setTimeout(checkAvailability, 350);
     });
 
+    const masterDl = document.getElementById('master_downloadable');
+    if (masterDl) {
+        masterDl.addEventListener('change', function() {
+            const isChecked = this.checked;
+            document.querySelectorAll('#selected-files-list input[name^="file_downloadable["]').forEach(cb => {
+                cb.checked = isChecked;
+            });
+        });
+    }
+
     if (form) {
         form.addEventListener('submit', (e) => {
             if (isCodeTaken) {

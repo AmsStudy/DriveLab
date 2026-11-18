@@ -1191,6 +1191,21 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    const modalMasterDl = document.getElementById('modal_is_downloadable');
+    if (modalMasterDl) {
+        modalMasterDl.addEventListener('change', function() {
+            const isChecked = this.checked;
+            document.querySelectorAll('input[name^="attachment_downloadable["]').forEach(cb => {
+                cb.checked = isChecked;
+            });
+            document.querySelectorAll('input[name^="file_downloadable["]').forEach(cb => {
+                cb.checked = isChecked;
+            });
+        });
+    }
+});
+
 @if(session('open_edit_modal') || $errors->any())
 document.addEventListener('DOMContentLoaded', function() {
     openEditModal();

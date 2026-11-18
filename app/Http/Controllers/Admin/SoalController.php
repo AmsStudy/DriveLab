@@ -184,7 +184,7 @@ class SoalController extends Controller
             $masterDl = $request->boolean('is_downloadable');
 
             foreach ($request->file('files') as $idx => $file) {
-                $canDownload = isset($fileDl[$idx]) ? (bool)$fileDl[$idx] : $masterDl;
+                $canDownload = $masterDl && (isset($fileDl[$idx]) ? (bool)$fileDl[$idx] : true);
 
                 $soal->attachments()->create([
                     'type'               => 'file',
@@ -386,14 +386,14 @@ class SoalController extends Controller
         }
 
         // Update hak download lampiran file yang sudah ada
+        $masterDl = $request->boolean('is_downloadable');
         if ($request->has('attachment_downloadable') && is_array($request->attachment_downloadable)) {
             foreach ($soal->attachments()->where('type', 'file')->get() as $existingAtt) {
-                $canDl = !empty($request->attachment_downloadable[$existingAtt->id]);
+                $canDl = $masterDl && !empty($request->attachment_downloadable[$existingAtt->id]);
                 $existingAtt->update(['is_downloadable' => $canDl]);
             }
-        } elseif ($request->has('is_downloadable_bulk')) {
-            // Jika admin melakukan mass toggle
-            $soal->attachments()->where('type', 'file')->update(['is_downloadable' => $request->boolean('is_downloadable')]);
+        } else {
+            $soal->attachments()->where('type', 'file')->update(['is_downloadable' => $masterDl]);
         }
 
         // Tambahkan file baru (maks total 15 file)
@@ -406,10 +406,9 @@ class SoalController extends Controller
             }
 
             $fileDl = $request->input('file_downloadable', []);
-            $masterDl = $request->boolean('is_downloadable');
 
             foreach ($request->file('files') as $idx => $file) {
-                $canDownload = isset($fileDl[$idx]) ? (bool)$fileDl[$idx] : $masterDl;
+                $canDownload = $masterDl && (isset($fileDl[$idx]) ? (bool)$fileDl[$idx] : true);
 
                 $soal->attachments()->create([
                     'type'               => 'file',
