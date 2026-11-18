@@ -682,8 +682,8 @@
                                                 </div>
                                             </template>
 
-                                            {{-- Options Grid: Hanya opsi yang dipilih mahasiswa yang diwarnai (Hijau jika benar, Merah jika salah) --}}
-                                            <template x-if="ans.question && ans.question.options && ans.question.options.length > 0">
+                                            {{-- Options Grid (Pilihan Ganda / Pilihan Jamak / Benar-Salah) --}}
+                                            <template x-if="ans.question && ans.question.options && ans.question.options.length > 0 && ans.question.question_type !== 'fill_blank'">
                                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
                                                     <template x-for="(opt, optIdx) in ans.question.options" :key="opt.id || optIdx">
                                                         <div class="p-3 rounded-xl border flex items-start justify-between gap-2 shadow-sm transition-all"
@@ -738,6 +738,39 @@
                                                             </div>
                                                         </div>
                                                     </template>
+                                                </div>
+                                            </template>
+
+                                            {{-- Isian Rumpang Evaluation Grid --}}
+                                            <template x-if="ans.question && ans.question.question_type === 'fill_blank'">
+                                                <div class="space-y-2 text-xs">
+                                                    <div class="p-3.5 rounded-xl bg-[#070B09] border border-[#1A2820]">
+                                                        <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5 flex items-center justify-between">
+                                                            <span>Evaluasi Jawaban Isian Rumpang:</span>
+                                                            <span class="text-[10px] text-gray-500 font-mono" x-text="(ans.question.options ? ans.question.options.length : 0) + ' Kolom Blank'"></span>
+                                                        </div>
+                                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                                            <template x-for="(bOpt, bIdx) in (ans.question.options || [])" :key="bOpt.id || bIdx">
+                                                                <div class="p-3 rounded-xl border transition-all"
+                                                                     :class="getBlankStatusClass(ans, bIdx, bOpt)">
+                                                                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                                                                        <span class="text-[11px] font-bold px-2 py-0.5 rounded-md"
+                                                                              :class="getBlankBadgeClass(ans, bIdx, bOpt)"
+                                                                              x-text="'Blank #' + (bIdx + 1)"></span>
+                                                                        <span class="text-[10px] font-semibold"
+                                                                              :class="isUserBlankCorrect(ans, bIdx, bOpt) ? 'text-emerald-400' : 'text-rose-400'"
+                                                                              x-text="isUserBlankCorrect(ans, bIdx, bOpt) ? '✓ Benar' : '✗ Salah'"></span>
+                                                                    </div>
+                                                                    <div class="text-[11px] text-gray-300 mb-1">
+                                                                        Jawaban Mhs: <strong class="text-white font-mono" x-text="getUserBlankAnswer(ans, bIdx) || '(tidak dijawab)'"></strong>
+                                                                    </div>
+                                                                    <div class="text-[11px] text-gray-400">
+                                                                        Kunci Jawaban: <span class="text-emerald-300 font-mono" x-text="bOpt.option_text"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </template>
 
@@ -912,7 +945,38 @@
                 if (!ans) return false;
                 if (ans.selected_option_id) return true;
                 if (Array.isArray(ans.selected_option_ids) && ans.selected_option_ids.length > 0) return true;
+                if (ans.text_answer && String(ans.text_answer).trim() !== '') return true;
                 return false;
+            },
+            getUserBlankList(ans) {
+                if (!ans || !ans.text_answer) return [];
+                try {
+                    const parsed = JSON.parse(ans.text_answer);
+                    return Array.isArray(parsed) ? parsed : [ans.text_answer];
+                } catch (e) {
+                    return [ans.text_answer];
+                }
+            },
+            getUserBlankAnswer(ans, bIdx) {
+                const list = this.getUserBlankList(ans);
+                return list[bIdx] !== undefined ? String(list[bIdx]).trim() : '';
+            },
+            isUserBlankCorrect(ans, bIdx, bOpt) {
+                const userVal = this.getUserBlankAnswer(ans, bIdx).toLowerCase();
+                if (!userVal) return false;
+                const rawKey = (bOpt && bOpt.option_text ? bOpt.option_text : '').toLowerCase();
+                const allowed = rawKey.split('|').map(s => s.trim()).filter(Boolean);
+                return allowed.includes(userVal);
+            },
+            getBlankStatusClass(ans, bIdx, bOpt) {
+                const isCorrect = this.isUserBlankCorrect(ans, bIdx, bOpt);
+                return isCorrect
+                    ? 'border-2 border-emerald-500/80 bg-[#0E2018] text-white shadow-emerald-500/10'
+                    : 'border-2 border-rose-500/80 bg-[#221013] text-white shadow-rose-500/10';
+            },
+            getBlankBadgeClass(ans, bIdx, bOpt) {
+                const isCorrect = this.isUserBlankCorrect(ans, bIdx, bOpt);
+                return isCorrect ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300';
             },
             getStudentAnswerText(ans) {
                 if (!ans || !ans.question || !Array.isArray(ans.question.options)) {
