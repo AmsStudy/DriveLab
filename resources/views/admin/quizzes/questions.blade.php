@@ -172,27 +172,36 @@
                             Teks Pertanyaan <span class="text-red-400">*</span>
                         </label>
                         {{-- Toolbar Cepat Khusus Isian Rumpang --}}
-                        <div x-show="formData.question_type === 'fill_blank'" class="flex items-center gap-1.5 flex-wrap">
+                        <div x-show="formData.question_type === 'fill_blank'" class="flex items-center gap-2 flex-wrap">
                             <button type="button" @click="wrapSelectedTextAsBlank()"
-                                    title="Sorot kata di dalam teks lalu klik tombol ini untuk menjadikannya titik-titik"
-                                    class="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25 font-semibold flex items-center gap-1 transition-all shadow-xs cursor-pointer">
+                                    title="Sorot kata di dalam teks lalu klik tombol ini untuk menjadikannya kolom isian rumpang"
+                                    class="text-xs px-3 py-1.5 rounded-lg border font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                                    :class="selectedText ? 'bg-emerald-500/30 border-emerald-500 text-white ring-2 ring-emerald-500/40 shadow-sm' : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25'">
                                 <span>🎯</span>
-                                <span>Jadikan Teks Terpilih Sebagai Titik-Titik</span>
+                                <span>Jadikan Isian</span>
+                                <template x-if="selectedText">
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-black/50 border border-emerald-400/40 text-emerald-200 font-mono truncate max-w-[130px]" x-text="'“' + selectedText + '”'"></span>
+                                </template>
                             </button>
                             <button type="button" @click="insertBlankAtCursor()"
-                                    title="Sisipkan titik-titik baru pada posisi kursor"
-                                    class="text-[11px] px-2.5 py-1 rounded-lg bg-teal-500/15 border border-teal-500/30 text-teal-300 hover:bg-teal-500/25 font-semibold flex items-center gap-1 transition-all shadow-xs cursor-pointer">
+                                    title="Sisipkan kolom isian baru pada posisi kursor"
+                                    class="text-xs px-2.5 py-1.5 rounded-lg bg-teal-500/15 border border-teal-500/30 text-teal-300 hover:bg-teal-500/25 font-semibold flex items-center gap-1 transition-all shadow-xs cursor-pointer">
                                 <span>➕</span>
-                                <span>Sisipkan Titik-Titik</span>
+                                <span>Sisipkan Isian</span>
                             </button>
                         </div>
                     </div>
-                    <textarea name="question_text" x-ref="questionTextArea" x-model="formData.question_text" @input="handleQuestionTextInput()" rows="3" required
+                    <textarea name="question_text" x-ref="questionTextArea" x-model="formData.question_text"
+                              @input="handleQuestionTextInput()"
+                              @select="handleTextSelection()"
+                              @mouseup="handleTextSelection()"
+                              @keyup="handleTextSelection()"
+                              rows="3" required
                               :placeholder="formData.question_type === 'fill_blank' ? 'Tuliskan kalimat soal di sini, contoh: Nilai x pada Outer adalah 10 dan Inner adalah 20...' : 'Tuliskan teks atau butir pertanyaan di sini...'"
                               class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-500 leading-relaxed"></textarea>
                     <p x-show="formData.question_type === 'fill_blank'" class="text-[11px] text-gray-400 mt-1 flex items-center gap-1">
                         <span>💡</span>
-                        <span>Admin cukup mengetik kalimat biasa. Gunakan tombol di atas untuk menentukan kata kunci. Jika soal memerlukan kurung siku biasa (misal kode <code>arr\[0\]</code>), gunakan garis miring terbalik <code>\[...\]</code> agar tidak dianggap sebagai titik-titik.</span>
+                        <span>Sorot kata di dalam teks lalu klik tombol <strong class="text-emerald-400">"Jadikan Isian"</strong> untuk menentukan kunci jawaban. Jika soal menggunakan kurung siku biasa (misal kode <code>arr\[0\]</code>), gunakan garis miring terbalik <code>\[...\]</code>.</span>
                     </p>
                 </div>
 
@@ -318,15 +327,15 @@
                         <div>
                             <label class="block text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                Daftar Kunci Jawaban Titik-Titik
+                                Daftar Kunci Jawaban Isian Rumpang
                             </label>
-                            <p class="text-[11px] text-gray-400">Admin langsung menginput kunci jawaban di bawah ini tanpa perlu mengetik tanda kurung <code>[ ]</code>.</p>
+                            <p class="text-[11px] text-gray-400">Admin dapat menentukan kunci jawaban utama dan sinonim di bawah ini, atau gunakan tombol <strong class="text-emerald-400">"Jadikan Isian"</strong> di atas.</p>
                         </div>
 
                         <button type="button" @click="insertBlankAtEnd()"
                                 class="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 cursor-pointer">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Tambah Titik-Titik
+                            Tambah Kolom Isian
                         </button>
                     </div>
 
@@ -350,7 +359,7 @@
                                     <div class="flex items-center gap-2">
                                         <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold font-mono text-xs flex items-center justify-center"
                                               x-text="'#' + (bIdx + 1)"></span>
-                                        <span class="text-xs font-semibold text-gray-200" x-text="'Titik-Titik Nomor ' + (bIdx + 1)"></span>
+                                        <span class="text-xs font-semibold text-gray-200" x-text="'Kolom Isian #' + (bIdx + 1)"></span>
                                     </div>
 
                                     <button type="button" @click="removeBlank(bIdx)"
@@ -689,6 +698,7 @@
             isSubmittingImport: false,
             showGuideTable: false,
             isEdit: false,
+            selectedText: '',
             formAction: '{{ route('admin.quizzes.questions.store', $quiz) }}',
             formData: {
                 question_text: '',
@@ -861,6 +871,16 @@
                     this.formData.blanks = found;
                 }
             },
+            handleTextSelection() {
+                if (this.formData.question_type !== 'fill_blank') return;
+                const ta = this.$refs.questionTextArea;
+                if (!ta) return;
+                const s = ta.selectionStart;
+                const e = ta.selectionEnd;
+                const txt = this.formData.question_text || '';
+                const sel = (s !== undefined && e !== undefined && e > s) ? txt.substring(s, e).trim() : '';
+                this.selectedText = sel;
+            },
             wrapSelectedTextAsBlank() {
                 const ta = this.$refs.questionTextArea;
                 if (!ta) return;
@@ -873,11 +893,8 @@
                     const before = text.substring(0, start);
                     const after = text.substring(end);
                     this.formData.question_text = `${before}[${selected}]${after}`;
-                    if (this.formData.blanks.length === 1 && (!this.formData.blanks[0].key || !this.formData.blanks[0].key.trim())) {
-                        this.formData.blanks[0] = { key: selected, synonyms: '' };
-                    } else {
-                        this.formData.blanks.push({ key: selected, synonyms: '' });
-                    }
+                    this.parseBlanksFromText();
+                    this.selectedText = '';
                     this.$nextTick(() => {
                         ta.focus();
                         ta.setSelectionRange(start + 1, start + 1 + selected.length);
@@ -896,11 +913,8 @@
                 const defaultKey = 'Kunci';
 
                 this.formData.question_text = `${before}[${defaultKey}]${after}`;
-                if (this.formData.blanks.length === 1 && (!this.formData.blanks[0].key || !this.formData.blanks[0].key.trim())) {
-                    this.formData.blanks[0] = { key: defaultKey, synonyms: '' };
-                } else {
-                    this.formData.blanks.push({ key: defaultKey, synonyms: '' });
-                }
+                this.parseBlanksFromText();
+                this.selectedText = '';
                 this.$nextTick(() => {
                     if (ta) {
                         ta.focus();
@@ -912,11 +926,8 @@
                 const text = this.formData.question_text || '';
                 const defaultKey = 'Kunci';
                 this.formData.question_text = text.trim() ? `${text.trim()} [${defaultKey}]` : `[${defaultKey}]`;
-                if (this.formData.blanks.length === 1 && (!this.formData.blanks[0].key || !this.formData.blanks[0].key.trim())) {
-                    this.formData.blanks[0] = { key: defaultKey, synonyms: '' };
-                } else {
-                    this.formData.blanks.push({ key: defaultKey, synonyms: '' });
-                }
+                this.parseBlanksFromText();
+                this.selectedText = '';
                 const ta = this.$refs.questionTextArea;
                 this.$nextTick(() => {
                     if (ta) ta.focus();
