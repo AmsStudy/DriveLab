@@ -2748,7 +2748,7 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                             <div class="sub-pane {{ $defaultSubType === 'file' ? 'active' : '' }}" id="pane-file">
                                 <label class="field-label" style="margin-bottom:7px">
                                     File Tugas <span class="req">*</span>
-                                    <span class="note">Maks. {{ $maxAllowedFiles }} Berkas · Maks. 10 MB/file (Check Keamanan Otomatis)</span>
+                                    <span class="note">Maks. {{ $maxAllowedFiles }} Berkas · Maks. {{ $soal->getMaxFileSizeMb() }} MB/file (Check Keamanan Otomatis)</span>
                                 </label>
 
                                 <div class="dropzone" id="dropzone"
@@ -2766,7 +2766,7 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                                 Klik atau seret file ke sini
                                             @endif
                                         </div>
-                                        <div class="dz-sub">{{ $extText }} · Maks. {{ $maxAllowedFiles }} Berkas (10 MB/file)</div>
+                                        <div class="dz-sub">{{ $extText }} · Maks. {{ $maxAllowedFiles }} Berkas ({{ $soal->getMaxFileSizeMb() }} MB/file)</div>
                                     </div>
                                     <div class="dz-success" id="dz-success" style="display:none;flex-direction:column;gap:10px;width:100%;text-align:left;">
                                         <div style="display:flex;align-items:center;justify-content:space-between;width:100%;flex-wrap:wrap;gap:8px;">
@@ -3104,6 +3104,8 @@ function showAlert(type, msg) {
 }
 
 const maxFilesAllowed = {{ (int) $soal->getMaxFiles() }};
+const maxFileSizeMb = {{ (int) $soal->getMaxFileSizeMb() }};
+const maxFileSizeBytes = maxFileSizeMb * 1024 * 1024;
 const allowedExtsList = @json($allAcceptedExtensions ?? []);
 let selectedFiles = [];
 
@@ -3163,8 +3165,9 @@ function handleFilesSelected(incomingFiles) {
             return;
         }
         const singleFile = newFiles[0] || list[0];
-        if (singleFile.size > 10 * 1024 * 1024) {
-            showAlert('error', `Berkas "${singleFile.name}" (${formatFileSize(singleFile.size)}) melebihi batas maksimal 10 MB per berkas!`);
+        if (singleFile.size > maxFileSizeBytes) {
+            showAlert('error', `Ukuran berkas "${singleFile.name}" (${formatFileSize(singleFile.size)}) melebihi batas maksimal ${maxFileSizeMb} MB per berkas!`);
+            if (fileInput) fileInput.value = '';
             return;
         }
         selectedFiles = [singleFile];
@@ -3182,8 +3185,9 @@ function handleFilesSelected(incomingFiles) {
 
     // Validasi ukuran masing-masing file baru
     for (let f of newFiles) {
-        if (f.size > 10 * 1024 * 1024) {
-            showAlert('error', `Berkas "${f.name}" (${formatFileSize(f.size)}) melebihi batas maksimal 10 MB per berkas!`);
+        if (f.size > maxFileSizeBytes) {
+            showAlert('error', `Ukuran berkas "${f.name}" (${formatFileSize(f.size)}) melebihi batas maksimal ${maxFileSizeMb} MB per berkas!`);
+            if (fileInput) fileInput.value = '';
             return;
         }
     }

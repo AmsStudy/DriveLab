@@ -38,6 +38,7 @@ class Soal extends Model
         'is_submission_enabled',
         'submission_types',
         'max_files',
+        'max_file_size_mb',
         'deadline_at',
         'submission_instructions',
         'allowed_extensions',
@@ -229,5 +230,14 @@ class Soal extends Model
     public function getMaxFiles(): int
     {
         return max(1, (int) ($this->max_files ?? 1));
+    }
+
+    /**
+     * Batas maksimal ukuran per berkas (dalam MB) yang dapat diunggah mahasiswa.
+     * Default 3 MB jika tidak disetel.
+     */
+    public function getMaxFileSizeMb(): int
+    {
+        return max(1, (int) ($this->max_file_size_mb ?? 3));
     }
 }

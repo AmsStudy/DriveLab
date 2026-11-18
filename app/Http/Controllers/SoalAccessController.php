@@ -484,12 +484,18 @@ class SoalAccessController extends Controller
         }
 
         // ─── Tipe 3: Upload File dengan Security Inspection (Dukung Multi-File) ─
+        $maxFileSizeMb = $soal->getMaxFileSizeMb();
+        $maxFileSizeKb = $maxFileSizeMb * 1024;
+
         $request->validate([
             'nim'     => 'required|string|max:50|regex:/^[a-zA-Z0-9\-]+$/',
             'nama'    => 'required|string|max:255',
-            'file'    => 'nullable|file|max:10240',
+            'file'    => "nullable|file|max:{$maxFileSizeKb}",
             'files'   => 'nullable|array',
-            'files.*' => 'file|max:10240',
+            'files.*' => "file|max:{$maxFileSizeKb}",
+        ], [
+            'file.max'    => "Ukuran berkas tidak boleh melebihi {$maxFileSizeMb} MB.",
+            'files.*.max' => "Ukuran berkas tidak boleh melebihi {$maxFileSizeMb} MB per file.",
         ]);
 
         $uploadedFiles = [];

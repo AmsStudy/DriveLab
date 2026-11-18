@@ -719,16 +719,30 @@
                             @error('classes') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                         </div>
 
-                        {{-- Maksimal Jumlah Berkas --}}
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Maksimal Jumlah Berkas File per Mahasiswa</label>
-                            <div class="flex items-center gap-2">
-                                <input type="number" id="modal_max_files" name="max_files" min="1" max="20" value="{{ old('max_files', 1) }}"
-                                       class="w-32 bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
-                                <span class="text-xs text-gray-500 dark:text-gray-400">berkas / file (Default: 1, Maks: 20)</span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {{-- Maksimal Jumlah Berkas --}}
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Maksimal Jumlah Berkas File per Mahasiswa</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="number" id="modal_max_files" name="max_files" min="1" max="20" value="{{ old('max_files', 1) }}"
+                                           class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">file (Maks: 20)</span>
+                                </div>
+                                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Banyaknya berkas yang dapat diunggah (Default: 1).</p>
+                                @error('max_files') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                             </div>
-                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Tentukan berapa banyak berkas yang dapat diunggah oleh mahasiswa saat mengumpulkan tugas.</p>
-                            @error('max_files') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+
+                            {{-- Batas Ukuran per Berkas --}}
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Batas Ukuran per Berkas (MB)</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="number" id="modal_max_file_size_mb" name="max_file_size_mb" min="1" max="100" value="{{ old('max_file_size_mb', 3) }}"
+                                           class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">MB per file</span>
+                                </div>
+                                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Batas ukuran tiap file (Default: 3 MB).</p>
+                                @error('max_file_size_mb') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                            </div>
                         </div>
 
                         {{-- Tipe Pengumpulan yang Diizinkan --}}
@@ -1052,15 +1066,28 @@
                         <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Jika diisi, mahasiswa wajib memilih salah satu kelas saat mengumpulkan tugas.</p>
                     </div>
 
-                    {{-- Maksimal Jumlah Berkas --}}
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Maksimal Jumlah Berkas File per Mahasiswa</label>
-                        <div class="flex items-center gap-2">
-                            <input type="number" id="edit_modal_max_files" name="max_files" min="1" max="20" value="1"
-                                   class="w-32 bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">berkas / file (Default: 1, Maks: 20)</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {{-- Maksimal Jumlah Berkas --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Maksimal Jumlah Berkas File per Mahasiswa</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="edit_modal_max_files" name="max_files" min="1" max="20" value="1"
+                                       class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">file (Maks: 20)</span>
+                            </div>
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Banyaknya berkas yang dapat diunggah (Default: 1).</p>
                         </div>
-                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Tentukan berapa banyak berkas yang dapat diunggah oleh mahasiswa saat mengumpulkan tugas.</p>
+
+                        {{-- Batas Ukuran per Berkas --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Batas Ukuran per Berkas (MB)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="edit_modal_max_file_size_mb" name="max_file_size_mb" min="1" max="100" value="3"
+                                       class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">MB per file</span>
+                            </div>
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Batas ukuran tiap file (Default: 3 MB).</p>
+                        </div>
                     </div>
 
                     {{-- Pilihan Tipe Pengumpulan --}}
@@ -1159,6 +1186,7 @@
             'submission_instructions' => $item->submission_instructions ?? '',
             'classes' => is_array($item->classes) ? implode(', ', $item->classes) : ($item->classes ?? ''),
             'max_files' => (int)($item->max_files ?? 1),
+            'max_file_size_mb' => $item->getMaxFileSizeMb(),
             'submission_types' => is_array($item->submission_types) ? $item->submission_types : ['file'],
             'allowed_extensions' => is_array($item->allowed_extensions) ? $item->allowed_extensions : ['all'],
             'update_url' => route('admin.soal.update', $item),
@@ -1320,6 +1348,9 @@ function openEditModalForSoal(id) {
     document.getElementById('edit_modal_classes').value = data.classes || '';
     if (document.getElementById('edit_modal_max_files')) {
         document.getElementById('edit_modal_max_files').value = data.max_files || 1;
+    }
+    if (document.getElementById('edit_modal_max_file_size_mb')) {
+        document.getElementById('edit_modal_max_file_size_mb').value = data.max_file_size_mb || 3;
     }
 
     // Submission Types Checkboxes
@@ -1973,6 +2004,7 @@ document.addEventListener('DOMContentLoaded', () => {
         @if(old('submission_instructions')) document.getElementById('edit_modal_submission_instructions').value = @json(old('submission_instructions')); @endif
         @if(old('classes')) document.getElementById('edit_modal_classes').value = @json(old('classes')); @endif
         @if(old('max_files')) if (document.getElementById('edit_modal_max_files')) document.getElementById('edit_modal_max_files').value = @json(old('max_files')); @endif
+        @if(old('max_file_size_mb')) if (document.getElementById('edit_modal_max_file_size_mb')) document.getElementById('edit_modal_max_file_size_mb').value = @json(old('max_file_size_mb')); @endif
     @elseif($errors->any() || request('action') === 'create')
         openCreateModal();
     @endif

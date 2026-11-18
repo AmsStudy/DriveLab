@@ -243,16 +243,30 @@
                         @error('classes') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                     </div>
 
-                    {{-- Maksimal Jumlah Berkas --}}
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Maksimal Jumlah Berkas File per Mahasiswa</label>
-                        <div class="flex items-center gap-2">
-                            <input type="number" name="max_files" min="1" max="20" value="{{ old('max_files', 1) }}"
-                                   class="w-32 bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">berkas / file (Default: 1, Maks: 20)</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {{-- Maksimal Jumlah Berkas --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Maksimal Jumlah Berkas File per Mahasiswa</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" name="max_files" min="1" max="20" value="{{ old('max_files', 1) }}"
+                                       class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">file (Maks: 20)</span>
+                            </div>
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Banyaknya berkas yang dapat diunggah (Default: 1).</p>
+                            @error('max_files') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                         </div>
-                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Tentukan berapa banyak berkas yang dapat diunggah oleh mahasiswa saat mengumpulkan tugas.</p>
-                        @error('max_files') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+
+                        {{-- Batas Ukuran per Berkas --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Batas Ukuran per Berkas (MB)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" name="max_file_size_mb" min="1" max="100" value="{{ old('max_file_size_mb', 3) }}"
+                                       class="w-full bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">MB per file</span>
+                            </div>
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Batas ukuran tiap file (Default: 3 MB).</p>
+                            @error('max_file_size_mb') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                        </div>
                     </div>
 
                     {{-- Tipe Pengumpulan yang Diizinkan --}}
