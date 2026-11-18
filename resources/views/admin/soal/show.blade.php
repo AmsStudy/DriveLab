@@ -344,8 +344,8 @@
     </div>
 
     {{-- RIGHT COLUMN: RIWAYAT PENGUMPULAN TUGAS (2 Cols) --}}
-    <div class="lg:col-span-2">
-        <div class="rounded-2xl shadow-sm dark:shadow-xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820]">
+    <div class="lg:col-span-2 min-w-0">
+        <div class="rounded-2xl shadow-sm dark:shadow-xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] overflow-hidden">
 
             {{-- Header Pengumpulan Tugas --}}
             <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-30 border-b border-gray-200 dark:border-[#1A2820]">
