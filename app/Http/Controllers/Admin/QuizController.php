@@ -900,7 +900,8 @@ class QuizController extends Controller
     {
         $this->authorizeQuiz($quiz);
         $quiz->loadCount(['questions', 'attempts']);
-        return view('admin.quizzes.monitor', compact('quiz'));
+        $initialData = $this->buildLiveMonitorData($quiz);
+        return view('admin.quizzes.monitor', compact('quiz', 'initialData'));
     }
 
     public function liveMonitorData(Quiz $quiz)

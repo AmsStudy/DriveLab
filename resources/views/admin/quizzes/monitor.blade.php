@@ -4,7 +4,7 @@
 @section('page-description', 'Pantau aktivitas pengerjaan ujian mahasiswa secara real-time di laboratorium')
 
 @section('content')
-<div x-data="liveExamMonitor({{ $quiz->id }})" x-init="initMonitor()" class="space-y-6">
+<div x-data="liveExamMonitor({{ $quiz->id }}, {{ Js::from($initialData ?? null) }})" x-init="initMonitor()" class="space-y-6">
 
     {{-- Top Header & Navigation --}}
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -780,10 +780,10 @@
 </div>
 
 <script>
-function liveExamMonitor(quizId) {
+function liveExamMonitor(quizId, initialData = null) {
     return {
         quizId: quizId,
-        sessionStatus: '{{ $quiz->session_status ?? 'waiting' }}',
+        sessionStatus: initialData?.quiz_session_status || '{{ $quiz->session_status ?? 'waiting' }}',
         isSessionProcessing: false,
         activeTab: 'active',
         viewMode: 'grid',
@@ -791,19 +791,19 @@ function liveExamMonitor(quizId) {
         searchQuery: '',
         isLoading: false,
         timer: null,
-        lastSyncTime: '-',
-        summary: {
+        lastSyncTime: initialData?.last_updated || '-',
+        summary: initialData?.summary || {
             total_active: 0,
             total_completed: 0,
             total_locked: 0,
             total_online: 0,
             quiz_time_limit: 0
         },
-        activeAttempts: [],
-        completedAttempts: [],
+        activeAttempts: initialData?.active_attempts || [],
+        completedAttempts: initialData?.completed_attempts || [],
 
         // Broadcast Announcements
-        announcements: [],
+        announcements: initialData?.announcements || [],
         broadcastMessage: '',
         broadcastType: 'info',
         isSendingBroadcast: false,
