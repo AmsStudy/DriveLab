@@ -2477,6 +2477,16 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
 
                 $extText    = 'Format: ' . implode(', ', $extLabels);
                 $acceptAttr = implode(',', $accepts);
+                $allAcceptedExtensions = [];
+                foreach ($accepts as $accGroup) {
+                    foreach (explode(',', $accGroup) as $ext) {
+                        $trimmed = trim(strtolower($ext));
+                        if ($trimmed) {
+                            $allAcceptedExtensions[] = $trimmed;
+                        }
+                    }
+                }
+                $allAcceptedExtensions = array_values(array_unique($allAcceptedExtensions));
             }
 
             $allowedSubTypes = $soal->submission_types ?: ['file'];
@@ -2803,7 +2813,7 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                        name="files[]"
                                        {{ $maxAllowedFiles > 1 ? 'multiple' : '' }}
                                        style="display:none"
-                                       {{ $acceptAttr ? 'accept=' . $acceptAttr : '' }}>
+                                       {{ $acceptAttr ? 'accept="' . $acceptAttr . '"' : '' }}>
                             </div>
                         @endif
 
@@ -3094,6 +3104,7 @@ function showAlert(type, msg) {
 }
 
 const maxFilesAllowed = {{ (int) $soal->getMaxFiles() }};
+const allowedExtsList = @json($allAcceptedExtensions ?? []);
 let selectedFiles = [];
 
 function formatFileSize(bytes) {
@@ -3110,6 +3121,20 @@ function resetAllSelectedFiles() {
 function handleFilesSelected(incomingFiles) {
     const list = Array.from(incomingFiles);
     if (!list.length) return;
+
+    // Validasi langsung ekstensi berkas saat dipilih
+    if (allowedExtsList && allowedExtsList.length > 0) {
+        for (let f of list) {
+            const fileName = f.name || '';
+            const lastDot = fileName.lastIndexOf('.');
+            const ext = lastDot !== -1 ? fileName.substring(lastDot).toLowerCase() : '';
+            if (!ext || !allowedExtsList.includes(ext)) {
+                showAlert('error', `Format file (${ext || 'tanpa ekstensi'}) tidak termasuk dalam format yang diizinkan untuk tugas ini.\nFormat yang diizinkan: ${allowedExtsList.join(', ')}.`);
+                if (fileInput) fileInput.value = '';
+                return;
+            }
+        }
+    }
 
     // Filter duplikat: jika file dengan nama, ukuran, dan waktu modifikasi sama sudah dipilih sebelumnya
     const newFiles = [];
