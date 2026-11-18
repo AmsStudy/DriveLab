@@ -226,7 +226,8 @@
                 </div>
 
                 {{-- Opsi Jawaban untuk Pilihan Ganda & Benar-Salah --}}
-                <div x-show="formData.question_type !== 'fill_blank'">
+                <template x-if="formData.question_type !== 'fill_blank'">
+                <div>
                     <div class="flex items-center justify-between mb-2">
                         <div>
                             <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider">
@@ -309,6 +310,7 @@
                         </template>
                     </div>
                 </div>
+                </template>
 
                 {{-- Opsi Jawaban Khusus ISIAN RUMPANG (Fill in the Blank) --}}
                 <div x-show="formData.question_type === 'fill_blank'" class="space-y-4">
@@ -871,7 +873,11 @@
                     const before = text.substring(0, start);
                     const after = text.substring(end);
                     this.formData.question_text = `${before}[${selected}]${after}`;
-                    this.formData.blanks.push({ key: selected, synonyms: '' });
+                    if (this.formData.blanks.length === 1 && (!this.formData.blanks[0].key || !this.formData.blanks[0].key.trim())) {
+                        this.formData.blanks[0] = { key: selected, synonyms: '' };
+                    } else {
+                        this.formData.blanks.push({ key: selected, synonyms: '' });
+                    }
                     this.$nextTick(() => {
                         ta.focus();
                         ta.setSelectionRange(start + 1, start + 1 + selected.length);
@@ -890,7 +896,11 @@
                 const defaultKey = 'Kunci';
 
                 this.formData.question_text = `${before}[${defaultKey}]${after}`;
-                this.formData.blanks.push({ key: defaultKey, synonyms: '' });
+                if (this.formData.blanks.length === 1 && (!this.formData.blanks[0].key || !this.formData.blanks[0].key.trim())) {
+                    this.formData.blanks[0] = { key: defaultKey, synonyms: '' };
+                } else {
+                    this.formData.blanks.push({ key: defaultKey, synonyms: '' });
+                }
                 this.$nextTick(() => {
                     if (ta) {
                         ta.focus();
@@ -902,7 +912,11 @@
                 const text = this.formData.question_text || '';
                 const defaultKey = 'Kunci';
                 this.formData.question_text = text.trim() ? `${text.trim()} [${defaultKey}]` : `[${defaultKey}]`;
-                this.formData.blanks.push({ key: defaultKey, synonyms: '' });
+                if (this.formData.blanks.length === 1 && (!this.formData.blanks[0].key || !this.formData.blanks[0].key.trim())) {
+                    this.formData.blanks[0] = { key: defaultKey, synonyms: '' };
+                } else {
+                    this.formData.blanks.push({ key: defaultKey, synonyms: '' });
+                }
                 const ta = this.$refs.questionTextArea;
                 this.$nextTick(() => {
                     if (ta) ta.focus();

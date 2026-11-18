@@ -351,8 +351,17 @@ class QuizController extends Controller
 
         if ($isFillBlank) {
             $questionType = 'fill_blank';
-            $correctIndices = array_keys($request->input('options', []));
+            $rawOptions = $request->input('options', []);
+            $fillBlankOptions = array_values(array_filter($rawOptions, function ($val) {
+                return trim((string)$val) !== '';
+            }));
+            if (empty($fillBlankOptions)) {
+                $fillBlankOptions = [''];
+            }
+            $optionsToSave = $fillBlankOptions;
+            $correctIndices = array_keys($optionsToSave);
         } else {
+            $optionsToSave = $request->input('options', []);
             $correctIndices = [];
             if ($request->has('correct_indices') && is_array($request->correct_indices)) {
                 $correctIndices = array_map('intval', $request->correct_indices);
@@ -371,7 +380,7 @@ class QuizController extends Controller
             $questionImagePath = QuizImageService::optimizeAndStore($request->file('question_image'), 'questions', 1200);
         }
 
-        DB::transaction(function () use ($quiz, $validated, $questionImagePath, $questionType, $correctIndices, $request) {
+        DB::transaction(function () use ($quiz, $validated, $questionImagePath, $questionType, $correctIndices, $optionsToSave, $request) {
             $maxOrder = $quiz->questions()->max('order_num') ?? 0;
             $question = $quiz->questions()->create([
                 'question_text' => $validated['question_text'],
@@ -382,7 +391,7 @@ class QuizController extends Controller
                 'order_num'     => $maxOrder + 1,
             ]);
 
-            foreach ($request->input('options', []) as $idx => $optText) {
+            foreach ($optionsToSave as $idx => $optText) {
                 $optImagePath = null;
                 if ($request->hasFile("option_images.{$idx}")) {
                     $optImagePath = QuizImageService::optimizeAndStore($request->file("option_images.{$idx}"), 'options', 650);
@@ -428,8 +437,17 @@ class QuizController extends Controller
 
         if ($isFillBlank) {
             $questionType = 'fill_blank';
-            $correctIndices = array_keys($request->input('options', []));
+            $rawOptions = $request->input('options', []);
+            $fillBlankOptions = array_values(array_filter($rawOptions, function ($val) {
+                return trim((string)$val) !== '';
+            }));
+            if (empty($fillBlankOptions)) {
+                $fillBlankOptions = [''];
+            }
+            $optionsToSave = $fillBlankOptions;
+            $correctIndices = array_keys($optionsToSave);
         } else {
+            $optionsToSave = $request->input('options', []);
             $correctIndices = [];
             if ($request->has('correct_indices') && is_array($request->correct_indices)) {
                 $correctIndices = array_map('intval', $request->correct_indices);
@@ -453,7 +471,7 @@ class QuizController extends Controller
             $questionImagePath = QuizImageService::optimizeAndStore($request->file('question_image'), 'questions', 1200);
         }
 
-        DB::transaction(function () use ($question, $validated, $questionImagePath, $questionType, $correctIndices, $request) {
+        DB::transaction(function () use ($question, $validated, $questionImagePath, $questionType, $correctIndices, $optionsToSave, $request) {
             $question->update([
                 'question_text' => $validated['question_text'],
                 'image_path'    => $questionImagePath,
@@ -464,7 +482,7 @@ class QuizController extends Controller
 
             // Recreate options, preserving or updating images
             $question->options()->delete();
-            foreach ($request->input('options', []) as $idx => $optText) {
+            foreach ($optionsToSave as $idx => $optText) {
                 $optImagePath = $request->input("existing_option_images.{$idx}");
                 if ($request->boolean("remove_option_images.{$idx}")) {
                     QuizImageService::deleteImage($optImagePath);
