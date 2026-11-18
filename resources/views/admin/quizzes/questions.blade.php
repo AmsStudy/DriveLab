@@ -192,7 +192,7 @@
                               class="w-full px-4 py-2.5 bg-[#090D0B] border border-[#1A2820] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-xl text-sm text-gray-100 placeholder-gray-500 leading-relaxed"></textarea>
                     <p x-show="formData.question_type === 'fill_blank'" class="text-[11px] text-gray-400 mt-1 flex items-center gap-1">
                         <span>💡</span>
-                        <span>Admin cukup mengetik kalimat biasa. Gunakan tombol di atas atau form di bawah untuk menentukan kata kunci tanpa perlu menghafal tanda kurung siku <code>[ ]</code>.</span>
+                        <span>Admin cukup mengetik kalimat biasa. Gunakan tombol di atas untuk menentukan kata kunci. Jika soal memerlukan kurung siku biasa (misal kode <code>arr\[0\]</code>), gunakan garis miring terbalik <code>\[...\]</code> agar tidak dianggap sebagai titik-titik.</span>
                     </p>
                 </div>
 
@@ -747,8 +747,8 @@
                             optTexts.push(raw);
                         });
                     } else {
-                        // Parse from brackets if options table empty
-                        const regex = /\[([^\]]+)\]/g;
+                        // Parse from brackets if options table empty (supporting backslash escaping)
+                        const regex = /(?<!\\)\[([^\]]+)\]/g;
                         let match;
                         while ((match = regex.exec(question.question_text)) !== null) {
                             const raw = match[1] || '';
@@ -829,7 +829,7 @@
             },
             parseBlanksFromText() {
                 const text = this.formData.question_text || '';
-                const regex = /\[([^\]]+)\]/g;
+                const regex = /(?<!\\)\[([^\]]+)\]/g;
                 let match;
                 const found = [];
                 while ((match = regex.exec(text)) !== null) {
@@ -846,7 +846,7 @@
             },
             handleQuestionTextInput() {
                 if (this.formData.question_type !== 'fill_blank') return;
-                const regex = /\[([^\]]+)\]/g;
+                const regex = /(?<!\\)\[([^\]]+)\]/g;
                 let match;
                 const found = [];
                 while ((match = regex.exec(this.formData.question_text)) !== null) {
@@ -928,7 +928,7 @@
                 this.formData.blanks.splice(index, 1);
 
                 let count = 0;
-                this.formData.question_text = (this.formData.question_text || '').replace(/\[([^\]]*)\]/g, (match, content) => {
+                this.formData.question_text = (this.formData.question_text || '').replace(/(?<!\\)\[([^\]]*)\]/g, (match, content) => {
                     if (count === index) {
                         count++;
                         return targetBlank ? targetBlank.key : '';
@@ -941,7 +941,7 @@
                 if (this.formData.question_type !== 'fill_blank') return;
                 let bIdx = 0;
                 const blanks = this.formData.blanks;
-                this.formData.question_text = (this.formData.question_text || '').replace(/\[([^\]]*)\]/g, (match) => {
+                this.formData.question_text = (this.formData.question_text || '').replace(/(?<!\\)\[([^\]]*)\]/g, (match) => {
                     if (bIdx < blanks.length) {
                         const b = blanks[bIdx++];
                         const val = this.getBlankOptionValue(b);
@@ -961,14 +961,14 @@
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;');
 
-                const rendered = escRaw.replace(/\[([^\]]*)\]/g, (match, content) => {
+                const rendered = escRaw.replace(/(?<!\\)\[([^\]]*)\]/g, (match, content) => {
                     bCount++;
                     const parts = content.split('|');
                     const key = parts[0] ? parts[0].trim() : ('Titik-titik #' + bCount);
                     return `<span class="inline-flex items-center gap-1 mx-1 px-2.5 py-0.5 rounded-lg border border-emerald-500/50 bg-emerald-500/10 text-emerald-300 font-mono font-bold text-xs shadow-inner">
                         <span class="text-[10px] text-emerald-500/80">#${bCount}:</span> ${key}
                     </span>`;
-                });
+                }).replace(/\\\[/g, '[').replace(/\\\]/g, ']');
 
                 return rendered.replace(/\n/g, '<br>');
             },

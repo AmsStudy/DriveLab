@@ -120,6 +120,9 @@ Route::prefix('admin')
         Route::resource('categories', CategoryController::class)->except(['show']);
 
         // Kuis Interaktif (CMS Quizizz)
+        Route::get('quizzes/trash', [QuizController::class, 'trash'])->name('quizzes.trash');
+        Route::patch('quizzes/{id}/restore', [QuizController::class, 'restore'])->name('quizzes.restore');
+        Route::delete('quizzes/{id}/force-delete', [QuizController::class, 'forceDelete'])->name('quizzes.force-delete');
         Route::resource('quizzes', QuizController::class);
         Route::post('quizzes/{quiz}/duplicate', [QuizController::class, 'duplicate'])->name('quizzes.duplicate');
         Route::patch('quizzes/{quiz}/toggle', [QuizController::class, 'toggleActive'])->name('quizzes.toggle');

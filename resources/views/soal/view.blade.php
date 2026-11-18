@@ -2613,6 +2613,7 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                                     </svg>
                                 </div>
+                                <div id="sub_nim_warning" style="display:none;margin-top:7px;font-size:11.5px;color:#F59E0B;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:7px 10px;line-height:1.4;"></div>
                             </div>
                             <div class="field-group">
                                 <label class="field-label">
@@ -3278,11 +3279,13 @@ function checkExistingSubmission(nim) {
     const timeEl = document.getElementById('existing-sub-time');
     const fileEl = document.getElementById('existing-sub-file');
     const filesContainer = document.getElementById('existing-sub-files-list');
+    const nimWarningEl = document.getElementById('sub_nim_warning');
 
     if (!nim || nim.length < 3) {
         currentExistingSubmission = null;
         if (banner) banner.style.display = 'none';
         if (policyTip) policyTip.style.display = 'flex';
+        if (nimWarningEl) nimWarningEl.style.display = 'none';
         if (filesContainer) {
             filesContainer.innerHTML = '';
             filesContainer.style.display = 'none';
@@ -3291,7 +3294,10 @@ function checkExistingSubmission(nim) {
         return;
     }
 
-    const checkUrl = '{{ route('soal.checkSubmission', ['token' => $soal->slug ?: $soal->unique_token], false) }}?nim=' + encodeURIComponent(nim);
+    const namaEl = document.getElementById('sub_nama');
+    const namaVal = namaEl ? namaEl.value.trim() : '';
+
+    const checkUrl = '{{ route('soal.checkSubmission', ['token' => $soal->slug ?: $soal->unique_token], false) }}?nim=' + encodeURIComponent(nim) + '&nama=' + encodeURIComponent(namaVal);
     fetch(checkUrl, {
         headers: { 'Accept': 'application/json' }
     })
@@ -3300,6 +3306,7 @@ function checkExistingSubmission(nim) {
         if (data && data.has_submitted) {
             data.nim = nim;
             currentExistingSubmission = data;
+            if (nimWarningEl) nimWarningEl.style.display = 'none';
             if (policyTip) policyTip.style.display = 'none';
             if (banner) banner.style.display = 'block';
 
@@ -3372,7 +3379,6 @@ function checkExistingSubmission(nim) {
                 }
             }
 
-            const namaEl = document.getElementById('sub_nama');
             if (namaEl && !namaEl.value) {
                 namaEl.value = data.nama;
                 localStorage.setItem('labsoal_student_nama', data.nama);
@@ -3387,6 +3393,15 @@ function checkExistingSubmission(nim) {
                 filesContainer.style.display = 'none';
             }
             btnLabel.textContent = 'Kirim Tugas Sekarang';
+
+            if (data && data.nim_mismatch_warning) {
+                if (nimWarningEl) {
+                    nimWarningEl.style.display = 'block';
+                    nimWarningEl.innerHTML = `⚠️ <strong>Peringatan Potensi Salah Ketik NIM:</strong> Nama Anda pernah terdaftar pada tugas ini dengan NIM <strong>${data.registered_nim}</strong>. Pastikan NIM tidak keliru agar tugas sebelumnya diperbarui.`;
+                }
+            } else {
+                if (nimWarningEl) nimWarningEl.style.display = 'none';
+            }
         }
     })
     .catch(() => {});
@@ -3449,6 +3464,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!namaInput.value && storedNama) namaInput.value = storedNama;
         namaInput.addEventListener('input', function() {
             localStorage.setItem('labsoal_student_nama', this.value.trim());
+            if (nimInput && nimInput.value.trim().length >= 9) {
+                clearTimeout(checkNimTimeout);
+                checkNimTimeout = setTimeout(() => checkExistingSubmission(nimInput.value.trim()), 450);
+            }
         });
     }
 
@@ -3585,15 +3604,48 @@ document.getElementById('submission-form').addEventListener('submit', async func
         ? currentExistingSubmission
         : null;
 
-    if (!existingData && nimVal.length === 11) {
+    if (!existingData && nimVal.length >= 9) {
         try {
-            const checkUrl = '{{ route('soal.checkSubmission', ['token' => $soal->slug ?: $soal->unique_token], false) }}?nim=' + encodeURIComponent(nimVal);
+            const checkUrl = '{{ route('soal.checkSubmission', ['token' => $soal->slug ?: $soal->unique_token], false) }}?nim=' + encodeURIComponent(nimVal) + '&nama=' + encodeURIComponent(namaVal);
             const r = await fetch(checkUrl, { headers: { 'Accept': 'application/json' } });
             const res = await r.json();
             if (res && res.has_submitted) {
                 res.nim = nimVal;
                 existingData = res;
                 currentExistingSubmission = res;
+            } else if (res && res.nim_mismatch_warning) {
+                const isDark = document.documentElement.classList.contains('dark');
+                if (window.Swal) {
+                    const confirmTypo = await Swal.fire({
+                        icon: 'question',
+                        title: 'Periksa Kembali NIM Anda',
+                        html: `
+                            <div style="text-align: left; font-size: 13px; line-height: 1.6; color: ${isDark ? '#E5E7EB' : '#374151'};">
+                                <p style="margin-bottom: 8px;">
+                                    Mahasiswa atas nama <strong>${namaVal}</strong> sebelumnya sudah pernah tercatat mengumpulkan tugas dengan NIM <strong>${res.registered_nim}</strong>.
+                                </p>
+                                <div style="background: ${isDark ? 'rgba(245, 158, 11, 0.15)' : '#FEF3C7'}; border-left: 4px solid #F59E0B; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; color: ${isDark ? '#FCD34D' : '#92400E'};">
+                                    <strong>⚠️ Potensi Salah Ketik NIM:</strong><br>
+                                    NIM yang Anda masukkan saat ini adalah <strong>${nimVal}</strong>. Jika Anda orang yang sama, pastikan NIM Anda benar agar tugas sebelumnya diperbarui, bukan membuat data baru.
+                                </div>
+                                <p style="margin-bottom: 0;">Apakah Anda yakin ingin tetap melanjutkan pengumpulan dengan NIM <strong>${nimVal}</strong>?</p>
+                            </div>
+                        `,
+                        background: isDark ? '#0F1713' : '#FFFFFF',
+                        color: isDark ? '#F3F4F6' : '#111827',
+                        backdrop: isDark ? 'rgba(9, 13, 11, 0.8)' : 'rgba(0, 0, 0, 0.5)',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, NIM Saya Benar',
+                        cancelButtonText: 'Koreksi NIM',
+                        confirmButtonColor: '#10B981',
+                        cancelButtonColor: '#6B7280',
+                    });
+                    if (!confirmTypo.isConfirmed) {
+                        const nimEl = document.getElementById('sub_nim');
+                        if (nimEl) nimEl.focus();
+                        return;
+                    }
+                }
             }
         } catch (err) {}
     }

@@ -6,6 +6,26 @@
 
 @section('content')
 
+{{-- Recycle Bin Category Tabs --}}
+<div class="flex items-center gap-2 mb-6 border-b border-[#1A2820] pb-3">
+    <a href="{{ route('admin.soal.trash') }}"
+       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span>Dokumen Soal & Tugas</span>
+        @if(isset($trashedSoalsCount) && $trashedSoalsCount > 0)
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[11px]">{{ $trashedSoalsCount }}</span>
+        @endif
+    </a>
+    <a href="{{ route('admin.quizzes.trash') }}"
+       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-gray-400 hover:text-gray-200 hover:bg-[#0F1713] border border-transparent transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <span>Kuis Interaktif (LabQuiz)</span>
+        @if(isset($trashedQuizzesCount) && $trashedQuizzesCount > 0)
+            <span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 font-mono text-[11px]">{{ $trashedQuizzesCount }}</span>
+        @endif
+    </a>
+</div>
+
 {{-- Filter & Search --}}
 <form method="GET" id="filter-form" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
     <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 flex-1">

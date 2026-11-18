@@ -612,6 +612,24 @@ class SoalAccessController extends Controller
 
         $existing = Submission::where('soal_id', $soal->id)->where('nim', $nim)->first();
         if (!$existing) {
+            $nama = trim((string) $request->query('nama', ''));
+            if ($nama && mb_strlen($nama) >= 3) {
+                // Deteksi kemungkinan kesalahan ketik NIM: cari apakah nama identik sudah terdaftar dengan NIM berbeda
+                $sameName = Submission::where('soal_id', $soal->id)
+                    ->where('nim', '!=', $nim)
+                    ->whereRaw('LOWER(TRIM(nama)) = ?', [mb_strtolower($nama)])
+                    ->first();
+
+                if ($sameName) {
+                    return response()->json([
+                        'has_submitted'        => false,
+                        'nim_mismatch_warning' => true,
+                        'registered_nim'       => $sameName->nim,
+                        'registered_nama'      => $sameName->nama,
+                    ]);
+                }
+            }
+
             return response()->json(['has_submitted' => false]);
         }
 

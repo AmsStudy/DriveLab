@@ -1,0 +1,159 @@
+@extends('layouts.admin')
+
+@section('title', 'Recycle Bin - Kuis Interaktif')
+@section('page-title', 'Recycle Bin')
+@section('page-description', 'Pulihkan kuis interaktif yang terhapus atau hapus permanen beserta bank soalnya')
+
+@section('content')
+
+{{-- Recycle Bin Category Tabs --}}
+<div class="flex items-center gap-2 mb-6 border-b border-[#1A2820] pb-3">
+    <a href="{{ route('admin.soal.trash') }}"
+       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-gray-400 hover:text-gray-200 hover:bg-[#0F1713] border border-transparent transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <span>Dokumen Soal & Tugas</span>
+        @if(isset($trashedSoalsCount) && $trashedSoalsCount > 0)
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[11px]">{{ $trashedSoalsCount }}</span>
+        @endif
+    </a>
+    <a href="{{ route('admin.quizzes.trash') }}"
+       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <span>Kuis Interaktif (LabQuiz)</span>
+        @if(isset($trashedQuizzesCount) && $trashedQuizzesCount > 0)
+            <span class="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 font-mono text-[11px]">{{ $trashedQuizzesCount }}</span>
+        @endif
+    </a>
+</div>
+
+{{-- Filter & Search --}}
+<form method="GET" id="filter-form" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+    <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 flex-1">
+        <div class="relative w-full sm:w-64 md:w-72 flex-shrink-0">
+            <svg class="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input id="search-input" type="text" name="search" value="{{ request('search') }}"
+                   placeholder="Cari judul atau kode kuis di Trash..."
+                   class="w-full bg-[#090E0B] border border-[#1A2820] text-gray-100 rounded-xl pr-3.5 py-2 text-sm placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                   style="padding-left:2.5rem !important;">
+        </div>
+        <button type="submit" id="search-btn" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-md shadow-emerald-500/20 flex-shrink-0 cursor-pointer">
+            Cari
+        </button>
+        @if(request('search'))
+            <a href="{{ route('admin.quizzes.trash') }}"
+               class="px-3 py-2 rounded-xl text-sm font-medium transition-colors border flex-shrink-0"
+               style="background:#1A2820;border-color:#25382D;color:#9CA3AF;"
+               onmouseover="this.style.background='#25382D';this.style.color='#d1d5db'"
+               onmouseout="this.style.background='#1A2820';this.style.color='#9CA3AF'">
+                Reset
+            </a>
+        @endif
+    </div>
+    <a href="{{ route('admin.quizzes.index') }}" id="back-btn"
+       class="inline-flex items-center justify-center bg-[#0F1713] hover:bg-gray-800 border border-[#1A2820] text-gray-300 px-4 py-2 rounded-xl text-sm font-medium transition-colors flex-shrink-0">
+        Kembali ke Kuis Interaktif
+    </a>
+</form>
+
+{{-- Table --}}
+<div class="bg-[#0F1713] border border-[#1A2820] rounded-2xl overflow-hidden shadow-xl">
+    @if($quizzes->isEmpty())
+        <div class="py-16 text-center text-gray-500">
+            <svg class="w-16 h-16 mx-auto mb-4 opacity-30 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            <p class="text-lg font-medium">Recycle Bin Kuis Kosong</p>
+            <p class="text-sm mt-1">Belum ada kuis interaktif yang dihapus.</p>
+        </div>
+    @else
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[700px]">
+                <thead>
+                    <tr class="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left">Kuis (Dihapus Pada)</th>
+                        <th class="px-4 py-3 text-left">Kode Akses</th>
+                        <th class="px-4 py-3 text-center">Bank Soal</th>
+                        <th class="px-4 py-3 text-center">Peserta</th>
+                        <th class="px-6 py-3 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800/60">
+                    @foreach($quizzes as $quiz)
+                    <tr class="hover:bg-gray-800/30 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-medium text-gray-100 truncate max-w-sm">{{ $quiz->title }}</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-xs text-rose-400">Dihapus: {{ $quiz->deleted_at->format('d M Y H:i') }}</span>
+                                        @if(auth()->user()->isSuperAdmin() && $quiz->user)
+                                            <span class="text-xs text-gray-600">· Oleh: {{ $quiz->user->name }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-4">
+                            <span class="font-mono text-xs px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold">
+                                {{ $quiz->access_code }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-4 text-center">
+                            <span class="text-gray-300 font-medium">{{ $quiz->questions_count }} Soal</span>
+                        </td>
+                        <td class="px-4 py-4 text-center">
+                            <span class="text-gray-400">{{ $quiz->attempts_count }} Peserta</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center justify-end gap-2">
+                                {{-- Restore --}}
+                                <form method="POST" action="{{ route('admin.quizzes.restore', $quiz->id) }}" class="inline"
+                                      onsubmit="confirmAction(event, 'Yakin ingin memulihkan Kuis ini kembali ke daftar Kuis aktif?', 'Ya, Pulihkan', false)">
+                                    @csrf @method('PATCH')
+                                    <button type="submit"
+                                            title="Pulihkan Kuis"
+                                            class="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-lg text-xs font-medium transition-colors cursor-pointer">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                        </svg>
+                                        Restore
+                                    </button>
+                                </form>
+                                {{-- Force Delete --}}
+                                <form method="POST" action="{{ route('admin.quizzes.force-delete', $quiz->id) }}" class="inline"
+                                      onsubmit="confirmAction(event, 'PERINGATAN: Menghapus permanen akan menghilangkan kuis, seluruh butir soal, gambar, dan riwayat nilai mahasiswa! Yakin ingin melanjutkan?', 'Ya, Hapus Permanen', true)">
+                                    @csrf @method('DELETE')
+                                    <button type="submit"
+                                            title="Hapus Permanen"
+                                            class="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-xs font-medium transition-colors cursor-pointer">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                        Hapus Permanen
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Pagination --}}
+        @if($quizzes->hasPages())
+            <div class="px-6 py-4 border-t border-gray-800">
+                {{ $quizzes->withQueryString()->links() }}
+            </div>
+        @endif
+    @endif
+</div>
+
+@endsection

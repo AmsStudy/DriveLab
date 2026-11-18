@@ -451,8 +451,11 @@ class PublicQuizController extends Controller
         $clientQuestions = $questions->map(function ($q, $index) {
             $isFillBlank = $q->question_type === 'fill_blank';
             $sanitizedQuestionText = $isFillBlank
-                ? preg_replace('/\[[^\]]+\]/', '[___]', $q->question_text)
+                ? preg_replace('/(?<!\\\\)\[[^\]]+\]/', '[___]', $q->question_text)
                 : $q->question_text;
+            if ($isFillBlank) {
+                $sanitizedQuestionText = str_replace(['\\[', '\\]'], ['[', ']'], $sanitizedQuestionText);
+            }
 
             return [
                 'id'            => $q->id,

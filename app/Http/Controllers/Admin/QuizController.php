@@ -14,6 +14,7 @@ use App\Services\QuizImportService;
 use App\Services\QuizScoringService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -91,6 +92,7 @@ class QuizController extends Controller
         $avgScore = QuizAttempt::whereIn('quiz_id', $quizIds)->whereNotNull('completed_at')->avg('score') ?? 0;
 
         $soals = $user->isSuperAdmin() ? Soal::select('id', 'title')->get() : Soal::where('user_id', $user->id)->select('id', 'title')->get();
+        $trashedQuizzesCount = ($user->isSuperAdmin() ? Quiz::onlyTrashed() : Quiz::onlyTrashed()->where('user_id', $user->id))->count();
 
         $editQuizId = session('edit_quiz_id') ?? old('quiz_id');
         $extraEditQuiz = null;
@@ -105,7 +107,8 @@ class QuizController extends Controller
             'totalAttempts',
             'avgScore',
             'soals',
-            'extraEditQuiz'
+            'extraEditQuiz',
+            'trashedQuizzesCount'
         ));
     }
 
@@ -268,7 +271,65 @@ class QuizController extends Controller
         $quiz->delete();
 
         return redirect()->route('admin.quizzes.index')
-            ->with('success', 'Kuis berhasil dihapus!');
+            ->with('success', 'Kuis berhasil dipindahkan ke Recycle Bin!');
+    }
+
+    public function trash(Request $request)
+    {
+        $user  = auth()->user();
+        $query = $user->isSuperAdmin() ? Quiz::onlyTrashed() : Quiz::onlyTrashed()->where('user_id', $user->id);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('access_code', 'like', "%{$search}%");
+            });
+        }
+
+        $quizzes = $query->with(['user', 'soal'])->withCount(['questions', 'attempts'])->latest('deleted_at')->paginate(15);
+        $trashedQuizzesCount = ($user->isSuperAdmin() ? Quiz::onlyTrashed() : Quiz::onlyTrashed()->where('user_id', $user->id))->count();
+        $trashedSoalsCount   = ($user->isSuperAdmin() ? Soal::onlyTrashed() : Soal::onlyTrashed()->where('user_id', $user->id))->count();
+
+        return view('admin.quizzes.trash', compact('quizzes', 'trashedQuizzesCount', 'trashedSoalsCount'));
+    }
+
+    public function restore($id)
+    {
+        $user = auth()->user();
+        $quiz = $user->isSuperAdmin() ? Quiz::onlyTrashed()->findOrFail($id) : Quiz::onlyTrashed()->where('user_id', $user->id)->findOrFail($id);
+
+        $quiz->restore();
+
+        return redirect()->route('admin.quizzes.trash')
+            ->with('success', 'Kuis berhasil dipulihkan.');
+    }
+
+    public function forceDelete($id)
+    {
+        $user = auth()->user();
+        $quiz = $user->isSuperAdmin() ? Quiz::onlyTrashed()->with(['questions.options'])->findOrFail($id) : Quiz::onlyTrashed()->where('user_id', $user->id)->with(['questions.options'])->findOrFail($id);
+
+        DB::transaction(function () use ($quiz) {
+            foreach ($quiz->questions as $question) {
+                if ($question->image_path) {
+                    Storage::disk('public')->delete($question->image_path);
+                }
+                foreach ($question->options as $option) {
+                    if ($option->image_path) {
+                        Storage::disk('public')->delete($option->image_path);
+                    }
+                }
+                $question->options()->delete();
+            }
+            $quiz->questions()->delete();
+            $quiz->attempts()->delete();
+            $quiz->announcements()->delete();
+            $quiz->forceDelete();
+        });
+
+        return redirect()->route('admin.quizzes.trash')
+            ->with('success', 'Kuis beserta seluruh bank soal dan riwayatnya berhasil dihapus permanen.');
     }
 
     public function toggleActive(Quiz $quiz)

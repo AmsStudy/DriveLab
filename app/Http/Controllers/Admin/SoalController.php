@@ -517,8 +517,10 @@ class SoalController extends Controller
         }
 
         $soals = $query->with(['category', 'admin'])->latest('deleted_at')->paginate(15);
+        $trashedSoalsCount = ($user->isSuperAdmin() ? Soal::onlyTrashed() : Soal::onlyTrashed()->where('user_id', $user->id))->count();
+        $trashedQuizzesCount = ($user->isSuperAdmin() ? \App\Models\Quiz::onlyTrashed() : \App\Models\Quiz::onlyTrashed()->where('user_id', $user->id))->count();
         
-        return view('admin.soal.trash', compact('soals'));
+        return view('admin.soal.trash', compact('soals', 'trashedSoalsCount', 'trashedQuizzesCount'));
     }
 
     public function restore($id)
@@ -710,7 +712,7 @@ class SoalController extends Controller
                 }
 
                 if ($submission->isLink()) {
-                    $entryName = $folderPrefix . 'tautan_tugas.txt';
+                    $entryName = $folderPrefix . "{$safeNim}_{$safeNama}_tautan_tugas.txt";
                     $content   = "PENGUMPULAN TUGAS BERUPA TAUTAN / LINK\n"
                                . "NIM        : " . $submission->nim . "\n"
                                . "Nama       : " . $submission->nama . "\n"
@@ -723,7 +725,7 @@ class SoalController extends Controller
                 }
 
                 if ($submission->isText()) {
-                    $entryName = $folderPrefix . 'jawaban_teks.txt';
+                    $entryName = $folderPrefix . "{$safeNim}_{$safeNama}_jawaban_teks.txt";
                     $content   = "PENGUMPULAN TUGAS BERUPA TEKS\n"
                                . "NIM        : " . $submission->nim . "\n"
                                . "Nama       : " . $submission->nama . "\n"
@@ -743,14 +745,15 @@ class SoalController extends Controller
                     $realFile = $this->resolvePrivateFile($file->file_path, $realBase);
                     if ($realFile !== null) {
                         $cleanOriginal = preg_replace('/[^a-zA-Z0-9.\-_]/', '_', $file->file_original_name ?: basename($file->file_path));
-                        $entryName = $folderPrefix . $cleanOriginal;
-                        $entryBase = $cleanOriginal;
+                        $formattedName = "{$safeNim}_{$safeNama}_{$cleanOriginal}";
+                        $entryName = $folderPrefix . $formattedName;
+                        $entryBase = $formattedName;
                         $c = 1;
                         while (isset($usedNames[$entryName])) {
                             $ext = pathinfo($entryBase, PATHINFO_EXTENSION);
                             $stem = pathinfo($entryBase, PATHINFO_FILENAME);
-                            $cleanOriginal = $ext ? "{$stem}_{$c}.{$ext}" : "{$stem}_{$c}";
-                            $entryName = $folderPrefix . $cleanOriginal;
+                            $formattedName = $ext ? "{$stem}_{$c}.{$ext}" : "{$stem}_{$c}";
+                            $entryName = $folderPrefix . $formattedName;
                             $c++;
                         }
                         $usedNames[$entryName] = true;
@@ -801,6 +804,8 @@ class SoalController extends Controller
 
         $added = 0;
         $usedFileNames = [];
+        $safeNim  = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $submission->nim);
+        $safeNama = preg_replace('/[^a-zA-Z0-9\-_]/', '_', str_replace(' ', '_', $submission->nama));
 
         if ($submission->isLink()) {
             $content = "PENGUMPULAN TUGAS BERUPA TAUTAN / LINK\n"
@@ -809,7 +814,7 @@ class SoalController extends Controller
                      . ($submission->kelas ? ("Kelas      : " . $submission->kelas . "\n") : "")
                      . "Tautan     : " . $submission->link_url . "\n"
                      . "Waktu      : " . $submission->created_at->format('Y-m-d H:i:s') . "\n";
-            $zip->addFromString('tautan_tugas.txt', $content);
+            $zip->addFromString("{$safeNim}_{$safeNama}_tautan_tugas.txt", $content);
             $added++;
         } elseif ($submission->isText()) {
             $content = "PENGUMPULAN TUGAS BERUPA TEKS\n"
@@ -819,7 +824,7 @@ class SoalController extends Controller
                      . "Waktu      : " . $submission->created_at->format('Y-m-d H:i:s') . "\n"
                      . "--------------------------------------------------------\n\n"
                      . $submission->text_content . "\n";
-            $zip->addFromString('jawaban_teks.txt', $content);
+            $zip->addFromString("{$safeNim}_{$safeNama}_jawaban_teks.txt", $content);
             $added++;
         } else {
             $files = $submission->getFilesList();
@@ -828,12 +833,13 @@ class SoalController extends Controller
                 $realFile = $this->resolvePrivateFile($file->file_path, $realBase);
                 if ($realFile !== null) {
                     $cleanName = preg_replace('/[^a-zA-Z0-9.\-_]/', '_', $file->file_original_name ?: basename($file->file_path));
-                    $name = $cleanName;
+                    $formattedName = "{$safeNim}_{$safeNama}_{$cleanName}";
+                    $name = $formattedName;
                     $k = 1;
                     while (isset($usedFileNames[$name])) {
                         $ext = pathinfo($cleanName, PATHINFO_EXTENSION);
                         $stem = pathinfo($cleanName, PATHINFO_FILENAME);
-                        $name = $ext ? "{$stem}_{$k}.{$ext}" : "{$stem}_{$k}";
+                        $name = $ext ? "{$safeNim}_{$safeNama}_{$stem}_{$k}.{$ext}" : "{$safeNim}_{$safeNama}_{$stem}_{$k}";
                         $k++;
                     }
                     $usedFileNames[$name] = true;
@@ -850,8 +856,6 @@ class SoalController extends Controller
             return back()->with('error', 'Tidak ada berkas yang dapat diunduh untuk mahasiswa ini.');
         }
 
-        $safeNim  = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $submission->nim);
-        $safeNama = preg_replace('/[^a-zA-Z0-9\-_]/', '_', str_replace(' ', '_', $submission->nama));
         $zipFileName = 'tugas_' . $safeNim . '_' . $safeNama . '.zip';
 
         return response()->download($tempPath, $zipFileName)->deleteFileAfterSend(true);
