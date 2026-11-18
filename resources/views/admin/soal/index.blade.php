@@ -718,6 +718,18 @@
                             @error('classes') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
                         </div>
 
+                        {{-- Maksimal Jumlah Berkas --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Maksimal Jumlah Berkas File per Mahasiswa</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="modal_max_files" name="max_files" min="1" max="20" value="{{ old('max_files', 1) }}"
+                                       class="w-32 bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">berkas / file (Default: 1, Maks: 20)</span>
+                            </div>
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Tentukan berapa banyak berkas yang dapat diunggah oleh mahasiswa saat mengumpulkan tugas.</p>
+                            @error('max_files') <p class="mt-1 text-[11px] text-red-500">{{ $message }}</p> @enderror
+                        </div>
+
                         {{-- Tipe Pengumpulan yang Diizinkan --}}
                         <div>
                             <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Metode Pengumpulan yang Diizinkan Mahasiswa <span class="text-red-500">*</span></label>
@@ -1039,6 +1051,17 @@
                         <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Jika diisi, mahasiswa wajib memilih salah satu kelas saat mengumpulkan tugas.</p>
                     </div>
 
+                    {{-- Maksimal Jumlah Berkas --}}
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Maksimal Jumlah Berkas File per Mahasiswa</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="edit_modal_max_files" name="max_files" min="1" max="20" value="1"
+                                   class="w-32 bg-white dark:bg-[#090E0B] border border-gray-300 dark:border-[#1A2820] text-gray-900 dark:text-gray-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">berkas / file (Default: 1, Maks: 20)</span>
+                        </div>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Tentukan berapa banyak berkas yang dapat diunggah oleh mahasiswa saat mengumpulkan tugas.</p>
+                    </div>
+
                     {{-- Pilihan Tipe Pengumpulan --}}
                     <div>
                         <label class="block text-xs text-gray-700 dark:text-gray-300 font-semibold mb-2">Metode Pengumpulan yang Diizinkan Mahasiswa <span class="text-red-500">*</span></label>
@@ -1134,6 +1157,7 @@
             'deadline_at' => $item->deadline_at ? $item->deadline_at->format('Y-m-d\TH:i') : '',
             'submission_instructions' => $item->submission_instructions ?? '',
             'classes' => is_array($item->classes) ? implode(', ', $item->classes) : ($item->classes ?? ''),
+            'max_files' => (int)($item->max_files ?? 1),
             'submission_types' => is_array($item->submission_types) ? $item->submission_types : ['file'],
             'allowed_extensions' => is_array($item->allowed_extensions) ? $item->allowed_extensions : ['all'],
             'update_url' => route('admin.soal.update', $item),
@@ -1293,6 +1317,9 @@ function openEditModalForSoal(id) {
     document.getElementById('edit_modal_deadline_at').value = data.deadline_at || '';
     document.getElementById('edit_modal_submission_instructions').value = data.submission_instructions || '';
     document.getElementById('edit_modal_classes').value = data.classes || '';
+    if (document.getElementById('edit_modal_max_files')) {
+        document.getElementById('edit_modal_max_files').value = data.max_files || 1;
+    }
 
     // Submission Types Checkboxes
     const subTypes = data.submission_types || ['file'];
@@ -1921,6 +1948,7 @@ document.addEventListener('DOMContentLoaded', () => {
         @if(old('deadline_at')) document.getElementById('edit_modal_deadline_at').value = @json(old('deadline_at')); @endif
         @if(old('submission_instructions')) document.getElementById('edit_modal_submission_instructions').value = @json(old('submission_instructions')); @endif
         @if(old('classes')) document.getElementById('edit_modal_classes').value = @json(old('classes')); @endif
+        @if(old('max_files')) if (document.getElementById('edit_modal_max_files')) document.getElementById('edit_modal_max_files').value = @json(old('max_files')); @endif
     @elseif($errors->any() || request('action') === 'create')
         openCreateModal();
     @endif
