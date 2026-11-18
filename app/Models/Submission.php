@@ -61,7 +61,29 @@ class Submission extends Model
             : $this->files()->exists();
 
         if ($hasFilesRelation) {
-            return $this->files;
+            $files = $this->relationLoaded('files') ? $this->files : $this->files()->get();
+
+            // Validasi integritas berkas terhadap identitas NIM mahasiswa
+            if (!empty($this->file_path)) {
+                $cleanNim = preg_replace('/[^a-zA-Z0-9\-]/', '', (string)$this->nim);
+                $firstFilePath = (string)($files->first()?->file_path ?? '');
+
+                // Jika berkas relasi tidak memuat NIM mahasiswa namun berkas submissions memuat NIM yang sesuai,
+                // gunakan berkas primer pada submissions untuk mencegah kekeliruan akibat pergeseran ID relasi.
+                if ($cleanNim !== '' && !str_contains($firstFilePath, $cleanNim) && str_contains($this->file_path, $cleanNim)) {
+                    return collect([
+                        (object) [
+                            'id'                 => 0,
+                            'file_path'          => $this->file_path,
+                            'file_original_name' => $this->file_original_name ?: basename($this->file_path),
+                            'file_extension'     => $this->file_extension ?: pathinfo($this->file_path, PATHINFO_EXTENSION),
+                            'file_size'          => $this->file_size ?: 0,
+                        ]
+                    ]);
+                }
+            }
+
+            return $files;
         }
 
         if (!empty($this->file_path)) {

@@ -561,7 +561,7 @@ class SoalController extends Controller
     {
         $this->authorizeAccess($soal);
 
-        $query = Submission::where('soal_id', $soal->id);
+        $query = Submission::with('files')->where('soal_id', $soal->id);
         if ($request->filled('kelas')) {
             $query->where('kelas', $request->kelas);
         }
@@ -638,7 +638,7 @@ class SoalController extends Controller
             @ini_set('memory_limit', '512M');
         }
 
-        $query = Submission::where('soal_id', $soal->id);
+        $query = Submission::with('files')->where('soal_id', $soal->id);
         if ($request->filled('kelas')) {
             $query->where('kelas', $request->kelas);
         }
