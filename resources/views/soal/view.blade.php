@@ -2588,15 +2588,15 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                     <label class="field-label" style="margin-bottom:0;">
                                         NIM Mahasiswa <span class="req">*</span>
                                     </label>
-                                    <span id="sub_nim_badge" style="font-size:11px;font-family:monospace;font-weight:600;color:var(--text3);">0/11 digit</span>
+                                    <span id="sub_nim_badge" style="font-size:11px;font-family:monospace;font-weight:600;color:var(--text3);">0 digit</span>
                                 </div>
                                 <div class="field-wrap">
                                     <input type="text" id="sub_nim" name="nim" required
-                                           inputmode="numeric" pattern="[0-9]{11}" maxlength="11" minlength="11"
-                                           placeholder="Wajib 11 digit angka (0-9)"
+                                           inputmode="numeric" pattern="[0-9]{9,20}" maxlength="20" minlength="9"
+                                           placeholder="Ketik NIM Anda (angka 0-9)"
                                            autocomplete="off"
                                            class="field-input"
-                                           oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11);">
+                                           oninput="this.value = this.value.replace(/\D/g, '').slice(0, 20);">
                                     <svg class="field-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                                     </svg>
@@ -3367,12 +3367,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateSubNimFeedback(inputEl) {
         if (!inputEl) return;
-        inputEl.value = inputEl.value.replace(/\D/g, '').slice(0, 11);
+        inputEl.value = inputEl.value.replace(/\D/g, '').slice(0, 20);
         const len = inputEl.value.length;
         const badge = document.getElementById('sub_nim_badge');
         if (badge) {
-            badge.textContent = `${len}/11 digit`;
-            if (len === 11) {
+            badge.textContent = `${len} digit`;
+            if (len >= 9) {
                 badge.style.color = '#10B981';
             } else if (len > 0) {
                 badge.style.color = '#F59E0B';
@@ -3479,8 +3479,8 @@ document.getElementById('submission-form').addEventListener('submit', async func
 
     const nimInput = document.getElementById('sub_nim');
     const nimVal = nimInput ? nimInput.value.replace(/\D/g, '') : '';
-    if (!nimVal || nimVal.length !== 11) {
-        showAlert('error', 'NIM harus terdiri dari tepat 11 digit angka (0-9). Saat ini: ' + (nimVal ? nimVal.length : 0) + ' digit.');
+    if (!nimVal || nimVal.length < 9 || nimVal.length > 20) {
+        showAlert('error', 'NIM harus terdiri dari 9 hingga 20 digit angka (0-9). Saat ini: ' + (nimVal ? nimVal.length : 0) + ' digit.');
         if (nimInput) nimInput.focus();
         return;
     }

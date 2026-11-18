@@ -1068,25 +1068,25 @@
                             type="text"
                             x-model="nim"
                             class="main-inp"
-                            placeholder="11 digit NIM (0-9)…"
+                            placeholder="Ketik NIM Anda (0-9)…"
                             autocomplete="off"
                             inputmode="numeric"
-                            pattern="[0-9]{11}"
-                            maxlength="11"
-                            @input="nim = nim.replace(/\D/g, '').slice(0, 11)"
+                            pattern="[0-9]{9,20}"
+                            maxlength="20"
+                            @input="nim = nim.replace(/\D/g, '').slice(0, 20)"
                         >
                         <button type="submit" class="go-btn go-green" :disabled="loading">
                             <span x-show="!loading">Cari →</span>
                             <span x-show="loading" style="opacity:.7">…</span>
                         </button>
                     </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding:0 4px;">
-                        <span style="font-size:11px;"
-                              :style="nim.length === 11 ? 'color:#10B981;' : (nim.length > 0 ? 'color:#F59E0B;' : 'color:var(--text3,#9CA3AF);')"
-                              x-text="nim.length === 11 ? '✓ Format NIM valid (11 digit)' : (nim.length > 0 ? '⚠️ Masukkan ' + (11 - nim.length) + ' digit lagi' : 'Format: 11 digit angka 0-9')"></span>
-                        <span style="font-size:11px;font-family:monospace;font-weight:600;"
-                              :style="nim.length === 11 ? 'color:#10B981;' : (nim.length > 0 ? 'color:#F59E0B;' : 'color:#9CA3AF;')"
-                              x-text="nim.length + '/11 digit'"></span>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding:0 4px;gap:8px;">
+                        <span style="font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
+                              :style="nim.length >= 9 ? 'color:#10B981;' : (nim.length > 0 ? 'color:#F59E0B;' : 'color:var(--text3,#9CA3AF);')"
+                              x-text="nim.length >= 9 ? '✓ Format NIM valid (' + nim.length + ' digit)' : (nim.length > 0 ? '⚠️ Minimal 9 digit angka' : 'Format: minimal 9 digit angka 0-9')"></span>
+                        <span style="font-size:11px;font-family:monospace;font-weight:600;white-space:nowrap;flex-shrink:0;"
+                              :style="nim.length >= 9 ? 'color:#10B981;' : (nim.length > 0 ? 'color:#F59E0B;' : 'color:#9CA3AF;')"
+                              x-text="nim.length > 0 ? nim.length + ' digit' : ''"></span>
                     </div>
                 </form>
 
@@ -1312,9 +1312,9 @@
                 tasks: [],
 
                 async cari() {
-                    this.nim = (this.nim || '').replace(/\D/g, '').slice(0, 11);
-                    if (!this.nim || this.nim.length !== 11) {
-                        this.errMsg = 'NIM harus terdiri dari tepat 11 digit angka (0-9).';
+                    this.nim = (this.nim || '').replace(/\D/g, '').slice(0, 20);
+                    if (!this.nim || this.nim.length < 9) {
+                        this.errMsg = 'NIM harus terdiri dari minimal 9 digit angka (0-9).';
                         this.result = false;
                         return;
                     }
