@@ -48,8 +48,16 @@ class QuizController extends Controller
         }
 
         $quizzes = $query->with(['user', 'soal'])
-            ->withCount(['questions', 'attempts'])
-            ->withAvg('attempts as avg_score', 'score')
+            ->withCount([
+                'questions',
+                'attempts',
+                'attempts as completed_attempts_count' => function ($q) {
+                    $q->whereNotNull('completed_at');
+                }
+            ])
+            ->withAvg(['attempts as avg_score' => function ($q) {
+                $q->whereNotNull('completed_at');
+            }], 'score')
             ->latest()
             ->paginate(12)
             ->withQueryString();

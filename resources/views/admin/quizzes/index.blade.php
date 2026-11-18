@@ -165,29 +165,40 @@
                         <div class="flex items-center justify-between gap-2 mb-3">
                             {{-- Active Status & Toggle --}}
                             <div class="flex items-center gap-1.5 flex-wrap">
-                                <form method="POST" action="{{ route('admin.quizzes.toggle', $quiz) }}">
-                                    @csrf @method('PATCH')
-                                    <button type="submit" title="Klik untuk mengubah status aktif"
-                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all {{ $quiz->is_active ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25' : 'bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700' }}">
-                                        <span class="w-1.5 h-1.5 rounded-full {{ $quiz->is_active ? 'bg-emerald-400 animate-pulse' : 'bg-gray-500' }}"></span>
-                                        {{ $quiz->is_active ? 'Aktif' : 'Nonaktif' }}
-                                    </button>
-                                </form>
+                                @if($quiz->isSessionEnded())
+                                    <form method="POST" action="{{ route('admin.quizzes.toggle', $quiz) }}">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" title="Sesi kuis telah selesai. Klik untuk mengubah status aktif/nonaktif."
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30 hover:bg-rose-500/25 transition-all">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                                            Selesai (Closed)
+                                        </button>
+                                    </form>
+                                @else
+                                    <form method="POST" action="{{ route('admin.quizzes.toggle', $quiz) }}">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" title="Klik untuk mengubah status aktif"
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all {{ $quiz->is_active ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25' : 'bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700' }}">
+                                            <span class="w-1.5 h-1.5 rounded-full {{ $quiz->is_active ? 'bg-emerald-400 animate-pulse' : 'bg-gray-500' }}"></span>
+                                            {{ $quiz->is_active ? 'Aktif' : 'Nonaktif' }}
+                                        </button>
+                                    </form>
 
-                                @if($quiz->is_active)
-                                    @if($quiz->isSessionWaiting())
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30" title="Mahasiswa menunggu di Ruang Tunggu">
-                                            ⏳ Ruang Tunggu
-                                        </span>
-                                    @elseif($quiz->isSessionStarted())
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" title="Ujian sedang berlangsung">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                                            Berlangsung
-                                        </span>
-                                    @elseif($quiz->isSessionEnded())
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30" title="Ujian telah selesai">
-                                            ⛔ Selesai
-                                        </span>
+                                    @if($quiz->is_active)
+                                        @if($quiz->isSessionWaiting())
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30" title="Mahasiswa menunggu di Ruang Tunggu">
+                                                ⏳ Ruang Tunggu
+                                            </span>
+                                        @elseif($quiz->isSessionStarted())
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" title="Ujian sedang berlangsung">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                                                Berlangsung
+                                            </span>
+                                        @elseif($quiz->isSessionPaused())
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-500/15 text-yellow-400 border border-yellow-500/30" title="Ujian sedang dijeda">
+                                                ⏸️ Dijeda
+                                            </span>
+                                        @endif
                                     @endif
                                 @endif
                             </div>
@@ -227,7 +238,7 @@
                                 <span class="text-[10px] text-gray-500 uppercase">Peserta</span>
                             </div>
                             <div>
-                                <span class="text-xs font-bold text-amber-400 block">{{ $quiz->avg_score !== null ? number_format($quiz->avg_score, 1) : '-' }}</span>
+                                <span class="text-xs font-bold text-amber-400 block">{{ ($quiz->completed_attempts_count > 0 && $quiz->avg_score !== null) ? number_format($quiz->avg_score, 1) : '—' }}</span>
                                 <span class="text-[10px] text-gray-500 uppercase">Avg Nilai</span>
                             </div>
                         </div>
