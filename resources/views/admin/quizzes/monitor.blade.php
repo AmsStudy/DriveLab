@@ -4,7 +4,7 @@
 @section('page-description', 'Pantau aktivitas pengerjaan ujian mahasiswa secara real-time di laboratorium')
 
 @section('content')
-<div x-data="liveExamMonitor({{ $quiz->id }}, {{ Js::from($initialData ?? null) }})" x-init="initMonitor()" class="space-y-6">
+<div x-data="liveExamMonitor({{ $quiz->id }}, {{ Js::from($initialData ?? null) }})" x-init="initMonitor()" x-cloak class="space-y-6">
 
     {{-- Top Header & Navigation --}}
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -68,6 +68,7 @@
 
     {{-- ─── LIVE EXAM SESSION CONTROL BANNER (START / PAUSE / RESUME / END / WAITING ROOM) ─── --}}
     <div class="rounded-2xl p-4 sm:p-5 border transition-all duration-300 shadow-sm session-status-banner"
+         x-cloak
          :class="{
              'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-amber-300 dark:border-amber-500/30': sessionStatus === 'waiting',
              'bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-300 dark:border-emerald-500/30': sessionStatus === 'started',
@@ -111,24 +112,26 @@
                         </span>
                         <span class="text-xs font-mono text-gray-600 dark:text-gray-400 font-semibold"
                               x-show="sessionStatus === 'waiting'"
+                              x-cloak
                               x-text="'(' + summary.total_active + ' Mahasiswa Siap di Ruang Tunggu)'"></span>
                         <span class="text-xs font-mono text-amber-600 dark:text-amber-400 font-bold"
                               x-show="sessionStatus === 'paused'"
+                              x-cloak
                               x-text="'(Hitung Mundur Seluruh Layar Dibekukan)'"></span>
                     </div>
 
                     <h4 class="text-base font-extrabold session-banner-title mt-1.5">
-                        <span x-show="sessionStatus === 'waiting'">Menunggu Pengawas Membuka Pengerjaan Soal</span>
-                        <span x-show="sessionStatus === 'started'">Akses Soal Terbuka & Hitungan Mundur Waktu Berjalan</span>
-                        <span x-show="sessionStatus === 'paused'">Ujian Sedang Dibekukan Sementara (Emergency Pause)</span>
-                        <span x-show="sessionStatus === 'ended'">Akses Pengerjaan Ditutup & Nilai Telah Direkap</span>
+                        <span x-show="sessionStatus === 'waiting'" x-cloak>Menunggu Pengawas Membuka Pengerjaan Soal</span>
+                        <span x-show="sessionStatus === 'started'" x-cloak>Akses Soal Terbuka & Hitungan Mundur Waktu Berjalan</span>
+                        <span x-show="sessionStatus === 'paused'" x-cloak>Ujian Sedang Dibekukan Sementara (Emergency Pause)</span>
+                        <span x-show="sessionStatus === 'ended'" x-cloak>Akses Pengerjaan Ditutup & Nilai Telah Direkap</span>
                     </h4>
 
                     <p class="text-xs session-banner-desc mt-0.5 font-medium leading-relaxed">
-                        <span x-show="sessionStatus === 'waiting'">Mahasiswa yang mengisi NIM berkumpul di Ruang Tunggu. Tekan tombol hijau di samping untuk memulai ujian serentak.</span>
-                        <span x-show="sessionStatus === 'started'">Mahasiswa sedang aktif menjawab. Anda dapat menjeda ujian sewaktu-waktu jika terjadi kendala listrik/jaringan lab.</span>
-                        <span x-show="sessionStatus === 'paused'">Layar ujian mahasiswa tertutup instruksi jeda. Waktu jeda TIDAK AKAN memotong sisa waktu ujian mahasiswa saat dilanjutkan.</span>
-                        <span x-show="sessionStatus === 'ended'">Seluruh pengerjaan aktif telah dikumpulkan dan dinilai. Anda dapat membuka kembali ruang tunggu jika ada sesi susulan.</span>
+                        <span x-show="sessionStatus === 'waiting'" x-cloak>Mahasiswa yang mengisi NIM berkumpul di Ruang Tunggu. Tekan tombol hijau di samping untuk memulai ujian serentak.</span>
+                        <span x-show="sessionStatus === 'started'" x-cloak>Mahasiswa sedang aktif menjawab. Anda dapat menjeda ujian sewaktu-waktu jika terjadi kendala listrik/jaringan lab.</span>
+                        <span x-show="sessionStatus === 'paused'" x-cloak>Layar ujian mahasiswa tertutup instruksi jeda. Waktu jeda TIDAK AKAN memotong sisa waktu ujian mahasiswa saat dilanjutkan.</span>
+                        <span x-show="sessionStatus === 'ended'" x-cloak>Seluruh pengerjaan aktif telah dikumpulkan dan dinilai. Anda dapat membuka kembali ruang tunggu jika ada sesi susulan.</span>
                     </p>
                 </div>
             </div>
@@ -138,6 +141,7 @@
                 {{-- Button START (When Waiting) --}}
                 <button type="button"
                         x-show="sessionStatus === 'waiting'"
+                        x-cloak
                         @click="confirmStartSession()"
                         :disabled="isSessionProcessing"
                         class="btn-session-action px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
@@ -149,6 +153,7 @@
                 {{-- Button PAUSE (When Started) --}}
                 <button type="button"
                         x-show="sessionStatus === 'started'"
+                        x-cloak
                         @click="confirmPauseSession()"
                         :disabled="isSessionProcessing"
                         class="btn-session-action px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-amber-500/20 flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
@@ -161,6 +166,7 @@
                 {{-- Button RESUME (When Paused) --}}
                 <button type="button"
                         x-show="sessionStatus === 'paused'"
+                        x-cloak
                         @click="confirmResumeSession()"
                         :disabled="isSessionProcessing"
                         class="btn-session-action px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm shadow-lg shadow-emerald-500/30 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50 animate-bounce"
@@ -172,6 +178,7 @@
                 {{-- Button END (When Started OR Paused) --}}
                 <button type="button"
                         x-show="sessionStatus === 'started' || sessionStatus === 'paused'"
+                        x-cloak
                         @click="confirmEndSession()"
                         :disabled="isSessionProcessing"
                         class="btn-session-action px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-500/20 flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
@@ -183,6 +190,7 @@
                 {{-- Button RESET (When Ended) --}}
                 <button type="button"
                         x-show="sessionStatus === 'ended'"
+                        x-cloak
                         @click="confirmResetSession()"
                         :disabled="isSessionProcessing"
                         class="px-4 py-2.5 rounded-xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold text-xs flex items-center gap-2 transition-all cursor-pointer">
@@ -284,7 +292,7 @@
         </div>
 
         {{-- Collapsible Broadcast History --}}
-        <div x-show="isBroadcastHistoryOpen" x-transition class="mt-4 pt-3 border-t border-gray-100 dark:border-[#1A2820]">
+        <div x-show="isBroadcastHistoryOpen" x-cloak x-transition class="mt-4 pt-3 border-t border-gray-100 dark:border-[#1A2820]">
             <h5 class="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center justify-between">
                 <span>Daftar Pengumuman Aktif Sesi Ini</span>
                 <span class="text-[11px] text-gray-400 font-normal">Mahasiswa dapat membuka kembali riwayat pengumuman ini di layar mereka</span>
@@ -360,7 +368,7 @@
             <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold uppercase tracking-wider"
                       :class="summary.total_locked > 0 ? 'text-rose-700 dark:text-rose-400' : 'text-gray-500 dark:text-gray-400'">Terkunci Pinalti</span>
-                <span x-show="summary.total_locked > 0" class="text-xs bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-300 px-2 py-0.5 rounded-full font-bold">Perlu Asisten</span>
+                <span x-show="summary.total_locked > 0" x-cloak class="text-xs bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-300 px-2 py-0.5 rounded-full font-bold">Perlu Asisten</span>
             </div>
             <span class="text-2xl font-bold mt-2 block"
                   :class="summary.total_locked > 0 ? 'text-rose-700 dark:text-rose-400' : 'text-gray-900 dark:text-gray-300'" x-text="summary.total_locked">0</span>
@@ -394,7 +402,7 @@
 
         <div class="flex items-center gap-3">
             {{-- Toggle Tampilan: Kartu (Grid) vs Tabel Ringkas (Table) --}}
-            <div x-show="activeTab === 'active'" class="inline-flex items-center p-0.5 rounded-xl bg-gray-100 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820]">
+            <div x-show="activeTab === 'active'" x-cloak class="inline-flex items-center p-0.5 rounded-xl bg-gray-100 dark:bg-[#090D0B] border border-gray-200 dark:border-[#1A2820]">
                 <button type="button" @click="viewMode = 'grid'"
                         class="p-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1"
                         :class="viewMode === 'grid' ? 'bg-white dark:bg-[#142019] text-emerald-700 dark:text-emerald-400 shadow-xs' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'"
@@ -412,7 +420,7 @@
             </div>
 
             {{-- Quick Filter Pills for Active Tab --}}
-            <div x-show="activeTab === 'active'" class="flex items-center gap-1.5 text-xs">
+            <div x-show="activeTab === 'active'" x-cloak class="flex items-center gap-1.5 text-xs">
                 <button type="button" @click="statusFilter = 'all'"
                         class="px-2.5 py-1 rounded-lg font-medium transition-colors border"
                         :class="statusFilter === 'all' ? 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30' : 'text-gray-600 dark:text-gray-400 border-gray-200 dark:border-[#1A2820] hover:bg-gray-50 dark:hover:bg-[#1A2820]'">Semua</button>
@@ -448,7 +456,7 @@
     </div>
 
     {{-- TAB 1: PESERTA AKTIF (SEDANG MENGERJAKAN) --}}
-    <div x-show="activeTab === 'active'" x-transition>
+    <div x-show="activeTab === 'active'" x-cloak x-transition>
         <template x-if="filteredActive.length === 0">
             <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-2xl p-16 text-center text-gray-500 shadow-xs">
                 <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-100 dark:bg-gray-800/40 flex items-center justify-center text-gray-400">
@@ -658,7 +666,7 @@
     </div>
 
     {{-- TAB 2: PESERTA SELESAI --}}
-    <div x-show="activeTab === 'completed'" x-transition>
+    <div x-show="activeTab === 'completed'" x-cloak x-transition>
         <template x-if="filteredCompleted.length === 0">
             <div class="bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1A2820] rounded-2xl p-16 text-center text-gray-500 shadow-xs">
                 <p class="text-base font-semibold text-gray-800 dark:text-gray-300">Belum ada peserta yang menyelesaikan kuis</p>
@@ -783,7 +791,7 @@
 function liveExamMonitor(quizId, initialData = null) {
     return {
         quizId: quizId,
-        sessionStatus: initialData?.quiz_session_status || '{{ $quiz->session_status ?? 'waiting' }}',
+        sessionStatus: initialData?.session_status || initialData?.quiz_session_status || '{{ $quiz->session_status ?? 'waiting' }}',
         isSessionProcessing: false,
         activeTab: 'active',
         viewMode: 'grid',
@@ -799,8 +807,8 @@ function liveExamMonitor(quizId, initialData = null) {
             total_online: 0,
             quiz_time_limit: 0
         },
-        activeAttempts: initialData?.active_attempts || [],
-        completedAttempts: initialData?.completed_attempts || [],
+        activeAttempts: initialData?.active || initialData?.active_attempts || [],
+        completedAttempts: initialData?.completed || initialData?.completed_attempts || [],
 
         // Broadcast Announcements
         announcements: initialData?.announcements || [],
