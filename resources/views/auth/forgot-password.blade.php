@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="Lupa Password - IC-Labs Repository">
     <div class="mb-6 text-center">
         <h2 class="text-xl font-bold text-gray-100">Lupa Password?</h2>
         <p class="text-sm text-gray-400 mt-2">Tidak masalah. Masukkan alamat email Anda dan kami akan mengirimkan link untuk mereset password Anda.</p>

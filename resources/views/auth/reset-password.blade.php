@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="Atur Ulang Password - IC-Labs Repository">
     <div class="mb-6 text-center">
         <h2 class="text-xl font-bold text-gray-100">Reset Password</h2>
         <p class="text-sm text-gray-400 mt-2">Buat password baru untuk akun Anda.</p>

@@ -413,7 +413,8 @@
                                     <div class="border-t my-1 border-gray-100 dark:border-[#1A2820]"></div>
 
                                     {{-- 5. Toggle Active --}}
-                                    <form method="POST" action="{{ route('admin.soal.toggle', $soal) }}" class="block m-0">
+                                    <form method="POST" action="{{ route('admin.soal.toggle', $soal) }}" class="block m-0"
+                                          onsubmit="confirmAction(event, '{{ $soal->is_active ? 'Nonaktifkan akses dokumen ini? Mahasiswa tidak akan dapat mengaksesnya lagi.' : 'Aktifkan akses dokumen ini?' }}', '{{ $soal->is_active ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan' }}', {{ $soal->is_active ? 'true' : 'false' }})">
                                         @csrf @method('PATCH')
                                         <button type="submit"
                                                 id="toggle-soal-{{ $soal->id }}"

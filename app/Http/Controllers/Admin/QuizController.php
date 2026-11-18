@@ -76,11 +76,14 @@ class QuizController extends Controller
 
         foreach ($uncompletedAttempts as $att) {
             $quizTime = (int) ($att->quiz->time_limit_minutes ?? 0) + (int) ($att->extra_time_minutes ?? 0);
+            $isSessionEnded = $att->quiz && $att->quiz->isSessionEnded();
             if ($quizTime > 0) {
                 $maxSec = ($quizTime * 60) + 120; // 2 minutes grace period
-                if (now()->diffInSeconds($att->started_at) > $maxSec) {
+                if (now()->diffInSeconds($att->started_at) > $maxSec || $isSessionEnded) {
                     \App\Services\QuizScoringService::finalize($att, $att->draft_answers ?? [], true);
                 }
+            } elseif ($isSessionEnded) {
+                \App\Services\QuizScoringService::finalize($att, $att->draft_answers ?? [], true);
             }
         }
 
@@ -717,10 +720,10 @@ class QuizController extends Controller
             ->groupBy('q.id', 'q.order_num', 'q.question_text', 'q.question_type', 'q.points')
             ->orderBy('q.order_num')
             ->get()
-            ->map(function ($item) {
-                $total = (int) $item->total_answers;
+            ->map(function ($item) use ($totalParticipants) {
+                $total = $totalParticipants > 0 ? $totalParticipants : (int) $item->total_answers;
                 $correct = (int) $item->correct_count;
-                $wrong = (int) $item->wrong_count;
+                $wrong = max(0, $total - $correct);
                 $accuracyPercent = $total > 0 ? round(($correct / $total) * 100) : 0;
 
                 if ($total === 0) {

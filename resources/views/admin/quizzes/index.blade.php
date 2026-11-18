@@ -166,7 +166,8 @@
                             {{-- Active Status & Toggle --}}
                             <div class="flex items-center gap-1.5 flex-wrap">
                                 @if($quiz->isSessionEnded())
-                                    <form method="POST" action="{{ route('admin.quizzes.toggle', $quiz) }}">
+                                    <form method="POST" action="{{ route('admin.quizzes.toggle', $quiz) }}"
+                                          onsubmit="confirmAction(event, '{{ $quiz->is_active ? 'Nonaktifkan kuis yang telah selesai ini?' : 'Aktifkan kembali kuis ini?' }}', '{{ $quiz->is_active ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan' }}', {{ $quiz->is_active ? 'true' : 'false' }})">
                                         @csrf @method('PATCH')
                                         <button type="submit" title="Sesi kuis telah selesai. Klik untuk mengubah status aktif/nonaktif."
                                                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30 hover:bg-rose-500/25 transition-all">
@@ -175,7 +176,8 @@
                                         </button>
                                     </form>
                                 @else
-                                    <form method="POST" action="{{ route('admin.quizzes.toggle', $quiz) }}">
+                                    <form method="POST" action="{{ route('admin.quizzes.toggle', $quiz) }}"
+                                          onsubmit="confirmAction(event, '{{ $quiz->is_active ? 'Nonaktifkan kuis ini? Mahasiswa tidak akan dapat mengakses ruang kuis.' : 'Aktifkan kuis ini sekarang?' }}', '{{ $quiz->is_active ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan' }}', {{ $quiz->is_active ? 'true' : 'false' }})">
                                         @csrf @method('PATCH')
                                         <button type="submit" title="Klik untuk mengubah status aktif"
                                                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all {{ $quiz->is_active ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25' : 'bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700' }}">

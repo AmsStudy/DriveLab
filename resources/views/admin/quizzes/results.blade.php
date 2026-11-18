@@ -167,7 +167,7 @@
                             No. {{ $hardestQuestion['order_num'] }}: {{ $hardestQuestion['question_text'] }}
                         </p>
                         <p class="text-[11px] text-gray-400 mt-0.5">
-                            {{ $hardestQuestion['wrong_count'] }} dari {{ $hardestQuestion['total_answers'] }} mahasiswa menjawab salah.
+                            {{ $hardestQuestion['wrong_count'] }} dari {{ $hardestQuestion['total_answers'] }} peserta kuis menjawab salah atau belum dijawab.
                         </p>
                     @else
                         <p class="text-xs text-gray-500 mt-1">Belum cukup data pengerjaan.</p>
@@ -194,7 +194,7 @@
                             No. {{ $easiestQuestion['order_num'] }}: {{ $easiestQuestion['question_text'] }}
                         </p>
                         <p class="text-[11px] text-gray-400 mt-0.5">
-                            {{ $easiestQuestion['correct_count'] }} dari {{ $easiestQuestion['total_answers'] }} mahasiswa menjawab benar.
+                            {{ $easiestQuestion['correct_count'] }} dari {{ $easiestQuestion['total_answers'] }} peserta kuis menjawab benar.
                         </p>
                     @else
                         <p class="text-xs text-gray-500 mt-1">Belum cukup data pengerjaan.</p>
@@ -546,11 +546,11 @@
                                 </p>
 
                                 {{-- Score Big Ring --}}
-                                <div class="inline-flex flex-col items-center justify-center w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-gradient-to-tr from-[#131E17] to-[#1A2D23] border-4 border-emerald-500/50 shadow-2xl shadow-emerald-500/20 mb-4">
-                                    <span class="text-3xl sm:text-5xl font-extrabold text-white heading-font tracking-tight font-mono"
+                                <div class="inline-flex flex-col items-center justify-center w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-[#10241A] dark:bg-gradient-to-tr dark:from-[#131E17] dark:to-[#1A2D23] border-4 border-emerald-500 shadow-2xl shadow-emerald-500/20 mb-4">
+                                    <span class="text-3xl sm:text-5xl font-extrabold !text-white heading-font tracking-tight font-mono"
                                           x-text="parseFloat(selectedAttempt.score).toFixed(1)">
                                     </span>
-                                    <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest mt-0.5">Skor Akhir</span>
+                                    <span class="text-xs font-bold !text-emerald-400 uppercase tracking-widest mt-0.5">Skor Akhir</span>
                                 </div>
 
                                 {{-- Grade Feedback Message --}}

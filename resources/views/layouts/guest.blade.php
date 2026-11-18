@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'IC-Labs Repository') }}</title>
+    <title>{{ $title ?? (config('app.name') !== 'Laravel' ? config('app.name') : 'IC-Labs Repository') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('images/iclabs-logo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +12,8 @@
     <x-theme-head-script />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        .logo-title-text { color: #fff; }
+        html:not(.dark) .logo-title-text { color: #0F1F17 !important; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', sans-serif;
@@ -173,7 +175,7 @@
                 <img src="{{ asset('images/iclabs-logo.png') }}" alt="IC-Labs Logo" style="width:100%;height:100%;object-fit:contain;" draggable="false">
             </div>
             <div style="display:flex;flex-direction:column;align-items:flex-start;">
-                <span style="font-family:'Orbitron',sans-serif;font-weight:800;font-size:18px;color:#fff;letter-spacing:1px;line-height:1;">IC-LABS</span>
+                <span class="logo-title-text" style="font-family:'Orbitron',sans-serif;font-weight:800;font-size:18px;letter-spacing:1px;line-height:1;">IC-LABS</span>
                 <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:10px;color:#34D399;letter-spacing:2px;margin-top:3px;">REPOSITORY</span>
             </div>
         </a>

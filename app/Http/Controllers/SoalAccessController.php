@@ -32,6 +32,8 @@ class SoalAccessController extends Controller
         $inputCode = trim($request->kode_unik);
         $soal = Soal::where('kode_unik', $inputCode)
             ->orWhere('kode_unik', strtoupper($inputCode))
+            ->orWhere('unique_token', $inputCode)
+            ->orWhere('unique_token', strtoupper($inputCode))
             ->first();
 
         if (!$soal) {

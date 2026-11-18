@@ -331,7 +331,11 @@
                             </div>
                             <div>
                                 <h3 class="text-base font-bold text-white heading-font">Data Identitas Mahasiswa</h3>
-                                <p class="text-xs text-gray-400">Masukkan NIM, Nama Lengkap, dan Password Akses</p>
+                                @if($hasPassword)
+                                    <p class="text-xs text-gray-400">Masukkan NIM, Nama Lengkap, dan Password Akses</p>
+                                @else
+                                    <p class="text-xs text-gray-400">Masukkan NIM dan Nama Lengkap Anda</p>
+                                @endif
                             </div>
                         </div>
 
