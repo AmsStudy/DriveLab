@@ -389,10 +389,11 @@
                             {{-- Dropdown Unduh ZIP per Kelas --}}
                             <div class="relative inline-block text-left" x-data="{ open: false }">
                                 <button @click="open = !open" @click.away="open = false" type="button"
-                                        class="px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/12 dark:hover:bg-emerald-500/20 border border-emerald-300 dark:border-emerald-500/30 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm">
-                                    <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                    <span>Unduh ZIP</span>
-                                    <svg class="w-3.5 h-3.5 ml-0.5 text-emerald-600 dark:text-emerald-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        class="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-md shadow-emerald-600/25 transition-all flex items-center gap-1.5 cursor-pointer hover:scale-[1.02] active:scale-95"
+                                        style="color: #FFFFFF !important;">
+                                    <svg class="w-4 h-4 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    <span class="text-white" style="color: #FFFFFF !important;">Unduh ZIP</span>
+                                    <svg class="w-3.5 h-3.5 ml-0.5 text-white/90 transition-transform duration-200" :class="{'rotate-180': open}" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
                                 </button>
                                 <div x-show="open" x-cloak
                                      x-transition:enter="transition ease-out duration-150"
@@ -405,7 +406,10 @@
                                     <a href="{{ route('admin.soal.download-submissions-zip', $soal) }}"
                                        class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-semibold transition-colors"
                                        style="gap:1rem;">
-                                        <span>Semua Kelas</span>
+                                        <span class="flex items-center gap-2">
+                                            <span>📦</span>
+                                            <span>Semua Kelas</span>
+                                        </span>
                                         <span class="zip-count-all text-[11px] font-mono font-bold {{ $submissions->count() > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2">{{ $submissions->count() }}</span>
                                     </a>
                                     <div class="border-t border-gray-100 dark:border-[#1A2820] my-1.5"></div>
@@ -414,7 +418,10 @@
                                         <a href="{{ route('admin.soal.download-submissions-zip', [$soal, 'kelas' => $cls]) }}"
                                            class="flex items-center justify-between gap-4 px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-500/10 transition-colors"
                                            style="gap:1rem;">
-                                            <span>Kelas {{ $cls }}</span>
+                                            <span class="flex items-center gap-2">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                <span>Kelas {{ $cls }}</span>
+                                            </span>
                                             <span class="zip-count-class text-[11px] font-mono font-bold {{ $cCount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600' }} ml-auto pl-2" data-class="{{ $cls }}">{{ $cCount }}</span>
                                         </a>
                                     @endforeach
@@ -422,9 +429,10 @@
                             </div>
                         @else
                             <a href="{{ route('admin.soal.download-submissions-zip', $soal) }}"
-                               class="px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/12 dark:hover:bg-emerald-500/20 border border-emerald-300 dark:border-emerald-500/30 transition-colors flex items-center gap-1.5 shadow-sm">
-                                <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                Unduh Semua (ZIP)
+                               class="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-md shadow-emerald-600/25 transition-all flex items-center gap-1.5 cursor-pointer hover:scale-[1.02] active:scale-95"
+                               style="color: #FFFFFF !important;">
+                                <svg class="w-4 h-4 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                <span class="text-white" style="color: #FFFFFF !important;">Unduh Semua (ZIP)</span>
                             </a>
                         @endif
 
