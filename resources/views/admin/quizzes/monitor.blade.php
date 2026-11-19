@@ -110,28 +110,44 @@
                               }"
                               x-text="sessionStatus === 'waiting' ? '⏳ Ruang Tunggu Aktif (Lobby)' : (sessionStatus === 'started' ? '🟢 Ujian Sedang Berlangsung' : (sessionStatus === 'paused' ? '⏸️ UJIAN DIJEDA DARURAT (PAUSED)' : '⛔ Ujian Telah Selesai'))">
                         </span>
-                        <span class="text-xs font-mono text-gray-600 dark:text-gray-400 font-semibold"
-                              x-show="sessionStatus === 'waiting'"
-                              x-cloak
-                              x-text="'(' + summary.total_active + ' Mahasiswa Siap di Ruang Tunggu)'"></span>
-                        <span class="text-xs font-mono text-amber-600 dark:text-amber-400 font-bold"
-                              x-show="sessionStatus === 'paused'"
-                              x-cloak
-                              x-text="'(Hitung Mundur Seluruh Layar Dibekukan)'"></span>
+                        <template x-if="sessionStatus === 'waiting'">
+                            <span class="text-xs font-mono text-gray-600 dark:text-gray-400 font-semibold"
+                                  x-text="'(' + summary.total_active + ' Mahasiswa Siap di Ruang Tunggu)'"></span>
+                        </template>
+                        <template x-if="sessionStatus === 'paused'">
+                            <span class="text-xs font-mono text-amber-600 dark:text-amber-400 font-bold"
+                                  x-text="'(Hitung Mundur Seluruh Layar Dibekukan)'"></span>
+                        </template>
                     </div>
 
                     <h4 class="text-base font-extrabold session-banner-title mt-1.5">
-                        <span x-show="sessionStatus === 'waiting'" x-cloak>Menunggu Pengawas Membuka Pengerjaan Soal</span>
-                        <span x-show="sessionStatus === 'started'" x-cloak>Akses Soal Terbuka & Hitungan Mundur Waktu Berjalan</span>
-                        <span x-show="sessionStatus === 'paused'" x-cloak>Ujian Sedang Dibekukan Sementara (Emergency Pause)</span>
-                        <span x-show="sessionStatus === 'ended'" x-cloak>Akses Pengerjaan Ditutup & Nilai Telah Direkap</span>
+                        <template x-if="sessionStatus === 'waiting'">
+                            <span>Menunggu Pengawas Membuka Pengerjaan Soal</span>
+                        </template>
+                        <template x-if="sessionStatus === 'started'">
+                            <span>Akses Soal Terbuka & Hitungan Mundur Waktu Berjalan</span>
+                        </template>
+                        <template x-if="sessionStatus === 'paused'">
+                            <span>Ujian Sedang Dibekukan Sementara (Emergency Pause)</span>
+                        </template>
+                        <template x-if="sessionStatus === 'ended'">
+                            <span>Akses Pengerjaan Ditutup & Nilai Telah Direkap</span>
+                        </template>
                     </h4>
 
                     <p class="text-xs session-banner-desc mt-0.5 font-medium leading-relaxed">
-                        <span x-show="sessionStatus === 'waiting'" x-cloak>Mahasiswa yang mengisi NIM berkumpul di Ruang Tunggu. Tekan tombol hijau di samping untuk memulai ujian serentak.</span>
-                        <span x-show="sessionStatus === 'started'" x-cloak>Mahasiswa sedang aktif menjawab. Anda dapat menjeda ujian sewaktu-waktu jika terjadi kendala listrik/jaringan lab.</span>
-                        <span x-show="sessionStatus === 'paused'" x-cloak>Layar ujian mahasiswa tertutup instruksi jeda. Waktu jeda TIDAK AKAN memotong sisa waktu ujian mahasiswa saat dilanjutkan.</span>
-                        <span x-show="sessionStatus === 'ended'" x-cloak>Seluruh pengerjaan aktif telah dikumpulkan dan dinilai. Anda dapat membuka kembali ruang tunggu jika ada sesi susulan.</span>
+                        <template x-if="sessionStatus === 'waiting'">
+                            <span>Mahasiswa yang mengisi NIM berkumpul di Ruang Tunggu. Tekan tombol hijau di samping untuk memulai ujian serentak.</span>
+                        </template>
+                        <template x-if="sessionStatus === 'started'">
+                            <span>Mahasiswa sedang aktif menjawab. Anda dapat menjeda ujian sewaktu-waktu jika terjadi kendala listrik/jaringan lab.</span>
+                        </template>
+                        <template x-if="sessionStatus === 'paused'">
+                            <span>Layar ujian mahasiswa tertutup instruksi jeda. Waktu jeda TIDAK AKAN memotong sisa waktu ujian mahasiswa saat dilanjutkan.</span>
+                        </template>
+                        <template x-if="sessionStatus === 'ended'">
+                            <span>Seluruh pengerjaan aktif telah dikumpulkan dan dinilai. Anda dapat membuka kembali ruang tunggu jika ada sesi susulan.</span>
+                        </template>
                     </p>
                 </div>
             </div>
@@ -139,64 +155,64 @@
             {{-- Action Buttons --}}
             <div class="flex items-center gap-2.5 flex-wrap sm:flex-nowrap flex-shrink-0">
                 {{-- Button START (When Waiting) --}}
-                <button type="button"
-                        x-show="sessionStatus === 'waiting'"
-                        x-cloak
-                        @click="confirmStartSession()"
-                        :disabled="isSessionProcessing"
-                        class="btn-session-action px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
-                        style="color: #FFFFFF !important;">
-                    <svg class="w-5 h-5 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span class="text-white" style="color: #FFFFFF !important;">Mulai Kuis Sekarang</span>
-                </button>
+                <template x-if="sessionStatus === 'waiting'">
+                    <button type="button"
+                            @click="confirmStartSession()"
+                            :disabled="isSessionProcessing"
+                            class="btn-session-action px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                            style="color: #FFFFFF !important;">
+                        <svg class="w-5 h-5 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span class="text-white" style="color: #FFFFFF !important;">Mulai Kuis Sekarang</span>
+                    </button>
+                </template>
 
                 {{-- Button PAUSE (When Started) --}}
-                <button type="button"
-                        x-show="sessionStatus === 'started'"
-                        x-cloak
-                        @click="confirmPauseSession()"
-                        :disabled="isSessionProcessing"
-                        class="btn-session-action px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-amber-500/20 flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
-                        style="color: #FFFFFF !important;"
-                        title="Jeda hitung mundur dan bekukan sementara layar seluruh mahasiswa">
-                    <svg class="w-4 h-4 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span class="text-white" style="color: #FFFFFF !important;">Jeda Ujian (Pause)</span>
-                </button>
+                <template x-if="sessionStatus === 'started'">
+                    <button type="button"
+                            @click="confirmPauseSession()"
+                            :disabled="isSessionProcessing"
+                            class="btn-session-action px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-amber-500/20 flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                            style="color: #FFFFFF !important;"
+                            title="Jeda hitung mundur dan bekukan sementara layar seluruh mahasiswa">
+                        <svg class="w-4 h-4 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span class="text-white" style="color: #FFFFFF !important;">Jeda Ujian (Pause)</span>
+                    </button>
+                </template>
 
                 {{-- Button RESUME (When Paused) --}}
-                <button type="button"
-                        x-show="sessionStatus === 'paused'"
-                        x-cloak
-                        @click="confirmResumeSession()"
-                        :disabled="isSessionProcessing"
-                        class="btn-session-action px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm shadow-lg shadow-emerald-500/30 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50 animate-bounce"
-                        style="color: #FFFFFF !important;">
-                    <svg class="w-5 h-5 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span class="text-white" style="color: #FFFFFF !important;">▶️ Lanjutkan Ujian (Resume)</span>
-                </button>
+                <template x-if="sessionStatus === 'paused'">
+                    <button type="button"
+                            @click="confirmResumeSession()"
+                            :disabled="isSessionProcessing"
+                            class="btn-session-action px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm shadow-lg shadow-emerald-500/30 flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50 animate-bounce"
+                            style="color: #FFFFFF !important;">
+                        <svg class="w-5 h-5 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span class="text-white" style="color: #FFFFFF !important;">▶️ Lanjutkan Ujian (Resume)</span>
+                    </button>
+                </template>
 
                 {{-- Button END (When Started OR Paused) --}}
-                <button type="button"
-                        x-show="sessionStatus === 'started' || sessionStatus === 'paused'"
-                        x-cloak
-                        @click="confirmEndSession()"
-                        :disabled="isSessionProcessing"
-                        class="btn-session-action px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-500/20 flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
-                        style="color: #FFFFFF !important;">
-                    <svg class="w-4 h-4 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
-                    <span class="text-white" style="color: #FFFFFF !important;">Hentikan Kuis</span>
-                </button>
+                <template x-if="sessionStatus === 'started' || sessionStatus === 'paused'">
+                    <button type="button"
+                            @click="confirmEndSession()"
+                            :disabled="isSessionProcessing"
+                            class="btn-session-action px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-500/20 flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                            style="color: #FFFFFF !important;">
+                        <svg class="w-4 h-4 text-white" style="color: #FFFFFF !important; stroke: #FFFFFF !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+                        <span class="text-white" style="color: #FFFFFF !important;">Hentikan Kuis</span>
+                    </button>
+                </template>
 
                 {{-- Button RESET (When Ended) --}}
-                <button type="button"
-                        x-show="sessionStatus === 'ended'"
-                        x-cloak
-                        @click="confirmResetSession()"
-                        :disabled="isSessionProcessing"
-                        class="px-4 py-2.5 rounded-xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold text-xs flex items-center gap-2 transition-all cursor-pointer">
-                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                    <span>Buka Ruang Tunggu Baru</span>
-                </button>
+                <template x-if="sessionStatus === 'ended'">
+                    <button type="button"
+                            @click="confirmResetSession()"
+                            :disabled="isSessionProcessing"
+                            class="px-4 py-2.5 rounded-xl bg-white dark:bg-[#0F1713] border border-gray-200 dark:border-[#1E3327] hover:border-emerald-500/40 text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 font-semibold text-xs flex items-center gap-2 transition-all cursor-pointer">
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        <span>Buka Ruang Tunggu Baru</span>
+                    </button>
+                </template>
             </div>
         </div>
     </div>
@@ -1209,7 +1225,19 @@ function liveExamMonitor(quizId, initialData = null) {
                         const data = await res.json();
                         if (data.success) {
                             this.sessionStatus = 'waiting';
-                            this.fetchData(true);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Ruang Tunggu Dibuka!',
+                                text: data.message,
+                                timer: 2500,
+                                showConfirmButton: false,
+                                background: isDark ? '#0F1713' : '#FFFFFF',
+                                color: isDark ? '#34D399' : '#059669',
+                                customClass: { popup: isDark ? 'border border-emerald-500/40 rounded-xl' : 'border border-emerald-200 rounded-xl' }
+                            });
+                            await this.fetchData(true);
+                        } else {
+                            Swal.fire('Gagal', data.message || 'Gagal membuka ruang tunggu.', 'error');
                         }
                     } catch (err) {
                         Swal.fire('Gagal', 'Terjadi kesalahan.', 'error');

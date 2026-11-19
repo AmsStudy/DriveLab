@@ -39,6 +39,7 @@
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        [x-cloak] { display: none !important; }
         body { font-family: 'Inter', sans-serif; }
         :root { --emerald: #10B981; --mint: #34D399; --teal: #0D9488; --surface: #0F1713; --border: #1A2820; }
         .sidebar-active { background: rgba(16,185,129,.12) !important; color: #10B981 !important; border-right: 2px solid #10B981; }

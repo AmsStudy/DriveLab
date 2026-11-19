@@ -971,6 +971,7 @@ class QuizController extends Controller
     public function liveMonitorData(Quiz $quiz)
     {
         $this->authorizeQuiz($quiz);
+        $quiz->refresh();
         return response()->json($this->buildLiveMonitorData($quiz));
     }
 
@@ -993,6 +994,7 @@ class QuizController extends Controller
                     break;
                 }
 
+                $quiz->refresh();
                 $data = $this->buildLiveMonitorData($quiz);
                 $currentHash = md5(json_encode($data));
 
@@ -1404,6 +1406,10 @@ class QuizController extends Controller
         $quiz->update([
             'session_status' => 'waiting',
         ]);
+
+        // Segera perbarui cache status kuis dan kosongkan hitungan ruang tunggu
+        cache()->put("quiz_{$quiz->id}_status", 'waiting', 120);
+        cache()->forget("quiz_{$quiz->id}_waiting_count");
 
         $msg = 'Sesi kuis berhasil direset kembali ke status Ruang Tunggu.';
 
