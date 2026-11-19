@@ -2755,7 +2755,8 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                                         </svg>
-                                        Upload File
+                                        <span>Upload File</span>
+                                        <span id="tab-badge-file" class="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" style="display:none;"></span>
                                     </button>
                                 @endif
                                 @if(in_array('link', $allowedSubTypes))
@@ -2763,7 +2764,8 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                                         </svg>
-                                        Tautan / Link
+                                        <span>Tautan / Link</span>
+                                        <span id="tab-badge-link" class="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-400 border border-teal-500/30" style="display:none;">✓ Terisi</span>
                                     </button>
                                 @endif
                                 @if(in_array('text', $allowedSubTypes))
@@ -2771,9 +2773,13 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                         </svg>
-                                        Jawaban Teks
+                                        <span>Jawaban Teks</span>
+                                        <span id="tab-badge-text" class="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30" style="display:none;">✓ Terisi</span>
                                     </button>
                                 @endif
+                            </div>
+                            <div style="font-size:11px;color:var(--text3);margin-bottom:14px;display:flex;align-items:center;gap:6px;padding:0 2px;">
+                                <span>💡 Anda dapat melampirkan berkas, tautan link, dan/atau jawaban teks secara bersamaan jika tugas memerlukannya.</span>
                             </div>
                         @endif
 
@@ -2886,6 +2892,12 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                 </div>
                             </div>
                         @endif
+
+                        {{-- Ringkasan Lampiran yang Akan Dikirim --}}
+                        <div id="sub-components-summary" style="display:none;margin-bottom:14px;padding:9px 13px;border-radius:10px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);font-size:12px;color:var(--emerald);font-weight:600;align-items:center;gap:8px;">
+                            <svg style="width:16px;height:16px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span id="sub-components-text"></span>
+                        </div>
 
                         @if(isset($isAdminPreview) && $isAdminPreview)
                             <button type="button" class="btn-submit" disabled style="opacity:0.65;cursor:not-allowed;" title="Pengumpulan dinonaktifkan dalam mode pratinjau">
@@ -3105,6 +3117,53 @@ const subBtn       = document.getElementById('sub-btn');
 const btnLabel     = document.getElementById('btn-label');
 const subTypeInput = document.getElementById('sub_type');
 
+function updateSubmissionBadges() {
+    const badgeFile = document.getElementById('tab-badge-file');
+    const badgeLink = document.getElementById('tab-badge-link');
+    const badgeText = document.getElementById('tab-badge-text');
+    const summaryBox = document.getElementById('sub-components-summary');
+    const summaryText = document.getElementById('sub-components-text');
+
+    const linkEl = document.getElementById('sub_link');
+    const linkVal = linkEl ? linkEl.value.trim() : '';
+    const textEl = document.getElementById('sub_text');
+    const textVal = textEl ? textEl.value.trim() : '';
+    const hasFiles = typeof selectedFiles !== 'undefined' && selectedFiles.length > 0;
+    const hasLink = !!linkVal;
+    const hasText = !!textVal;
+
+    if (badgeFile) {
+        if (hasFiles) {
+            badgeFile.style.display = 'inline-block';
+            badgeFile.textContent = `${selectedFiles.length} file`;
+        } else {
+            badgeFile.style.display = 'none';
+        }
+    }
+
+    if (badgeLink) {
+        badgeLink.style.display = hasLink ? 'inline-block' : 'none';
+    }
+
+    if (badgeText) {
+        badgeText.style.display = hasText ? 'inline-block' : 'none';
+    }
+
+    if (summaryBox && summaryText) {
+        const parts = [];
+        if (hasFiles) parts.push(`📁 ${selectedFiles.length} Berkas File`);
+        if (hasLink) parts.push(`🔗 Tautan Link`);
+        if (hasText) parts.push(`📝 Jawaban Teks`);
+
+        if (parts.length > 0) {
+            summaryBox.style.display = 'flex';
+            summaryText.textContent = 'Lampiran yang akan dikirim: ' + parts.join(' + ');
+        } else {
+            summaryBox.style.display = 'none';
+        }
+    }
+}
+
 function switchSubmissionType(type) {
     if (subTypeInput) subTypeInput.value = type;
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -3113,6 +3172,7 @@ function switchSubmissionType(type) {
     document.querySelectorAll('.sub-pane').forEach(pane => {
         pane.classList.toggle('active', pane.id === 'pane-' + type);
     });
+    updateSubmissionBadges();
 }
 
 function showAlert(type, msg) {
@@ -3272,6 +3332,7 @@ function renderSelectedFilesUI() {
         if (dzSuccessEl) dzSuccessEl.style.display = 'none';
         if (dropzone) dropzone.classList.remove('has-file');
         if (fileInput) fileInput.value = '';
+        updateSubmissionBadges();
         return;
     }
 
@@ -3299,6 +3360,7 @@ function renderSelectedFilesUI() {
             listEl.appendChild(row);
         });
     }
+    updateSubmissionBadges();
 }
 
 // ─── Real-time Submission Check & Auto-Remember ───
@@ -3344,7 +3406,7 @@ function checkExistingSubmission(nim) {
             if (policyTip) policyTip.style.display = 'none';
             if (banner) banner.style.display = 'block';
 
-            const subTipe = data.submission_type === 'link' ? 'Tautan' : (data.submission_type === 'text' ? 'Jawaban Teks' : 'Berkas File');
+            const subTipe = data.submission_type === 'link' ? 'Tautan' : (data.submission_type === 'text' ? 'Jawaban Teks' : (data.submission_type === 'composite' ? 'Gabungan' : 'Berkas File'));
             if (info) {
                 info.textContent = `Tercatat atas nama ${data.nama}${data.kelas ? ' (Kelas ' + data.kelas + ')' : ''}, dikumpulkan pada ${data.submitted_at}. (${subTipe}: ${data.identifier})`;
             }
@@ -3361,7 +3423,7 @@ function checkExistingSubmission(nim) {
             // Render digital receipt berkas & tombol unduh mandiri mahasiswa
             if (filesContainer) {
                 filesContainer.innerHTML = '';
-                if (data.submission_type === 'file' && data.files && data.files.length > 0) {
+                if (data.files && data.files.length > 0) {
                     filesContainer.style.display = 'flex';
                     data.files.forEach(file => {
                         const item = document.createElement('div');
@@ -3513,6 +3575,18 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('labsoal_student_kelas', this.value.trim());
         });
     }
+
+    const subLinkEl = document.getElementById('sub_link');
+    if (subLinkEl) {
+        subLinkEl.addEventListener('input', updateSubmissionBadges);
+        subLinkEl.addEventListener('change', updateSubmissionBadges);
+    }
+    const subTextEl = document.getElementById('sub_text');
+    if (subTextEl) {
+        subTextEl.addEventListener('input', updateSubmissionBadges);
+        subTextEl.addEventListener('change', updateSubmissionBadges);
+    }
+    updateSubmissionBadges();
 });
 
 function setLoading(loading, progressText) {
@@ -3583,33 +3657,35 @@ document.getElementById('submission-form').addEventListener('submit', async func
 
     const currentType = subTypeInput ? subTypeInput.value : 'file';
 
-    if (currentType === 'file') {
-        if (!selectedFiles.length) {
-            showAlert('error', 'Silakan pilih file tugas terlebih dahulu.');
-            return;
-        }
-        if (selectedFiles.length > maxFilesAllowed) {
-            showAlert('error', `Jumlah berkas melebihi batas maksimal (${maxFilesAllowed} file). Anda memilih ${selectedFiles.length} berkas.`);
-            return;
-        }
-    } else if (currentType === 'link') {
-        const linkEl = document.getElementById('sub_link');
-        const linkVal = linkEl ? linkEl.value.trim() : '';
-        if (!linkVal) {
-            showAlert('error', 'Silakan masukkan URL / tautan tugas.');
-            return;
-        }
-        if (!/^https?:\/\//i.test(linkVal)) {
-            showAlert('error', 'URL harus diawali dengan http:// atau https://');
-            return;
-        }
-    } else if (currentType === 'text') {
-        const textEl = document.getElementById('sub_text');
-        const textVal = textEl ? textEl.value.trim() : '';
-        if (!textVal) {
-            showAlert('error', 'Silakan ketikkan jawaban teks terlebih dahulu.');
-            return;
-        }
+    const linkEl = document.getElementById('sub_link');
+    const linkVal = linkEl ? linkEl.value.trim() : '';
+    const textEl = document.getElementById('sub_text');
+    const textVal = textEl ? textEl.value.trim() : '';
+    const hasFiles = typeof selectedFiles !== 'undefined' && selectedFiles.length > 0;
+    const hasLink = !!linkVal;
+    const hasText = !!textVal;
+
+    // Pastikan minimal salah satu komponen pengumpulan yang diizinkan telah diisi
+    if (!hasFiles && !hasLink && !hasText && (!currentExistingSubmission || !currentExistingSubmission.has_submitted)) {
+        showAlert('error', 'Silakan lampirkan tugas Anda (unggah berkas file, isi tautan link, atau ketikkan jawaban teks).');
+        return;
+    }
+
+    if (hasFiles && selectedFiles.length > maxFilesAllowed) {
+        showAlert('error', `Jumlah berkas melebihi batas maksimal (${maxFilesAllowed} file). Anda memilih ${selectedFiles.length} berkas.`);
+        return;
+    }
+
+    if (hasLink && !/^https?:\/\//i.test(linkVal)) {
+        showAlert('error', 'URL tautan harus diawali dengan http:// atau https://');
+        if (linkEl) linkEl.focus();
+        return;
+    }
+
+    if (hasText && textVal.length < 3) {
+        showAlert('error', 'Jawaban teks tugas minimal 3 karakter.');
+        if (textEl) textEl.focus();
+        return;
     }
 
     // ─── Network Offline Guard ───
@@ -3739,15 +3815,25 @@ document.getElementById('submission-form').addEventListener('submit', async func
     }
 
     const formData = new FormData(this);
-    if (currentType === 'file') {
-        formData.delete('files[]');
-        formData.delete('file');
+    formData.delete('files[]');
+    formData.delete('file');
+    if (selectedFiles && selectedFiles.length > 0) {
         selectedFiles.forEach(f => {
             formData.append('files[]', f);
         });
         if (selectedFiles[0]) {
             formData.append('file', selectedFiles[0]);
         }
+    }
+    if (linkVal) {
+        formData.set('link_url', linkVal);
+    } else {
+        formData.delete('link_url');
+    }
+    if (textVal) {
+        formData.set('text_content', textVal);
+    } else {
+        formData.delete('text_content');
     }
     setLoading(true);
 
@@ -3760,7 +3846,7 @@ document.getElementById('submission-form').addEventListener('submit', async func
     xhr.setRequestHeader('Accept', 'application/json');
     xhr.timeout = 180000; // 3 menit batas waktu maksimal unggahan
 
-    if (xhr.upload && currentType === 'file') {
+    if (xhr.upload && hasFiles) {
         xhr.upload.onprogress = function(e) {
             if (e.lengthComputable) {
                 const percent = Math.round((e.loaded / e.total) * 100);
@@ -3810,6 +3896,7 @@ document.getElementById('submission-form').addEventListener('submit', async func
             if (dzEmpty) dzEmpty.style.display   = 'block';
             if (dzSuccess) dzSuccess.style.display = 'none';
             if (dropzone) dropzone.classList.remove('has-file');
+            updateSubmissionBadges();
 
             showAlert('success', result.message || 'Tugas berhasil dikirim!');
             btnLabel.textContent = 'Perbarui Tugas Sekarang';

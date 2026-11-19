@@ -115,18 +115,39 @@ class Submission extends Model
         return !empty($this->file_path) ? 1 : 0;
     }
 
+    public function hasFile(): bool
+    {
+        return !empty($this->file_path) || $this->getFilesCount() > 0;
+    }
+
+    public function hasLink(): bool
+    {
+        return !empty($this->link_url);
+    }
+
+    public function hasText(): bool
+    {
+        return !empty($this->text_content);
+    }
+
+    public function isComposite(): bool
+    {
+        $count = ($this->hasFile() ? 1 : 0) + ($this->hasLink() ? 1 : 0) + ($this->hasText() ? 1 : 0);
+        return $count > 1;
+    }
+
     public function isFile(): bool
     {
-        return ($this->submission_type ?? 'file') === 'file';
+        return $this->hasFile() || ($this->submission_type ?? 'file') === 'file';
     }
 
     public function isLink(): bool
     {
-        return $this->submission_type === 'link';
+        return $this->hasLink() || $this->submission_type === 'link';
     }
 
     public function isText(): bool
     {
-        return $this->submission_type === 'text';
+        return $this->hasText() || $this->submission_type === 'text';
     }
 }

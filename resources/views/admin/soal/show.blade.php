@@ -512,13 +512,13 @@
                             data-type="all">Semua (<span id="countPillAll">{{ $submissions->count() }}</span>)</button>
                     <button type="button" onclick="setSubFilter('file')"
                             class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#090D0B] border border-gray-300 dark:border-[#1A2820]"
-                            data-type="file">File (<span id="countPillFile">{{ $submissions->filter(fn($s) => ($s->submission_type ?? 'file') === 'file')->count() }}</span>)</button>
+                            data-type="file">File (<span id="countPillFile">{{ $submissions->filter(fn($s) => $s->hasFile())->count() }}</span>)</button>
                     <button type="button" onclick="setSubFilter('link')"
                             class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#090D0B] border border-gray-300 dark:border-[#1A2820]"
-                            data-type="link">Link (<span id="countPillLink">{{ $submissions->where('submission_type', 'link')->count() }}</span>)</button>
+                            data-type="link">Link (<span id="countPillLink">{{ $submissions->filter(fn($s) => $s->hasLink())->count() }}</span>)</button>
                     <button type="button" onclick="setSubFilter('text')"
                             class="sub-filter-pill px-3 py-1.5 rounded-lg font-medium transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#090D0B] border border-gray-300 dark:border-[#1A2820]"
-                            data-type="text">Teks (<span id="countPillText">{{ $submissions->where('submission_type', 'text')->count() }}</span>)</button>
+                            data-type="text">Teks (<span id="countPillText">{{ $submissions->filter(fn($s) => $s->hasText())->count() }}</span>)</button>
                 </div>
             </div>
 
@@ -1311,13 +1311,20 @@ function filterSubmissions() {
     const rows = document.querySelectorAll('.submission-row');
 
     rows.forEach(row => {
-        const type = row.getAttribute('data-type');
+        const type = row.getAttribute('data-type') || '';
+        const hasFile = row.getAttribute('data-has-file') === '1' || type === 'file';
+        const hasLink = row.getAttribute('data-has-link') === '1' || type === 'link';
+        const hasText = row.getAttribute('data-has-text') === '1' || type === 'text';
         const kelas = row.getAttribute('data-kelas') || '';
         const nama = row.querySelector('.sub-nama').textContent.toLowerCase();
         const nim = row.querySelector('.sub-nim').textContent.toLowerCase();
 
         const matchesQuery = query === '' || nama.includes(query) || nim.includes(query);
-        const matchesType = currentFilterType === 'all' || type === currentFilterType;
+        let matchesType = currentFilterType === 'all';
+        if (currentFilterType === 'file') matchesType = hasFile;
+        else if (currentFilterType === 'link') matchesType = hasLink;
+        else if (currentFilterType === 'text') matchesType = hasText;
+
         const matchesClass = selectedClass === 'all' || kelas === selectedClass;
 
         if (matchesQuery && matchesType && matchesClass) {

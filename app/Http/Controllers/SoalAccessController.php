@@ -379,207 +379,166 @@ class SoalAccessController extends Controller
             ]);
         }
         $kelas = $soal->hasClasses() ? $request->input('kelas') : ($request->input('kelas') ?: null);
-
-        $submissionType = $request->input('submission_type', 'file');
         $allowedTypes   = $soal->submission_types ?: ['file'];
 
-        if (!in_array($submissionType, $allowedTypes, true)) {
-            return response()->json(['message' => 'Tipe pengumpulan (' . $submissionType . ') tidak diizinkan untuk tugas ini.'], 422);
-        }
-
-        // ─── Tipe 1: Link URL ─────────────────────────────────────────────
-        if ($submissionType === 'link') {
-            $request->validate([
-                'nim'      => 'required|string|max:50|regex:/^[a-zA-Z0-9\-]+$/',
-                'nama'     => 'required|string|max:255',
-                'link_url' => 'required|url:http,https|max:2000',
-            ]);
-
-            $existing = Submission::where('soal_id', $soal->id)->where('nim', $request->nim)->first();
-            $isUpdate = $existing !== null;
-
-            if ($existing && $existing->file_path) {
-                Storage::disk('private')->delete($existing->file_path);
-            }
-
-            $subData = [
-                'soal_id'            => $soal->id,
-                'nim'                => $request->nim,
-                'nama'               => $request->nama,
-                'kelas'              => $kelas,
-                'submission_type'    => 'link',
-                'link_url'           => $request->link_url,
-                'text_content'       => null,
-                'file_path'          => null,
-                'file_original_name' => null,
-                'file_extension'     => null,
-                'file_size'          => null,
-            ];
-
-            if ($existing) {
-                foreach ($existing->files as $f) {
-                    if ($f->file_path) Storage::disk('private')->delete($f->file_path);
-                }
-                $existing->files()->delete();
-                if ($existing->file_path) {
-                    Storage::disk('private')->delete($existing->file_path);
-                }
-                $existing->update($subData);
-            } else {
-                Submission::create($subData);
-            }
-
-            return response()->json([
-                'message'   => $isUpdate ? 'Tautan tugas berhasil diperbarui.' : 'Tautan tugas berhasil dikumpulkan.',
-                'is_update' => $isUpdate,
-            ]);
-        }
-
-        // ─── Tipe 2: Teks Langsung ─────────────────────────────────────────
-        if ($submissionType === 'text') {
-            $request->validate([
-                'nim'          => 'required|string|max:50|regex:/^[a-zA-Z0-9\-]+$/',
-                'nama'         => 'required|string|max:255',
-                'text_content' => 'required|string|min:3|max:50000',
-            ]);
-
-            $existing = Submission::where('soal_id', $soal->id)->where('nim', $request->nim)->first();
-            $isUpdate = $existing !== null;
-
-            if ($existing && $existing->file_path) {
-                Storage::disk('private')->delete($existing->file_path);
-            }
-
-            $subData = [
-                'soal_id'            => $soal->id,
-                'nim'                => $request->nim,
-                'nama'               => $request->nama,
-                'kelas'              => $kelas,
-                'submission_type'    => 'text',
-                'link_url'           => null,
-                'text_content'       => $request->text_content,
-                'file_path'          => null,
-                'file_original_name' => null,
-                'file_extension'     => null,
-                'file_size'          => null,
-            ];
-
-            if ($existing) {
-                foreach ($existing->files as $f) {
-                    if ($f->file_path) Storage::disk('private')->delete($f->file_path);
-                }
-                $existing->files()->delete();
-                if ($existing->file_path) {
-                    Storage::disk('private')->delete($existing->file_path);
-                }
-                $existing->update($subData);
-            } else {
-                Submission::create($subData);
-            }
-
-            return response()->json([
-                'message'   => $isUpdate ? 'Jawaban teks berhasil diperbarui.' : 'Jawaban teks berhasil dikumpulkan.',
-                'is_update' => $isUpdate,
-            ]);
-        }
-
-        // ─── Tipe 3: Upload File dengan Security Inspection (Dukung Multi-File) ─
-        $maxFileSizeMb = $soal->getMaxFileSizeMb();
-        $maxFileSizeKb = $maxFileSizeMb * 1024;
-
+        // Validasi dasar identitas mahasiswa
         $request->validate([
-            'nim'     => 'required|string|max:50|regex:/^[a-zA-Z0-9\-]+$/',
-            'nama'    => 'required|string|max:255',
-            'file'    => "nullable|file|max:{$maxFileSizeKb}",
-            'files'   => 'nullable|array',
-            'files.*' => "file|max:{$maxFileSizeKb}",
-        ], [
-            'file.max'    => "Ukuran berkas tidak boleh melebihi {$maxFileSizeMb} MB.",
-            'files.*.max' => "Ukuran berkas tidak boleh melebihi {$maxFileSizeMb} MB per file.",
+            'nim'  => 'required|string|max:50|regex:/^[a-zA-Z0-9\-]+$/',
+            'nama' => 'required|string|max:255',
         ]);
 
+        $hasLinkAllowed = in_array('link', $allowedTypes, true);
+        $hasTextAllowed = in_array('text', $allowedTypes, true);
+        $hasFileAllowed = in_array('file', $allowedTypes, true);
+
+        $hasLinkInput = $hasLinkAllowed && $request->filled('link_url');
+        $hasTextInput = $hasTextAllowed && $request->filled('text_content');
+
         $uploadedFiles = [];
-        if ($request->hasFile('files')) {
-            $rawFiles = $request->file('files');
-            $uploadedFiles = is_array($rawFiles) ? $rawFiles : [$rawFiles];
-        } elseif ($request->hasFile('file')) {
-            $uploadedFiles = [$request->file('file')];
-        }
-
-        if (empty($uploadedFiles)) {
-            return response()->json(['message' => 'Silakan pilih berkas tugas terlebih dahulu.'], 422);
-        }
-
-        $maxFiles = $soal->getMaxFiles();
-        if (count($uploadedFiles) > $maxFiles) {
-            return response()->json([
-                'message' => "Jumlah berkas melebihi batas maksimal ({$maxFiles} file). Anda memilih " . count($uploadedFiles) . " file."
-            ], 422);
-        }
-
-        // Validasi keamanan setiap file (anti-shell, anti-executable, sniffing, double-extension)
-        foreach ($uploadedFiles as $file) {
-            [$isSafe, $errorMsg] = \App\Services\FileSecurityService::validate($file, $soal->allowed_extensions ?? []);
-            if (!$isSafe) {
-                return response()->json(['message' => "Berkas \"{$file->getClientOriginalName()}\": {$errorMsg}"], 422);
+        if ($hasFileAllowed) {
+            if ($request->hasFile('files')) {
+                $rawFiles = $request->file('files');
+                $uploadedFiles = is_array($rawFiles) ? $rawFiles : [$rawFiles];
+            } elseif ($request->hasFile('file')) {
+                $uploadedFiles = [$request->file('file')];
             }
         }
+        $hasFileInput = !empty($uploadedFiles);
 
+        // Cari data pengumpulan mahasiswa sebelumnya untuk soal ini
         $existing = Submission::with('files')
             ->where('soal_id', $soal->id)
             ->where('nim', $request->nim)
             ->first();
-
         $isUpdate = $existing !== null;
 
-        // Bersihkan berkas fisik lama jika mahasiswa mengumpulkan ulang
-        if ($existing) {
-            foreach ($existing->files as $oldFile) {
-                if ($oldFile->file_path) {
-                    Storage::disk('private')->delete($oldFile->file_path);
+        // Pastikan setidaknya ada satu lampiran yang diisi (atau berkas yang sudah ada sebelumnya pada update)
+        $hasExistingFiles = $existing && $existing->hasFile();
+        if (!$hasFileInput && !$hasLinkInput && !$hasTextInput && !$hasExistingFiles) {
+            return response()->json([
+                'message' => 'Silakan lampirkan tugas Anda (unggah berkas, tautan link, atau jawaban teks).'
+            ], 422);
+        }
+
+        // ── Validasi Komponen Link (jika diisi) ──
+        if ($hasLinkInput) {
+            $request->validate([
+                'link_url' => 'required|url:http,https|max:2000',
+            ]);
+        }
+
+        // ── Validasi Komponen Teks (jika diisi) ──
+        if ($hasTextInput) {
+            $request->validate([
+                'text_content' => 'required|string|min:3|max:50000',
+            ]);
+        }
+
+        // ── Validasi Komponen File (jika diunggah) ──
+        $savedFilesData = [];
+        if ($hasFileInput) {
+            $maxFileSizeMb = $soal->getMaxFileSizeMb();
+            $maxFileSizeKb = $maxFileSizeMb * 1024;
+            $maxFiles = $soal->getMaxFiles();
+
+            if (count($uploadedFiles) > $maxFiles) {
+                return response()->json([
+                    'message' => "Jumlah berkas melebihi batas maksimal ({$maxFiles} file). Anda memilih " . count($uploadedFiles) . " file."
+                ], 422);
+            }
+
+            foreach ($uploadedFiles as $file) {
+                if ($file->getSize() > ($maxFileSizeKb * 1024)) {
+                    return response()->json(['message' => "Ukuran berkas \"{$file->getClientOriginalName()}\" melebihi {$maxFileSizeMb} MB."], 422);
+                }
+                [$isSafe, $errorMsg] = \App\Services\FileSecurityService::validate($file, $soal->allowed_extensions ?? []);
+                if (!$isSafe) {
+                    return response()->json(['message' => "Berkas \"{$file->getClientOriginalName()}\": {$errorMsg}"], 422);
                 }
             }
-            if ($existing->file_path) {
-                Storage::disk('private')->delete($existing->file_path);
+
+            // Bersihkan berkas fisik lama karena digantikan oleh berkas baru
+            if ($existing) {
+                foreach ($existing->files as $oldFile) {
+                    if ($oldFile->file_path) {
+                        Storage::disk('private')->delete($oldFile->file_path);
+                    }
+                }
+                if ($existing->file_path) {
+                    Storage::disk('private')->delete($existing->file_path);
+                }
+                $existing->files()->delete();
             }
-            $existing->files()->delete();
+
+            $kelasPrefix = $kelas ? (preg_replace('/[^a-zA-Z0-9\-_]/', '_', $kelas) . '_') : '';
+            $nimClean    = preg_replace('/[^a-zA-Z0-9\-]/', '_', $request->nim);
+            $namaClean   = preg_replace('/[^a-zA-Z0-9\s\-]/', '_', $request->nama);
+
+            foreach ($uploadedFiles as $idx => $file) {
+                $suffix = count($uploadedFiles) > 1 ? ('_' . ($idx + 1)) : '';
+                $fileName = $kelasPrefix . $nimClean . '_' . str_replace(' ', '_', $namaClean) . $suffix . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('submissions/' . $soal->id, $fileName, 'private');
+
+                $fileHash = @hash_file('sha256', $file->getRealPath()) ?: null;
+                $savedFilesData[] = [
+                    'file_path'          => $path,
+                    'file_original_name' => $file->getClientOriginalName(),
+                    'file_extension'     => $file->getClientOriginalExtension(),
+                    'file_size'          => $file->getSize(),
+                    'file_hash'          => $fileHash,
+                ];
+            }
         }
 
-        $kelasPrefix = $kelas ? (preg_replace('/[^a-zA-Z0-9\-_]/', '_', $kelas) . '_') : '';
-        $nimClean    = preg_replace('/[^a-zA-Z0-9\-]/', '_', $request->nim);
-        $namaClean   = preg_replace('/[^a-zA-Z0-9\s\-]/', '_', $request->nama);
-
-        $savedFilesData = [];
-        foreach ($uploadedFiles as $idx => $file) {
-            $suffix = count($uploadedFiles) > 1 ? ('_' . ($idx + 1)) : '';
-            $fileName = $kelasPrefix . $nimClean . '_' . str_replace(' ', '_', $namaClean) . $suffix . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('submissions/' . $soal->id, $fileName, 'private');
-
-            $fileHash = @hash_file('sha256', $file->getRealPath()) ?: null;
-            $savedFilesData[] = [
-                'file_path'          => $path,
-                'file_original_name' => $file->getClientOriginalName(),
-                'file_extension'     => $file->getClientOriginalExtension(),
-                'file_size'          => $file->getSize(),
-                'file_hash'          => $fileHash,
-            ];
-        }
-
-        $firstFile = $savedFilesData[0];
+        // Tentukan data yang akan disimpan / diperbarui
         $subData = [
-            'soal_id'            => $soal->id,
-            'nim'                => $request->nim,
-            'nama'               => $request->nama,
-            'kelas'              => $kelas,
-            'submission_type'    => 'file',
-            'link_url'           => null,
-            'text_content'       => null,
-            'file_path'          => $firstFile['file_path'],
-            'file_original_name' => $firstFile['file_original_name'],
-            'file_extension'     => $firstFile['file_extension'],
-            'file_size'          => $firstFile['file_size'],
-            'file_hash'          => $firstFile['file_hash'] ?? null,
+            'soal_id' => $soal->id,
+            'nim'     => $request->nim,
+            'nama'    => $request->nama,
+            'kelas'   => $kelas,
         ];
+
+        // Tautan Link
+        if ($hasLinkAllowed) {
+            $subData['link_url'] = $request->input('link_url') ? trim($request->input('link_url')) : null;
+        }
+
+        // Teks Jawaban
+        if ($hasTextAllowed) {
+            $subData['text_content'] = $request->input('text_content') ? trim($request->input('text_content')) : null;
+        }
+
+        // Berkas File
+        if ($hasFileInput) {
+            $firstFile = $savedFilesData[0];
+            $subData['file_path']          = $firstFile['file_path'];
+            $subData['file_original_name'] = $firstFile['file_original_name'];
+            $subData['file_extension']     = $firstFile['file_extension'];
+            $subData['file_size']          = $firstFile['file_size'];
+            $subData['file_hash']          = $firstFile['file_hash'] ?? null;
+        } elseif (!$existing) {
+            $subData['file_path']          = null;
+            $subData['file_original_name'] = null;
+            $subData['file_extension']     = null;
+            $subData['file_size']          = null;
+            $subData['file_hash']          = null;
+        }
+
+        // Hitung komponen aktif untuk menentukan tipe pengumpulan (submission_type)
+        $hasActiveFile = $hasFileInput || ($existing && $existing->hasFile());
+        $hasActiveLink = !empty($subData['link_url']);
+        $hasActiveText = !empty($subData['text_content']);
+
+        $activePartsCount = ($hasActiveFile ? 1 : 0) + ($hasActiveLink ? 1 : 0) + ($hasActiveText ? 1 : 0);
+        if ($activePartsCount > 1) {
+            $subData['submission_type'] = 'composite';
+        } elseif ($hasActiveLink) {
+            $subData['submission_type'] = 'link';
+        } elseif ($hasActiveText) {
+            $subData['submission_type'] = 'text';
+        } else {
+            $subData['submission_type'] = 'file';
+        }
 
         if ($existing) {
             $existing->update($subData);
@@ -588,17 +547,35 @@ class SoalAccessController extends Controller
             $submission = Submission::create($subData);
         }
 
-        // Simpan ke relasi submission_files
-        foreach ($savedFilesData as $fData) {
-            $submission->files()->create($fData);
+        // Simpan lampiran multi-berkas baru ke relasi submission_files
+        if ($hasFileInput) {
+            foreach ($savedFilesData as $fData) {
+                $submission->files()->create($fData);
+            }
         }
 
-        $count = count($savedFilesData);
-        $message = $isUpdate
-            ? "Tugas berhasil diperbarui ({$count} berkas). Berkas pengumpulan sebelumnya telah diganti."
-            : "Tugas berhasil dikumpulkan ({$count} berkas).";
+        // Susun pesan respons ramah pengguna
+        $summaryParts = [];
+        if ($hasActiveFile) {
+            $fileCount = $submission->getFilesCount();
+            $summaryParts[] = $fileCount > 1 ? "{$fileCount} berkas" : "1 berkas";
+        }
+        if ($hasActiveLink) {
+            $summaryParts[] = "tautan link";
+        }
+        if ($hasActiveText) {
+            $summaryParts[] = "jawaban teks";
+        }
 
-        return response()->json(['message' => $message, 'is_update' => $isUpdate]);
+        $partsStr = implode(' + ', $summaryParts);
+        $message = $isUpdate
+            ? "Tugas berhasil diperbarui (" . ($partsStr ?: 'data tersimpan') . ")."
+            : "Tugas berhasil dikumpulkan (" . ($partsStr ?: 'data tersimpan') . ").";
+
+        return response()->json([
+            'message'   => $message,
+            'is_update' => $isUpdate,
+        ]);
     }
 
     public function checkSubmission(Request $request, string $token)
@@ -636,16 +613,22 @@ class SoalAccessController extends Controller
             return response()->json(['has_submitted' => false]);
         }
 
-        $identifier = match ($existing->submission_type) {
-            'link' => $existing->link_url,
-            'text' => \Illuminate\Support\Str::limit($existing->text_content, 35),
-            default => $existing->getFilesCount() > 1
+        $idParts = [];
+        if ($existing->hasFile()) {
+            $idParts[] = $existing->getFilesCount() > 1
                 ? ($existing->getFilesCount() . ' berkas (' . $existing->file_original_name . ', dll)')
-                : $existing->file_original_name,
-        };
+                : ($existing->file_original_name ?: '1 berkas');
+        }
+        if ($existing->hasLink()) {
+            $idParts[] = 'Tautan: ' . \Illuminate\Support\Str::limit($existing->link_url, 30);
+        }
+        if ($existing->hasText()) {
+            $idParts[] = 'Teks: ' . \Illuminate\Support\Str::limit($existing->text_content, 25);
+        }
+        $identifier = !empty($idParts) ? implode(' + ', $idParts) : ($existing->file_original_name ?? 'Tugas Terkumpul');
 
         $filesData = [];
-        if ($existing->submission_type === 'file') {
+        if ($existing->hasFile()) {
             foreach ($existing->getFilesList() as $f) {
                 $fId = $f->id ?? 0;
                 $filesData[] = [

@@ -20,7 +20,12 @@
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-[#1A2820]" id="submissionsTableBody">
                 @foreach($submissions as $sub)
-                <tr class="hover:bg-emerald-500/5 dark:hover:bg-emerald-950/10 transition-colors submission-row border-b border-gray-100 dark:border-[#1A2820]" data-type="{{ $sub->submission_type ?: 'file' }}" data-kelas="{{ $sub->kelas ?? '' }}">
+                <tr class="hover:bg-emerald-500/5 dark:hover:bg-emerald-950/10 transition-colors submission-row border-b border-gray-100 dark:border-[#1A2820]" 
+                    data-type="{{ $sub->submission_type ?: 'file' }}" 
+                    data-has-file="{{ $sub->hasFile() ? '1' : '0' }}"
+                    data-has-link="{{ $sub->hasLink() ? '1' : '0' }}"
+                    data-has-text="{{ $sub->hasText() ? '1' : '0' }}"
+                    data-kelas="{{ $sub->kelas ?? '' }}">
                     {{-- Mahasiswa Identity --}}
                     <td class="px-6 py-3.5">
                         <div class="flex items-center gap-3">
@@ -59,34 +64,54 @@
                         @endif
                     </td>
 
-                    {{-- Submission Type Badge --}}
+                    {{-- Submission Type Badge (Mendukung Multi-Komponen / Komposit) --}}
                     <td class="px-4 py-3.5 text-xs">
-                        @if($sub->isLink())
-                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/30">Link</span>
-                        @elseif($sub->isText())
-                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">Teks</span>
-                        @else
-                            @php
-                                $fCount = $sub->getFilesCount();
-                                $ext = strtoupper($sub->file_extension ?: pathinfo($sub->file_original_name ?: $sub->file_path, PATHINFO_EXTENSION));
-                            @endphp
-                            <div class="flex items-center gap-1.5 flex-wrap">
-                                <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase
-                                    {{ in_array($ext, ['PDF']) ? 'bg-red-500/15 text-red-500 border border-red-500/30' : '' }}
-                                    {{ in_array($ext, ['ZIP', 'RAR', '7Z']) ? 'bg-purple-500/15 text-purple-400 border border-purple-500/30' : '' }}
-                                    {{ in_array($ext, ['PNG', 'JPG', 'JPEG', 'WEBP']) ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30' : '' }}
-                                    {{ in_array($ext, ['DOC', 'DOCX']) ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30' : '' }}
-                                    {{ !in_array($ext, ['PDF', 'ZIP', 'RAR', '7Z', 'PNG', 'JPG', 'JPEG', 'WEBP', 'DOC', 'DOCX']) ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : '' }}">
-                                    {{ $ext ?: 'FILE' }}
-                                </span>
-                                @if($fCount > 1)
-                                    <span class="text-[10px] font-mono text-gray-400 font-semibold">({{ $fCount }} files)</span>
-                                @endif
-                            </div>
-                            @if($sub->file_original_name)
-                                <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate max-w-[170px] mt-0.5 font-mono" title="{{ $sub->file_original_name }}">{{ $sub->file_original_name }}</p>
+                        <div class="flex flex-col gap-1.5 items-start">
+                            @if($sub->hasFile())
+                                @php
+                                    $fCount = $sub->getFilesCount();
+                                    $ext = strtoupper($sub->file_extension ?: pathinfo($sub->file_original_name ?: $sub->file_path, PATHINFO_EXTENSION));
+                                @endphp
+                                <div>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase
+                                            {{ in_array($ext, ['PDF']) ? 'bg-red-500/15 text-red-500 border border-red-500/30' : '' }}
+                                            {{ in_array($ext, ['ZIP', 'RAR', '7Z']) ? 'bg-purple-500/15 text-purple-400 border border-purple-500/30' : '' }}
+                                            {{ in_array($ext, ['PNG', 'JPG', 'JPEG', 'WEBP']) ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30' : '' }}
+                                            {{ in_array($ext, ['DOC', 'DOCX']) ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30' : '' }}
+                                            {{ !in_array($ext, ['PDF', 'ZIP', 'RAR', '7Z', 'PNG', 'JPG', 'JPEG', 'WEBP', 'DOC', 'DOCX']) ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : '' }}">
+                                            📁 {{ $ext ?: 'FILE' }}
+                                        </span>
+                                        @if($fCount > 1)
+                                            <span class="text-[10px] font-mono text-gray-400 font-semibold">({{ $fCount }} files)</span>
+                                        @endif
+                                    </div>
+                                    @if($sub->file_original_name)
+                                        <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate max-w-[170px] mt-0.5 font-mono" title="{{ $sub->file_original_name }}">{{ $sub->file_original_name }}</p>
+                                    @endif
+                                </div>
                             @endif
-                        @endif
+
+                            @if($sub->hasLink())
+                                <div class="flex items-center gap-1">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/30 inline-flex items-center gap-1">
+                                        🔗 Link
+                                    </span>
+                                </div>
+                            @endif
+
+                            @if($sub->hasText())
+                                <div class="flex items-center gap-1">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 inline-flex items-center gap-1">
+                                        📝 Teks
+                                    </span>
+                                </div>
+                            @endif
+
+                            @if(!$sub->hasFile() && !$sub->hasLink() && !$sub->hasText())
+                                <span class="text-gray-400 text-xs italic">-</span>
+                            @endif
+                        </div>
                     </td>
 
                     {{-- Waktu --}}
@@ -95,24 +120,11 @@
                         <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 font-mono">{{ $sub->created_at->diffForHumans() }}</p>
                     </td>
 
-                    {{-- Aksi --}}
+                    {{-- Aksi (Menyediakan tombol akses untuk setiap komponen aktif) --}}
                     <td class="px-4 py-3.5 text-center">
-                        <div class="flex items-center justify-center gap-1">
-                            @if($sub->isLink())
-                                <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer"
-                                   class="p-2 text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block" title="Buka Link Tautan">
-                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                </a>
-                            @elseif($sub->isText())
-                                <button type="button"
-                                        data-nama="{{ $sub->nama }}"
-                                        data-nim="{{ $sub->nim }}"
-                                        data-content="{{ $sub->text_content }}"
-                                        onclick="showTextModal(this.dataset.nama, this.dataset.nim, this.dataset.content)"
-                                        class="p-2 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Baca Teks Lengkap">
-                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                </button>
-                            @else
+                        <div class="flex items-center justify-center gap-1 flex-wrap">
+                            {{-- Aksi File --}}
+                            @if($sub->hasFile())
                                 @php
                                     $isImgOrPdf = in_array(strtolower($sub->file_extension ?? ''), ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'svg']);
                                 @endphp
@@ -130,9 +142,29 @@
                                 </a>
                             @endif
 
+                            {{-- Aksi Link --}}
+                            @if($sub->hasLink())
+                                <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer"
+                                   class="p-2 text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block" title="Buka Tautan: {{ $sub->link_url }}">
+                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                </a>
+                            @endif
+
+                            {{-- Aksi Teks --}}
+                            @if($sub->hasText())
+                                <button type="button"
+                                        data-nama="{{ $sub->nama }}"
+                                        data-nim="{{ $sub->nim }}"
+                                        data-content="{{ $sub->text_content }}"
+                                        onclick="showTextModal(this.dataset.nama, this.dataset.nim, this.dataset.content)"
+                                        class="p-2 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Baca Teks Lengkap">
+                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                </button>
+                            @endif
+
                             {{-- Hapus / Reset Pengumpulan --}}
                             <form method="POST" action="{{ route('admin.soal.submission.destroy', $sub->id) }}" class="inline"
-                                  onsubmit="confirmAction(event, 'Hapus pengumpulan tugas mahasiswa {{ addslashes($sub->nama) }} ({{ $sub->nim }})? Berkas akan dihapus permanen dan mahasiswa dapat mengumpulkan ulang.', 'Ya, Hapus Pengumpulan', true)">
+                                  onsubmit="confirmAction(event, 'Hapus pengumpulan tugas mahasiswa {{ addslashes($sub->nama) }} ({{ $sub->nim }})? Berkas dan tautan akan dihapus permanen dan mahasiswa dapat mengumpulkan ulang.', 'Ya, Hapus Pengumpulan', true)">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors inline-block cursor-pointer" title="Hapus / Reset Pengumpulan">
                                     <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
