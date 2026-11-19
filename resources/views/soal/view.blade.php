@@ -794,24 +794,39 @@ html:not(.dark) .note-text {
 .sub-policy-tip {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 14px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  color: var(--text3);
-  font-size: 12px;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #FFFFFF !important;
+  font-size: 12.5px;
+  font-weight: 500;
   margin-bottom: 16px;
-  line-height: 1.4;
+  line-height: 1.45;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
-html:not(.dark) .sub-policy-tip {
-  background: #F8FAF9 !important;
-  border-color: #E2EAE5 !important;
-  color: #64748B !important;
+.sub-policy-tip span {
+  color: #FFFFFF !important;
 }
 .sub-policy-tip svg {
-  color: var(--emerald);
+  color: #34D399;
   flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+html:not(.dark) .sub-policy-tip {
+  background: #F0FDF4 !important;
+  border-color: #A7F3D0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 1px 4px rgba(16, 185, 129, 0.08) !important;
+}
+html:not(.dark) .sub-policy-tip span {
+  color: #0F172A !important;
+  font-weight: 600 !important;
+}
+html:not(.dark) .sub-policy-tip svg {
+  color: #059669 !important;
 }
 
 /* ─── Prior Submission Receipt Card ─── */
@@ -1124,32 +1139,44 @@ html:not(.dark) .btn-sub-file-download:hover {
   color:#F87171;
 }
 
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.form-grid.has-classes{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
-@media(max-width:580px){.form-grid,.form-grid.has-classes{grid-template-columns:1fr}}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:start}
+.form-grid.has-classes{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:768px){.form-grid,.form-grid.has-classes{grid-template-columns:1fr}}
 
 .field-group{display:flex;flex-direction:column;gap:7px}
+.field-header{display:flex;align-items:center;justify-content:space-between;min-height:20px;height:20px}
 .field-label{
   font-size:10.5px;font-weight:700;color:var(--text3);
   text-transform:uppercase;letter-spacing:0.08em;
   display:flex;align-items:center;gap:4px;
+  margin:0;
 }
 .field-label .req{color:var(--emerald)}
 .field-label .note{color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;margin-left:auto;font-size:11px}
+.sub-nim-badge{
+  font-size:10.5px;font-family:monospace;font-weight:700;
+  color:var(--emerald);background:rgba(16,185,129,0.12);
+  border:1px solid rgba(16,185,129,0.3);
+  padding:1px 7px;border-radius:9999px;letter-spacing:0.02em;line-height:1.4;
+}
+html:not(.dark) .sub-nim-badge{
+  color:#065F46 !important;background:#D1FAE5 !important;border-color:#6EE7B7 !important;
+}
 .field-wrap{position:relative}
 .field-icon{
   position:absolute;left:13px;top:50%;transform:translateY(-50%);
-  width:15px;height:15px;color:var(--text3);pointer-events:none;
+  width:16px;height:16px;color:var(--text3);pointer-events:none;
   transition:color 0.2s;
 }
 .field-input{
-  width:100%;padding:11px 14px 11px 38px;
+  width:100%;height:44px;min-height:44px;padding:11px 14px 11px 38px;
   background:#080810;
   border:1px solid var(--border);
-  border-radius:10px;
+  border-radius:12px;
   color:var(--text1);font-size:13.5px;
   font-family:'DM Sans',sans-serif;
   outline:none;transition:all 0.2s;
+  box-sizing:border-box;
 }
 .field-input::placeholder{color:var(--text3)}
 .field-input:focus{
@@ -1215,19 +1242,22 @@ html:not(.dark) .btn-sub-file-download:hover {
 }
 .custom-cyber-trigger {
   width: 100%;
+  height: 44px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px 12px 38px;
+  padding: 11px 14px 11px 38px;
   background-color: #090D0B;
   border: 1px solid #1A2820;
   border-radius: 12px;
   color: var(--text1);
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
+  font-size: 13.5px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
+  box-sizing: border-box;
 }
 .custom-cyber-trigger:hover,
 .custom-cyber-trigger.is-open {
@@ -2596,11 +2626,11 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
 
                         <div class="form-grid {{ $soal->hasClasses() ? 'has-classes' : '' }}">
                             <div class="field-group">
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                                    <label class="field-label" style="margin-bottom:0;">
+                                <div class="field-header">
+                                    <label class="field-label">
                                         NIM Mahasiswa <span class="req">*</span>
                                     </label>
-                                    <span id="sub_nim_badge" style="font-size:11px;font-family:monospace;font-weight:600;color:var(--text3);">0 digit</span>
+                                    <span id="sub_nim_badge" class="sub-nim-badge">0 digit</span>
                                 </div>
                                 <div class="field-wrap">
                                     <input type="text" id="sub_nim" name="nim" required
@@ -2616,9 +2646,11 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                 <div id="sub_nim_warning" style="display:none;margin-top:7px;font-size:11.5px;color:#F59E0B;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:7px 10px;line-height:1.4;"></div>
                             </div>
                             <div class="field-group">
-                                <label class="field-label">
-                                    Nama Lengkap <span class="req">*</span>
-                                </label>
+                                <div class="field-header">
+                                    <label class="field-label">
+                                        Nama Lengkap <span class="req">*</span>
+                                    </label>
+                                </div>
                                 <div class="field-wrap">
                                     <input type="text" id="sub_nama" name="nama" required
                                            placeholder="Contoh: Aan Maulana Sampe"
@@ -2658,9 +2690,11 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                     }
                                 }
                             }" @click.outside="open = false" @keydown.escape.window="open = false">
-                                <label class="field-label">
-                                    Kelas <span class="req">*</span>
-                                </label>
+                                <div class="field-header">
+                                    <label class="field-label">
+                                        Kelas <span class="req">*</span>
+                                    </label>
+                                </div>
                                 <div class="custom-cyber-dropdown">
                                     <input type="hidden" id="sub_kelas" name="kelas" :value="selected" required>
                                     
