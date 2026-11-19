@@ -3423,8 +3423,11 @@ function checkExistingSubmission(nim) {
             // Render digital receipt berkas & tombol unduh mandiri mahasiswa
             if (filesContainer) {
                 filesContainer.innerHTML = '';
+                let hasAnyItem = false;
+
+                // 1. Berkas File
                 if (data.files && data.files.length > 0) {
-                    filesContainer.style.display = 'flex';
+                    hasAnyItem = true;
                     data.files.forEach(file => {
                         const item = document.createElement('div');
                         item.className = 'prior-file-item';
@@ -3445,40 +3448,60 @@ function checkExistingSubmission(nim) {
                         `;
                         filesContainer.appendChild(item);
                     });
-                } else if (data.submission_type === 'link' && (data.link_url || data.identifier)) {
-                    filesContainer.style.display = 'flex';
-                    const targetLink = data.link_url || data.identifier;
-                    filesContainer.innerHTML = `
-                        <div class="prior-file-item">
-                            <div class="prior-file-left">
-                                <svg width="15" height="15" fill="none" stroke="#A855F7" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                </svg>
-                                <span class="prior-file-name" title="${targetLink}">${targetLink}</span>
-                            </div>
-                            <a href="${targetLink}" target="_blank" rel="noopener noreferrer" class="btn-sub-file-download">
-                                Buka Tautan
-                            </a>
-                        </div>
-                    `;
-                } else if (data.submission_type === 'text') {
-                    filesContainer.style.display = 'flex';
-                    const textVal = data.text_content || data.identifier;
-                    filesContainer.innerHTML = `
-                        <div class="prior-file-item" style="flex-direction:column;align-items:flex-start;gap:6px;">
-                            <span class="p-label" style="font-size:11px;">Teks Jawaban Tersimpan:</span>
-                            <div style="font-size:12px;color:var(--text1);font-family:monospace;white-space:pre-wrap;background:rgba(0,0,0,0.25);padding:8px 10px;border-radius:6px;width:100%;max-height:85px;overflow-y:auto;border:1px solid rgba(255,255,255,0.06);">${textVal}</div>
-                        </div>
-                    `;
-                } else {
-                    filesContainer.style.display = 'none';
                 }
+
+                // 2. Tautan Link
+                if (data.link_url || (data.submission_type === 'link' && data.identifier)) {
+                    hasAnyItem = true;
+                    const targetLink = data.link_url || data.identifier;
+                    const linkItem = document.createElement('div');
+                    linkItem.className = 'prior-file-item';
+                    linkItem.innerHTML = `
+                        <div class="prior-file-left">
+                            <svg width="15" height="15" fill="none" stroke="#0D9488" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                            <span class="prior-file-name" title="${targetLink}">${targetLink}</span>
+                        </div>
+                        <a href="${targetLink}" target="_blank" rel="noopener noreferrer" class="btn-sub-file-download">
+                            Buka Tautan
+                        </a>
+                    `;
+                    filesContainer.appendChild(linkItem);
+                }
+
+                // 3. Jawaban Teks
+                if (data.text_content || (data.submission_type === 'text' && data.identifier)) {
+                    hasAnyItem = true;
+                    const textVal = data.text_content || data.identifier;
+                    const textItem = document.createElement('div');
+                    textItem.className = 'prior-file-item';
+                    textItem.style.cssText = 'flex-direction:column;align-items:flex-start;gap:6px;width:100%;';
+                    textItem.innerHTML = `
+                        <span class="p-label" style="font-size:11px;color:var(--text2);font-weight:600;">Teks Jawaban Tersimpan:</span>
+                        <div style="font-size:12px;color:var(--text1);font-family:monospace;white-space:pre-wrap;background:rgba(0,0,0,0.25);padding:8px 10px;border-radius:6px;width:100%;max-height:85px;overflow-y:auto;border:1px solid rgba(255,255,255,0.06);">${textVal}</div>
+                    `;
+                    filesContainer.appendChild(textItem);
+                }
+
+                filesContainer.style.display = hasAnyItem ? 'flex' : 'none';
             }
 
             if (namaEl && !namaEl.value) {
                 namaEl.value = data.nama;
                 localStorage.setItem('labsoal_student_nama', data.nama);
             }
+
+            const inputLinkEl = document.getElementById('sub_link');
+            if (inputLinkEl && !inputLinkEl.value && data.link_url) {
+                inputLinkEl.value = data.link_url;
+            }
+            const inputTextEl = document.getElementById('sub_text');
+            if (inputTextEl && !inputTextEl.value && data.text_content) {
+                inputTextEl.value = data.text_content;
+            }
+            updateSubmissionBadges();
+
             btnLabel.textContent = 'Perbarui Tugas Sekarang';
         } else {
             currentExistingSubmission = null;

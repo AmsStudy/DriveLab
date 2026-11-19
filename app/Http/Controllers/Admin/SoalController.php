@@ -655,13 +655,18 @@ class SoalController extends Controller
             fputcsv($file, ['No', 'NIM', 'Nama Mahasiswa', 'Kelas', 'Tipe Pengumpulan', 'File / Tautan / Teks', 'Waktu Pengumpulan'], ';');
 
             foreach ($submissions as $index => $sub) {
-                $konten = match ($sub->submission_type) {
-                    'link'  => $sub->link_url,
-                    'text'  => $sub->text_content,
-                    default => $sub->getFilesCount() > 1
-                        ? $sub->getFilesList()->pluck('file_original_name')->filter()->implode(', ')
-                        : ($sub->file_original_name ?: ($sub->file_path ? basename($sub->file_path) : '-')),
-                };
+                $kontenParts = [];
+                if ($sub->hasFile()) {
+                    $fileNames = $sub->getFilesList()->pluck('file_original_name')->filter()->implode(', ');
+                    $kontenParts[] = 'File: ' . ($fileNames ?: ($sub->file_original_name ?: ($sub->file_path ? basename($sub->file_path) : 'Berkas')));
+                }
+                if ($sub->hasLink()) {
+                    $kontenParts[] = 'Link: ' . $sub->link_url;
+                }
+                if ($sub->hasText()) {
+                    $kontenParts[] = 'Teks: ' . preg_replace('/\s+/', ' ', trim($sub->text_content));
+                }
+                $konten = !empty($kontenParts) ? implode(' | ', $kontenParts) : '-';
 
                 // Sanitasi setiap kolom terhadap Formula Injection (CWE-1236)
                 fputcsv($file, [
