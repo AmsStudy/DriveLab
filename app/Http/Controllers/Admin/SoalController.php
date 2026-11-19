@@ -265,9 +265,9 @@ class SoalController extends Controller
 
         $counts = [
             'total'      => $count,
-            'file'       => $submissions->filter(fn($s) => ($s->submission_type ?? 'file') === 'file')->count(),
-            'link'       => $submissions->where('submission_type', 'link')->count(),
-            'text'       => $submissions->where('submission_type', 'text')->count(),
+            'file'       => $submissions->filter(fn($s) => $s->hasFile())->count(),
+            'link'       => $submissions->filter(fn($s) => $s->hasLink())->count(),
+            'text'       => $submissions->filter(fn($s) => $s->hasText())->count(),
             'duplicates' => $duplicateCount,
             'classes'    => $classCounts,
         ];
