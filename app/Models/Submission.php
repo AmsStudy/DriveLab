@@ -122,7 +122,68 @@ class Submission extends Model
 
     public function hasLink(): bool
     {
-        return !empty($this->link_url);
+        return !empty($this->link_url) && $this->getLinksCount() > 0;
+    }
+
+    /**
+     * Mengambil seluruh daftar tautan link tugas mahasiswa.
+     * Mendukung data lama (string URL tunggal) maupun format baru (JSON array tautan link).
+     *
+     * @return array<int, array{url: string, title: ?string}>
+     */
+    public function getLinksList(): array
+    {
+        if (empty($this->link_url)) {
+            return [];
+        }
+
+        $val = trim((string)$this->link_url);
+
+        // Cek format JSON array
+        if ((str_starts_with($val, '[') && str_ends_with($val, ']')) || (str_starts_with($val, '{') && str_ends_with($val, '}'))) {
+            $decoded = json_decode($val, true);
+            if (is_array($decoded)) {
+                $list = [];
+                foreach ($decoded as $item) {
+                    if (is_string($item) && !empty(trim($item))) {
+                        $list[] = ['url' => trim($item), 'title' => null];
+                    } elseif (is_array($item) && !empty($item['url'])) {
+                        $list[] = ['url' => trim($item['url']), 'title' => !empty($item['title']) ? trim($item['title']) : null];
+                    }
+                }
+                if (!empty($list)) {
+                    return $list;
+                }
+            }
+        }
+
+        // Cek baris per baris (jika dipisahkan newline)
+        $lines = preg_split('/[\r\n]+/', $val, -1, PREG_SPLIT_NO_EMPTY);
+        if (count($lines) > 1) {
+            $list = [];
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (!empty($line)) {
+                    $list[] = ['url' => $line, 'title' => null];
+                }
+            }
+            if (!empty($list)) {
+                return $list;
+            }
+        }
+
+        return [['url' => $val, 'title' => null]];
+    }
+
+    public function getLinksCount(): int
+    {
+        return count($this->getLinksList());
+    }
+
+    public function getFirstLinkUrl(): ?string
+    {
+        $links = $this->getLinksList();
+        return $links[0]['url'] ?? $this->link_url;
     }
 
     public function hasText(): bool

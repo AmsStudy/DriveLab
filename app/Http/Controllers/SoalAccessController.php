@@ -391,7 +391,26 @@ class SoalAccessController extends Controller
         $hasTextAllowed = in_array('text', $allowedTypes, true);
         $hasFileAllowed = in_array('file', $allowedTypes, true);
 
-        $hasLinkInput = $hasLinkAllowed && $request->filled('link_url');
+        // Ambil input tautan link (mendukung array link_urls[] maupun link_url tunggal/JSON)
+        $rawLinks = [];
+        if ($hasLinkAllowed) {
+            if ($request->has('link_urls') && is_array($request->input('link_urls'))) {
+                $rawLinks = array_filter(array_map('trim', $request->input('link_urls')), fn($u) => !empty($u));
+            } elseif ($request->filled('link_url')) {
+                $trimmed = trim($request->input('link_url'));
+                if (str_starts_with($trimmed, '[') && str_ends_with($trimmed, ']')) {
+                    $dec = json_decode($trimmed, true);
+                    if (is_array($dec)) {
+                        $rawLinks = array_filter(array_map('trim', $dec), fn($u) => !empty($u));
+                    }
+                }
+                if (empty($rawLinks) && !empty($trimmed)) {
+                    $rawLinks = [$trimmed];
+                }
+            }
+        }
+        $rawLinks = array_values(array_unique($rawLinks));
+        $hasLinkInput = !empty($rawLinks);
         $hasTextInput = $hasTextAllowed && $request->filled('text_content');
 
         $uploadedFiles = [];
@@ -422,9 +441,23 @@ class SoalAccessController extends Controller
 
         // ── Validasi Komponen Link (jika diisi) ──
         if ($hasLinkInput) {
-            $request->validate([
-                'link_url' => 'required|url:http,https|max:2000',
-            ]);
+            if (count($rawLinks) > 10) {
+                return response()->json([
+                    'message' => 'Jumlah tautan link maksimal adalah 10 tautan.'
+                ], 422);
+            }
+            foreach ($rawLinks as $index => $linkItem) {
+                if (!filter_var($linkItem, FILTER_VALIDATE_URL) || !preg_match('~^https?://~i', $linkItem)) {
+                    return response()->json([
+                        'message' => 'Format tautan #' . ($index + 1) . ' tidak valid. Pastikan diawali dengan http:// atau https://.'
+                    ], 422);
+                }
+                if (strlen($linkItem) > 2000) {
+                    return response()->json([
+                        'message' => 'Tautan #' . ($index + 1) . ' terlalu panjang (maksimal 2000 karakter).'
+                    ], 422);
+                }
+            }
         }
 
         // ── Validasi Komponen Teks (jika diisi) ──
@@ -500,7 +533,11 @@ class SoalAccessController extends Controller
 
         // Tautan Link
         if ($hasLinkAllowed) {
-            $subData['link_url'] = $request->input('link_url') ? trim($request->input('link_url')) : null;
+            if (!empty($rawLinks)) {
+                $subData['link_url'] = count($rawLinks) === 1 ? $rawLinks[0] : json_encode($rawLinks);
+            } else {
+                $subData['link_url'] = null;
+            }
         }
 
         // Teks Jawaban
@@ -655,6 +692,8 @@ class SoalAccessController extends Controller
             'submitted_at'    => $existing->updated_at ? $existing->updated_at->format('d M Y, H:i') : $existing->created_at->format('d M Y, H:i'),
             'files'           => $filesData,
             'link_url'        => $existing->link_url,
+            'links'           => $existing->getLinksList(),
+            'links_count'     => $existing->getLinksCount(),
             'text_content'    => $existing->text_content,
         ]);
     }

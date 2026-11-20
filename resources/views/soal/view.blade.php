@@ -2892,17 +2892,36 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                         @if(in_array('link', $allowedSubTypes))
                             <div class="sub-pane {{ $defaultSubType === 'link' ? 'active' : '' }}" id="pane-link" style="margin-bottom:16px;">
                                 <div class="field-group">
-                                    <label class="field-label">
-                                        URL / Tautan Tugas <span class="req">*</span>
-                                        <span class="note">GitHub, Google Drive, Figma, dll.</span>
-                                    </label>
-                                    <div class="field-wrap">
-                                        <input type="url" id="sub_link" name="link_url"
-                                               placeholder="https://github.com/... atau https://drive.google.com/..."
-                                               class="field-input">
-                                        <svg class="field-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                        </svg>
+                                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
+                                        <label class="field-label" style="margin-bottom:0;">
+                                            URL / Tautan Tugas <span class="req">*</span>
+                                            <span class="note" style="display:block;font-size:11px;color:var(--text2);margin-top:2px;">GitHub, Google Drive, Figma, YouTube, dll.</span>
+                                        </label>
+                                        <button type="button" id="btn-add-link-row" onclick="addAnotherLinkInput()"
+                                                style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;font-size:11.5px;font-weight:600;border-radius:6px;background:rgba(13,148,136,0.12);color:var(--primary);border:1px solid rgba(13,148,136,0.25);cursor:pointer;transition:all 0.15s ease;">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                            Tambah Tautan
+                                        </button>
+                                    </div>
+                                    <div id="link-inputs-container" style="display:flex;flex-direction:column;gap:8px;">
+                                        <div class="field-wrap link-input-row" style="position:relative;display:flex;align-items:center;gap:6px;">
+                                            <div style="position:relative;flex:1;">
+                                                <input type="url" name="link_urls[]"
+                                                       placeholder="https://github.com/... atau https://drive.google.com/..."
+                                                       class="field-input link-url-input"
+                                                       style="padding-left:36px;padding-right:12px;width:100%;box-sizing:border-box;">
+                                                <svg class="field-icon" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;pointer-events:none;color:var(--text2);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                                </svg>
+                                            </div>
+                                            <button type="button" class="btn-remove-link" onclick="removeLinkInput(this)" title="Hapus tautan ini"
+                                                    style="display:none;width:34px;height:34px;border-radius:6px;border:1px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.08);color:#ef4444;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;flex-shrink:0;">
+                                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div style="font-size:11px;color:var(--text2);margin-top:6px;display:flex;align-items:center;gap:4px;">
+                                        <span>Bisa mengirim hingga 10 tautan sekaligus.</span>
                                     </div>
                                 </div>
                             </div>
@@ -3147,6 +3166,120 @@ const subBtn       = document.getElementById('sub-btn');
 const btnLabel     = document.getElementById('btn-label');
 const subTypeInput = document.getElementById('sub_type');
 
+function getFilledLinkUrls() {
+    const inputs = document.querySelectorAll('.link-url-input');
+    const urls = [];
+    inputs.forEach(inp => {
+        const val = inp.value.trim();
+        if (val) urls.push(val);
+    });
+    return urls;
+}
+
+function updateLinkInputControls() {
+    const container = document.getElementById('link-inputs-container');
+    if (!container) return;
+    const rows = container.querySelectorAll('.link-input-row');
+    const addBtn = document.getElementById('btn-add-link-row');
+    if (addBtn) {
+        if (rows.length >= 10) {
+            addBtn.style.opacity = '0.5';
+            addBtn.style.pointerEvents = 'none';
+        } else {
+            addBtn.style.opacity = '1';
+            addBtn.style.pointerEvents = 'auto';
+        }
+    }
+    rows.forEach(row => {
+        const delBtn = row.querySelector('.btn-remove-link');
+        if (delBtn) {
+            delBtn.style.display = rows.length > 1 ? 'inline-flex' : 'none';
+        }
+    });
+}
+
+function addAnotherLinkInput(val = '') {
+    const container = document.getElementById('link-inputs-container');
+    if (!container) return null;
+    const rows = container.querySelectorAll('.link-input-row');
+    if (rows.length >= 10) {
+        if (typeof showAlert === 'function') {
+            showAlert('error', 'Batas maksimal pengumpulan tautan adalah 10 tautan.');
+        }
+        return null;
+    }
+    const row = document.createElement('div');
+    row.className = 'field-wrap link-input-row';
+    row.style.cssText = 'position:relative;display:flex;align-items:center;gap:6px;';
+    
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:relative;flex:1;';
+    
+    const input = document.createElement('input');
+    input.type = 'url';
+    input.name = 'link_urls[]';
+    input.placeholder = 'https://github.com/... atau https://drive.google.com/...';
+    input.className = 'field-input link-url-input';
+    input.value = val || '';
+    input.style.cssText = 'padding-left:36px;padding-right:12px;width:100%;box-sizing:border-box;';
+    input.addEventListener('input', updateSubmissionBadges);
+    input.addEventListener('change', updateSubmissionBadges);
+    
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('class', 'field-icon');
+    icon.setAttribute('style', 'position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;pointer-events:none;color:var(--text2);');
+    icon.setAttribute('fill', 'none');
+    icon.setAttribute('stroke', 'currentColor');
+    icon.setAttribute('stroke-width', '2');
+    icon.setAttribute('viewBox', '0 0 24 24');
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>';
+    
+    wrapper.appendChild(input);
+    wrapper.appendChild(icon);
+    
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'btn-remove-link';
+    delBtn.title = 'Hapus tautan ini';
+    delBtn.style.cssText = 'display:none;width:34px;height:34px;border-radius:6px;border:1px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.08);color:#ef4444;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;flex-shrink:0;';
+    delBtn.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>';
+    delBtn.onclick = function() { removeLinkInput(this); };
+    
+    row.appendChild(wrapper);
+    row.appendChild(delBtn);
+    container.appendChild(row);
+    
+    updateLinkInputControls();
+    updateSubmissionBadges();
+    return input;
+}
+
+function removeLinkInput(btn) {
+    const row = btn.closest('.link-input-row');
+    const container = document.getElementById('link-inputs-container');
+    if (!container || !row) return;
+    const rows = container.querySelectorAll('.link-input-row');
+    if (rows.length > 1) {
+        row.remove();
+        updateLinkInputControls();
+        updateSubmissionBadges();
+    }
+}
+
+function populateLinkInputs(urls) {
+    const container = document.getElementById('link-inputs-container');
+    if (!container) return;
+    container.innerHTML = '';
+    const cleanUrls = Array.isArray(urls) ? urls.filter(u => !!u) : (urls ? [urls] : []);
+    if (cleanUrls.length === 0) {
+        addAnotherLinkInput('');
+        return;
+    }
+    cleanUrls.forEach(url => {
+        addAnotherLinkInput(url);
+    });
+}
+
 function updateSubmissionBadges() {
     const badgeFile = document.getElementById('tab-badge-file');
     const badgeLink = document.getElementById('tab-badge-link');
@@ -3154,12 +3287,11 @@ function updateSubmissionBadges() {
     const summaryBox = document.getElementById('sub-components-summary');
     const summaryText = document.getElementById('sub-components-text');
 
-    const linkEl = document.getElementById('sub_link');
-    const linkVal = linkEl ? linkEl.value.trim() : '';
+    const filledLinks = getFilledLinkUrls();
     const textEl = document.getElementById('sub_text');
     const textVal = textEl ? textEl.value.trim() : '';
     const hasFiles = typeof selectedFiles !== 'undefined' && selectedFiles.length > 0;
-    const hasLink = !!linkVal;
+    const hasLink = filledLinks.length > 0;
     const hasText = !!textVal;
 
     if (badgeFile) {
@@ -3172,7 +3304,12 @@ function updateSubmissionBadges() {
     }
 
     if (badgeLink) {
-        badgeLink.style.display = hasLink ? 'inline-block' : 'none';
+        if (hasLink) {
+            badgeLink.style.display = 'inline-block';
+            badgeLink.textContent = filledLinks.length > 1 ? `${filledLinks.length} link` : '✓';
+        } else {
+            badgeLink.style.display = 'none';
+        }
     }
 
     if (badgeText) {
@@ -3182,7 +3319,7 @@ function updateSubmissionBadges() {
     if (summaryBox && summaryText) {
         const parts = [];
         if (hasFiles) parts.push(`📁 ${selectedFiles.length} Berkas File`);
-        if (hasLink) parts.push(`🔗 Tautan Link`);
+        if (hasLink) parts.push(filledLinks.length > 1 ? `🔗 ${filledLinks.length} Tautan Link` : `🔗 Tautan Link`);
         if (hasText) parts.push(`📝 Jawaban Teks`);
 
         if (parts.length > 0) {
@@ -3480,24 +3617,30 @@ function checkExistingSubmission(nim) {
                     });
                 }
 
-                // 2. Tautan Link
-                if (data.link_url || (data.submission_type === 'link' && data.identifier)) {
+                // 2. Tautan Link (bisa multiple)
+                const linksToRender = (data.links && data.links.length > 0)
+                    ? data.links
+                    : (data.link_url ? [{ url: data.link_url, title: 'Tautan' }] : []);
+
+                if (linksToRender.length > 0) {
                     hasAnyItem = true;
-                    const targetLink = data.link_url || data.identifier;
-                    const linkItem = document.createElement('div');
-                    linkItem.className = 'prior-file-item';
-                    linkItem.innerHTML = `
-                        <div class="prior-file-left">
-                            <svg width="15" height="15" fill="none" stroke="#0D9488" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                            </svg>
-                            <span class="prior-file-name" title="${targetLink}">${targetLink}</span>
-                        </div>
-                        <a href="${targetLink}" target="_blank" rel="noopener noreferrer" class="btn-sub-file-download">
-                            Buka Tautan
-                        </a>
-                    `;
-                    filesContainer.appendChild(linkItem);
+                    linksToRender.forEach((lItem, idx) => {
+                        const targetUrl = typeof lItem === 'string' ? lItem : lItem.url;
+                        const linkItem = document.createElement('div');
+                        linkItem.className = 'prior-file-item';
+                        linkItem.innerHTML = `
+                            <div class="prior-file-left" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                <svg width="15" height="15" fill="none" stroke="#0D9488" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                </svg>
+                                <span class="prior-file-name" title="${targetUrl}">${linksToRender.length > 1 ? '#' + (idx + 1) + ' ' : ''}${targetUrl}</span>
+                            </div>
+                            <a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="btn-sub-file-download" style="flex-shrink:0;">
+                                Buka Tautan
+                            </a>
+                        `;
+                        filesContainer.appendChild(linkItem);
+                    });
                 }
 
                 // 3. Jawaban Teks
@@ -3522,9 +3665,14 @@ function checkExistingSubmission(nim) {
                 localStorage.setItem('labsoal_student_nama', data.nama);
             }
 
-            const inputLinkEl = document.getElementById('sub_link');
-            if (inputLinkEl && !inputLinkEl.value && data.link_url) {
-                inputLinkEl.value = data.link_url;
+            // Isi ulang input tautan jika pengguna belum mengetikkan tautan baru
+            const currentFilledLinks = getFilledLinkUrls();
+            if (currentFilledLinks.length === 0) {
+                if (data.links && data.links.length > 0) {
+                    populateLinkInputs(data.links.map(l => typeof l === 'string' ? l : l.url));
+                } else if (data.link_url) {
+                    populateLinkInputs([data.link_url]);
+                }
             }
             const inputTextEl = document.getElementById('sub_text');
             if (inputTextEl && !inputTextEl.value && data.text_content) {
@@ -3629,11 +3777,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const subLinkEl = document.getElementById('sub_link');
-    if (subLinkEl) {
-        subLinkEl.addEventListener('input', updateSubmissionBadges);
-        subLinkEl.addEventListener('change', updateSubmissionBadges);
-    }
+    document.querySelectorAll('.link-url-input').forEach(inp => {
+        inp.addEventListener('input', updateSubmissionBadges);
+        inp.addEventListener('change', updateSubmissionBadges);
+    });
+    updateLinkInputControls();
     const subTextEl = document.getElementById('sub_text');
     if (subTextEl) {
         subTextEl.addEventListener('input', updateSubmissionBadges);
@@ -3710,12 +3858,11 @@ document.getElementById('submission-form').addEventListener('submit', async func
 
     const currentType = subTypeInput ? subTypeInput.value : 'file';
 
-    const linkEl = document.getElementById('sub_link');
-    const linkVal = linkEl ? linkEl.value.trim() : '';
+    const filledLinks = getFilledLinkUrls();
     const textEl = document.getElementById('sub_text');
     const textVal = textEl ? textEl.value.trim() : '';
     const hasFiles = typeof selectedFiles !== 'undefined' && selectedFiles.length > 0;
-    const hasLink = !!linkVal;
+    const hasLink = filledLinks.length > 0;
     const hasText = !!textVal;
 
     // Pastikan minimal salah satu komponen pengumpulan yang diizinkan telah diisi
@@ -3729,10 +3876,17 @@ document.getElementById('submission-form').addEventListener('submit', async func
         return;
     }
 
-    if (hasLink && !/^https?:\/\//i.test(linkVal)) {
-        showAlert('error', 'URL tautan harus diawali dengan http:// atau https://');
-        if (linkEl) linkEl.focus();
-        return;
+    if (hasLink) {
+        if (filledLinks.length > 10) {
+            showAlert('error', 'Jumlah tautan link maksimal adalah 10 tautan.');
+            return;
+        }
+        for (let i = 0; i < filledLinks.length; i++) {
+            if (!/^https?:\/\//i.test(filledLinks[i])) {
+                showAlert('error', `Tautan #${i + 1} (${filledLinks[i]}) harus diawali dengan http:// atau https://`);
+                return;
+            }
+        }
     }
 
     if (hasText && textVal.length < 3) {
@@ -3870,6 +4024,8 @@ document.getElementById('submission-form').addEventListener('submit', async func
     const formData = new FormData(this);
     formData.delete('files[]');
     formData.delete('file');
+    formData.delete('link_urls[]');
+    formData.delete('link_url');
     if (selectedFiles && selectedFiles.length > 0) {
         selectedFiles.forEach(f => {
             formData.append('files[]', f);
@@ -3878,10 +4034,11 @@ document.getElementById('submission-form').addEventListener('submit', async func
             formData.append('file', selectedFiles[0]);
         }
     }
-    if (linkVal) {
-        formData.set('link_url', linkVal);
-    } else {
-        formData.delete('link_url');
+    if (filledLinks.length > 0) {
+        filledLinks.forEach(u => {
+            formData.append('link_urls[]', u);
+        });
+        formData.set('link_url', filledLinks.length === 1 ? filledLinks[0] : JSON.stringify(filledLinks));
     }
     if (textVal) {
         formData.set('text_content', textVal);
@@ -3940,8 +4097,7 @@ document.getElementById('submission-form').addEventListener('submit', async func
             if (fileInput) fileInput.value = '';
             selectedFiles = [];
             renderSelectedFilesUI();
-            const linkEl = document.getElementById('sub_link');
-            if (linkEl) linkEl.value = '';
+            populateLinkInputs(['']);
             const textEl = document.getElementById('sub_text');
             if (textEl) textEl.value = '';
 

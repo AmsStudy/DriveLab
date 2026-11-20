@@ -661,7 +661,8 @@ class SoalController extends Controller
                     $kontenParts[] = 'File: ' . ($fileNames ?: ($sub->file_original_name ?: ($sub->file_path ? basename($sub->file_path) : 'Berkas')));
                 }
                 if ($sub->hasLink()) {
-                    $kontenParts[] = 'Link: ' . $sub->link_url;
+                    $allLinks = collect($sub->getLinksList())->pluck('url')->implode(' | ');
+                    $kontenParts[] = 'Link: ' . $allLinks;
                 }
                 if ($sub->hasText()) {
                     $kontenParts[] = 'Teks: ' . preg_replace('/\s+/', ' ', trim($sub->text_content));
@@ -780,8 +781,9 @@ class SoalController extends Controller
 
             $no = 1;
             foreach ($submissions as $sub) {
+                $linkText = collect($sub->getLinksList())->pluck('url')->implode(', ');
                 $subDesc = match ($sub->submission_type) {
-                    'link'  => 'Tautan: ' . $sub->link_url,
+                    'link'  => 'Tautan: ' . ($linkText ?: $sub->link_url),
                     'text'  => 'Teks (' . Str::limit(str_replace(["\r", "\n"], ' ', $sub->text_content), 40) . ')',
                     default => $sub->getFilesCount() . ' Berkas File (' . ($sub->file_original_name ?: 'tugas') . ')',
                 };
@@ -852,12 +854,21 @@ class SoalController extends Controller
                         $c++;
                     }
                     $usedNames[$entryName] = true;
+
+                    $linksList = $submission->getLinksList();
+                    $linksBody = "";
+                    foreach ($linksList as $idx => $linkObj) {
+                        $linksBody .= "Tautan #" . ($idx + 1) . " : " . $linkObj['url'] . "\n";
+                    }
+
                     $content   = "PENGUMPULAN TUGAS BERUPA TAUTAN / LINK\n"
                                . "NIM        : " . $submission->nim . "\n"
                                . "Nama       : " . $submission->nama . "\n"
                                . ($submission->kelas ? ("Kelas      : " . $submission->kelas . "\n") : "")
-                               . "Tautan     : " . $submission->link_url . "\n"
-                               . "Waktu      : " . $submission->created_at->format('Y-m-d H:i:s') . "\n";
+                               . "Waktu      : " . $submission->created_at->format('Y-m-d H:i:s') . "\n"
+                               . "Total Link : " . count($linksList) . " Tautan\n"
+                               . "--------------------------------------------------------\n"
+                               . $linksBody;
                     $zip->addFromString($entryName, $content);
                     $added++;
                 }
@@ -967,12 +978,20 @@ class SoalController extends Controller
             }
             $usedFileNames[$linkFileName] = true;
 
+            $linksList = $submission->getLinksList();
+            $linksBody = "";
+            foreach ($linksList as $idx => $linkObj) {
+                $linksBody .= "Tautan #" . ($idx + 1) . " : " . $linkObj['url'] . "\n";
+            }
+
             $content = "PENGUMPULAN TUGAS BERUPA TAUTAN / LINK\n"
                      . "NIM        : " . $submission->nim . "\n"
                      . "Nama       : " . $submission->nama . "\n"
                      . ($submission->kelas ? ("Kelas      : " . $submission->kelas . "\n") : "")
-                     . "Tautan     : " . $submission->link_url . "\n"
-                     . "Waktu      : " . $submission->created_at->format('Y-m-d H:i:s') . "\n";
+                     . "Waktu      : " . $submission->created_at->format('Y-m-d H:i:s') . "\n"
+                     . "Total Link : " . count($linksList) . " Tautan\n"
+                     . "--------------------------------------------------------\n"
+                     . $linksBody;
             $zip->addFromString($linkFileName, $content);
             $added++;
         }
@@ -1052,7 +1071,7 @@ class SoalController extends Controller
 
         // Prioritas 2: Jika pengumpulan murni berupa Tautan Link (tanpa berkas fisik)
         if ($submission->hasLink()) {
-            return redirect()->away($submission->link_url);
+            return redirect()->away($submission->getFirstLinkUrl());
         }
 
         // Prioritas 3: Jika pengumpulan murni berupa Jawaban Teks

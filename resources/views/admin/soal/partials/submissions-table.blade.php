@@ -136,15 +136,75 @@
                                 </div>
                             @endif
 
-                            {{-- 2. Komponen Tautan Link (Dapat diklik langsung untuk menuju ke tautan) --}}
+                            {{-- 2. Komponen Tautan Link (Dapat diklik langsung jika 1 tautan, atau dropdown minimalis jika > 1 tautan) --}}
                             @if($sub->hasLink())
-                                <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer"
-                                   title="Buka tautan: {{ $sub->link_url }}"
-                                   class="group/link inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-teal-50 hover:bg-teal-100/80 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-500/30 transition-all shadow-2xs hover:shadow-xs max-w-[220px]">
-                                    <svg class="w-3.5 h-3.5 flex-shrink-0 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                    <span class="truncate">Buka Tautan</span>
-                                    <svg class="w-3 h-3 flex-shrink-0 ml-auto opacity-70 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                </a>
+                                @php
+                                    $linksList = $sub->getLinksList();
+                                    $linksCount = count($linksList);
+                                @endphp
+
+                                @if($linksCount === 1)
+                                    @php
+                                        $singleUrl = $linksList[0]['url'];
+                                        $host = parse_url($singleUrl, PHP_URL_HOST) ?: 'Tautan';
+                                        $host = preg_replace('/^www\./', '', $host);
+                                    @endphp
+                                    <a href="{{ $singleUrl }}" target="_blank" rel="noopener noreferrer"
+                                       title="Buka tautan: {{ $singleUrl }}"
+                                       class="group/link inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-teal-50 hover:bg-teal-100/80 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-500/30 transition-all shadow-2xs hover:shadow-xs max-w-[220px]">
+                                        <svg class="w-3.5 h-3.5 flex-shrink-0 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        <span class="truncate">{{ $host }}</span>
+                                        <svg class="w-3 h-3 flex-shrink-0 ml-auto opacity-70 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                    </a>
+                                @else
+                                    {{-- Dropdown Minimalis untuk Lebih dari 1 Tautan --}}
+                                    <div class="relative inline-block text-left" x-data="{ open: false }">
+                                        <button @click="open = !open" @click.away="open = false" type="button"
+                                                class="group/link inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-teal-50 hover:bg-teal-100/80 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-500/30 transition-all shadow-2xs hover:shadow-xs cursor-pointer max-w-[220px]"
+                                                title="Klik untuk melihat {{ $linksCount }} tautan tugas">
+                                            <svg class="w-3.5 h-3.5 flex-shrink-0 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            <span>{{ $linksCount }} Tautan Link</span>
+                                            <svg class="w-3 h-3 flex-shrink-0 ml-auto transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+
+                                        {{-- Dropdown Menu Tautan --}}
+                                        <div x-show="open" x-cloak
+                                             x-transition:enter="transition ease-out duration-150"
+                                             x-transition:enter-start="transform opacity-0 scale-95 -translate-y-1"
+                                             x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+                                             x-transition:leave="transition ease-in duration-100"
+                                             x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+                                             x-transition:leave-end="transform opacity-0 scale-95 -translate-y-1"
+                                             class="absolute left-0 mt-1.5 w-64 rounded-xl shadow-xl shadow-gray-400/20 dark:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.8)] py-1.5 z-50 border border-gray-200 dark:border-teal-500/25 bg-white dark:bg-[#0F1713] backdrop-blur-md">
+                                            <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-[#1A2820] flex items-center justify-between">
+                                                <span>Tautan Tugas ({{ $linksCount }})</span>
+                                                <span class="text-teal-600 dark:text-teal-400 font-mono">Mahasiswa</span>
+                                            </div>
+                                            <div class="max-h-48 overflow-y-auto py-1 divide-y divide-gray-100 dark:divide-[#1A2820]">
+                                                @foreach($linksList as $idx => $linkItem)
+                                                    @php
+                                                        $itemUrl = $linkItem['url'];
+                                                        $itemHost = parse_url($itemUrl, PHP_URL_HOST) ?: 'Tautan';
+                                                        $itemHost = preg_replace('/^www\./', '', $itemHost);
+                                                    @endphp
+                                                    <a href="{{ $itemUrl }}" target="_blank" rel="noopener noreferrer"
+                                                       class="flex items-center justify-between gap-2 px-3 py-2 text-xs text-gray-700 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-300 hover:bg-teal-50/70 dark:hover:bg-teal-500/10 transition-colors group">
+                                                        <div class="min-w-0 flex-1">
+                                                            <p class="font-semibold truncate text-[11px] flex items-center gap-1.5">
+                                                                <span class="w-4 h-4 rounded-full bg-teal-500/15 text-teal-600 dark:text-teal-400 text-[10px] flex items-center justify-center font-bold flex-shrink-0">
+                                                                    {{ $idx + 1 }}
+                                                                </span>
+                                                                <span class="truncate">{{ $itemHost }}</span>
+                                                            </p>
+                                                            <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate font-mono mt-0.5" title="{{ $itemUrl }}">{{ $itemUrl }}</p>
+                                                        </div>
+                                                        <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-teal-600 dark:group-hover:text-teal-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             @endif
 
                             {{-- 3. Komponen Jawaban Teks (Dapat diklik langsung untuk membaca teks lengkap) --}}
@@ -198,8 +258,13 @@
 
                             {{-- Aksi Link --}}
                             @if($sub->hasLink())
-                                <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer"
-                                   class="p-2 text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block" title="Buka Tautan: {{ $sub->link_url }}">
+                                @php
+                                    $firstUrl = $sub->getFirstLinkUrl();
+                                    $lCount = $sub->getLinksCount();
+                                @endphp
+                                <a href="{{ $firstUrl }}" target="_blank" rel="noopener noreferrer"
+                                   class="p-2 text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 rounded-xl transition-colors inline-block"
+                                   title="{{ $lCount > 1 ? "Buka Tautan Utama (Total {$lCount} Tautan)" : "Buka Tautan: {$firstUrl}" }}">
                                     <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                 </a>
                             @endif
