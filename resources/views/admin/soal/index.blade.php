@@ -178,29 +178,29 @@
                                                         id="pwd-badge-closed-{{ $soal->id }}"
                                                         onclick="toggleDocPassword({{ $soal->id }}, '{{ addslashes($plainPwd) }}', '{{ addslashes($soal->title) }}')"
                                                         title="Klik untuk melihat password dokumen"
-                                                        class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 hover:border-amber-500/50 text-amber-400 hover:text-amber-300 transition-all cursor-pointer shadow-sm active:scale-95 group/lock">
-                                                    <svg class="w-3.5 h-3.5 text-amber-400 group-hover/lock:text-amber-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 hover:border-amber-500/50 text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-all cursor-pointer shadow-sm active:scale-95 group/lock">
+                                                    <svg class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 group-hover/lock:text-amber-700 dark:group-hover/lock:text-amber-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                                     </svg>
                                                 </button>
 
                                                 {{-- Chip Password Terbuka (Muncul saat tombol gembok ditekan) --}}
                                                 <div id="pwd-badge-open-{{ $soal->id }}"
-                                                     class="hidden inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-semibold transition-all shadow-sm">
+                                                     class="hidden inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-500/15 border border-amber-300 dark:border-amber-500/40 text-amber-800 dark:text-amber-300 font-mono text-[11px] font-semibold transition-all shadow-sm">
                                                     <button type="button"
                                                             onclick="toggleDocPassword({{ $soal->id }})"
                                                             title="Sembunyikan password"
-                                                            class="text-amber-400 hover:text-amber-200 cursor-pointer flex-shrink-0 transition-colors">
+                                                            class="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 cursor-pointer flex-shrink-0 transition-colors">
                                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
                                                         </svg>
                                                     </button>
-                                                    <span class="select-all font-bold tracking-wider text-amber-200">{{ $plainPwd ?: '••••••••' }}</span>
+                                                    <span class="select-all font-bold tracking-wider text-amber-900 dark:text-amber-200">{{ $plainPwd ?: '••••••••' }}</span>
                                                     @if($plainPwd)
                                                     <button type="button"
                                                             onclick="copyToClipboard('{{ addslashes($plainPwd) }}', 'Password dokumen berhasil disalin!')"
                                                             title="Salin password"
-                                                            class="text-amber-400/80 hover:text-amber-200 cursor-pointer transition-colors flex-shrink-0">
+                                                            class="text-amber-600 dark:text-amber-400/80 hover:text-amber-800 dark:hover:text-amber-200 cursor-pointer transition-colors flex-shrink-0">
                                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                                         </svg>
@@ -209,7 +209,7 @@
                                                     <button type="button"
                                                             onclick="toggleDocPassword({{ $soal->id }})"
                                                             title="Tutup password"
-                                                            class="text-amber-400/60 hover:text-amber-200 ml-0.5 cursor-pointer flex-shrink-0 transition-colors">
+                                                            class="text-amber-600/70 dark:text-amber-400/60 hover:text-amber-800 dark:hover:text-amber-200 ml-0.5 cursor-pointer flex-shrink-0 transition-colors">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                                         </svg>
@@ -235,16 +235,16 @@
                                     {{ $soal->category->name }}
                                 </span>
                             @else
-                                <span class="text-gray-600 text-xs">—</span>
+                                <span class="text-gray-400 dark:text-gray-600 text-xs">—</span>
                             @endif
                         </td>
                         <td class="px-4 py-4">
                             @php $accessStatus = $soal->access_status; @endphp
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
-                                {{ $accessStatus === 'active' ? 'bg-green-500/15 text-green-400' : '' }}
-                                {{ $accessStatus === 'inactive' ? 'bg-gray-500/15 text-gray-400' : '' }}
-                                {{ $accessStatus === 'expired' ? 'bg-red-500/15 text-red-400' : '' }}
-                                {{ $accessStatus === 'scheduled' ? 'bg-yellow-500/15 text-yellow-400' : '' }}">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border
+                                {{ $accessStatus === 'active' ? 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/25 dark:border-green-500/30' : '' }}
+                                {{ $accessStatus === 'inactive' ? 'bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/25 dark:border-gray-500/30' : '' }}
+                                {{ $accessStatus === 'expired' ? 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/25 dark:border-red-500/30' : '' }}
+                                {{ $accessStatus === 'scheduled' ? 'bg-yellow-500/10 text-yellow-800 dark:text-yellow-400 border-yellow-500/25 dark:border-yellow-500/30' : '' }}">
                                 <span class="w-1.5 h-1.5 rounded-full
                                     {{ $accessStatus === 'active' ? 'bg-green-500' : '' }}
                                     {{ $accessStatus === 'inactive' ? 'bg-gray-500' : '' }}
@@ -253,23 +253,23 @@
                                 {{ ['active'=>'Aktif','inactive'=>'Nonaktif','expired'=>'Expired','scheduled'=>'Terjadwal'][$accessStatus] ?? $accessStatus }}
                             </span>
                         </td>
-                        <td class="px-4 py-4 text-xs text-gray-500">
+                        <td class="px-4 py-4 text-xs text-gray-500 dark:text-gray-400">
                             @if($soal->access_type === 'lifetime')
-                                <span class="text-teal-400 font-medium">∞ Selamanya</span>
+                                <span class="text-teal-700 dark:text-teal-400 font-medium">∞ Selamanya</span>
                             @else
                                 <div>
-                                    <p>{{ optional($soal->active_from)->format('d M Y H:i') ?? '—' }}</p>
-                                    <p>s/d {{ optional($soal->active_until)->format('d M Y H:i') ?? '—' }}</p>
+                                    <p class="text-gray-700 dark:text-gray-300 font-medium">{{ optional($soal->active_from)->format('d M Y H:i') ?? '—' }}</p>
+                                    <p class="text-gray-500 dark:text-gray-400">s/d {{ optional($soal->active_until)->format('d M Y H:i') ?? '—' }}</p>
                                 </div>
                             @endif
                         </td>
                         <td class="px-4 py-4 text-center">
                             @if($soal->is_submission_enabled)
-                                <a href="{{ route('admin.soal.show', $soal) }}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-teal-500/15 text-teal-400 border border-teal-500/25 hover:bg-teal-500/25 transition-colors" title="Lihat Pengumpulan Tugas">
+                                <a href="{{ route('admin.soal.show', $soal) }}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-500/15 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-500/25 hover:bg-teal-100 dark:hover:bg-teal-500/25 transition-colors" title="Lihat Pengumpulan Tugas">
                                     {{ $soal->submissions_count }} Tugas
                                 </a>
                             @else
-                                <span class="text-gray-600 text-xs">—</span>
+                                <span class="text-gray-400 dark:text-gray-600 text-xs">—</span>
                             @endif
                         </td>
                         <td class="px-6 py-4 text-right">
@@ -341,7 +341,7 @@
                                     <a href="{{ route('admin.soal.show', $soal) }}"
                                        id="show-soal-{{ $soal->id }}"
                                        class="flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 dark:text-gray-200 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-500/10 transition-colors group">
-                                        <div class="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                        <div class="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -352,7 +352,7 @@
                                             <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate">Kelola kiriman tugas</p>
                                         </div>
                                         @if($soal->is_submission_enabled)
-                                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-600 dark:text-teal-300 font-bold">
+                                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-700 dark:text-teal-300 font-bold">
                                                 {{ $soal->submissions_count ?? $soal->submissions->count() }}
                                             </span>
                                         @endif
@@ -363,7 +363,7 @@
                                             onclick="openEditModalForSoal({{ $soal->id }}); open = false;"
                                             id="edit-soal-{{ $soal->id }}"
                                             class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 dark:text-gray-200 hover:text-amber-600 dark:hover:text-amber-300 hover:bg-amber-50/70 dark:hover:bg-amber-500/10 transition-colors group cursor-pointer">
-                                        <div class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                        <div class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                             </svg>
@@ -378,7 +378,7 @@
                                     <a href="{{ route('admin.soal.preview', $soal) }}" target="_blank"
                                        id="preview-soal-{{ $soal->id }}"
                                        class="flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-green-300 hover:bg-green-50/70 dark:hover:bg-green-500/10 transition-colors group">
-                                        <div class="w-7 h-7 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                        <div class="w-7 h-7 rounded-lg bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -398,7 +398,7 @@
                                             onclick="copyLink('{{ route('soal.access', $soal->slug ?: $soal->unique_token) }}'); open = false;"
                                             id="copy-link-{{ $soal->id }}"
                                             class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-gray-700 dark:text-gray-200 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-50/70 dark:hover:bg-emerald-500/10 transition-colors group cursor-pointer">
-                                        <div class="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                        <div class="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                             </svg>
@@ -419,7 +419,7 @@
                                         <button type="submit"
                                                 id="toggle-soal-{{ $soal->id }}"
                                                 class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs transition-colors group cursor-pointer {{ $soal->is_active ? 'text-gray-700 dark:text-gray-200 hover:text-orange-600 dark:hover:text-orange-300 hover:bg-orange-50/70 dark:hover:bg-orange-500/10' : 'text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-green-300 hover:bg-green-50/70 dark:hover:bg-green-500/10' }}">
-                                            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform {{ $soal->is_active ? 'bg-orange-500/10 border border-orange-500/20 text-orange-400' : 'bg-green-500/10 border border-green-500/20 text-green-400' }}">
+                                            <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform {{ $soal->is_active ? 'bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400' : 'bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400' }}">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $soal->is_active ? 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' }}"/>
                                                 </svg>
@@ -438,7 +438,7 @@
                                         <button type="submit"
                                                 id="delete-soal-{{ $soal->id }}"
                                                 class="w-full text-left flex items-center gap-2.5 px-3 py-2 text-xs text-rose-600 dark:text-rose-300 hover:text-rose-700 dark:hover:text-rose-200 hover:bg-rose-50/70 dark:hover:bg-rose-500/15 transition-colors group cursor-pointer">
-                                            <div class="w-7 h-7 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                            <div class="w-7 h-7 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                 </svg>
@@ -460,7 +460,7 @@
 
         {{-- Pagination --}}
         @if($soals->hasPages())
-            <div class="px-6 py-4 border-t border-gray-800">
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-[#1A2820]">
                 {{ $soals->withQueryString()->links() }}
             </div>
         @endif

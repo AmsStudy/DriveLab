@@ -2756,7 +2756,7 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                                         </svg>
                                         <span>Upload File</span>
-                                        <span id="tab-badge-file" class="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" style="display:none;"></span>
+                                        <span id="tab-badge-file" class="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30" style="display:none;"></span>
                                     </button>
                                 @endif
                                 @if(in_array('link', $allowedSubTypes))
@@ -2765,7 +2765,7 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                                         </svg>
                                         <span>Tautan / Link</span>
-                                        <span id="tab-badge-link" class="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-400 border border-teal-500/30" style="display:none;">✓ Terisi</span>
+                                        <span id="tab-badge-link" class="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-teal-100 dark:bg-teal-500/20 text-teal-700 dark:text-teal-400 border border-teal-300 dark:border-teal-500/30" style="display:none;">✓ Terisi</span>
                                     </button>
                                 @endif
                                 @if(in_array('text', $allowedSubTypes))
@@ -2774,7 +2774,7 @@ html:not(.dark) .soal-lock-btn-secondary:hover {
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                         </svg>
                                         <span>Jawaban Teks</span>
-                                        <span id="tab-badge-text" class="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30" style="display:none;">✓ Terisi</span>
+                                        <span id="tab-badge-text" class="ml-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30" style="display:none;">✓ Terisi</span>
                                     </button>
                                 @endif
                             </div>

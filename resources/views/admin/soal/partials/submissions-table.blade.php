@@ -75,15 +75,15 @@
                                 <div>
                                     <div class="flex items-center gap-1.5 flex-wrap">
                                         <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase
-                                            {{ in_array($ext, ['PDF']) ? 'bg-red-500/15 text-red-500 border border-red-500/30' : '' }}
-                                            {{ in_array($ext, ['ZIP', 'RAR', '7Z']) ? 'bg-purple-500/15 text-purple-400 border border-purple-500/30' : '' }}
-                                            {{ in_array($ext, ['PNG', 'JPG', 'JPEG', 'WEBP']) ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30' : '' }}
-                                            {{ in_array($ext, ['DOC', 'DOCX']) ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30' : '' }}
-                                            {{ !in_array($ext, ['PDF', 'ZIP', 'RAR', '7Z', 'PNG', 'JPG', 'JPEG', 'WEBP', 'DOC', 'DOCX']) ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : '' }}">
+                                            {{ in_array($ext, ['PDF']) ? 'bg-red-50 dark:bg-red-500/15 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-500/30' : '' }}
+                                            {{ in_array($ext, ['ZIP', 'RAR', '7Z']) ? 'bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-300 dark:border-purple-500/30' : '' }}
+                                            {{ in_array($ext, ['PNG', 'JPG', 'JPEG', 'WEBP']) ? 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-500/30' : '' }}
+                                            {{ in_array($ext, ['DOC', 'DOCX']) ? 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-500/30' : '' }}
+                                            {{ !in_array($ext, ['PDF', 'ZIP', 'RAR', '7Z', 'PNG', 'JPG', 'JPEG', 'WEBP', 'DOC', 'DOCX']) ? 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30' : '' }}">
                                             📁 {{ $ext ?: 'FILE' }}
                                         </span>
                                         @if($fCount > 1)
-                                            <span class="text-[10px] font-mono text-gray-400 font-semibold">({{ $fCount }} files)</span>
+                                            <span class="text-[10px] font-mono text-gray-500 dark:text-gray-400 font-semibold">({{ $fCount }} files)</span>
                                         @endif
                                     </div>
                                     @if($sub->file_original_name)
@@ -94,7 +94,7 @@
 
                             @if($sub->hasLink())
                                 <div class="flex items-center gap-1">
-                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/30 inline-flex items-center gap-1">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-teal-50 dark:bg-teal-500/15 text-teal-700 dark:text-teal-400 border border-teal-300 dark:border-teal-500/30 inline-flex items-center gap-1">
                                         🔗 Link
                                     </span>
                                 </div>
@@ -102,7 +102,7 @@
 
                             @if($sub->hasText())
                                 <div class="flex items-center gap-1">
-                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 inline-flex items-center gap-1">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-500/15 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30 inline-flex items-center gap-1">
                                         📝 Teks
                                     </span>
                                 </div>
