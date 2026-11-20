@@ -660,6 +660,36 @@ main{max-width:960px;margin:0 auto;padding:28px 20px 60px;position:relative;z-in
   color:#fff;border:1px solid rgba(16,185,129,0.4);
   box-shadow:0 2px 10px rgba(16,185,129,0.15);
 }
+
+/* Light Mode Overrides for Submission Tabs */
+html:not(.dark) .sub-type-tabs {
+  background: #F1F5F3 !important;
+  border-color: #DDE5E0 !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+}
+html:not(.dark) .tab-btn {
+  color: #4B5563 !important;
+}
+html:not(.dark) .tab-btn:hover {
+  color: #111827 !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+html:not(.dark) .tab-btn.active {
+  background: linear-gradient(135deg, #059669 0%, #0D9488 100%) !important;
+  color: #FFFFFF !important;
+  border: 1px solid #047857 !important;
+  box-shadow: 0 3px 10px rgba(5, 150, 105, 0.35) !important;
+  font-weight: 700 !important;
+}
+html:not(.dark) .tab-btn.active svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+html:not(.dark) .tab-btn.active span[id^="tab-badge-"] {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+}
 .sub-pane{display:none}
 .sub-pane.active{display:block}
 
