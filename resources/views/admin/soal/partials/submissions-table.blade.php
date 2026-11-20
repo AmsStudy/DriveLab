@@ -64,48 +64,102 @@
                         @endif
                     </td>
 
-                    {{-- Submission Type Badge (Mendukung Multi-Komponen / Komposit) --}}
+                    {{-- Submission Type Badge (Mendukung Multi-Komponen / Komposit dengan Aksi Langsung) --}}
                     <td class="px-4 py-3.5 text-xs">
                         <div class="flex flex-col gap-1.5 items-start">
+                            {{-- 1. Komponen Berkas Fisik (Dapat diklik langsung untuk pratinjau PDF / Gambar) --}}
                             @if($sub->hasFile())
                                 @php
                                     $fCount = $sub->getFilesCount();
-                                    $ext = strtoupper($sub->file_extension ?: pathinfo($sub->file_original_name ?: $sub->file_path, PATHINFO_EXTENSION));
+                                    $rawExt = strtolower($sub->file_extension ?: pathinfo($sub->file_original_name ?: $sub->file_path, PATHINFO_EXTENSION));
+                                    $ext = strtoupper($rawExt);
+                                    $isImgOrPdf = in_array($rawExt, ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'svg']);
+                                    $fileName = $sub->file_original_name ?: ($rawExt ? "tugas.{$rawExt}" : 'berkas_tugas');
                                 @endphp
-                                <div>
-                                    <div class="flex items-center gap-1.5 flex-wrap">
-                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase
-                                            {{ in_array($ext, ['PDF']) ? 'bg-red-50 dark:bg-red-500/15 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-500/30' : '' }}
-                                            {{ in_array($ext, ['ZIP', 'RAR', '7Z']) ? 'bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-300 dark:border-purple-500/30' : '' }}
-                                            {{ in_array($ext, ['PNG', 'JPG', 'JPEG', 'WEBP']) ? 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-500/30' : '' }}
-                                            {{ in_array($ext, ['DOC', 'DOCX']) ? 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-500/30' : '' }}
-                                            {{ !in_array($ext, ['PDF', 'ZIP', 'RAR', '7Z', 'PNG', 'JPG', 'JPEG', 'WEBP', 'DOC', 'DOCX']) ? 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30' : '' }}">
-                                            📁 {{ $ext ?: 'FILE' }}
-                                        </span>
-                                        @if($fCount > 1)
-                                            <span class="text-[10px] font-mono text-gray-500 dark:text-gray-400 font-semibold">({{ $fCount }} files)</span>
-                                        @endif
-                                    </div>
-                                    @if($sub->file_original_name)
-                                        <p class="text-[10px] text-gray-500 dark:text-gray-400 truncate max-w-[170px] mt-0.5 font-mono" title="{{ $sub->file_original_name }}">{{ $sub->file_original_name }}</p>
+                                <div class="w-full max-w-[220px]">
+                                    @if($isImgOrPdf)
+                                        <button type="button"
+                                                onclick="showFilePreviewModal('{{ route('admin.soal.submission.preview', $sub->id) }}', '{{ addslashes($fileName) }}', '{{ addslashes($sub->nama) }} ({{ $sub->nim }})', '{{ $rawExt }}')"
+                                                title="Klik untuk pratinjau berkas {{ $fileName }}"
+                                                class="group/file w-full text-left p-1.5 rounded-lg border transition-all cursor-pointer shadow-2xs hover:shadow-sm
+                                                    {{ in_array($ext, ['PDF']) ? 'bg-red-50/80 hover:bg-red-100/70 border-red-200 dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:border-red-500/30' : '' }}
+                                                    {{ in_array($ext, ['PNG', 'JPG', 'JPEG', 'WEBP', 'SVG']) ? 'bg-blue-50/80 hover:bg-blue-100/70 border-blue-200 dark:bg-blue-500/10 dark:hover:bg-blue-500/20 dark:border-blue-500/30' : '' }}
+                                                    {{ !in_array($ext, ['PDF', 'PNG', 'JPG', 'JPEG', 'WEBP', 'SVG']) ? 'bg-emerald-50/80 hover:bg-emerald-100/70 border-emerald-200 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 dark:border-emerald-500/30' : '' }}">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold uppercase
+                                                    {{ in_array($ext, ['PDF']) ? 'text-red-700 dark:text-red-400' : '' }}
+                                                    {{ in_array($ext, ['PNG', 'JPG', 'JPEG', 'WEBP', 'SVG']) ? 'text-blue-700 dark:text-blue-400' : '' }}
+                                                    {{ !in_array($ext, ['PDF', 'PNG', 'JPG', 'JPEG', 'WEBP', 'SVG']) ? 'text-emerald-700 dark:text-emerald-400' : '' }}">
+                                                    <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                    <span>{{ $ext ?: 'FILE' }}</span>
+                                                </span>
+                                                <span class="text-[9.5px] font-medium text-gray-400 dark:text-gray-500 group-hover/file:text-gray-700 dark:group-hover/file:text-gray-300 flex items-center gap-0.5">
+                                                    <span>Preview</span>
+                                                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                                </span>
+                                            </div>
+                                            <p class="text-[11px] font-mono text-gray-700 dark:text-gray-300 truncate mt-0.5 group-hover/file:text-emerald-600 dark:group-hover/file:text-emerald-300 font-medium" title="{{ $fileName }}">
+                                                {{ $fileName }}
+                                            </p>
+                                            @if($fCount > 1)
+                                                <span class="text-[9.5px] font-mono text-gray-400 dark:text-gray-500 font-semibold mt-0.5 block">({{ $fCount }} total berkas)</span>
+                                            @endif
+                                        </button>
+                                    @else
+                                        <a href="{{ route('admin.soal.download-submissions', $sub->id) }}"
+                                           title="Klik untuk unduh berkas {{ $fileName }}"
+                                           class="group/file w-full text-left p-1.5 rounded-lg border transition-all cursor-pointer shadow-2xs hover:shadow-sm block
+                                                {{ in_array($ext, ['ZIP', 'RAR', '7Z']) ? 'bg-purple-50/80 hover:bg-purple-100/70 border-purple-200 dark:bg-purple-500/10 dark:hover:bg-purple-500/20 dark:border-purple-500/30' : '' }}
+                                                {{ in_array($ext, ['DOC', 'DOCX']) ? 'bg-indigo-50/80 hover:bg-indigo-100/70 border-indigo-200 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 dark:border-indigo-500/30' : '' }}
+                                                {{ !in_array($ext, ['ZIP', 'RAR', '7Z', 'DOC', 'DOCX']) ? 'bg-emerald-50/80 hover:bg-emerald-100/70 border-emerald-200 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 dark:border-emerald-500/30' : '' }}">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold uppercase
+                                                    {{ in_array($ext, ['ZIP', 'RAR', '7Z']) ? 'text-purple-700 dark:text-purple-400' : '' }}
+                                                    {{ in_array($ext, ['DOC', 'DOCX']) ? 'text-indigo-700 dark:text-indigo-400' : '' }}
+                                                    {{ !in_array($ext, ['ZIP', 'RAR', '7Z', 'DOC', 'DOCX']) ? 'text-emerald-700 dark:text-emerald-400' : '' }}">
+                                                    <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                                    <span>{{ $ext ?: 'FILE' }}</span>
+                                                </span>
+                                                <span class="text-[9.5px] font-medium text-gray-400 dark:text-gray-500 group-hover/file:text-gray-700 dark:group-hover/file:text-gray-300 flex items-center gap-0.5">
+                                                    <span>Unduh</span>
+                                                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                                </span>
+                                            </div>
+                                            <p class="text-[11px] font-mono text-gray-700 dark:text-gray-300 truncate mt-0.5 font-medium" title="{{ $fileName }}">
+                                                {{ $fileName }}
+                                            </p>
+                                            @if($fCount > 1)
+                                                <span class="text-[9.5px] font-mono text-gray-400 dark:text-gray-500 font-semibold mt-0.5 block">({{ $fCount }} total berkas)</span>
+                                            @endif
+                                        </a>
                                     @endif
                                 </div>
                             @endif
 
+                            {{-- 2. Komponen Tautan Link (Dapat diklik langsung untuk menuju ke tautan) --}}
                             @if($sub->hasLink())
-                                <div class="flex items-center gap-1">
-                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-teal-50 dark:bg-teal-500/15 text-teal-700 dark:text-teal-400 border border-teal-300 dark:border-teal-500/30 inline-flex items-center gap-1">
-                                        🔗 Link
-                                    </span>
-                                </div>
+                                <a href="{{ $sub->link_url }}" target="_blank" rel="noopener noreferrer"
+                                   title="Buka tautan: {{ $sub->link_url }}"
+                                   class="group/link inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-teal-50 hover:bg-teal-100/80 dark:bg-teal-500/10 dark:hover:bg-teal-500/20 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-500/30 transition-all shadow-2xs hover:shadow-xs max-w-[220px]">
+                                    <svg class="w-3.5 h-3.5 flex-shrink-0 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    <span class="truncate">Buka Tautan</span>
+                                    <svg class="w-3 h-3 flex-shrink-0 ml-auto opacity-70 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                </a>
                             @endif
 
+                            {{-- 3. Komponen Jawaban Teks (Dapat diklik langsung untuk membaca teks lengkap) --}}
                             @if($sub->hasText())
-                                <div class="flex items-center gap-1">
-                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 dark:bg-amber-500/15 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30 inline-flex items-center gap-1">
-                                        📝 Teks
-                                    </span>
-                                </div>
+                                <button type="button"
+                                        data-nama="{{ $sub->nama }}"
+                                        data-nim="{{ $sub->nim }}"
+                                        data-content="{{ $sub->text_content }}"
+                                        onclick="showTextModal(this.dataset.nama, this.dataset.nim, this.dataset.content)"
+                                        title="Klik untuk membaca jawaban teks"
+                                        class="group/text inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100/80 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 transition-all shadow-2xs hover:shadow-xs cursor-pointer max-w-[220px]">
+                                    <svg class="w-3.5 h-3.5 flex-shrink-0 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    <span class="truncate">Baca Teks</span>
+                                    <svg class="w-3 h-3 flex-shrink-0 ml-auto opacity-70 group-hover/text:opacity-100 group-hover/text:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                </button>
                             @endif
 
                             @if(!$sub->hasFile() && !$sub->hasLink() && !$sub->hasText())
